@@ -64,3 +64,13 @@ Route::group(['prefix' => 'crm', 'as' => 'crm.'], function () {
         Route::post('/validate-field', [CRMRoleController::class, 'validateField'])->name('validate-field');
     });
 });
+
+Route::middleware([
+    'auth:sanctum',
+    config('jetstream.auth_session'),
+    'verified',
+])->group(function () {
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
+});
