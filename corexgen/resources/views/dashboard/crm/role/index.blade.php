@@ -6,48 +6,55 @@
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="card-title">{{ __('Roles Management') }}</h5>
             <div class="card-header-action">
-                <a href="{{ route('crm.role.create') }}" class="btn btn-primary me-2">
-                    <i class="feather feather-plus"></i> {{ __('Create Role') }}
+                <a href="{{ route('crm.role.create') }}" class="btn btn-md btn-primary me-2">
+                    <i class="feather feather-plus"></i> <span>{{ __('Create Role') }}</span>
                 </a>
-                <a href="{{ route('crm.role.export', request()->all()) }}" class="btn btn-outline-secondary">
-                    <i class="feather feather-download"></i> {{ __('Export') }}
+                <a href="{{ route('crm.role.export', request()->all()) }}" class="btn btn-md btn-outline-secondary">
+                    <i class="feather feather-download"></i> <span>{{ __('Export') }}</span>
                 </a>
-                <button data-bs-toggle="modal" data-bs-target="#bulkImportModal" class="btn btn-outline-info">
-                    <i class="feather feather-upload"></i> {{ __('Import') }}
+                <button data-bs-toggle="modal" data-bs-target="#bulkImportModal" class="btn btn-md btn-outline-info">
+                    <i class="feather feather-upload"></i><span> {{ __('Import') }}</span>
+                </button>
+                <button onclick="openFilters()" class="btn btn-md btn-light-brand">
+                    <i class="feather-filter me-2"></i>
+                    <span>{{ __('Filter') }}</span>
                 </button>
             </div>
         </div>
 
         <div class="card-body">
      
-                <h6>{{__('Filters')}}</h6>
+               
      
-            <!-- Advanced Filter Form -->
-            <form action="{{ route('crm.role.index') }}" method="GET" class="mb-4">
-                <div class="row g-3">
-                    <div class="col-md-3">
-                        <input type="text" name="name" class="form-control" 
-                               placeholder="{{ __('Role Name') }}" 
-                               value="{{ request('name') }}">
-                    </div>
-                    <div class="col-md-2">
-                        <select name="status" class="form-select">
-                            <option value="">{{ __('All Statuses') }}</option>
-                            <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>
-                                {{ __('Active') }}
-                            </option>
-                            <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>
-                                {{ __('Inactive') }}
-                            </option>
-                        </select>
-                    </div>
-                    <div class="col-md-1">
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="feather feather-search"></i>
-                        </button>
-                    </div>
-                </div>
-            </form>
+            <div id="filter-section">
+   <!-- Advanced Filter Form -->
+   <form action="{{ route('crm.role.index') }}" method="GET" class="mb-4">
+    <div class="row g-3">
+        <div class="col-md-3">
+            <input type="text" name="name" class="form-control" 
+                   placeholder="{{ __('Role Name') }}" 
+                   value="{{ request('name') }}">
+        </div>
+        <div class="col-md-2">
+            <select name="status" class="form-select">
+                <option value="">{{ __('All Statuses') }}</option>
+                <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>
+                    {{ __('Active') }}
+                </option>
+                <option value="deactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>
+                    {{ __('Inactive') }}
+                </option>
+            </select>
+        </div>
+        <div class="col-md-1">
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="feather feather-search"></i>
+            </button>
+        </div>
+    </div>
+</form>
+            </div>
+         
 
             <!-- Roles Table -->
             <div class="table-responsive">
@@ -168,8 +175,26 @@
 
 @endsection
 
+
+@push('style')
+<style>
+    #filter-section{
+        display:none;
+    }
+</style>
+@endpush
+
 @push('scripts')
 <script>
+
+function openFilters() {
+    const filterSection = document.getElementById('filter-section');
+    if (filterSection.style.display === 'block') {
+        filterSection.style.display = 'none';
+    } else {
+        filterSection.style.display = 'block';
+    }
+}
 
 document.querySelector('.drop-zone').addEventListener('click', function () {
         document.querySelector('#csvFile').click();
