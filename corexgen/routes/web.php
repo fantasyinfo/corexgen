@@ -41,12 +41,26 @@ Route::get('/setlang/{locale}', function (string $locale) {
 
 // crm routes
 Route::group(['prefix' => 'crm', 'as' => 'crm.'], function () {
-    Route::get('/role', [CRMRoleController::class, 'index'])->name('role.index');
-    Route::get('/role/create', [CRMRoleController::class, 'create'])->name('role.create');
-    Route::get('/role/edit', [CRMRoleController::class, 'edit'])->name('role.edit');
-    Route::get('/role/destroy', [CRMRoleController::class, 'destroy'])->name('role.destroy');
-    Route::get('/role/export', [CRMRoleController::class, 'export'])->name('role.export');
-    Route::post('/role', [CRMRoleController::class, 'store'])->name('role.store'); 
+
+
+    // role routes
+    Route::group(['prefix' => 'role', 'as' => 'role.'], function () {
+        // role for fetch, store, update
+        Route::get('/', [CRMRoleController::class, 'index'])->name('index');
+        Route::post('/', [CRMRoleController::class, 'store'])->name('store');
+        Route::patch('/', [CRMRoleController::class, 'update'])->name('update');
+
+
+        // create, edit, change status, delete
+        Route::get('/create', [CRMRoleController::class, 'create'])->name('create');
+        Route::get('/edit/{id}', [CRMRoleController::class, 'edit'])->name('edit');
+        Route::get('/changeStatus/{id}', [CRMRoleController::class, 'changeStatus'])->name('changeStatus');
+        Route::delete('/destroy/{id}', [CRMRoleController::class, 'destroy'])->name('destroy');
+
+
+        // validate, export, import
+        Route::get('/export', [CRMRoleController::class, 'export'])->name('export');
+        Route::post('/import', [CRMRoleController::class, 'import'])->name('import');
+        Route::post('/validate-field', [CRMRoleController::class, 'validateField'])->name('validate-field');
+    });
 });
-
-

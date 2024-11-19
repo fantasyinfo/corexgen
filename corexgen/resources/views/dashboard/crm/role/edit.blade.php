@@ -5,18 +5,20 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="card stretch stretch-full">
-           
+               
 
-                <form id="roleForm" action="{{ route('crm.role.store') }}" method="POST">
+                <form id="roleForm" action="{{ route('crm.role.update') }}" method="POST">
                     @csrf
+                    @method('PATCH')
+                    <input type='hidden' name='id' value='{{$role["id"]}}' />
                     <div class="card-body general-info">
                         <div class="mb-5 d-flex align-items-center justify-content-between">
                             <h5 class="fw-bold mb-0 me-4">
-                                <span class="d-block mb-2">{{ __('Create new role') }}</span>
+                                <span class="d-block mb-2">{{ __('Update role') }}</span>
                                 <span class="fs-12 fw-normal text-muted text-truncate-1-line">{{ __('Please add correct information') }}</span>
                             </h5>
                             <button type="submit" class="btn btn-primary">
-                                <i class="feather-plus me-2"></i> <span>{{ __('Create Role') }}</span>
+                                <i class="feather-plus me-2"></i> <span>{{ __('Update Role') }}</span>
                             </button>
                         </div>
 
@@ -32,7 +34,7 @@
                                            id="roleName" 
                                            name="role_name" 
                                            placeholder="{{ __('Admin/Manager') }}"
-                                           value="{{ old('role_name') }}"
+                                           value="{{ $role['role_name']}}"
                                            required>
                                     <div class="invalid-feedback" id="roleNameError">
                                         @error('role_name')
@@ -55,7 +57,7 @@
                                         id="roleDesc" 
                                         name="role_desc" 
                                         placeholder="{{ __('Description for the role') }}"
-                                        rows="3">{{ old('role_desc') }}</textarea>
+                                        rows="3">{{ $role['role_desc'] }}</textarea>
                                     <div class="invalid-feedback" id="roleDescError">
                                         @error('role_desc')
                                             {{ $message }}
@@ -65,7 +67,6 @@
                             </div>
                         </div>
 
-                     
                     </div>
                 </form>
             </div>
@@ -92,7 +93,12 @@
                 validateField('role_desc', this.value);
             });
         
-       
+            // Draft button functionality
+            document.getElementById('draftButton').addEventListener('click', function() {
+                // Implement draft saving logic here
+                alert('Draft saving functionality to be implemented');
+            });
+        
             function validateField(field, value) {
                 fetch('{{ route("crm.role.validate-field") }}', {
                     method: 'POST',

@@ -29,6 +29,8 @@
                     </a>
                     <ul class="nxl-submenu">
                         <li class="nxl-item"><a class="nxl-link" href="{{url('crm/role')}}">Role</a></li>
+                        <li class="nxl-item"><a class="nxl-link" href="{{url('crm/role/create')}}">Create Role</a></li>
+          
                     </ul>
                 </li>
                 {{-- <li class="nxl-item nxl-hasmenu">

@@ -4,6 +4,11 @@
 {{-- head --}}
 @include('layout.header.head')
 
+<style>
+    body.modal-open .nxl-container{
+        filter:none !important;
+    }
+</style>
 <body>
 
 {{-- nav --}}
