@@ -7,14 +7,19 @@ use Illuminate\Http\Request;
 use App\Models\CRM\CRMRole;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class CRMRoleController extends Controller
 {
     protected $perPage = 10;
 
+
+
     public function index(Request $request)
     {
-        $query = CRMRole::query();
+      
+
+        $query = CRMRole::query()->where('buyer_id',auth()->user()->buyer_id);
 
         // Advanced Filtering
         $query->when($request->filled('name'), function ($q) use ($request) {
@@ -87,7 +92,8 @@ class CRMRoleController extends Controller
 
         try {
             $validated = $validator->validated();
-            $validated['buyer_id'] = 1;
+            $validated['buyer_id'] = auth()->user()->buyer_id;
+            $validated['created_by'] = auth()->user()->id;
             $validated['status'] = $validated['status'] ?? 'active';
 
             $role = CRMRole::create($validated);
@@ -243,7 +249,8 @@ class CRMRoleController extends Controller
                     'role_name' => $row['role_name'] ?? '',
                     'role_desc' => $row['role_desc'] ?? '',
                     'status' => $row['status'] ?? 'active',
-                    'buyer_id' => auth()->user()->buyer_id ?? 1,
+                    'buyer_id' => auth()->user()->buyer_id,
+                    'created_by' => auth()->user()->id,
                 ]);
             }
     

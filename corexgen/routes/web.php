@@ -2,16 +2,11 @@
 
 // crm routes
 use App\Http\Controllers\CRM\CRMRoleController;
-
-
-
-
-
-
-
+use App\Models\CRM\CRMRole;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Auth;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -25,8 +20,37 @@ use Illuminate\Support\Facades\Session;
 
 // home route
 Route::get('/', function () {
-    return view('welcome');
+    if (Auth::check()) {
+        return view('welcome');
+    } else {
+        return redirect()->route('login');
+    }
 });
+
+// login
+Route::get('/login', function () {
+    // Fetch the data from the table to be used in the dropdown
+    $role = CRMRole::where('buyer_id', 1)
+    ->where('created_by', 1)
+    ->limit(1)
+    ->get();
+
+    return view('auth.login', compact('role'));
+})->name('login');
+
+
+// register
+Route::get('/register', function () {
+    // Fetch the data from the table to be used in the dropdown
+    $role = CRMRole::where('buyer_id', 1)
+    ->where('created_by', 1)
+    ->limit(1)
+    ->get();
+
+    return view('auth.register', compact('role'));
+})->name('register');
+
+
 
 
 // language set
@@ -40,16 +64,19 @@ Route::get('/setlang/{locale}', function (string $locale) {
 });
 
 // crm routes
-Route::group(['prefix' => 'crm', 'as' => 'crm.'], function () {
-
-
+Route::middleware([
+    'auth:sanctum',
+    config('jetstream.auth_session'),
+    'verified',
+    'check.user.role'
+])->prefix('crm')->as('crm.')->group(function () {
+    
     // role routes
-    Route::group(['prefix' => 'role', 'as' => 'role.'], function () {
+    Route::prefix('role')->as('role.')->group(function () {
         // role for fetch, store, update
         Route::get('/', [CRMRoleController::class, 'index'])->name('index');
         Route::post('/', [CRMRoleController::class, 'store'])->name('store');
         Route::patch('/', [CRMRoleController::class, 'update'])->name('update');
-
 
         // create, edit, change status, delete
         Route::get('/create', [CRMRoleController::class, 'create'])->name('create');
@@ -57,20 +84,9 @@ Route::group(['prefix' => 'crm', 'as' => 'crm.'], function () {
         Route::get('/changeStatus/{id}', [CRMRoleController::class, 'changeStatus'])->name('changeStatus');
         Route::delete('/destroy/{id}', [CRMRoleController::class, 'destroy'])->name('destroy');
 
-
         // validate, export, import
         Route::get('/export', [CRMRoleController::class, 'export'])->name('export');
         Route::post('/import', [CRMRoleController::class, 'import'])->name('import');
         Route::post('/validate-field', [CRMRoleController::class, 'validateField'])->name('validate-field');
     });
-});
-
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
-])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
 });

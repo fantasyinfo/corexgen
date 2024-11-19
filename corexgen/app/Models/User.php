@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\CRM\CRMRole;
+use App\Models\Buyer;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -28,7 +29,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role_id'
+        'role_id',
+        'buyer_id'
     ];
 
     /**
@@ -64,5 +66,9 @@ class User extends Authenticatable
     public function role()
     {
         return $this->belongsTo(CRMRole::class, 'id');
+    }
+    public function buyer()
+    {
+        return $this->belongsTo(Buyer::class, 'id');
     }
 }

@@ -1913,10 +1913,10 @@
                             <span>Account Settings</span>
                         </a>
                         <div class="dropdown-divider"></div>
-                        <a href="./auth-login-minimal.html" class="dropdown-item">
-                            <i class="feather-log-out"></i>
-                            <span>Logout</span>
-                        </a>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="dropdown-item">Logout</button>
+                        </form>
                     </div>
                 </div>
             </div>
