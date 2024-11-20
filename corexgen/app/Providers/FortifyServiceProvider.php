@@ -13,6 +13,10 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Fortify;
 
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
 class FortifyServiceProvider extends ServiceProvider
 {
     /**
@@ -42,5 +46,29 @@ class FortifyServiceProvider extends ServiceProvider
         RateLimiter::for('two-factor', function (Request $request) {
             return Limit::perMinute(5)->by($request->session()->get('login.id'));
         });
+
+
+        // Custom Authentication Logic
+        Fortify::authenticateUsing(function (Request $request) {
+            $buyerId = $request->input('buyer_id');
+            $email = $request->input('email');
+            $password = $request->input('password');
+        
+            // Query the `users` table and join with the `buyers` table directly
+            $user = DB::table('users')
+                ->join('buyers', 'buyers.id', '=', 'users.buyer_id')
+                ->where('users.email', $email)
+                ->where('buyers.buyer_id', $buyerId)
+                ->select('users.*') // Select user fields
+                ->first();
+        
+            // Verify password
+            if ($user && Hash::check($password, $user->password)) {
+                return \App\Models\User::find($user->id);
+            }
+        
+            return null;
+        });
+        
     }
 }

@@ -12,7 +12,14 @@ class CRMRole extends Model
 
     const table = 'crm_roles';
 
-    protected $fillable = ['role_name', 'role_desc','buyer_id','created_by','status'];
+    protected $fillable = [
+        'role_name', 
+        'role_desc',
+        'buyer_id',
+        'created_by',
+        'updated_by',
+        'status'
+    ];
 
     protected $table = self::table;
 

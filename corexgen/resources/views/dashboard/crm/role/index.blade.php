@@ -75,6 +75,7 @@
                             <th>{{ __('Description') }}</th>
                             <th>{{ __('Status') }}</th>
                             <th>{{ __('Created At') }}</th>
+                   
                             <th class="text-end">{{ __('Actions') }}</th>
                         </tr>
                     </thead>

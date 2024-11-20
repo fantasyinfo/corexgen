@@ -29,25 +29,13 @@ Route::get('/', function () {
 
 // login
 Route::get('/login', function () {
-    // Fetch the data from the table to be used in the dropdown
-    $role = CRMRole::where('buyer_id', 1)
-    ->where('created_by', 1)
-    ->limit(1)
-    ->get();
-
-    return view('auth.login', compact('role'));
+    return view('auth.login', );
 })->name('login');
 
 
 // register
 Route::get('/register', function () {
-    // Fetch the data from the table to be used in the dropdown
-    $role = CRMRole::where('buyer_id', 1)
-    ->where('created_by', 1)
-    ->limit(1)
-    ->get();
-
-    return view('auth.register', compact('role'));
+    return view('auth.register', );
 })->name('register');
 
 

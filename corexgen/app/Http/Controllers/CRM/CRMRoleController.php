@@ -94,6 +94,7 @@ class CRMRoleController extends Controller
             $validated = $validator->validated();
             $validated['buyer_id'] = auth()->user()->buyer_id;
             $validated['created_by'] = auth()->user()->id;
+            $validated['updated_by'] = auth()->user()->id;
             $validated['status'] = $validated['status'] ?? 'active';
 
             $role = CRMRole::create($validated);
@@ -142,7 +143,9 @@ class CRMRoleController extends Controller
 
     public function edit($id)
     {
-        $roleData = CRMRole::findOrFail($id);
+        $roleData = CRMRole::where('id', $id)
+        ->where('buyer_id', auth()->user()->buyer_id)
+        ->firstOrFail();
         return view('dashboard.crm.role.edit', [
 
             'title' => 'Edit Role',
@@ -165,7 +168,13 @@ class CRMRoleController extends Controller
             'status' => 'nullable|in:active,inactive'
         ]);
 
-        $role = CRMRole::findOrFail($request->id);
+     
+        $role = CRMRole::where('id', $request->id)
+            ->where('buyer_id', auth()->user()->buyer_id)
+            ->firstOrFail();
+
+        $validated['updated_by'] = auth()->user()->id;
+
         $role->update($validated);
 
         return redirect()->route('crm.role.index')
@@ -174,7 +183,7 @@ class CRMRoleController extends Controller
 
     public function export(Request $request)
     {
-        $query = CRMRole::query();
+        $query = CRMRole::query()->where('buyer_id',auth()->user()->buyer_id);
     
         // Apply filters as in index method
         $query->when($request->filled('name'), function ($q) use ($request) {
@@ -251,6 +260,7 @@ class CRMRoleController extends Controller
                     'status' => $row['status'] ?? 'active',
                     'buyer_id' => auth()->user()->buyer_id,
                     'created_by' => auth()->user()->id,
+                    'updated_by' => auth()->user()->id,
                 ]);
             }
     
@@ -272,7 +282,10 @@ class CRMRoleController extends Controller
 
         try {
             // Delete the role
-            $role = CRMRole::findOrFail($id);
+            $role = CRMRole::where('id', $id)
+            ->where('buyer_id', auth()->user()->buyer_id)
+            ->firstOrFail();
+
             $role->delete();
             // Return success response
             return redirect()->back()->with('success', 'Role deleted successfully.');
@@ -286,7 +299,11 @@ class CRMRoleController extends Controller
     public function changeStatus($id){
         try {
             // Delete the role
-            $role = CRMRole::findOrFail($id);
+            $role = CRMRole::where('id', $id)
+            ->where('buyer_id', auth()->user()->buyer_id)
+            ->firstOrFail();
+
+            $role->updated_by = auth()->user()->id;
             $role->status = $role->status === 'active' ? 'deactive' : 'active';
             $role->save();
             // Return success response
