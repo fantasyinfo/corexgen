@@ -26,7 +26,7 @@ Route::get('/', function () {
     } else {
         return redirect()->route('login');
     }
-});
+})->name('home');
 
 // login
 Route::get('/login', function () {

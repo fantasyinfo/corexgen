@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use App\Models\CRM\CRMRole;
+use Illuminate\Support\Facades\DB;
 
 
 function getUserName($id = null)
@@ -98,4 +99,10 @@ function prePrintR($arr){
     echo '<pre>';
     print_r($arr);
     echo '</pre>';
+}
+
+
+
+function getCRMMenus(){
+    return DB::table('crm_menu')->get();
 }

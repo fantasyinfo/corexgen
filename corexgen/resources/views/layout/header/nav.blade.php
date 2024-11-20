@@ -1,3 +1,7 @@
+@php
+    $menus = getCRMMenus();
+@endphp
+
 <nav class="nxl-navigation">
     <div class="navbar-wrapper">
         <div class="m-header">
@@ -12,7 +16,7 @@
                 <li class="nxl-item nxl-caption">
                     <label>Navigation</label>
                 </li>
-                <li class="nxl-item nxl-hasmenu">
+                {{-- <li class="nxl-item nxl-hasmenu">
                     <a href="javascript:void(0);" class="nxl-link">
                         <span class="nxl-micon"><i class="feather-airplay"></i></span>
                         <span class="nxl-mtext">Dashboards</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
@@ -21,8 +25,28 @@
                         <li class="nxl-item"><a class="nxl-link" href="index.html">CRM</a></li>
                         <li class="nxl-item"><a class="nxl-link" href="analytics.html">Analytics</a></li>
                     </ul>
+                </li> --}}
+                @foreach($menus->where('parent_menu', '1') as $parentMenu)
+                <li>
+                    <a href="javascript:void(0);" class="nxl-link">
+                        <span class="nxl-micon"><i class="{{$parentMenu->menu_icon}}"></i> </span>
+                        <span class="nxl-mtext">  {{ $parentMenu->menu_name }}</span>
+                        <span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                    </a>
+                    @if($menus->where('parent_menu_id', $parentMenu->id)->count())
+                        <ul class="nxl-submenu">
+                            @foreach($menus->where('parent_menu_id', $parentMenu->id) as $childMenu)
+                                <li class="nxl-item">
+                                    <a class="nxl-link" href="{{ route($childMenu->menu_url) }}"> 
+                                        <i class="{{$childMenu->menu_icon}}"></i>   {{ $childMenu->menu_name }}</a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
                 </li>
-                <li class="nxl-item nxl-hasmenu">
+            @endforeach
+
+                {{-- <li class="nxl-item nxl-hasmenu">
                     <a href="javascript:void(0);" class="nxl-link">
                         <span class="nxl-micon"><i class="feather-cast"></i></span>
                         <span class="nxl-mtext">Role & Users</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
@@ -35,7 +59,7 @@
                         <li class="nxl-item"><a class="nxl-link" href="{{url('crm/users/create')}}"> <i class="feather-corner-down-right"></i>Create User</a></li>
           
                     </ul>
-                </li>
+                </li> --}}
                 {{-- <li class="nxl-item nxl-hasmenu">
                     <a href="javascript:void(0);" class="nxl-link">
                         <span class="nxl-micon"><i class="feather-send"></i></span>
