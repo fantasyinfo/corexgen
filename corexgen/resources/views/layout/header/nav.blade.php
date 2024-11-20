@@ -25,11 +25,14 @@
                 <li class="nxl-item nxl-hasmenu">
                     <a href="javascript:void(0);" class="nxl-link">
                         <span class="nxl-micon"><i class="feather-cast"></i></span>
-                        <span class="nxl-mtext">Role</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                        <span class="nxl-mtext">Role & Users</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
                     </a>
                     <ul class="nxl-submenu">
-                        <li class="nxl-item"><a class="nxl-link" href="{{url('crm/role')}}">Role</a></li>
+                        <li class="nxl-item"><a class="nxl-link" href="{{url('crm/role')}}"> Role</a></li>
                         <li class="nxl-item"><a class="nxl-link" href="{{url('crm/role/create')}}">Create Role</a></li>
+
+                        <li class="nxl-item"><a class="nxl-link" href="{{url('crm/users')}}">Users</a></li>
+                        <li class="nxl-item"><a class="nxl-link" href="{{url('crm/users/create')}}">Create User</a></li>
           
                     </ul>
                 </li>
