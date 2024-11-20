@@ -41,6 +41,27 @@ Route::group(['prefix' => 'v1'], function () {
                 Route::delete('/destroy/{id}', [CRMRoleAPIController::class, 'destroy'])->name('destroy');
 
             });
+
+
+
+             // user routes
+             Route::prefix('users')->as('users.')->group(function () {
+                // role for fetch, store, update
+                Route::get('/', [UserAPIController::class, 'index'])->name('index');
+                Route::get('/show/{id}', [UserAPIController::class, 'show'])->name('show');
+                Route::post('/create', [UserAPIController::class, 'store'])->name('store');
+                Route::patch('/update/{id}', [UserAPIController::class, 'update'])->name('update');
+
+                Route::get('/changeStatus/{id}', [UserAPIController::class, 'toggleStatus'])->name('toggleStatus');
+                Route::delete('/destroy/{id}', [UserAPIController::class, 'destroy'])->name('destroy');
+
+            });
+
+
+
+
+
+
         });
     });
 });

@@ -58,8 +58,8 @@
                                     <input type="email" 
                                            class="form-control @error('email') is-invalid @enderror" 
                                            id="emailName" 
-                                           name="email" 
-                                           required
+                                   
+                                           disabled
                                            placeholder="{{ __('john@doe.com') }}"
                                            value="{{ $user->email }}">
                                     <div class="invalid-feedback" id="emailNameError">

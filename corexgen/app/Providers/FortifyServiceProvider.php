@@ -58,6 +58,7 @@ class FortifyServiceProvider extends ServiceProvider
             $user = DB::table('users')
                 ->join('buyers', 'buyers.id', '=', 'users.buyer_id')
                 ->where('users.email', $email)
+                ->where('users.status', 'active')
                 ->where('buyers.buyer_id', $buyerId)
                 ->select('users.*') // Select user fields
                 ->first();

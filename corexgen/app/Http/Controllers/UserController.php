@@ -78,7 +78,7 @@ class UserController extends Controller
                 'required',
                 'max:255',
             ],
-            'email' => 'required|string|max:1000',
+            'email' => 'required|email|string|max:1000',
             'password' => ['required', 'string'],
             'role_id' => 'required|integer'
         ]);
@@ -148,7 +148,6 @@ class UserController extends Controller
                 'required',
                 'max:255',
             ],
-            'email' => 'required|string|max:1000',
             'role_id' => 'required|integer'
         ]);
 
@@ -294,11 +293,11 @@ class UserController extends Controller
 
         try {
             // Delete the role
-            $role = User::where('id', $id)
+            $user = User::where('id', $id)
                 ->where('buyer_id', auth()->user()->buyer_id)
                 ->firstOrFail();
 
-            $role->delete();
+            $user->delete();
             // Return success response
             return redirect()->back()->with('success', 'User deleted successfully.');
         } catch (\Exception $e) {
