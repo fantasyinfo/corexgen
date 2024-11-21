@@ -15,7 +15,7 @@
             {{-- Pagination Elements --}}
             @php
                 $currentPage = $paginator->currentPage();
-                $lastPage = $paginator->lastPage();
+                $lastPage = $paginator->lastPage(); 
                 
                 // Calculate start and end for main pagination range
                 $start = max(1, $currentPage - 3);

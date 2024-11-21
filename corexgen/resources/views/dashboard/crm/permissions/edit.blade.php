@@ -31,10 +31,10 @@
                                     name="role_id" 
                                     id="role_id">
                                 @if($roles && $roles->isNotEmpty())
-                                    @foreach($roles as $role)
-                                        <option value="{{ $role->id }}" 
-                                                {{ $role->id == $role->id ? 'selected' : '' }}>
-                                            {{ $role->role_name }}
+                                    @foreach($roles as $role1)
+                                        <option value="{{ $role1->id }}" 
+                                                {{ $role1->id == $role->id ? 'selected' : '' }}>
+                                            {{ $role1->role_name }}
                                         </option>
                                     @endforeach
                                 @else

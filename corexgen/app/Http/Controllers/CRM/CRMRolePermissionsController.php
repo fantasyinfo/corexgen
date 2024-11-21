@@ -189,6 +189,7 @@ class CRMRolePermissionsController extends Controller
      */
     public function update(Request $request)
     {
+     
         // Validate the request
         $validator = Validator::make($request->all(), [
             'role_id' => ['required', 'exists:crm_roles,id'],
