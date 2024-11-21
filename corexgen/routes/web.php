@@ -2,6 +2,7 @@
 
 // crm routes
 use App\Http\Controllers\CRM\CRMRoleController;
+use App\Http\Controllers\CRM\CRMRolePermissionsController;
 use App\Http\Controllers\UserController;
 use App\Models\CRM\CRMRole;
 use Illuminate\Support\Facades\Route;
@@ -97,4 +98,28 @@ Route::middleware([
         Route::post('/import', [UserController::class, 'import'])->name('import');
       
     });
+
+
+
+        // permissions routes
+        Route::prefix('permissions')->as('permissions.')->group(function () {
+            // role for fetch, store, update
+            Route::get('/', [CRMRolePermissionsController::class, 'index'])->name('index');
+            Route::post('/', [CRMRolePermissionsController::class, 'store'])->name('store');
+            Route::patch('/', [CRMRolePermissionsController::class, 'update'])->name('update');
+    
+            // create, edit, change status, delete
+            Route::get('/create', [CRMRolePermissionsController::class, 'create'])->name('create');
+            Route::get('/edit/{id}', [CRMRolePermissionsController::class, 'edit'])->name('edit');
+        
+            Route::delete('/destroy/{id}', [CRMRolePermissionsController::class, 'destroy'])->name('destroy');
+    
+      
+          
+        });
+
+
+
+
+
 });

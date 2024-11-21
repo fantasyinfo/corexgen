@@ -8,7 +8,7 @@ return [
     'Role Name' => 'भूमिका नाम',
     'All Statuses' => 'सभी स्थिति',
     'Description' => 'विवरण',
-    'Create new role' => 'नई भूमिका बनाएं',
-    'Update role' => 'भूमिका अपडेट करें'
+    'Create New Role' => 'नई भूमिका बनाएं',
+    'Update Role' => 'भूमिका अपडेट करें'
 
 ];

@@ -145,3 +145,28 @@ function getCRMMenus()
         ]
     ],
 ]);
+
+!defined('CRM_MENU_ITEMS') && define('CRM_MENU_ITEMS',[
+    'Dashboard' => [
+        'menu_icon' => 'feather-airplay',
+        'children' => [
+            'CRM' => ['menu_url' => 'home', 'menu_icon' => 'feather-corner-down-right']
+        ]
+    ],
+    'Roles & Permissions' => [
+        'menu_icon' => 'feather-command',
+        'children' => [
+            'Role' => ['menu_url' => 'crm.role.index', 'menu_icon' => 'feather-corner-down-right'],
+            'Create Role' => ['menu_url' => 'crm.role.create', 'menu_icon' => 'feather-corner-down-right'],
+            'Permissions' => ['menu_url' => 'crm.permissions.index', 'menu_icon' => 'feather-corner-down-right'],
+            'Create Permissions' => ['menu_url' => 'crm.permissions.create', 'menu_icon' => 'feather-corner-down-right']
+        ]
+        ],
+    'Users' => [
+        'menu_icon' => 'feather-user-plus',
+        'children' => [
+            'Users' => ['menu_url' => 'crm.users.index', 'menu_icon' => 'feather-corner-down-right'],
+            'Create Users' => ['menu_url' => 'crm.users.create', 'menu_icon' => 'feather-corner-down-right']
+        ]
+    ]
+]);

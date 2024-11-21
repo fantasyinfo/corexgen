@@ -8,8 +8,9 @@ return [
     'Role Name' => 'Role Name',
     'All Statuses' => 'All Statuses',
     'Description' => 'Description',
-    'Create new role' => 'Create new role',
-    'Update role' => 'Update role'
+    'Create New Role' => 'Create New role',
+    'Update Role' => 'Update Role',
+    'No Roles Found' => 'No Roles Found'
 
 
 ];

@@ -9,23 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class CRMMenuSeeder extends Seeder
 {
-    private $menuItems = [
-        'Dashboard' => [
-            'menu_icon' => 'feather-airplay',
-            'children' => [
-                'CRM' => ['menu_url' => 'home', 'menu_icon' => 'feather-corner-down-right']
-            ]
-        ],
-        'Roles & Users' => [
-            'menu_icon' => 'feather-user-plus',
-            'children' => [
-                'Role' => ['menu_url' => 'crm.role.index', 'menu_icon' => 'feather-corner-down-right'],
-                'Create Role' => ['menu_url' => 'crm.role.create', 'menu_icon' => 'feather-corner-down-right'],
-                'Users' => ['menu_url' => 'crm.users.index', 'menu_icon' => 'feather-corner-down-right'],
-                'Create Users' => ['menu_url' => 'crm.users.create', 'menu_icon' => 'feather-corner-down-right']
-            ]
-        ]
-    ];
+
 
     /**
      * Run the database seeds.
@@ -34,7 +18,7 @@ class CRMMenuSeeder extends Seeder
     {
         DB::table('crm_menu')->delete();
 
-        foreach ($this->menuItems as $category => $menuData) {
+        foreach (CRM_MENU_ITEMS as $category => $menuData) {
             // Insert parent menu
             $parentMenuId = DB::table('crm_menu')->insertGetId([
                 'menu_name' => $category,

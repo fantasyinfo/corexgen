@@ -14,11 +14,11 @@
                     <div class="card-body general-info">
                         <div class="mb-5 d-flex align-items-center justify-content-between">
                             <h5 class="fw-bold mb-0 me-4">
-                                <span class="d-block mb-2">{{ __('crm_role.Update role') }}</span>
+                                <span class="d-block mb-2">{{ __('crm_role.Update Role') }}</span>
                                 <span class="fs-12 fw-normal text-muted text-truncate-1-line">{{ __('crud.Please add correct information') }}</span>
                             </h5>
                             <button type="submit" class="btn btn-primary">
-                                <i class="feather-plus me-2"></i> <span>{{ __('crm_role.Update role') }}</span>
+                                <i class="feather-plus me-2"></i> <span>{{ __('crm_role.Update Role') }}</span>
                             </button>
                         </div>
 

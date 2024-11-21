@@ -11,8 +11,8 @@ return [
     'All Statuses' => 'सभी स्थितियां',
     'Select Role' => 'भूमिका चुनें',
     'Description' => 'विवरण',
-    'Create new user' => 'नया उपयोगकर्ता बनाएं',
-    'Update user' => 'उपयोगकर्ता अपडेट करें',
+    'Create New User' => 'नया उपयोगकर्ता बनाएं',
+    'Update User' => 'उपयोगकर्ता अपडेट करें',
     'Password' => 'पासवर्ड',
     'Full Name' => 'पूरा नाम'
 

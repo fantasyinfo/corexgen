@@ -11,8 +11,8 @@ return [
     'All Statuses' => 'All Statuses',
     'Select Role' => 'Select Role',
     'Description' => 'Description',
-    'Create new user' => 'Create new user',
-    'Update user' => 'Update user',
+    'Create New User' => 'Create New User',
+    'Update User' => 'Update User',
     'Password' => 'Password',
     'Full Name' => 'Full Name'
 
