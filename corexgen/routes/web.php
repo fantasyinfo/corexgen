@@ -3,6 +3,7 @@
 // crm routes
 use App\Http\Controllers\CRM\CRMRoleController;
 use App\Http\Controllers\CRM\CRMRolePermissionsController;
+use App\Http\Controllers\SystemInstallerController;
 use App\Http\Controllers\UserController;
 use App\Models\CRM\CRMRole;
 use Illuminate\Support\Facades\Route;
@@ -20,19 +21,34 @@ use Illuminate\Support\Facades\Auth;
 |
 */
 
-// home route
-Route::get('/', function () {
-    if (Auth::check()) {
-        return view('welcome');
-    } else {
-        return redirect()->route('login');
-    }
-})->name('home');
 
-// login
-Route::get('/login', function () {
-    return view('auth.login', );
-})->name('login');
+
+
+
+// Installer Routes
+Route::get('/install', [SystemInstallerController::class, 'showInstaller'])
+    ->name('installer.index');
+
+Route::prefix('installer')->group(function() {
+    Route::get('/requirements', [SystemInstallerController::class, 'checkSystemRequirements']);
+    Route::post('/test-database', [SystemInstallerController::class, 'testDatabaseConnection']);
+    Route::post('/install', [SystemInstallerController::class, 'installApplication']);
+});
+
+
+
+// Example of applying it to a group of routes
+Route::middleware(['check.installation'])->group(function () {
+    // All routes that require the installation to be completed
+    Route::get('/', function () {
+        if (Auth::check()) {
+            return view('welcome');
+        } else {
+            return redirect()->route('login');
+        }
+    })->name('home');
+
+});
 
 
 // register
@@ -58,7 +74,8 @@ Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
-    'check.user.role'
+    'check.user.role',
+    'check.installation'
 ])->prefix('crm')->as('crm.')->group(function () {
     
     // role routes

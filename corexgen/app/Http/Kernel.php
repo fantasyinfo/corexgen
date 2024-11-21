@@ -71,5 +71,6 @@ class Kernel extends HttpKernel
         // Other middleware
         'check.user.role' => \App\Http\Middleware\CheckUserRole::class,
         'check.permission' => \App\Http\Middleware\CheckRolePermission::class,
+        'check.installation' => \App\Http\Middleware\CheckInstallation::class,
     ];
 }
