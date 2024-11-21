@@ -33,6 +33,7 @@ Route::prefix('installer')->group(function() {
     Route::get('/requirements', [SystemInstallerController::class, 'checkSystemRequirements']);
     Route::post('/test-database', [SystemInstallerController::class, 'testDatabaseConnection']);
     Route::post('/install', [SystemInstallerController::class, 'installApplication']);
+    Route::post('/update-env', [SystemInstallerController::class, 'updateEnvironmentFromConfig']);
 });
 
 
