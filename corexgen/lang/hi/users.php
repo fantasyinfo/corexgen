@@ -1,0 +1,19 @@
+<?php 
+
+return [
+
+    'Users'=> "उपयोगकर्ता",
+    'Users Management' => 'उपयोगकर्ता प्रबंधन',
+    'Create User' => 'उपयोगकर्ता बनाएं',
+    'Name' => 'नाम',
+    'Email' => 'ईमेल',
+    'Role' => 'भूमिका',
+    'All Statuses' => 'सभी स्थितियां',
+    'Select Role' => 'भूमिका चुनें',
+    'Description' => 'विवरण',
+    'Create new user' => 'नया उपयोगकर्ता बनाएं',
+    'Update user' => 'उपयोगकर्ता अपडेट करें',
+    'Password' => 'पासवर्ड',
+    'Full Name' => 'पूरा नाम'
+
+];

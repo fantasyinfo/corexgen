@@ -14,17 +14,17 @@
                     <div class="card-body general-info">
                         <div class="mb-5 d-flex align-items-center justify-content-between">
                             <h5 class="fw-bold mb-0 me-4">
-                                <span class="d-block mb-2">{{ __('Update role') }}</span>
-                                <span class="fs-12 fw-normal text-muted text-truncate-1-line">{{ __('Please add correct information') }}</span>
+                                <span class="d-block mb-2">{{ __('crm_role.Update role') }}</span>
+                                <span class="fs-12 fw-normal text-muted text-truncate-1-line">{{ __('crud.Please add correct information') }}</span>
                             </h5>
                             <button type="submit" class="btn btn-primary">
-                                <i class="feather-plus me-2"></i> <span>{{ __('Update Role') }}</span>
+                                <i class="feather-plus me-2"></i> <span>{{ __('crm_role.Update role') }}</span>
                             </button>
                         </div>
 
                         <div class="row mb-4 align-items-center">
                             <div class="col-lg-4">
-                                <label for="roleName" class="fw-semibold">{{ __('Role Name') }}: <span class="text-danger">*</span></label>
+                                <label for="roleName" class="fw-semibold">{{ __('crm_role.Role Name') }}: <span class="text-danger">*</span></label>
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">
@@ -47,7 +47,7 @@
 
                         <div class="row mb-4 align-items-center">
                             <div class="col-lg-4">
-                                <label for="roleDesc" class="fw-semibold">{{ __('Role Description') }}:</label>
+                                <label for="roleDesc" class="fw-semibold">{{ __('crm_role.Description') }}:</label>
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">

@@ -10,11 +10,7 @@ use Illuminate\Database\Seeder;
 
 class CRMPermissionsSeeder extends Seeder
 {
-    private $permissions = [
-        'CRM_DASHBOARD' => ['READ'],
-        'CRM_ROLE' => ['CREATE', 'READ', 'READ_ALL', 'UPDATE', 'DELETE'],
-        'CRM_USERS' => ['CREATE', 'READ', 'READ_ALL', 'UPDATE', 'DELETE'],
-    ];
+  
 
     /**
      * Run the database seeds.
@@ -24,11 +20,27 @@ class CRMPermissionsSeeder extends Seeder
         // Truncate table to remove all entries and reset auto-increment IDs
         DB::table('crm_permissions')->truncate();
 
-        foreach ($this->permissions as $name => $values) {
-            foreach ($values as $permission) {
+        foreach (CRMPERMISSIONS as $name => $values) {
+
+            // Insert the parent permission and get its ID
+            $parentMenuId = DB::table('crm_permissions')->insertGetId([
+                'name' => $values['name'],
+                'parent_menu' => '1',
+                'parent_menu_id' => null,
+                'buyer_id' => 1,
+                'permission_id' => $values['id'],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            foreach ($values['children'] as $keys => $data) {
+                // Insert child permissions with the parent_menu_id
                 DB::table('crm_permissions')->insert([
-                    'name' => $name . '_' . $permission,
+                    'name' => $data,
+                    'parent_menu' => '2',
+                    'parent_menu_id' => $parentMenuId,
                     'buyer_id' => 1,
+                    'permission_id' => $keys,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
@@ -36,4 +48,3 @@ class CRMPermissionsSeeder extends Seeder
         }
     }
 }
-

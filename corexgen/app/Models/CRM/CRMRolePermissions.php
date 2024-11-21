@@ -5,21 +5,18 @@ namespace App\Models\CRM;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CRMPermissions extends Model
+class CRMRolePermissions extends Model
 {
     use HasFactory;
 
-    const table = 'crm_permissions';
+    const table = 'crm_role_permissions';
 
     protected $fillable = [
-        'name', 
+        'role_id', 
         'buyer_id',
-        'parent_menu',
-        'parent_menu_id',
         'permission_id'
     ];
 
     protected $table = self::table;
-
 
 }

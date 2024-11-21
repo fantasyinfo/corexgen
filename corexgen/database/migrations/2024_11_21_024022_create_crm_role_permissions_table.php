@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('crm_permissions', function (Blueprint $table) {
+        Schema::create('crm_role_permissions', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->enum('parent_menu',['1','2'])->default('1');
-            $table->bigInteger('parent_menu_id',)->nullable();
-            $table->bigInteger('buyer_id')->default(1);
+            $table->bigInteger('role_id');
+            $table->bigInteger('buyer_id');
             $table->bigInteger('permission_id');
             $table->timestamps();
         });
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('crm_permissions');
+        Schema::dropIfExists('crm_role_permissions');
     }
 };

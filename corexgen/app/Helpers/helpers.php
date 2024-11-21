@@ -95,7 +95,8 @@ function filerUserDetails($user)
 }
 
 
-function prePrintR($arr){
+function prePrintR($arr)
+{
     echo '<pre>';
     print_r($arr);
     echo '</pre>';
@@ -103,6 +104,44 @@ function prePrintR($arr){
 
 
 
-function getCRMMenus(){
+function getCRMMenus()
+{
     return DB::table('crm_menu')->get();
 }
+
+
+!defined('CRMPERMISSIONS') && define('CRMPERMISSIONS',  [
+    'DASHBOARD' => [
+        'name' => 'CRM_DASHBOARD',
+        'id' => 1,
+        'children' => [
+            2 => 'READ'
+        ]
+    ],
+    'ROLE' => [
+        'name' => 'CRM_ROLE',
+        'id' => 20,
+        'children' => [
+            21 => 'CREATE',
+            22 => 'READ',
+            23 => 'READ_ALL',
+            24 => 'UPDATE',
+            25 => 'DELETE',
+            26 => 'BULK_UPLOAD',
+            27 => 'EXPORT'
+        ]
+    ],
+    'USERS' => [
+        'name' => 'CRM_USERS',
+        'id' => 40,
+        'children' => [
+            41 => 'CREATE',
+            42 => 'READ',
+            43 => 'READ_ALL',
+            44 => 'UPDATE',
+            45 => 'DELETE',
+            46 => 'BULK_UPLOAD',
+            47 => 'EXPORT'
+        ]
+    ],
+]);

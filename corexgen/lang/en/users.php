@@ -1,0 +1,20 @@
+<?php 
+
+return [
+
+    'Users'=> "Users",
+    'Users Management' => 'Users Management',
+    'Create User' => 'Create User',
+    'Name' => 'Name',
+    'Email' => 'Email',
+    'Role' => 'Role',
+    'All Statuses' => 'All Statuses',
+    'Select Role' => 'Select Role',
+    'Description' => 'Description',
+    'Create new user' => 'Create new user',
+    'Update user' => 'Update user',
+    'Password' => 'Password',
+    'Full Name' => 'Full Name'
+
+
+];

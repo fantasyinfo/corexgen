@@ -4,20 +4,20 @@
 <div class="container-fluid">
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="card-title">{{ __('Roles Management') }}</h5>
+            <h5 class="card-title">{{ __('crm_role.Roles Management') }}</h5>
             <div class="card-header-action">
                 <a href="{{ route('crm.role.create') }}" class="btn btn-md btn-primary me-2">
-                    <i class="feather feather-plus"></i> <span>{{ __('Create Role') }}</span>
+                    <i class="feather feather-plus"></i> <span>{{ __('crm_role.Create Role') }}</span>
                 </a>
                 <a href="{{ route('crm.role.export', request()->all()) }}" class="btn btn-md btn-outline-secondary">
-                    <i class="feather feather-download"></i> <span>{{ __('Export') }}</span>
+                    <i class="feather feather-download"></i> <span>{{ __('crud.Export') }}</span>
                 </a>
                 <button data-bs-toggle="modal" data-bs-target="#bulkImportModal" class="btn btn-md btn-outline-info">
-                    <i class="feather feather-upload"></i><span> {{ __('Import') }}</span>
+                    <i class="feather feather-upload"></i><span> {{ __('crud.Import') }}</span>
                 </button>
                 <button onclick="openFilters()" class="btn btn-md btn-light-brand">
                     <i class="feather-filter me-2"></i>
-                    <span>{{ __('Filter') }}</span>
+                    <span>{{ __('crud.Filter') }}</span>
                 </button>
             </div>
         </div>
@@ -32,12 +32,12 @@
     <div class="row g-3">
         <div class="col-md-3">
             <input type="text" name="name" class="form-control" 
-                   placeholder="{{ __('Role Name') }}" 
+                   placeholder="{{ __('crm_role.Role Name') }}" 
                    value="{{ request('name') }}">
         </div>
         <div class="col-md-2">
             <select name="status" class="form-select">
-                <option value="">{{ __('All Statuses') }}</option>
+                <option value="">{{ __('crm_role.All Statuses') }}</option>
                 <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>
                     {{ __('Active') }}
                 </option>
@@ -66,17 +66,17 @@
                                     'sort' => 'role_name', 
                                     'direction' => request('sort') == 'role_name' && request('direction') == 'asc' ? 'desc' : 'asc'
                                 ]) }}">
-                                    {{ __('Role Name') }}
+                                    {{ __('crm_role.Role Name') }}
                                     @if(request('sort') == 'role_name')
                                         {!! request('direction') == 'asc' ? '&#9650;' : '&#9660;' !!}
                                     @endif
                                 </a>
                             </th>
-                            <th>{{ __('Description') }}</th>
-                            <th>{{ __('Status') }}</th>
-                            <th>{{ __('Created At') }}</th>
+                            <th>{{ __('crm_role.Description') }}</th>
+                            <th>{{ __('crud.Status') }}</th>
+                            <th>{{ __('crud.Created At') }}</th>
                    
-                            <th class="text-end">{{ __('Actions') }}</th>
+                            <th class="text-end">{{ __('crud.Actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -103,18 +103,18 @@
                                             <li>
                                                 <a class="dropdown-item" href="{{ route('crm.role.edit',['id' => $role->id] ) }}">
                                                     <i class="feather feather-edit-3 me-3"></i>
-                                                    <span>{{ __('Edit') }}</span>
+                                                    <span>{{ __('crud.Edit') }}</span>
                                                 </a>
                                             </li>
                                             
                                             <li class="dropdown-divider"></li>
                                             <li>
                                                 <form action="{{ route('crm.role.destroy', ['id' => $role->id]) }}" method="POST" 
-                                                onsubmit="return confirm('{{ __('Are you sure?') }}');">
+                                                onsubmit="return confirm('{{ __('crud.Are you sure?') }}');">
                                               @csrf
                                               @method('DELETE')
                                               <button type="submit" class="dropdown-item text-danger">
-                                                  <i class="feather feather-trash-2 me-2"></i>{{ __('Delete') }}
+                                                  <i class="feather feather-trash-2 me-2"></i>{{ __('crud.Delete') }}
                                               </button>
                                           </form>
                                                
@@ -135,8 +135,8 @@
             <!-- Pagination -->
             <div class="d-flex justify-content-between align-items-center mt-3">
                 <div>
-                    {{ __('Showing') }} {{ $roles->firstItem() }} - {{ $roles->lastItem() }} 
-                    {{ __('of') }} {{ $roles->total() }} {{ __('results') }}
+                    {{ __('crud.Showing') }} {{ $roles->firstItem() }} - {{ $roles->lastItem() }} 
+                    {{ __('crud.of') }} {{ $roles->total() }} {{ __('crud.results') }}
                 </div>
                 {{ $roles->links('layout.components.pagination') }}
             </div>

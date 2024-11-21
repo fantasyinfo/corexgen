@@ -4,20 +4,20 @@
 <div class="container-fluid">
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="card-title">{{ __('Users Management') }}</h5>
+            <h5 class="card-title">{{ __('users.Users Management') }}</h5>
             <div class="card-header-action">
                 <a href="{{ route('crm.users.create') }}" class="btn btn-md btn-primary me-2">
-                    <i class="feather feather-plus"></i> <span>{{ __('Create User') }}</span>
+                    <i class="feather feather-plus"></i> <span>{{ __('users.Create User') }}</span>
                 </a>
                 <a href="{{ route('crm.users.export', request()->all()) }}" class="btn btn-md btn-outline-secondary">
-                    <i class="feather feather-download"></i> <span>{{ __('Export') }}</span>
+                    <i class="feather feather-download"></i> <span>{{ __('crud.Export') }}</span>
                 </a>
                 <button data-bs-toggle="modal" data-bs-target="#bulkImportModal" class="btn btn-md btn-outline-info">
-                    <i class="feather feather-upload"></i><span> {{ __('Import') }}</span>
+                    <i class="feather feather-upload"></i><span> {{ __('crud.Import') }}</span>
                 </button>
                 <button onclick="openFilters()" class="btn btn-md btn-light-brand">
                     <i class="feather-filter me-2"></i>
-                    <span>{{ __('Filter') }}</span>
+                    <span>{{ __('crud.Filter') }}</span>
                 </button>
             </div>
         </div>
@@ -32,17 +32,17 @@
     <div class="row g-3">
         <div class="col-md-3">
             <input type="text" name="name" class="form-control" 
-                   placeholder="{{ __('Name') }}" 
+                   placeholder="{{ __('users.Name') }}" 
                    value="{{ request('name') }}">
         </div>
         <div class="col-md-3">
             <input type="text" name="email" class="form-control" 
-                   placeholder="{{ __('Email') }}" 
+                   placeholder="{{ __('users.Email') }}" 
                    value="{{ request('email') }}">
         </div>
         <div class="col-md-2">
             <select name="status" class="form-control select2-hidden-accessible">
-                <option value="">{{ __('All Statuses') }}</option>
+                <option value="">{{ __('users.All Statuses') }}</option>
                 <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>
                     {{ __('Active') }}
                 </option>
@@ -53,7 +53,7 @@
         </div>
         <div class="col-md-2">
             <select class="form-control select2-hidden-accessible" name="role_id">
-                <option value="">{{ __('Select Role') }}</option>
+                <option value="">{{ __('users.Select Role') }}</option>
                 @if($roles && $roles->isNotEmpty())
                     @foreach($roles as $role)
                         <option value="{{ $role->id }}" {{ request('role_id') == $role->id ? 'selected' : '' }}>
@@ -85,18 +85,18 @@
                                     'sort' => 'name', 
                                     'direction' => request('sort') == 'name' && request('direction') == 'asc' ? 'desc' : 'asc'
                                 ]) }}">
-                                    {{ __('Name') }}
+                                    {{ __('users.Name') }}
                                     @if(request('sort') == 'name')
                                         {!! request('direction') == 'asc' ? '&#9650;' : '&#9660;' !!}
                                     @endif
                                 </a>
                             </th>
-                            <th>{{ __('Email') }}</th>
-                            <th>{{ __('Role') }}</th>
-                            <th>{{ __('Status') }}</th>
-                            <th>{{ __('Created At') }}</th>
+                            <th>{{ __('users.Email') }}</th>
+                            <th>{{ __('users.Role') }}</th>
+                            <th>{{ __('crud.Status') }}</th>
+                            <th>{{ __('crud.Created At') }}</th>
                    
-                            <th class="text-end">{{ __('Actions') }}</th>
+                            <th class="text-end">{{ __('crud.Actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -124,18 +124,18 @@
                                             <li>
                                                 <a class="dropdown-item" href="{{ route('crm.users.edit',['id' => $user->id] ) }}">
                                                     <i class="feather feather-edit-3 me-3"></i>
-                                                    <span>{{ __('Edit') }}</span>
+                                                    <span>{{ __('crud.Edit') }}</span>
                                                 </a>
                                             </li>
                                             
                                             <li class="dropdown-divider"></li>
                                             <li>
                                                 <form action="{{ route('crm.users.destroy', ['id' => $user->id]) }}" method="POST" 
-                                                onsubmit="return confirm('{{ __('Are you sure?') }}');">
+                                                onsubmit="return confirm('{{ __('crud.Are you sure?') }}');">
                                               @csrf
                                               @method('DELETE')
                                               <button type="submit" class="dropdown-item text-danger">
-                                                  <i class="feather feather-trash-2 me-2"></i>{{ __('Delete') }}
+                                                  <i class="feather feather-trash-2 me-2"></i>{{ __('crud.Delete') }}
                                               </button>
                                           </form>
                                                
@@ -156,8 +156,8 @@
             <!-- Pagination -->
             <div class="d-flex justify-content-between align-items-center mt-3">
                 <div>
-                    {{ __('Showing') }} {{ $users->firstItem() }} - {{ $users->lastItem() }} 
-                    {{ __('of') }} {{ $users->total() }} {{ __('results') }}
+                    {{ __('crud.Showing') }} {{ $users->firstItem() }} - {{ $users->lastItem() }} 
+                    {{ __('crud.of') }} {{ $users->total() }} {{ __('crud.results') }}
                 </div>
                 {{ $users->links('layout.components.pagination') }}
             </div>

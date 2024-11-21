@@ -15,18 +15,18 @@
                     <div class="card-body general-info">
                         <div class="mb-5 d-flex align-items-center justify-content-between">
                             <h5 class="fw-bold mb-0 me-4">
-                                <span class="d-block mb-2">{{ __('Update user') }}</span>
-                                <span class="fs-12 fw-normal text-muted text-truncate-1-line">{{ __('Please add correct information') }}</span>
+                                <span class="d-block mb-2">{{ __('users.Update user') }}</span>
+                                <span class="fs-12 fw-normal text-muted text-truncate-1-line">{{ __('crud.Please add correct information') }}</span>
                             </h5>
                             <button type="submit" class="btn btn-primary">
-                                <i class="feather-plus me-2"></i> <span>{{ __('Update User') }}</span>
+                                <i class="feather-plus me-2"></i> <span>{{ __('users.Update user') }}</span>
                             </button>
                         </div>
                 
                         <!-- Full Name Field -->
                         <div class="row mb-4 align-items-center">
                             <div class="col-lg-4">
-                                <label for="nameName" class="fw-semibold">{{ __('Full Name') }}: <span class="text-danger">*</span></label>
+                                <label for="nameName" class="fw-semibold">{{ __('users.Full Name') }}: <span class="text-danger">*</span></label>
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">
@@ -50,7 +50,7 @@
                         <!-- Email Field -->
                         <div class="row mb-4 align-items-center">
                             <div class="col-lg-4">
-                                <label for="emailName" class="fw-semibold">{{ __('Email') }}: <span class="text-danger">*</span></label>
+                                <label for="emailName" class="fw-semibold">{{ __('users.Email') }}: <span class="text-danger">*</span></label>
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">
@@ -74,7 +74,7 @@
                         <!-- Role Selection Field -->
                         <div class="row mb-4 align-items-center">
                             <div class="col-lg-4">
-                                <label for="role_id" class="fw-semibold">{{ __('Select Role') }}: <span class="text-danger">*</span></label>
+                                <label for="role_id" class="fw-semibold">{{ __('users.Select Role') }}: <span class="text-danger">*</span></label>
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">
