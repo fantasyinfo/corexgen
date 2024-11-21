@@ -22,5 +22,7 @@ return [
     'Please add correct information' => 'Please add correct information',
     "Showing" => 'Showing',
     'of' => 'of',
-    'results' => 'results'
+    'results' => 'results',
+    'You do not have permission to view the table' => 'You do not have permission to view the table',
+    'No Permission' => 'No Permission',
 ];

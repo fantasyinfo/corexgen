@@ -10,7 +10,7 @@
 
                 <form id="userForm" action="{{ route('crm.users.store') }}" method="POST">
                     @csrf
-                    @method('PATCH')
+                    @method('PUT')
                     <input type='hidden' name='id' value='{{$user["id"]}}' />
                     <div class="card-body general-info">
                         <div class="mb-5 d-flex align-items-center justify-content-between">

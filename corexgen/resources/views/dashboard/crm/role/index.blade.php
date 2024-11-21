@@ -6,58 +6,67 @@
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="card-title">{{ __('crm_role.Roles Management') }}</h5>
             <div class="card-header-action">
+                @if(hasPermission('ROLE.CREATE'))
                 <a href="{{ route('crm.role.create') }}" class="btn btn-md btn-primary me-2">
                     <i class="feather feather-plus"></i> <span>{{ __('crm_role.Create Role') }}</span>
                 </a>
+                @endif
+                @if(hasPermission('ROLE.EXPORT'))
                 <a href="{{ route('crm.role.export', request()->all()) }}" class="btn btn-md btn-outline-secondary">
                     <i class="feather feather-download"></i> <span>{{ __('crud.Export') }}</span>
                 </a>
+                @endif
+                @if(hasPermission('ROLE.IMPORT'))
                 <button data-bs-toggle="modal" data-bs-target="#bulkImportModal" class="btn btn-md btn-outline-info">
                     <i class="feather feather-upload"></i><span> {{ __('crud.Import') }}</span>
                 </button>
+                @endif
+                @if(hasPermission('ROLE.FILTER'))
                 <button onclick="openFilters()" class="btn btn-md btn-light-brand">
                     <i class="feather-filter me-2"></i>
                     <span>{{ __('crud.Filter') }}</span>
                 </button>
+                @endif
             </div>
         </div>
 
         <div class="card-body">
      
                
-     
+            @if(hasPermission('ROLE.FILTER'))
             <div id="filter-section">
-   <!-- Advanced Filter Form -->
-   <form action="{{ route('crm.role.index') }}" method="GET" class="mb-4">
-    <div class="row g-3">
-        <div class="col-md-3">
-            <input type="text" name="name" class="form-control" 
-                   placeholder="{{ __('crm_role.Role Name') }}" 
-                   value="{{ request('name') }}">
-        </div>
-        <div class="col-md-2">
-            <select name="status" class="form-select">
-                <option value="">{{ __('crm_role.All Statuses') }}</option>
-                <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>
-                    {{ __('Active') }}
-                </option>
-                <option value="deactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>
-                    {{ __('Inactive') }}
-                </option>
-            </select>
-        </div>
-        <div class="col-md-1">
-            <button type="submit" class="btn btn-primary w-100">
-                <i class="feather feather-search"></i>
-            </button>
-        </div>
-    </div>
-</form>
+                <!-- Advanced Filter Form -->
+                <form action="{{ route('crm.role.index') }}" method="GET" class="mb-4">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <input type="text" name="name" class="form-control" 
+                                placeholder="{{ __('crm_role.Role Name') }}" 
+                                value="{{ request('name') }}">
+                        </div>
+                        <div class="col-md-2">
+                            <select name="status" class="form-select">
+                                <option value="">{{ __('crm_role.All Statuses') }}</option>
+                                <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>
+                                    {{ __('Active') }}
+                                </option>
+                                <option value="deactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>
+                                    {{ __('Inactive') }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="feather feather-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
-         
+            @endif
 
             <!-- Roles Table -->
             <div class="table-responsive">
+                @if(hasPermission('ROLE.READ_ALL') || hasPermission('ROLE.READ') )
                 <table class="table table-hover">
                     <thead>
                         <tr>
@@ -92,6 +101,7 @@
                                     </a>
                                 </td>
                                 <td>{{ $role->created_at->format('d M Y') }}</td>
+                                @if(hasPermission('ROLE.UPDATE') || hasPermission('ROLE.DELETE'))
                                 <td class="text-end">
                                  
 
@@ -100,28 +110,34 @@
                                             <i class="feather feather-more-horizontal"></i>
                                         </a>
                                         <ul class="dropdown-menu" style="">
+                                            @if(hasPermission('ROLE.UPDATE'))
                                             <li>
                                                 <a class="dropdown-item" href="{{ route('crm.role.edit',['id' => $role->id] ) }}">
                                                     <i class="feather feather-edit-3 me-3"></i>
                                                     <span>{{ __('crud.Edit') }}</span>
                                                 </a>
                                             </li>
-                                            
+                                            @endif
+                                            @if(hasPermission('ROLE.DELETE'))
                                             <li class="dropdown-divider"></li>
                                             <li>
                                                 <form action="{{ route('crm.role.destroy', ['id' => $role->id]) }}" method="POST" 
                                                 onsubmit="return confirm('{{ __('crud.Are you sure?') }}');">
-                                              @csrf
-                                              @method('DELETE')
-                                              <button type="submit" class="dropdown-item text-danger">
-                                                  <i class="feather feather-trash-2 me-2"></i>{{ __('crud.Delete') }}
-                                              </button>
-                                          </form>
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="dropdown-item text-danger">
+                                                        <i class="feather feather-trash-2 me-2"></i>{{ __('crud.Delete') }}
+                                                    </button>
+                                                </form>
                                                
                                             </li>
+                                            @endif
                                         </ul>
                                     </div>
                                 </td>
+                                @else
+                                <td class="text-end">...</td>
+                                @endif
                             </tr>
                         @empty
                             <tr>
@@ -130,8 +146,18 @@
                         @endforelse
                     </tbody>
                 </table>
+                @else 
+                <table class="table table-hover">
+                    <tbody>
+                            <tr>
+                                <td colspan="5" class="text-center"><i class="fa-solid fa-file"></i> {{ __('crud.You do not have permission to view the table') }}</td>
+                            </tr>
+                    </tbody>
+                </table>
+                @endif
             </div>
 
+            @if(hasPermission('USERS.READ_ALL') || hasPermission('USERS.READ') )
             <!-- Pagination -->
             <div class="d-flex justify-content-between align-items-center mt-3">
                 <div>
@@ -140,6 +166,7 @@
                 </div>
                 {{ $roles->links('layout.components.pagination') }}
             </div>
+            @endif
         </div>
     </div>
 </div>

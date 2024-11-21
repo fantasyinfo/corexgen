@@ -32,13 +32,13 @@ Route::group(['prefix' => 'v1'], function () {
             // roles routes
             Route::prefix('role')->as('role.')->group(function () {
                 // role for fetch, store, update
-                Route::get('/', [CRMRoleAPIController::class, 'index'])->name('index');
-                Route::get('/show/{id}', [CRMRoleAPIController::class, 'show'])->name('show');
-                Route::post('/create', [CRMRoleAPIController::class, 'store'])->name('store');
-                Route::patch('/update/{id}', [CRMRoleAPIController::class, 'update'])->name('update');
+                Route::get('/', [CRMRoleAPIController::class, 'index'])->name('index')->middleware('check.permission:ROLE.READ_ALL');
+                Route::get('/show/{id}', [CRMRoleAPIController::class, 'show'])->name('show')->middleware('check.permission:ROLE.READ');
+                Route::post('/create', [CRMRoleAPIController::class, 'store'])->name('store')->middleware('check.permission:ROLE.CREATE');
+                Route::put('/update/{id}', [CRMRoleAPIController::class, 'update'])->name('update')->middleware('check.permission:ROLE.UPDATE');
 
-                Route::get('/changeStatus/{id}', [CRMRoleAPIController::class, 'toggleStatus'])->name('toggleStatus');
-                Route::delete('/destroy/{id}', [CRMRoleAPIController::class, 'destroy'])->name('destroy');
+                Route::get('/changeStatus/{id}', [CRMRoleAPIController::class, 'toggleStatus'])->name('toggleStatus')->middleware('check.permission:ROLE.CHANGE_STATUS');
+                Route::delete('/destroy/{id}', [CRMRoleAPIController::class, 'destroy'])->name('destroy')->middleware('check.permission:ROLE.DELETE');
 
             });
 
@@ -47,13 +47,13 @@ Route::group(['prefix' => 'v1'], function () {
              // user routes
              Route::prefix('users')->as('users.')->group(function () {
                 // role for fetch, store, update
-                Route::get('/', [UserAPIController::class, 'index'])->name('index');
-                Route::get('/show/{id}', [UserAPIController::class, 'show'])->name('show');
-                Route::post('/create', [UserAPIController::class, 'store'])->name('store');
-                Route::patch('/update/{id}', [UserAPIController::class, 'update'])->name('update');
+                Route::get('/', [UserAPIController::class, 'index'])->name('index')->middleware('check.permission:USERS.READ_ALL');
+                Route::get('/show/{id}', [UserAPIController::class, 'show'])->name('show')->middleware('check.permission:USERS.READ');
+                Route::post('/create', [UserAPIController::class, 'store'])->name('store')->middleware('check.permission:USERS.CREATE');
+                Route::put('/update/{id}', [UserAPIController::class, 'update'])->name('update')->middleware('check.permission:USERS.UPDATE');
 
-                Route::get('/changeStatus/{id}', [UserAPIController::class, 'toggleStatus'])->name('toggleStatus');
-                Route::delete('/destroy/{id}', [UserAPIController::class, 'destroy'])->name('destroy');
+                Route::get('/changeStatus/{id}', [UserAPIController::class, 'toggleStatus'])->name('toggleStatus')->middleware('check.permission:USERS.CHANGE_STATUS');
+                Route::delete('/destroy/{id}', [UserAPIController::class, 'destroy'])->name('destroy')->middleware('check.permission:USERS.DELETE');
 
             });
 

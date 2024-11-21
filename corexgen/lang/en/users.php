@@ -14,7 +14,8 @@ return [
     'Create New User' => 'Create New User',
     'Update User' => 'Update User',
     'Password' => 'Password',
-    'Full Name' => 'Full Name'
+    'Full Name' => 'Full Name',
+    'No Users Found' => 'No Users Found'
 
 
 ];

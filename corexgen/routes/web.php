@@ -64,38 +64,38 @@ Route::middleware([
     // role routes
     Route::prefix('role')->as('role.')->group(function () {
         // role for fetch, store, update
-        Route::get('/', [CRMRoleController::class, 'index'])->name('index');
-        Route::post('/', [CRMRoleController::class, 'store'])->name('store');
-        Route::patch('/', [CRMRoleController::class, 'update'])->name('update');
+        Route::get('/', [CRMRoleController::class, 'index'])->name('index')->middleware('check.permission:ROLE.READ_ALL');
+        Route::post('/', [CRMRoleController::class, 'store'])->name('store')->middleware('check.permission:ROLE.CREATE');
+        Route::put('/', [CRMRoleController::class, 'update'])->name('update')->middleware('check.permission:ROLE.UPDATE');
 
         // create, edit, change status, delete
-        Route::get('/create', [CRMRoleController::class, 'create'])->name('create');
-        Route::get('/edit/{id}', [CRMRoleController::class, 'edit'])->name('edit');
-        Route::get('/changeStatus/{id}', [CRMRoleController::class, 'changeStatus'])->name('changeStatus');
-        Route::delete('/destroy/{id}', [CRMRoleController::class, 'destroy'])->name('destroy');
+        Route::get('/create', [CRMRoleController::class, 'create'])->name('create')->middleware('check.permission:ROLE.CREATE');
+        Route::get('/edit/{id}', [CRMRoleController::class, 'edit'])->name('edit')->middleware('check.permission:ROLE.UPDATE');
+        Route::get('/changeStatus/{id}', [CRMRoleController::class, 'changeStatus'])->name('changeStatus')->middleware('check.permission:ROLE.CHANGE_STATUS');
+        Route::delete('/destroy/{id}', [CRMRoleController::class, 'destroy'])->name('destroy')->middleware('check.permission:ROLE.DELETE');
 
         // validate, export, import
-        Route::get('/export', [CRMRoleController::class, 'export'])->name('export');
-        Route::post('/import', [CRMRoleController::class, 'import'])->name('import');
+        Route::get('/export', [CRMRoleController::class, 'export'])->name('export')->middleware('check.permission:ROLE.EXPORT');
+        Route::post('/import', [CRMRoleController::class, 'import'])->name('import')->middleware('check.permission:ROLE.IMPORT');
         Route::post('/validate-field', [CRMRoleController::class, 'validateField'])->name('validate-field');
     });
 
     // users routes
     Route::prefix('users')->as('users.')->group(function () {
         // role for fetch, store, update
-        Route::get('/', [UserController::class, 'index'])->name('index');
-        Route::post('/', [UserController::class, 'store'])->name('store');
-        Route::patch('/', [UserController::class, 'update'])->name('update');
+        Route::get('/', [UserController::class, 'index'])->name('index')->middleware('check.permission:USERS.READ_ALL');
+        Route::post('/', [UserController::class, 'store'])->name('store')->middleware('check.permission:USERS.CREATE');
+        Route::put('/', [UserController::class, 'update'])->name('update')->middleware('check.permission:USERS.UPDATE');
 
         // create, edit, change status, delete
-        Route::get('/create', [UserController::class, 'create'])->name('create');
-        Route::get('/edit/{id}', [UserController::class, 'edit'])->name('edit');
-        Route::get('/changeStatus/{id}', [UserController::class, 'changeStatus'])->name('changeStatus');
-        Route::delete('/destroy/{id}', [UserController::class, 'destroy'])->name('destroy');
+        Route::get('/create', [UserController::class, 'create'])->name('create')->middleware('check.permission:USERS.CREATE');
+        Route::get('/edit/{id}', [UserController::class, 'edit'])->name('edit')->middleware('check.permission:USERS.UPDATE');
+        Route::get('/changeStatus/{id}', [UserController::class, 'changeStatus'])->name('changeStatus')->middleware('check.permission:USERS.CHANGE_STATUS');
+        Route::delete('/destroy/{id}', [UserController::class, 'destroy'])->name('destroy')->middleware('check.permission:USERS.DELETE');
 
         // validate, export, import
-        Route::get('/export', [UserController::class, 'export'])->name('export');
-        Route::post('/import', [UserController::class, 'import'])->name('import');
+        Route::get('/export', [UserController::class, 'export'])->name('export')->middleware('check.permission:USERS.EXPORT');
+        Route::post('/import', [UserController::class, 'import'])->name('import')->middleware('check.permission:USERS.IMPORT');
       
     });
 
@@ -104,15 +104,15 @@ Route::middleware([
         // permissions routes
         Route::prefix('permissions')->as('permissions.')->group(function () {
             // role for fetch, store, update
-            Route::get('/', [CRMRolePermissionsController::class, 'index'])->name('index');
-            Route::post('/', [CRMRolePermissionsController::class, 'store'])->name('store');
-            Route::patch('/', [CRMRolePermissionsController::class, 'update'])->name('update');
+            Route::get('/', [CRMRolePermissionsController::class, 'index'])->name('index')->middleware('check.permission:PERMISSIONS.READ_ALL');
+            Route::post('/', [CRMRolePermissionsController::class, 'store'])->name('store')->middleware('check.permission:PERMISSIONS.CREATE');
+            Route::put('/', [CRMRolePermissionsController::class, 'update'])->name('update')->middleware('check.permission:PERMISSIONS.UPDATE');
     
             // create, edit, change status, delete
-            Route::get('/create', [CRMRolePermissionsController::class, 'create'])->name('create');
-            Route::get('/edit/{id}', [CRMRolePermissionsController::class, 'edit'])->name('edit');
+            Route::get('/create', [CRMRolePermissionsController::class, 'create'])->name('create')->middleware('check.permission:PERMISSIONS.CREATE');
+            Route::get('/edit/{id}', [CRMRolePermissionsController::class, 'edit'])->name('edit')->middleware('check.permission:PERMISSIONS.UPDATE');
         
-            Route::delete('/destroy/{id}', [CRMRolePermissionsController::class, 'destroy'])->name('destroy');
+            Route::delete('/destroy/{id}', [CRMRolePermissionsController::class, 'destroy'])->name('destroy')->middleware('check.permission:PERMISSIONS.DELETE');
     
       
           

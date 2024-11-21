@@ -11,7 +11,8 @@ return [
     'Create New Permissions' => 'Create New Permissions',
     'Update Permissions' => 'Update Permissions',
     'No Permissions Found' => 'No Permissions Found',
-    'Select Role' => 'Select Role'
+    'Select Role' => 'Select Role',
+    'Role Name' => 'Role Name'
 
 
 ];
