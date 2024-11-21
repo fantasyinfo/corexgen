@@ -13,29 +13,51 @@
             @endif
 
             {{-- Pagination Elements --}}
-            @foreach ($elements as $element)
-                {{-- "Three Dots" Separator --}}
-                @if (is_string($element))
+            @php
+                $currentPage = $paginator->currentPage();
+                $lastPage = $paginator->lastPage();
+                
+                // Calculate start and end for main pagination range
+                $start = max(1, $currentPage - 3);
+                $end = min($lastPage, $currentPage + 3);
+            @endphp
+
+            {{-- First page if not in range --}}
+            @if ($start > 1)
+                <li>
+                    <a href="{{ $paginator->url(1) }}">1</a>
+                </li>
+                @if ($start > 2)
                     <li>
                         <span><i class="bi bi-dot"></i></span>
                     </li>
                 @endif
+            @endif
 
-                {{-- Array Of Links --}}
-                @if (is_array($element))
-                    @foreach ($element as $page => $url)
-                        @if ($page == $paginator->currentPage())
-                            <li>
-                                <a href="javascript:void(0);" class="active">{{ $page }}</a>
-                            </li>
-                        @else
-                            <li>
-                                <a href="{{ $url }}">{{ $page }}</a>
-                            </li>
-                        @endif
-                    @endforeach
+            {{-- Main pagination range --}}
+            @for ($page = $start; $page <= $end; $page++)
+                @if ($page == $currentPage)
+                    <li>
+                        <a href="javascript:void(0);" class="active">{{ $page }}</a>
+                    </li>
+                @else
+                    <li>
+                        <a href="{{ $paginator->url($page) }}">{{ $page }}</a>
+                    </li>
                 @endif
-            @endforeach
+            @endfor
+
+            {{-- Last page if not in range --}}
+            @if ($end < $lastPage)
+                @if ($end < $lastPage - 1)
+                    <li>
+                        <span><i class="bi bi-dot"></i></span>
+                    </li>
+                @endif
+                <li>
+                    <a href="{{ $paginator->url($lastPage) }}">{{ $lastPage }}</a>
+                </li>
+            @endif
 
             {{-- Next Page Link --}}
             @if ($paginator->hasMorePages())
