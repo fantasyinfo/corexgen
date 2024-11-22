@@ -10,7 +10,8 @@ return [
     'Description' => 'Description',
     'Create New Settings' => 'Create New role',
     'Update Settings' => 'Update Settings',
-    'No Settings Found' => 'No Settings Found'
+    'No Settings Found' => 'No Settings Found',
+    'General' => 'General',
 
 
 ];

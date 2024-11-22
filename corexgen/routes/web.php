@@ -4,6 +4,7 @@
 use App\Http\Controllers\CountryCitySeederController;
 use App\Http\Controllers\CRM\CRMRoleController;
 use App\Http\Controllers\CRM\CRMRolePermissionsController;
+use App\Http\Controllers\CRM\CRMSettingsController;
 use App\Http\Controllers\SystemInstallerController;
 use App\Http\Controllers\UserController;
 use App\Models\CRM\CRMRole;
@@ -158,8 +159,8 @@ Route::middleware([
     // settings routes
     Route::prefix('settings')->as('settings.')->group(function () {
         // role for fetch, store, update
-        Route::get('/', [CRMRolePermissionsController::class, 'index'])->name('index')->middleware('check.permission:SETTINGS.READ_ALL');
-        Route::put('/', [CRMRolePermissionsController::class, 'update'])->name('update')->middleware('check.permission:SETTINGS.UPDATE');
+        Route::get('/', [CRMSettingsController::class, 'index'])->name('index')->middleware('check.permission:SETTINGS.READ_ALL');
+        Route::put('/', [CRMSettingsController::class, 'update'])->name('update')->middleware('check.permission:SETTINGS.UPDATE');
     });
 
 

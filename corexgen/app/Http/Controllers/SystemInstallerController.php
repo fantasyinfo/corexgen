@@ -376,6 +376,8 @@ class SystemInstallerController extends Controller
         Artisan::call('db:seed', ['--class' => 'CRMPermissionsSeeder']);
         Artisan::call('db:seed', ['--class' => 'CRMMenuSeeder']);
         Artisan::call('db:seed', ['--class' => 'CRMRoleSeeder']);
+        Artisan::call('db:seed', ['--class' => 'CRMSettingsSeeder']);
+    
     }
 
     private function createSuperAdmin(Request $request)
