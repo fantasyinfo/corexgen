@@ -158,6 +158,13 @@ public function installApplication(Request $request)
         \Log::info('Generating application key');
         Artisan::call('key:generate');
 
+          // Step 9: Update the .env File (Defer to the End)
+          $this->updateEnvironmentFile($request);
+
+          // Step 10: Clear and Cache Configuration
+          Artisan::call('config:clear');
+          Artisan::call('config:cache');
+
         // Step 10: Return Success Response
         return response()->json([
             'status' => 'success',
@@ -224,61 +231,7 @@ public function installApplication(Request $request)
         File::put($envPath, implode("\n", $lines));
     }
     
-    public function updateEnvironmentFromConfig()
-{
-    try {
-        // Get the current path of the .env file
-        $envPath = base_path('.env');
-        if (!File::exists($envPath)) {
-            throw new \Exception('.env file not found.');
-        }
 
-        // Create an associative array of the key-value pairs to update based on current configuration
-        $replacements = [
-            'APP_NAME' => config('app.name'),
-            'APP_URL' => config('app.url'),
-            'DB_HOST' => config('database.connections.mysql.host'),
-            'DB_PORT' => config('database.connections.mysql.port'),
-            'DB_DATABASE' => config('database.connections.mysql.database'),
-            'DB_USERNAME' => config('database.connections.mysql.username'),
-            'DB_PASSWORD' => config('database.connections.mysql.password'),
-            'SESSION_DRIVER' => config('session.driver')
-        ];
-
-        // Read the .env file and modify it line by line to ensure minimal change
-        $envContent = File::get($envPath);
-        $lines = explode("\n", $envContent);
-
-        foreach ($lines as $index => $line) {
-            foreach ($replacements as $key => $value) {
-                if (str_contains($line, "{$key}=")) {
-                    $lines[$index] = "{$key}={$value}";
-                }
-            }
-        }
-
-        // Write the modified content back to the .env file
-        File::put($envPath, implode("\n", $lines));
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Environment file updated successfully.'
-        ]);
-
-    } catch (\Exception $e) {
-        // Log the error and return a failure response
-        \Log::error('Failed to update .env file', [
-            'message' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ]);
-
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Failed to update environment file.',
-            'error_details' => $e->getMessage()
-        ], 500);
-    }
-}
 
     private function checkExtensions()
     {

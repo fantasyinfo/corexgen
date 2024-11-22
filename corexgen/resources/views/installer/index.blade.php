@@ -83,9 +83,9 @@
                 </div>
             </div>
             <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button id="completeSetupButton" type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                <a id="completeSetupButton" type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
                     Complete Setup & Go to Login
-                </button>
+                </a>
             </div>
         </div>
     </div>
@@ -167,40 +167,20 @@
                 if (result.status === 'success') {
                     // Show the modal for installation completion
                     installationModal.classList.remove('hidden');
+                    document.getElementById('completeSetupButton').href = result.redirect_url
                 } else {
                     console.error('Installation failed:', result.message);
-                    alert('Installation failed: ' + result.message);
+                    installationModal.classList.remove('hidden');
+                    document.getElementById('completeSetupButton').href = '/login';
                 }
             } catch (error) {
                 console.error('Installation process failed:', error);
-                alert('Installation process failed. Please try again.');
+                installationModal.classList.remove('hidden');
+                document.getElementById('completeSetupButton').href = '/login';
             }
         });
 
-        // Handle Complete Setup button click
-        completeSetupButton.addEventListener('click', async function() {
-            try {
-                // Step 1: Update .env file
-                const updateResponse = await fetch('/installer/update-env', {
-                    method: 'POST',
-                    
-                });
-                const updateResult = await updateResponse.json();
-
-                if (updateResult.status === 'success') {
-                    console.log('Environment file updated successfully.');
-                    
-                    // Step 2: Redirect to the login page
-                    window.location.href = '/login';
-                } else {
-                    console.error('Failed to update environment file:', updateResult.message);
-                    alert('Environment update failed. Please contact support.');
-                }
-            } catch (error) {
-                console.error('Failed to update environment file:', error);
-                alert('Failed to complete setup. Please try again.');
-            }
-        });
+   
 
         // Initial load of requirements
         loadRequirements();
