@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Fortify\Features;
+use Illuminate\Support\Facades\File;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -35,7 +36,14 @@ Route::prefix('installer')->group(function() {
     Route::post('/test-database', [SystemInstallerController::class, 'testDatabaseConnection']);
     Route::post('/test-smtp', [SystemInstallerController::class, 'testSmtpConnection']);
     Route::post('/install', [SystemInstallerController::class, 'installApplication']);
+    Route::get('/status', function () {
+        if (File::exists(storage_path('installed.lock'))) {
+            return response()->json(['status' => 'success']);
+        }
+        return response()->json(['status' => 'pending']);
+    });
 });
+
 
 
 // Example of applying it to a group of routes

@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
-
+use Illuminate\Support\Facades\Config;
 class SystemInstallerController extends Controller
 {
     public function showInstaller()
@@ -145,10 +145,80 @@ class SystemInstallerController extends Controller
         }
     }
 
-    public function installApplication(Request $request)
+
+    private function reConnectDB($request)
+    {
+        config(['database.default' => 'mysql']);
+
+
+        // Dynamically update database configuration
+        Config::set('database.connections.mysql', [
+            'driver' => 'mysql',
+            'host' => $request->db_host,
+            'port' => $request->db_port,
+            'database' => $request->db_name,
+            'username' => $request->db_username,
+            'password' => $request->db_password,
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => true,
+            'engine' => null,
+        ]);
+
+        // Reconnect to apply the new configuration
+        DB::purge('mysql');
+        DB::reconnect('mysql');
+
+        \Log::info('DB is Reconnected.');
+    }
+
+
+    private function ensureDatabaseExists($host, $port, $username, $password, $database)
     {
         try {
+            // Connect to the server (not the specific database)
+            $pdo = new \PDO("mysql:host=$host;port=$port", $username, $password);
+            $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
+            // Check if the database exists
+            $result = $pdo->query("SHOW DATABASES LIKE '$database'")->fetch();
+            if (!$result) {
+                // Create the database
+                $pdo->exec("CREATE DATABASE `$database` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+            }
+        } catch (\Exception $e) {
+            throw new \Exception("Database creation failed: " . $e->getMessage());
+        }
+    }
+
+
+    public function installApplication(Request $request)
+    {
+        \Log::info('Reached to the installation function');
+        try {
+            \Log::info('Installation Begin');
+
+            \Log::info('Ensure DB Connect');
+            $this->ensureDatabaseExists(
+                $request->db_host,
+                $request->db_port,
+                $request->db_username,
+                $request->db_password,
+                $request->db_name
+            );
+
+
+            \Log::info('Reconnect the DB');
+            $this->reConnectDB($request);
+
+            // Test connection immediately
+            DB::connection('mysql')->getPdo();
+
+            \Log::info('DB Transaction Begin');
             DB::beginTransaction();
+
+         
 
             $validator = Validator::make($request->all(), [
                 'site_name' => 'required|string|max:255',
@@ -171,24 +241,37 @@ class SystemInstallerController extends Controller
             ]);
 
             if ($validator->fails()) {
+                \Log::info('Validation Failed');
                 return response()->json([
                     'status' => 'error',
                     'errors' => $validator->errors()
                 ], 422);
             }
 
+
+            \Log::info('Migration Started.');
             // Run migrations
             Artisan::call('migrate:fresh');
+
+            \Log::info('Seeders Started.');
+
             $this->runSeeders();
 
+            \Log::info('Super Admin Creating...');
             // Create super admin
             $buyer = $this->createSuperAdmin($request);
 
-            // Update environment file
-            $this->updateEnvironmentFile($request, $buyer->buyer_id);
+          
 
             // Create installation lock file
             File::put(storage_path('installed.lock'), 'Installation completed on ' . now());
+
+
+            \Log::info('Updating the .env file...');
+            // Update environment file
+            $this->updateEnvironmentFile($request, $buyer->buyer_id);
+
+            \Log::info('Artisan Calls...');
 
             // Generate application key
             Artisan::call('key:generate');
@@ -197,8 +280,16 @@ class SystemInstallerController extends Controller
             Artisan::call('config:clear');
             Artisan::call('config:cache');
 
+            \Log::info('DB Commit...');
+
             DB::commit();
 
+            session()->put('installation_success', true);
+
+
+
+
+            \Log::info('Installation Succfully...');
             return response()->json([
                 'status' => 'success',
                 'message' => 'Installation Successful',
