@@ -4,7 +4,9 @@ use App\Models\User;
 use App\Models\CRM\CRMRole;
 use App\Models\CRM\CRMRolePermissions;
 use Illuminate\Support\Facades\DB;
-
+use App\Models\Media;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 
 final class PermissionsIds
@@ -93,6 +95,95 @@ final class PermissionsIds
         ]
     ]
 ]);
+
+
+
+
+
+!defined('CRM_SETTINGS') && define('CRM_SETTINGS', [
+    'GENERAL_SETTINGS' => [
+        'COMPANY_NAME' => [
+            'key' => 'Company Name',
+            'value' => 'Core X Gen',
+            'is_media_setting' => false,
+            'media_id' => null,
+        ],
+        'COMPANY_TAGLINE' => [
+            'key' => 'Company Tagline',
+            'value' => 'Next Generation CRM',
+            'is_media_setting' => false,
+            'media_id' => null,
+        ],
+        'COMPANY_LOGO' => [
+            'key' => 'Company Logo',
+            'value' => '/',
+            'is_media_setting' => true,
+            'media_id' => null,
+        ],
+        'DATE_FORMAT' => [
+            'key' => 'Date Format',
+            'value' => 'DD/MM/YYYY',
+            'is_media_setting' => false,
+            'media_id' => null,
+        ],
+        'TIME_FORMAT' => [
+            'key' => 'Time Format',
+            'value' => '12 Hours',
+            'is_media_setting' => false,
+            'media_id' => null,
+        ],
+        'TIME_ZONE' => [
+            'key' => 'Time Zone',
+            'value' => 'Asia/Kolkata',
+            'is_media_setting' => false,
+            'media_id' => null,
+        ],
+
+    ],
+]);
+
+
+
+
+
+function createMedia(UploadedFile $file)
+{
+    // Validate or process the file as needed
+
+    $mediaDirectory = storage_path('app/public/media');
+    if (!file_exists($mediaDirectory)) {
+        mkdir($mediaDirectory, 0775, true);
+    }
+
+    // Store the file in the 'media' directory (can be customized to use any disk)
+    $filePath = $file->store('media', 'public');
+
+    // Create the media record in the database
+    $media = Media::create([
+        'file_name' => $file->getClientOriginalName(),
+        'file_path' => $filePath,
+        'file_type' => $file->getMimeType(),
+        'file_extension' => $file->getClientOriginalExtension(),
+        'size' => $file->getSize(),
+        'buyer_id' =>  auth()->user()->buyer_id,
+        'is_super_user' => auth()->user()->is_super_user,
+        'created_by' => auth()->user()->id,
+        'updated_by' => auth()->user()->id,
+        'status' => 'active',
+    ]);
+
+    // Return the created media record
+    return $media;
+}
+
+
+
+
+
+
+
+
+
 
 
 
@@ -283,7 +374,7 @@ function hasMenuPermission($permissionId = null)
     // for superadmins
     $userRoleId = auth()->user()->role_id;
 
-    if($userRoleId == 1) return true;
+    if ($userRoleId == 1) return true;
 
     if ($permissionId == null)
         return false;

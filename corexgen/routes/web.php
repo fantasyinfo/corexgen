@@ -62,11 +62,6 @@ Route::middleware(['check.installation'])->group(function () {
         return view('auth.login');
     })->name('login');
 
-
-
-
-
-
 });
 
 
