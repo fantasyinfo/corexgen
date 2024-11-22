@@ -1,11 +1,12 @@
 php artisan db:seed --class=UserSeeder
 php artisan db:seed --class=CRMPermissionsSeeder
 php artisan db:seed --class=CRMMenuSeeder
+php artisan db:seed --class=CRMSettingsSeeder
 
 
 
 
-# change the .env file SESSION_DRIVER=file 
+# change the .env file SESSION_DRIVER=file
 rm -f bootstrap/cache/config.php
 
 
@@ -20,6 +21,12 @@ php artisan optimize
 
 // for learning
 php artisan migrate:rollback --step=1
+php artisan make:job SeedCountriesCities
+
+
+/usr/local/bin/php /home/your-username/public_html/artisan queue:work --daemon
+
+php artisan queue:work
 
 
 u804660301_corexgen

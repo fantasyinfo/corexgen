@@ -15,7 +15,8 @@ final class PermissionsIds
         'DASHBOARD' => [501 => 'READ', 502 => 'READ_ALL'],
         'ROLE' => [551 => 'CREATE', 552 => 'READ', 553 => 'READ_ALL', 554 => 'UPDATE', 555 => 'DELETE', 556 => 'IMPORT', 557 => 'EXPORT', 558 => 'FILTER', 559 => 'CHANGE_STATUS',],
         'USERS' => [601 => 'CREATE', 602 => 'READ', 103 => 'READ_ALL', 604 => 'UPDATE', 605 => 'DELETE', 606 => 'IMPORT', 607 => 'EXPORT', 608 => 'FILTER', 609 => 'CHANGE_STATUS',],
-        'PERMISSIONS' => [651 => 'CREATE', 652 => 'READ', 653 => 'READ_ALL', 654 => 'UPDATE', 655 => 'DELETE', 656 => 'FILTER',]
+        'PERMISSIONS' => [651 => 'CREATE', 652 => 'READ', 653 => 'READ_ALL', 654 => 'UPDATE', 655 => 'DELETE', 656 => 'FILTER',],
+        'SETTINGS' => [701 => 'READ', 654 => 'UPDATE',],
 
     ];
 
@@ -65,6 +66,11 @@ final class PermissionsIds
         'id' => PermissionsIds::$PARENT_PERMISSION_IDS['4'],
         'children' => PermissionsIds::$PERMISSIONS_IDS['PERMISSIONS']
     ],
+    'SETTINGS' => [
+        'name' => 'CRM_SETTINGS',
+        'id' => PermissionsIds::$PARENT_PERMISSION_IDS['5'],
+        'children' => PermissionsIds::$PERMISSIONS_IDS['SETTINGS']
+    ],
 ]);
 
 !defined('CRM_MENU_ITEMS') && define('CRM_MENU_ITEMS', [
@@ -93,7 +99,14 @@ final class PermissionsIds
         'children' => [
             'Users' => ['menu_url' => 'crm.users.index', 'menu_icon' => 'feather-corner-down-right', 'permission_id' => PermissionsIds::findPermissionKey('USERS', 'READ_ALL')],
         ]
-    ]
+    ],
+    'Settings' => [
+        'menu_icon' => 'feather-settings',
+        'permission_id' => PermissionsIds::$PARENT_PERMISSION_IDS['4'],
+        'children' => [
+            'Settings' => ['menu_url' => 'crm.settings.index', 'menu_icon' => 'feather-corner-down-right', 'permission_id' => PermissionsIds::findPermissionKey('SETTINGS', 'READ')],
+        ]
+    ],
 ]);
 
 
@@ -101,45 +114,40 @@ final class PermissionsIds
 
 
 !defined('CRM_SETTINGS') && define('CRM_SETTINGS', [
-    'GENERAL_SETTINGS' => [
-        'COMPANY_NAME' => [
-            'key' => 'Company Name',
-            'value' => 'Core X Gen',
-            'is_media_setting' => false,
-            'media_id' => null,
-        ],
-        'COMPANY_TAGLINE' => [
-            'key' => 'Company Tagline',
-            'value' => 'Next Generation CRM',
-            'is_media_setting' => false,
-            'media_id' => null,
-        ],
-        'COMPANY_LOGO' => [
-            'key' => 'Company Logo',
-            'value' => '/',
-            'is_media_setting' => true,
-            'media_id' => null,
-        ],
-        'DATE_FORMAT' => [
-            'key' => 'Date Format',
-            'value' => 'DD/MM/YYYY',
-            'is_media_setting' => false,
-            'media_id' => null,
-        ],
-        'TIME_FORMAT' => [
-            'key' => 'Time Format',
-            'value' => '12 Hours',
-            'is_media_setting' => false,
-            'media_id' => null,
-        ],
-        'TIME_ZONE' => [
-            'key' => 'Time Zone',
-            'value' => 'Asia/Kolkata',
-            'is_media_setting' => false,
-            'media_id' => null,
-        ],
 
+    'COMPANY_NAME' => [
+        'key' => 'Company Name',
+        'value' => 'Core X Gen',
+        'is_media_setting' => false,
+        'media_id' => null,
     ],
+    'COMPANY_TAGLINE' => [
+        'key' => 'Company Tagline',
+        'value' => 'Next Generation CRM',
+        'is_media_setting' => false,
+        'media_id' => null,
+    ],
+    'COMPANY_LOGO' => [
+        'key' => 'Company Logo',
+        'value' => '/',
+        'is_media_setting' => true,
+        'media_id' => null,
+    ],
+    'DATE_FORMAT' => [
+        'key' => 'Date Format',
+        'value' => 'DD/MM/YYYY',
+        'is_media_setting' => false,
+        'media_id' => null,
+    ],
+    'TIME_FORMAT' => [
+        'key' => 'Time Format',
+        'value' => '12 Hours',
+        'is_media_setting' => false,
+        'media_id' => null,
+    ],
+
+
+
 ]);
 
 

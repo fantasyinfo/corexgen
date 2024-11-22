@@ -1,6 +1,7 @@
 <?php
 
 // crm routes
+use App\Http\Controllers\CountryCitySeederController;
 use App\Http\Controllers\CRM\CRMRoleController;
 use App\Http\Controllers\CRM\CRMRolePermissionsController;
 use App\Http\Controllers\SystemInstallerController;
@@ -153,6 +154,19 @@ Route::middleware([
 
 
 
+
+    // settings routes
+    Route::prefix('settings')->as('settings.')->group(function () {
+        // role for fetch, store, update
+        Route::get('/', [CRMRolePermissionsController::class, 'index'])->name('index')->middleware('check.permission:SETTINGS.READ_ALL');
+        Route::put('/', [CRMRolePermissionsController::class, 'update'])->name('update')->middleware('check.permission:SETTINGS.UPDATE');
+    });
+
+
+
+
+    // add country, city tables in bg
+    Route::get('/add-default-countries-cities', [CountryCitySeederController::class, 'runSeeder']);
 
 
 });
