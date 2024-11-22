@@ -30,7 +30,8 @@ class User extends Authenticatable
         'email',
         'password',
         'role_id',
-        'buyer_id'
+        'buyer_id',
+        'is_super_user'
     ];
 
     /**

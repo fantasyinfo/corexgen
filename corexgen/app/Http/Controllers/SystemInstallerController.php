@@ -11,24 +11,26 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
 
 class SystemInstallerController extends Controller
 {
-    //
     public function showInstaller()
     {
-  
-        // Check if already installed
         if (File::exists(storage_path('installed.lock'))) {
             return redirect()->route('login');
         }
-
         return view('installer.index');
     }
 
     protected $requiredExtensions = [
-        'pdo', 'mbstring', 'tokenizer', 'xml', 
-        'curl', 'openssl', 'json'
+        'pdo',
+        'mbstring',
+        'tokenizer',
+        'xml',
+        'curl',
+        'openssl',
+        'json'
     ];
 
     public function checkSystemRequirements()
@@ -46,192 +48,230 @@ class SystemInstallerController extends Controller
         ]);
     }
 
-    public function testDatabaseConnection(Request $request)
-{
-    $validator = Validator::make($request->all(), [
-        'db_host' => 'required',
-        'db_port' => 'required|integer',
-        'db_name' => 'required',
-        'db_username' => 'required',
-        'db_password' => 'nullable'
-    ]);
-
-    if ($validator->fails()) {
-        return response()->json(['errors' => $validator->errors()], 422);
-    }
-
-    $config = [
-        'driver'    => 'mysql',
-        'host'      => $request->input('db_host'),
-        'port'      => $request->input('db_port'),
-        'database'  => $request->input('db_name'),
-        'username'  => $request->input('db_username'),
-        'password'  => $request->input('db_password'),
-        'charset'   => 'utf8mb4',
-        'collation' => 'utf8mb4_unicode_ci',
-    ];
-
-    try {
-        // Set the new connection configuration
-        config(['database.connections.installer_test' => $config]);
-        
-        // Attempt to connect using the new configuration
-        $connection = DB::connection('installer_test');
-        $connection->getPdo();
-
-        return response()->json(['success' => true]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false, 
-            'message' => $e->getMessage()
-        ], 500);
-    }
-}
-
-
-public function installApplication(Request $request)
-{
-    try {
-        // Step 1: Validate the Request Data
+    public function verifyPurchaseCodeEndpoint(Request $request)
+    {
         $validator = Validator::make($request->all(), [
-            'site_name' => 'required|string|max:255',
-            'name' => 'required|string|max:255',
-            'admin_email' => 'required|email',
-            'admin_password' => 'required',
-            'db_host' => 'required|string',
-            'db_port' => 'required|numeric',
-            'db_name' => 'required|string',
-            'db_username' => 'required|string',
-            'db_password' => 'nullable|string',
             'purchase_code' => 'required|string'
         ]);
 
         if ($validator->fails()) {
-            \Log::error('Validation failed', ['errors' => $validator->errors()]);
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Validation Failed',
-                'errors' => $validator->errors()
-            ], 422);
+            return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Step 2: Verify Purchase Code
-        if (!$this->verifyPurchaseCode($request->purchase_code)) {
-            \Log::error('Purchase code verification failed');
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Invalid Purchase Code'
-            ], 403);
-        }
+        $isValid = $this->verifyPurchaseCode($request->purchase_code);
 
-        // Step 3: Update Configurations in Memory
-        config(['app.name' => $request->site_name]);
-        config(['database.connections.mysql.host' => $request->db_host]);
-        config(['database.connections.mysql.port' => $request->db_port]);
-        config(['database.connections.mysql.database' => $request->db_name]);
-        config(['database.connections.mysql.username' => $request->db_username]);
-        config(['database.connections.mysql.password' => $request->db_password]);
-
-        // Step 4: Run Database Migrations
-        \Log::info('Running database migrations');
-        Artisan::call('migrate:fresh');
-
-        // Step 5: Run Database Seeders
-        \Log::info('Running database seeders');
-     
-        $this->runSeeders();
-
-
-        // Step 6: Create Super Admin User
-        \Log::info('Creating super admin user');
-        $this->createSuperAdmin($request);
-
-        // Step 7: Create Installation Lock File to Prevent Re-installation
-        \Log::info('Creating installation lock file');
-        File::put(storage_path('installed.lock'), 'Installation completed on ' . now());
-
-        // Step 8: Update the Environment File at the End
-        // \Log::info('Updating environment file');
-        // $this->updateEnvironmentFile($request);
-
-        // Step 9: Generate Application Key
-        \Log::info('Generating application key');
-        Artisan::call('key:generate');
-
-          // Step 9: Update the .env File (Defer to the End)
-          $this->updateEnvironmentFile($request);
-
-          // Step 10: Clear and Cache Configuration
-          Artisan::call('config:clear');
-          Artisan::call('config:cache');
-
-        // Step 10: Return Success Response
         return response()->json([
-            'status' => 'success',
-            'message' => 'Installation Successful',
-            'redirect_url' => route('login')
+            'success' => $isValid,
+            'message' => $isValid ? 'Purchase code verified successfully' : 'Invalid purchase code'
         ]);
-
-    } catch (\Exception $e) {
-        // Log the Exception Details
-        \Log::error('Installation failed', [
-            'message' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ]);
-
-        // Return Error Response
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Installation Failed',
-            'error_details' => $e->getMessage()
-        ], 500);
     }
-}
 
+    public function testSmtpConnection(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'smtp_host' => 'required',
+            'smtp_port' => 'required|integer',
+            'smtp_username' => 'required',
+            'smtp_password' => 'required',
+            'smtp_encryption' => 'required|in:tls,ssl',
+            'mail_from_address' => 'required|email',
+            'mail_from_name' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        try {
+            config([
+                'mail.mailers.smtp.host' => $request->smtp_host,
+                'mail.mailers.smtp.port' => $request->smtp_port,
+                'mail.mailers.smtp.username' => $request->smtp_username,
+                'mail.mailers.smtp.password' => $request->smtp_password,
+                'mail.mailers.smtp.encryption' => $request->smtp_encryption,
+                'mail.from.address' => $request->mail_from_address,
+                'mail.from.name' => $request->mail_from_name,
+            ]);
+
+            // Try to send a test email
+            Mail::raw('Test email from installer', function($message) use ($request) {
+                $message->to($request->mail_from_address)
+                        ->subject('SMTP Test Email');
+            });
+
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function testDatabaseConnection(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'db_host' => 'required',
+            'db_port' => 'required|integer',
+            'db_name' => 'required',
+            'db_username' => 'required',
+            'db_password' => 'nullable'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $config = [
+            'driver' => 'mysql',
+            'host' => $request->input('db_host'),
+            'port' => $request->input('db_port'),
+            'database' => $request->input('db_name'),
+            'username' => $request->input('db_username'),
+            'password' => $request->input('db_password'),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+        ];
+
+        try {
+            config(['database.connections.installer_test' => $config]);
+            DB::connection('installer_test')->getPdo();
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function installApplication(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            $validator = Validator::make($request->all(), [
+                'site_name' => 'required|string|max:255',
+                'name' => 'required|string|max:255',
+                'admin_email' => 'required|email',
+                'admin_password' => 'required',
+                'db_host' => 'required|string',
+                'db_port' => 'required|numeric',
+                'db_name' => 'required|string',
+                'db_username' => 'required|string',
+                'db_password' => 'nullable|string',
+                'purchase_code' => 'required|string',
+                'smtp_host' => 'required',
+                'smtp_port' => 'required|integer',
+                'smtp_username' => 'required',
+                'smtp_password' => 'required',
+                'smtp_encryption' => 'required|in:tls,ssl',
+                'mail_from_address' => 'required|email',
+                'mail_from_name' => 'required'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 'error',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            // Run migrations
+            Artisan::call('migrate:fresh');
+            $this->runSeeders();
+
+            // Create super admin
+            $buyer = $this->createSuperAdmin($request);
+
+            // Update environment file
+            $this->updateEnvironmentFile($request, $buyer->buyer_id);
+
+            // Create installation lock file
+            File::put(storage_path('installed.lock'), 'Installation completed on ' . now());
+
+            // Generate application key
+            Artisan::call('key:generate');
+
+            // Clear and cache configuration
+            Artisan::call('config:clear');
+            Artisan::call('config:cache');
+
+            DB::commit();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Installation Successful',
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Installation failed', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Installation Failed: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 
     private function verifyPurchaseCode($code)
     {
-        // Implement purchase code verification
-        // Could be a remote API call or local validation
-        return true; // Placeholder
+        // Implement your purchase code verification logic here
+        // This is a placeholder - replace with actual verification
+        return true;
     }
 
-    private function updateEnvironmentFile(Request $request)
+    private function updateEnvironmentFile(Request $request, $buyerId)
     {
         $envPath = base_path('.env');
+        
         if (!File::exists($envPath)) {
             throw new \Exception('.env file not found.');
         }
-    
-        // Create an associative array of the key-value pairs to update
+
         $replacements = [
-            'APP_NAME' => preg_replace('/\s+/', '', $request->site_name),
+            'APP_NAME' => '"'.str_replace('"', '', $request->site_name).'"',
             'APP_URL' => url('/'),
             'DB_HOST' => $request->db_host,
             'DB_PORT' => $request->db_port,
             'DB_DATABASE' => $request->db_name,
             'DB_USERNAME' => $request->db_username,
             'DB_PASSWORD' => $request->db_password,
-            'SESSION_DRIVER' => 'database'
+            'MAIL_MAILER' => 'smtp',
+            'MAIL_HOST' => $request->smtp_host,
+            'MAIL_PORT' => $request->smtp_port,
+            'MAIL_USERNAME' => $request->smtp_username,
+            'MAIL_PASSWORD' => $request->smtp_password,
+            'MAIL_ENCRYPTION' => $request->smtp_encryption,
+            'MAIL_FROM_ADDRESS' => $request->mail_from_address,
+            'MAIL_FROM_NAME' => '"'.str_replace('"', '', $request->mail_from_name).'"',
+            'SESSION_DRIVER' => 'database',
+            'BUYER_ID' => $buyerId
         ];
-    
-        // Read the .env file, modify it line by line to ensure minimal change
+
         $envContent = File::get($envPath);
         $lines = explode("\n", $envContent);
-    
+
         foreach ($lines as $index => $line) {
             foreach ($replacements as $key => $value) {
                 if (str_contains($line, "{$key}=")) {
                     $lines[$index] = "{$key}={$value}";
+                    unset($replacements[$key]);
                 }
             }
         }
-    
-        // Write the modified content back to the .env file at the end
+
+        // Add any remaining replacements that weren't found
+        foreach ($replacements as $key => $value) {
+            $lines[] = "{$key}={$value}";
+        }
+
         File::put($envPath, implode("\n", $lines));
     }
-    
-
 
     private function checkExtensions()
     {
@@ -239,51 +279,42 @@ public function installApplication(Request $request)
             ->mapWithKeys(fn($ext) => [$ext => extension_loaded($ext)]);
     }
 
-
-    private function runSeeders(){
-
+    private function runSeeders()
+    {
         Artisan::call('db:seed');
         Artisan::call('db:seed', ['--class' => 'CRMPermissionsSeeder']);
         Artisan::call('db:seed', ['--class' => 'CRMMenuSeeder']);
         Artisan::call('db:seed', ['--class' => 'CRMRoleSeeder']);
     }
+
     private function createSuperAdmin(Request $request)
     {
+        $buyerIdToMaintain = time();
+        $buyer = Buyer::create([
+            'name' => $request->name,
+            'email' => $request->admin_email,
+            'buyer_id' => $buyerIdToMaintain,
+            'password' => Hash::make(value: $request->admin_password),
+        ]);
 
-        try {
-            DB::beginTransaction();
-   
-            // only for buyers/superadmin
-                $buyerIdToMaintain = time();
-                $buyer = Buyer::create([
-                    'name' => $request->name,
-                    'email' => $request->admin_email,
-                    'buyer_id' => $buyerIdToMaintain,
-                    'password' => Hash::make($request->admin_password),
-                    
-                ]);
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->admin_email,
+            'role_id' => 1,
+            'password' => Hash::make($request->admin_password),
+            'buyer_id' => $buyer->id,
+            'email_verified_at' => now(),
+            'is_super_user' => true
+        ]);
 
-                $userArr = [
-                    'name' => $request->name,
-                    'email' => $request->admin_email,
-                    'role_id' => 1, // superadmin 
-                    'password' => Hash::make($request->admin_password),
-                    'buyer_id' => $buyer->id,
-                    'email_verified_at' => now()
-                ];
-   
-                $user = User::create($userArr);
-                
-            
-        
-    
-            DB::commit();
-    
-        } catch (\Exception $e) {
-            DB::rollBack();
-            \Log::error('Database rollback at the time of super user creationg',[  'message' => $e->getMessage()]);
-        }
+        $details = [
+            'name' => $request->name,
+            'email' => $request->admin_email,
+            'buyer_id' => $buyer->buyer_id
+        ];
 
+        \Mail::to($user->email)->send(new \App\Mail\WelcomeSuperAdmin($details));
+
+        return $buyer;
     }
-
 }

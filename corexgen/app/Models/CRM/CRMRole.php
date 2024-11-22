@@ -18,7 +18,8 @@ class CRMRole extends Model
         'buyer_id',
         'created_by',
         'updated_by',
-        'status'
+        'status',
+        'is_super_user'
     ];
 
     protected $table = self::table;

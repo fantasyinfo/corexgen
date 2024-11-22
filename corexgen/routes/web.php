@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
+use Laravel\Fortify\Features;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -25,17 +26,16 @@ use Illuminate\Support\Facades\Auth;
 
 
 
-// Installer Routes
-Route::get('/install', [SystemInstallerController::class, 'showInstaller'])
-    ->name('installer.index');
 
 Route::prefix('installer')->group(function() {
+    Route::get('/install', [SystemInstallerController::class, 'showInstaller'])
+    ->name('installer.index');
     Route::get('/requirements', [SystemInstallerController::class, 'checkSystemRequirements']);
+    Route::post('/verify-purchase', [SystemInstallerController::class, 'verifyPurchaseCodeEndpoint']);
     Route::post('/test-database', [SystemInstallerController::class, 'testDatabaseConnection']);
+    Route::post('/test-smtp', [SystemInstallerController::class, 'testSmtpConnection']);
     Route::post('/install', [SystemInstallerController::class, 'installApplication']);
-    Route::post('/update-env', [SystemInstallerController::class, 'updateEnvironmentFromConfig']);
 });
-
 
 
 // Example of applying it to a group of routes
@@ -49,12 +49,24 @@ Route::middleware(['check.installation'])->group(function () {
         }
     })->name('home');
 
+
+    Route::get('/login', function(){
+        return view('auth.login');
+    })->name('login');
+
+
+
+
+
+
 });
 
 
 // register
 Route::get('/register', function () {
-    return view('auth.register', );
+    // return view('auth.register', );
+    // disable registration redirect to login page
+    return redirect()->route('login');
 })->name('register');
 
 

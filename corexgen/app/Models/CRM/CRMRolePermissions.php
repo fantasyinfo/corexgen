@@ -14,7 +14,8 @@ class CRMRolePermissions extends Model
     protected $fillable = [
         'role_id', 
         'buyer_id',
-        'permission_id'
+        'permission_id',
+        'is_super_user'
     ];
 
     protected $table = self::table;

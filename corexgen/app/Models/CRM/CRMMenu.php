@@ -18,6 +18,7 @@ class CRMMenu extends Model
         'menu_icon',
         'buyer_id',
         'permission_id',
+        'is_super_user'
     ];
 
     protected $table = self::table;

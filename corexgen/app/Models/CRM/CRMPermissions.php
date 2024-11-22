@@ -16,7 +16,8 @@ class CRMPermissions extends Model
         'buyer_id',
         'parent_menu',
         'parent_menu_id',
-        'permission_id'
+        'permission_id',
+        'is_super_user'
     ];
 
     protected $table = self::table;
