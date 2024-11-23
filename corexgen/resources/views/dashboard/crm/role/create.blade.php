@@ -1,9 +1,9 @@
-@extends('layout.app')
+@extends('layout.new.app')
 
 @section('content')
-<div class="container">
+<div class="container-fluid">
     <div class="row">
-        <div class="col-lg-12">
+        <div class="justify-content-md-center col-lg-8">
             <div class="card stretch stretch-full">
            
 
@@ -16,7 +16,7 @@
                                 <span class="fs-12 fw-normal text-muted text-truncate-1-line">{{ __('crud.Please add correct information') }}</span>
                             </h5>
                             <button type="submit" class="btn btn-primary">
-                                <i class="feather-plus me-2"></i> <span>{{ __('crm_role.Create Role') }}</span>
+                                <i class="fas fa-plus"></i> <span>{{ __('crm_role.Create Role') }}</span>
                             </button>
                         </div>
 
@@ -26,7 +26,7 @@
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">
-                                    <div class="input-group-text"><i class="feather-user"></i></div>
+                           
                                     <input type="text" 
                                            class="form-control @error('role_name') is-invalid @enderror" 
                                            id="roleName" 
@@ -49,7 +49,7 @@
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">
-                                    <div class="input-group-text"><i class="feather-file-text"></i></div>
+                                  
                                     <textarea 
                                         class="form-control @error('role_desc') is-invalid @enderror" 
                                         id="roleDesc" 
@@ -73,50 +73,5 @@
     </div>
 </div>
     @endsection
-    @push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('roleForm');
-            const roleName = document.getElementById('roleName');
-            const roleDesc = document.getElementById('roleDesc');
-            const roleNameError = document.getElementById('roleNameError');
-            const roleDescError = document.getElementById('roleDescError');
-        
-            // Real-time validation for role name
-            roleName.addEventListener('blur', function() {
-                validateField('role_name', this.value);
-            });
-        
-            // Real-time validation for role description
-            roleDesc.addEventListener('blur', function() {
-                validateField('role_desc', this.value);
-            });
-        
+ 
        
-            function validateField(field, value) {
-                fetch('{{ route("crm.role.validate-field") }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({ field, value })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    const errorElement = document.getElementById(`${field}Error`);
-                    const inputElement = document.getElementById(field === 'role_name' ? 'roleName' : 'roleDesc');
-        
-                    if (!data.valid) {
-                        inputElement.classList.add('is-invalid');
-                        errorElement.textContent = data.errors[0] || 'Invalid input';
-                    } else {
-                        inputElement.classList.remove('is-invalid');
-                        errorElement.textContent = '';
-                    }
-                });
-            }
-        });
-        </script>
-
-        @endpush

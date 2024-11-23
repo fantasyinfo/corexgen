@@ -23,6 +23,11 @@
             <li class="breadcrumb-item active" aria-current="page">{{$title ? $title : ''}}</li>
           </ol>
       </nav>
+
+          @include('layout.new.components.alert')
+          
+         <div class="toast-container" id="toastContainer"></div>
+
             @yield('content')
        </div>
 

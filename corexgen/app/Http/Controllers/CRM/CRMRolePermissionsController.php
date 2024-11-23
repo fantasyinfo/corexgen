@@ -9,6 +9,7 @@ use App\Models\CRM\CRMRolePermissions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Yajra\DataTables\Facades\DataTables;
 
 class CRMRolePermissionsController extends Controller
 {
@@ -32,14 +33,34 @@ class CRMRolePermissionsController extends Controller
             ->groupBy('crm_roles.id', 'crm_roles.role_name')
             ->select('crm_roles.id', 'crm_roles.role_name');
 
-        // Sorting
 
 
-        // Pagination with additional parameters
-        $permissions = $query->paginate($request->input('per_page', $this->perPage));
+        if ($request->ajax()) {
+            return DataTables::of($query)
+            ->addColumn('actions', function ($permissions) {
+                $editButton = '';
+                $deleteButton = '';
 
-        // Add query parameters to pagination links
-        $permissions->appends($request->all());
+                if (hasPermission('PERMISSIONS.UPDATE')) {
+                    $editButton = '<a href="' . route('crm.permissions.edit', $permissions->id) . '" class="btn btn-sm btn-warning" data-toggle="tooltip" title="Edit">
+                               <i class="fas fa-pencil-alt"></i>
+                           </a>';
+                }
+
+                if (hasPermission('PERMISSIONS.DELETE')) {
+                    $deleteButton = '<form action="' . route('crm.permissions.destroy', $permissions->id) . '" method="POST" style="display:inline;" onsubmit="return confirm(\'Are you sure?\');">
+                                 ' . csrf_field() . method_field('DELETE') . '
+                                 <button type="submit" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Delete">
+                                     <i class="fas fa-trash-alt"></i>
+                                 </button>
+                             </form>';
+                }
+
+                    return "<div class='text-end'> $editButton  $deleteButton </div>";
+                })
+                ->rawColumns(['actions', 'status']) // Add 'status' to raw columns
+                ->make(true);
+        }
 
 
         $roles = CRMRole::where('buyer_id', auth()->user()->buyer_id)
@@ -47,7 +68,7 @@ class CRMRolePermissionsController extends Controller
 
 
         return view('dashboard.crm.permissions.index', [
-            'permissions' => $permissions,
+          
             'filters' => $request->all(),
             'roles' => $roles,
             'title' => 'Permissions Management'

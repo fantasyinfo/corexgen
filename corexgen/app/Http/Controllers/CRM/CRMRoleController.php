@@ -8,6 +8,7 @@ use App\Models\CRM\CRMRole;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Yajra\DataTables\Facades\DataTables;
 
 class CRMRoleController extends Controller
 {
@@ -18,34 +19,73 @@ class CRMRoleController extends Controller
     public function index(Request $request)
     {
         $query = CRMRole::query()->where('buyer_id', auth()->user()->buyer_id);
-    
-        // Advanced Filtering
+
+        // Apply filters
         $query->when($request->filled('name'), function ($q) use ($request) {
             $q->where('role_name', 'LIKE', "%{$request->name}%");
         });
-    
+
         $query->when($request->filled('status'), function ($q) use ($request) {
             $q->where('status', $request->status);
         });
-    
+
         $query->when($request->filled('start_date'), function ($q) use ($request) {
             $q->whereDate('created_at', '>=', $request->start_date);
         });
-    
+
         $query->when($request->filled('end_date'), function ($q) use ($request) {
             $q->whereDate('created_at', '<=', $request->end_date);
         });
-    
-        // Sorting
-        $sortField = $request->input('sort', 'created_at');
-        $sortDirection = $request->input('direction', 'desc');
-        $query->orderBy($sortField, $sortDirection);
-    
-        // Get all results since we're using client-side DataTables
-        $roles = $query->get();
-    
+
+        // Server-side DataTables response
+        if ($request->ajax()) {
+            return DataTables::of($query)
+                ->addColumn('actions', function ($role) {
+                    $editButton = '';
+                    $deleteButton = '';
+
+                    if (hasPermission('ROLE.UPDATE')) {
+                        $editButton = '<a href="' . route('crm.role.edit', $role->id) . '" class="btn btn-sm btn-warning" data-toggle="tooltip" title="Edit">
+                               <i class="fas fa-pencil-alt"></i>
+                           </a>';
+                    }
+
+                    if (hasPermission('ROLE.DELETE')) {
+                        $deleteButton = '<form action="' . route('crm.role.destroy', $role->id) . '" method="POST" style="display:inline;" onsubmit="return confirm(\'Are you sure?\');">
+                                 ' . csrf_field() . method_field('DELETE') . '
+                                 <button type="submit" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Delete">
+                                     <i class="fas fa-trash-alt"></i>
+                                 </button>
+                             </form>';
+                    }
+
+                    return "<div class='text-end'> $editButton  $deleteButton </div>";
+                })
+                ->editColumn('created_at', function ($role) {
+                    return $role->created_at->format('d M Y');
+                })
+                ->editColumn('status', function ($role) {
+                    if (hasPermission('ROLE.CHANGE_STATUS')) {
+                        return "<a 
+                        data-toggle='tooltip' 
+                        data-placement='top' 
+                        title='" . ($role->status == 'active' ? 'De Active' : 'Active') . "' 
+                        href='" . route('crm.role.changeStatus', ['id' => $role->id]) . "'>
+                            <span class='badge " . ($role->status == 'active' ? 'bg-success' : 'bg-danger') . "'>
+                                " . ucfirst($role->status) . "
+                            </span>
+                        </a>";
+                    }
+
+                    return "<span class='badge " . ($role->status == 'active' ? 'bg-success' : 'bg-danger') . "'>
+                        " . ucfirst($role->status) . "
+                    </span>";
+                })
+                ->rawColumns(['actions', 'status']) // Add 'status' to raw columns
+                ->make(true);
+        }
+
         return view('dashboard.crm.role.index', [
-            'roles' => $roles,
             'filters' => $request->all(),
             'title' => 'Roles Management'
         ]);
@@ -140,7 +180,7 @@ class CRMRoleController extends Controller
     {
         $roleData = CRMRole::where('id', $id)
         ->where('buyer_id', auth()->user()->buyer_id)
-        ->firstOrFail();
+            ->firstOrFail();
         return view('dashboard.crm.role.edit', [
 
             'title' => 'Edit Role',
@@ -163,7 +203,7 @@ class CRMRoleController extends Controller
             'status' => 'nullable|in:active,inactive'
         ]);
 
-     
+
         $role = CRMRole::where('id', $request->id)
             ->where('buyer_id', auth()->user()->buyer_id)
             ->firstOrFail();
@@ -178,32 +218,32 @@ class CRMRoleController extends Controller
 
     public function export(Request $request)
     {
-        $query = CRMRole::query()->where('buyer_id',auth()->user()->buyer_id);
-    
+        $query = CRMRole::query()->where('buyer_id', auth()->user()->buyer_id);
+
         // Apply filters as in index method
         $query->when($request->filled('name'), function ($q) use ($request) {
             $q->where('role_name', 'LIKE', "%{$request->name}%");
         });
-    
+
         $query->when($request->filled('status'), function ($q) use ($request) {
             $q->where('status', $request->status);
         });
-    
+
         $query->when($request->filled('start_date'), function ($q) use ($request) {
             $q->whereDate('created_at', '>=', $request->start_date);
         });
-    
+
         $query->when($request->filled('end_date'), function ($q) use ($request) {
             $q->whereDate('created_at', '<=', $request->end_date);
         });
-    
+
         // Get the filtered data
         $roles = $query->get();
-    
+
         // Generate CSV content
         $csvData = [];
-        $csvData[] = ['ID', 'Role Name', 'Role Desc' ,'Status', 'Created At', 'Updated At']; // CSV headers
-    
+        $csvData[] = ['ID', 'Role Name', 'Role Desc', 'Status', 'Created At', 'Updated At']; // CSV headers
+
         foreach ($roles as $role) {
             $csvData[] = [
                 $role->id,
@@ -214,41 +254,41 @@ class CRMRoleController extends Controller
                 $role->updated_at->format('Y-m-d H:i:s'),
             ];
         }
-    
+
         // Convert the data to CSV string
         $csvContent = '';
         foreach ($csvData as $row) {
             $csvContent .= implode(',', $row) . "\n";
         }
-    
+
         // Return the response with the CSV content as a file
         $fileName = 'roles_export_' . now()->format('Y_m_d_H_i_s') . '.csv';
         return response($csvContent)
             ->header('Content-Type', 'text/csv')
             ->header('Content-Disposition', "attachment; filename={$fileName}");
     }
-    
+
     public function import(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'file' => 'required|mimes:csv,txt|max:2048', // Validate file type and size
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'errors' => $validator->errors(),
             ]);
         }
-    
+
         try {
             $file = $request->file('file');
             $data = array_map('str_getcsv', file($file->getRealPath()));
             $header = array_shift($data);
-    
+
             foreach ($data as $row) {
                 $row = array_combine($header, $row);
-    
+
                 CRMRole::create([
                     'role_name' => $row['role_name'] ?? '',
                     'role_desc' => $row['role_desc'] ?? '',
@@ -258,7 +298,7 @@ class CRMRoleController extends Controller
                     'updated_by' => auth()->user()->id,
                 ]);
             }
-    
+
             return response()->json([
                 'success' => true,
                 'message' => 'Roles imported successfully!',
@@ -270,7 +310,7 @@ class CRMRoleController extends Controller
             ]);
         }
     }
-    
+
 
     public function destroy($id)
     {
@@ -291,7 +331,8 @@ class CRMRoleController extends Controller
     }
 
 
-    public function changeStatus($id){
+    public function changeStatus($id)
+    {
         try {
             // Delete the role
             $role = CRMRole::where('id', $id)
@@ -308,7 +349,4 @@ class CRMRoleController extends Controller
             return redirect()->back()->with('error', 'Failed to changed the role status: ' . $e->getMessage());
         }
     }
-
-
-
 }

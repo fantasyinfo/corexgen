@@ -1,9 +1,9 @@
-@extends('layout.app')
+@extends('layout.new.app')
 
 @section('content')
 <div class="container">
     <div class="row">
-        <div class="col-lg-12">
+        <div class="justify-content-md-center col-lg-8">
             <div class="card stretch stretch-full">
                
 
@@ -18,7 +18,7 @@
                                 <span class="fs-12 fw-normal text-muted text-truncate-1-line">{{ __('crud.Please add correct information') }}</span>
                             </h5>
                             <button type="submit" class="btn btn-primary">
-                                <i class="feather-plus me-2"></i> <span>{{ __('crm_role.Update Role') }}</span>
+                                 <i class="fas fa-plus"></i> <span>{{ __('crm_role.Update Role') }}</span>
                             </button>
                         </div>
 
@@ -28,7 +28,7 @@
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">
-                                    <div class="input-group-text"><i class="feather-user"></i></div>
+                             
                                     <input type="text" 
                                            class="form-control @error('role_name') is-invalid @enderror" 
                                            id="roleName" 
@@ -51,7 +51,7 @@
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">
-                                    <div class="input-group-text"><i class="feather-file-text"></i></div>
+                                 
                                     <textarea 
                                         class="form-control @error('role_desc') is-invalid @enderror" 
                                         id="roleDesc" 

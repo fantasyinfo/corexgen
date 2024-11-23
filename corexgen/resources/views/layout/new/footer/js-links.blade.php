@@ -5,6 +5,8 @@
 <!-- datatables js -->
 <script src="{{asset('new/js/datatables/datatables.min.js')}}"></script>
 
+
+
 <!-- custom js -->
 <script src="{{asset('new/js/custom/index.js')}}"></script>
 
