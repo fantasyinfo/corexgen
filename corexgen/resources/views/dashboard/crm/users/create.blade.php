@@ -17,7 +17,7 @@
                                 <span class="fs-12 fw-normal text-muted text-truncate-1-line">{{ __('crud.Please add correct information') }}</span>
                             </h5>
                             <button type="submit" class="btn btn-primary">
-                                <i class="feather-plus me-2"></i> <span>{{ __('users.Create User') }}</span>
+                                <i class="fas fa-plus"></i>  <span>{{ __('users.Create User') }}</span>
                             </button>
                         </div>
                 
@@ -28,7 +28,7 @@
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">
-                                    <div class="input-group-text"><i class="feather-user"></i></div>
+                                  
                                     <input type="text" 
                                            class="form-control @error('name') is-invalid @enderror" 
                                            id="nameName" 
@@ -52,7 +52,7 @@
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">
-                                    <div class="input-group-text"><i class="fa-regular fa-envelope"></i></div>
+                                   
                                     <input type="email" 
                                            class="form-control @error('email') is-invalid @enderror" 
                                            id="emailName" 
@@ -76,7 +76,7 @@
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">
-                                    <div class="input-group-text"><i class="fa-regular fa-user"></i></div>
+                                  
                                     <select class="form-control select2-hidden-accessible @error('role_id') is-invalid @enderror" name="role_id" id="role_id">
                                         @if($roles && $roles->isNotEmpty())
                                             @foreach($roles as $role)
@@ -104,7 +104,7 @@
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">
-                                    <div class="input-group-text"><i class="fa-solid fa-lock"></i></div>
+                                 
                                     <input type="password" 
                                            class="form-control @error('password') is-invalid @enderror" 
                                            id="passName" 

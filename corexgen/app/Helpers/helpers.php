@@ -120,30 +120,35 @@ final class PermissionsIds
         'value' => 'Core X Gen',
         'is_media_setting' => false,
         'media_id' => null,
+        'input_type' => 'text'
     ],
     'COMPANY_TAGLINE' => [
         'key' => 'Company Tagline',
         'value' => 'Next Generation CRM',
         'is_media_setting' => false,
         'media_id' => null,
+        'input_type' => 'text'
     ],
     'COMPANY_LOGO' => [
         'key' => 'Company Logo',
         'value' => '/',
         'is_media_setting' => true,
         'media_id' => null,
+        'input_type' => 'image'
     ],
     'DATE_FORMAT' => [
         'key' => 'Date Format',
         'value' => 'DD/MM/YYYY',
         'is_media_setting' => false,
         'media_id' => null,
+        'input_type' => 'date'
     ],
     'TIME_FORMAT' => [
         'key' => 'Time Format',
         'value' => '12 Hours',
         'is_media_setting' => false,
         'media_id' => null,
+        'input_type' => 'time'
     ],
 
 

@@ -15,7 +15,7 @@
                                 <span class="fs-12 fw-normal text-muted text-truncate-1-line">{{ __('crud.Please add correct information') }}</span>
                             </h5>
                             <button type="submit" class="btn btn-primary">
-                                <i class="feather-plus me-2"></i> <span>{{ __('crm_permissions.Update Permissions') }}</span>
+                                <i class="fas fa-plus"></i>  <span>{{ __('crm_permissions.Update Permissions') }}</span>
                             </button>
                         </div>
 
@@ -26,7 +26,7 @@
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">
-                                    <div class="input-group-text"><i class="fa-regular fa-user"></i></div>
+                                  
                                     <select class="form-control select2-hidden-accessible @error('role_id') is-invalid @enderror" 
                                     name="role_id" 
                                     id="role_id">

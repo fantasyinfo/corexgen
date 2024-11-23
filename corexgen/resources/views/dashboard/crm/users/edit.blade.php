@@ -30,7 +30,7 @@
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">
-                                    <div class="input-group-text"><i class="feather-user"></i></div>
+                                 
                                     <input type="text" 
                                            class="form-control @error('name') is-invalid @enderror" 
                                            id="nameName" 
@@ -54,7 +54,7 @@
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">
-                                    <div class="input-group-text"><i class="fa-regular fa-envelope"></i></div>
+                                   
                                     <input type="email" 
                                            class="form-control @error('email') is-invalid @enderror" 
                                            id="emailName" 
@@ -78,7 +78,7 @@
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">
-                                    <div class="input-group-text"><i class="fa-regular fa-user"></i></div>
+                          
                                     <select class="form-control select2-hidden-accessible @error('role_id') is-invalid @enderror" name="role_id" id="role_id">
                                         @if($roles && $roles->isNotEmpty())
                                             @foreach($roles as $role)

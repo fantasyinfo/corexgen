@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
-
+use Yajra\DataTables\Facades\DataTables;
 class UserController extends Controller
 {
     protected $perPage = 10;
@@ -30,7 +30,11 @@ class UserController extends Controller
         });
 
         $query->when($request->filled('email'), function ($q) use ($request) {
-            $q->where('users.email', 'LIKE', "%{$request->name}%");
+            $q->where('users.email', 'LIKE', "%{$request->email}%");
+        });
+
+        $query->when($request->filled('role_id'), function ($q) use ($request) {
+            $q->where('users.role_id', 'LIKE', "%{$request->role_id}%");
         });
 
         $query->when($request->filled('status'), function ($q) use ($request) {
@@ -49,22 +53,58 @@ class UserController extends Controller
             $q->whereDate('users.created_at', '<=', $request->end_date);
         });
 
-        // Sorting
-        $sortField = $request->input('sort', 'users.created_at');
-        $sortDirection = $request->input('direction', 'desc');
-        $query->orderBy($sortField, $sortDirection);
+         // Server-side DataTables response
+         if ($request->ajax()) {
+            return DataTables::of($query)
+                ->addColumn('actions', function ($user) {
+                    $editButton = '';
+                    $deleteButton = '';
 
-        // Pagination with additional parameters
-        $users = $query->paginate($request->input('per_page', $this->perPage));
+                    if (hasPermission('USERS.UPDATE')) {
+                        $editButton = '<a href="' . route('crm.users.edit', $user->id) . '" class="btn btn-sm btn-warning" data-toggle="tooltip" title="Edit">
+                               <i class="fas fa-pencil-alt"></i>
+                           </a>';
+                    }
 
-        // Add query parameters to pagination links
-        $users->appends($request->all());
+                    if (hasPermission('USERS.DELETE')) {
+                        $deleteButton = '<form action="' . route('crm.users.destroy', $user->id) . '" method="POST" style="display:inline;" onsubmit="return confirm(\'Are you sure?\');">
+                                 ' . csrf_field() . method_field('DELETE') . '
+                                 <button type="submit" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Delete">
+                                     <i class="fas fa-trash-alt"></i>
+                                 </button>
+                             </form>';
+                    }
+
+                    return "<div class='text-end'> $editButton  $deleteButton </div>";
+                })
+                ->editColumn('created_at', function ($user) {
+                    return $user->created_at->format('d M Y');
+                })
+                ->editColumn('status', function ($user) {
+                    if (hasPermission('USERS.CHANGE_STATUS')) {
+                        return "<a 
+                        data-toggle='tooltip' 
+                        data-placement='top' 
+                        title='" . ($user->status == 'active' ? 'De Active' : 'Active') . "' 
+                        href='" . route('crm.users.changeStatus', ['id' => $user->id]) . "'>
+                            <span class='badge " . ($user->status == 'active' ? 'bg-success' : 'bg-danger') . "'>
+                                " . ucfirst($user->status) . "
+                            </span>
+                        </a>";
+                    }
+
+                    return "<span class='badge " . ($user->status == 'active' ? 'bg-success' : 'bg-danger') . "'>
+                        " . ucfirst($user->status) . "
+                    </span>";
+                })
+                ->rawColumns(['actions', 'status']) // Add 'status' to raw columns
+                ->make(true);
+        }
 
         $roles = CRMRole::where('buyer_id', auth()->user()->buyer_id)
             ->get();
 
         return view('dashboard.crm.users.index', [
-            'users' => $users,
             'filters' => $request->all(),
             'title' => 'Users Management',
             'roles' => $roles

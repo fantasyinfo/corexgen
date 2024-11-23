@@ -12,6 +12,8 @@ return [
     'Update Settings' => 'Update Settings',
     'No Settings Found' => 'No Settings Found',
     'General' => 'General',
+    'General Settings' => 'General Settings',
+    'Save' => 'Save',
 
 
 ];

@@ -15,13 +15,15 @@ class CRMSettingsSeeder extends Seeder
     public function run(): void
     {
         //
-
+        CRMSettings::truncate();
+        
         foreach (CRM_SETTINGS as $setting) {
             CRMSettings::create([
                 'key' => $setting['key'],
                 'value' => $setting['value'],
                 'is_media_setting' => $setting['is_media_setting'],
                 'media_id' => $setting['media_id'],
+                'input_type' => $setting['input_type'],
                 'buyer_id' => 1,
                 'is_super_user' => true,
                 'updated_by' => 1,
