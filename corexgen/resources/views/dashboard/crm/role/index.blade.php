@@ -1,29 +1,30 @@
-@extends('layout.app')
+@extends('layout.new.app')
 
 @section('content')
+
 <div class="container-fluid">
     <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="card-header d-flex justify-content-between align-items-center border-bottom pb-2">
             <h5 class="card-title">{{ __('crm_role.Roles Management') }}</h5>
             <div class="card-header-action">
                 @if(hasPermission('ROLE.CREATE'))
-                <a href="{{ route('crm.role.create') }}" class="btn btn-md btn-primary me-2">
-                    <i class="feather feather-plus"></i> <span>{{ __('crm_role.Create Role') }}</span>
+                <a data-toggle="tooltip" data-placement="top" title="Create New" href="{{ route('crm.role.create') }}" class="btn btn-md btn-primary me-2">
+                    <i class="fas fa-plus"></i> <span>{{ __('crm_role.Create Role') }}</span>
                 </a>
                 @endif
                 @if(hasPermission('ROLE.EXPORT'))
-                <a href="{{ route('crm.role.export', request()->all()) }}" class="btn btn-md btn-outline-secondary">
-                    <i class="feather feather-download"></i> <span>{{ __('crud.Export') }}</span>
+                <a data-toggle="tooltip" data-placement="top" title="Export Data" href="{{ route('crm.role.export', request()->all()) }}" class="btn btn-md btn-outline-secondary">
+                    <i class="fas fa-download"></i> <span>{{ __('crud.Export') }}</span>
                 </a>
                 @endif
                 @if(hasPermission('ROLE.IMPORT'))
-                <button data-bs-toggle="modal" data-bs-target="#bulkImportModal" class="btn btn-md btn-outline-info">
-                    <i class="feather feather-upload"></i><span> {{ __('crud.Import') }}</span>
+                <button data-toggle="tooltip" data-placement="top" title="Import Data" data-bs-toggle="modal" data-bs-target="#bulkImportModal" class="btn btn-md btn-outline-info">
+                    <i class="fas fa-upload"></i><span> {{ __('crud.Import') }}</span>
                 </button>
                 @endif
                 @if(hasPermission('ROLE.FILTER'))
-                <button onclick="openFilters()" class="btn btn-md btn-light-brand">
-                    <i class="feather-filter me-2"></i>
+                <button data-toggle="tooltip" data-placement="top" title="Filter Data" onclick="openFilters()" class="btn btn-md btn-outline-warning">
+                    <i class="fas fa-filter"></i>
                     <span>{{ __('crud.Filter') }}</span>
                 </button>
                 @endif
@@ -35,138 +36,140 @@
                
             @if(hasPermission('ROLE.FILTER'))
             <div id="filter-section">
+              
+                <div class="card-title">
+                    {{ __('crud.Filter') }}
+                
+                </div>
                 <!-- Advanced Filter Form -->
                 <form action="{{ route('crm.role.index') }}" method="GET" class="mb-4">
                     <div class="row g-3">
-                        <div class="col-md-3">
-                            <input type="text" name="name" class="form-control" 
-                                placeholder="{{ __('crm_role.Role Name') }}" 
-                                value="{{ request('name') }}">
+                        <!-- Search Input -->
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <input type="text" 
+                                       name="name" 
+                                       class="form-control" 
+                                       placeholder="{{ __('crm_role.Role Name') }}" 
+                                       value="{{ request('name') }}">
+                            </div>
                         </div>
-                        <div class="col-md-2">
-                            <select name="status" class="form-select">
-                                <option value="">{{ __('crm_role.All Statuses') }}</option>
-                                <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>
-                                    {{ __('Active') }}
-                                </option>
-                                <option value="deactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>
-                                    {{ __('Inactive') }}
-                                </option>
-                            </select>
+                
+                        <!-- Status Dropdown -->
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <select name="status" class="form-select">
+                                    <option value="">{{ __('crm_role.All Statuses') }}</option>
+                                    <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>
+                                        {{ __('Active') }}
+                                    </option>
+                                    <option value="deactive" {{ request('status') == 'deactive' ? 'selected' : '' }}>
+                                        {{ __('Inactive') }}
+                                    </option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="col-md-1">
-                            <button type="submit" class="btn btn-primary w-100">
-                                <i class="feather feather-search"></i>
-                            </button>
+                
+                        <!-- Buttons -->
+                        <div class="col-md-4">
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search me-1"></i>{{ __('Search') }}
+                                </button>
+                                <button type="button" id="clearFilter" class="btn btn-light">
+                                    <i class="fas fa-trash-alt me-1"></i>{{ __('Clear') }}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </form>
             </div>
             @endif
 
-            <!-- Roles Table -->
-            <div class="table-responsive">
-                @if(hasPermission('ROLE.READ_ALL') || hasPermission('ROLE.READ') )
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>
-                                <a href="{{ request()->fullUrlWithQuery([
-                                    'sort' => 'role_name', 
-                                    'direction' => request('sort') == 'role_name' && request('direction') == 'asc' ? 'desc' : 'asc'
-                                ]) }}">
-                                    {{ __('crm_role.Role Name') }}
-                                    @if(request('sort') == 'role_name')
-                                        {!! request('direction') == 'asc' ? '&#9650;' : '&#9660;' !!}
-                                    @endif
-                                </a>
-                            </th>
-                            <th>{{ __('crm_role.Description') }}</th>
-                            <th>{{ __('crud.Status') }}</th>
-                            <th>{{ __('crud.Created At') }}</th>
-                   
-                            <th class="text-end">{{ __('crud.Actions') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($roles as $role)
+   
+            @if(hasPermission('ROLE.READ_ALL') || hasPermission('ROLE.READ') )
+                <div class="table-responsive card">
+                    @if($roles->isNotEmpty())
+                    <table id="dbTable" class="table table-striped table-bordered ui celled">
+                        <thead>
                             <tr>
-                                <td>{{ $role->role_name }}</td>
-                                <td>{{ Str::limit($role->role_desc, 50) }}</td>
-                                <td>
-                                    <a href="{{ route('crm.role.changeStatus',['id' => $role->id] ) }}">
-                                        <span class="badge {{ $role->status == 'active' ? 'bg-success' : 'bg-danger' }}">
-                                            {{ ucfirst($role->status) }}
-                                        </span>
-                                    </a>
-                                </td>
-                                <td>{{ $role->created_at->format('d M Y') }}</td>
-                                @if(hasPermission('ROLE.UPDATE') || hasPermission('ROLE.DELETE'))
-                                <td class="text-end">
-                                 
-
-                                    <div class="dropdown">
-                                        <a href="javascript:void(0)" class="avatar-text avatar-md ms-auto" data-bs-toggle="dropdown" data-bs-offset="0,28" aria-expanded="false">
-                                            <i class="feather feather-more-horizontal"></i>
+                                <th> {{ __('crm_role.Role Name') }}</th>
+                                <th>{{ __('crm_role.Description') }}</th>
+                                <th>{{ __('crud.Status') }}</th>
+                                <th>{{ __('crud.Created At') }}</th>
+                    
+                                <th class="text-end">{{ __('crud.Actions') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($roles as $role)
+                                <tr>
+                                    <td>{{ $role->role_name }}</td>
+                                    <td>{{ Str::limit($role->role_desc, 50) }}</td>
+                                    <td>
+                                        <a data-toggle="tooltip" data-placement="top" title="{{$role->status == 'active' ? 'De Active' : 'Active'}}" href="{{ route('crm.role.changeStatus',['id' => $role->id] ) }}">
+                                            <span class="badge {{ $role->status == 'active' ? 'bg-success' : 'bg-danger' }}">
+                                                {{ ucfirst($role->status) }}
+                                            </span>
                                         </a>
-                                        <ul class="dropdown-menu" style="">
+                                    </td>
+                                    <td>{{ $role->created_at->format('d M Y') }}</td>
+                                    @if(hasPermission('ROLE.UPDATE') || hasPermission('ROLE.DELETE'))
+                                    <td class="text-end">
+                                        <div class="d-flex align-items-center justify-content-end">
                                             @if(hasPermission('ROLE.UPDATE'))
-                                            <li>
-                                                <a class="dropdown-item" href="{{ route('crm.role.edit',['id' => $role->id] ) }}">
-                                                    <i class="feather feather-edit-3 me-3"></i>
-                                                    <span>{{ __('crud.Edit') }}</span>
-                                                </a>
-                                            </li>
+                                                <div class="edit-btn">
+                                                    <a data-toggle="tooltip" data-placement="top"   title="{{ __('crud.Edit') }}" href="{{ route('crm.role.edit',['id' => $role->id] ) }}">
+                                                    
+                                                        <span class="text-warning"><i class="fas fa-pencil-alt"></i></span>
+                                                    </a>
+                                            
+                                                </div>
                                             @endif
-                                            @if(hasPermission('ROLE.DELETE'))
-                                            <li class="dropdown-divider"></li>
-                                            <li>
-                                                <form action="{{ route('crm.role.destroy', ['id' => $role->id]) }}" method="POST" 
-                                                onsubmit="return confirm('{{ __('crud.Are you sure?') }}');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="dropdown-item text-danger">
-                                                        <i class="feather feather-trash-2 me-2"></i>{{ __('crud.Delete') }}
-                                                    </button>
-                                                </form>
-                                               
-                                            </li>
-                                            @endif
-                                        </ul>
-                                    </div>
-                                </td>
-                                @else
-                                <td class="text-end">...</td>
-                                @endif
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="text-center"><i class="fa-solid fa-file"></i> {{ __('crm_role.No Roles Found.') }}</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-                @else 
-                <table class="table table-hover">
-                    <tbody>
-                            <tr>
-                                <td colspan="5" class="text-center"><i class="fa-solid fa-file"></i> {{ __('crud.You do not have permission to view the table') }}</td>
-                            </tr>
-                    </tbody>
-                </table>
-                @endif
-            </div>
 
-            @if(hasPermission('USERS.READ_ALL') || hasPermission('USERS.READ') )
-            <!-- Pagination -->
-            <div class="d-flex justify-content-between align-items-center mt-3">
-                <div>
-                    {{ __('crud.Showing') }} {{ $roles->firstItem() }} - {{ $roles->lastItem() }} 
-                    {{ __('crud.of') }} {{ $roles->total() }} {{ __('crud.results') }}
+                                            @if(hasPermission('ROLE.DELETE'))
+                                            <div class="delete-btn">
+                                                <form action="{{ route('crm.role.destroy', ['id' => $role->id]) }}" method="POST" 
+                                                    onsubmit="return confirm('{{ __('crud.Are you sure?') }}');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm text-danger" data-toggle="tooltip" data-placement="top"  title="{{ __('crud.Delete') }}">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+                                                    </form>
+                                            </div>
+                                            @endif
+                                            
+                                        </div>
+                                        
+                                    </td>
+                                    @else
+                                    <td class="text-end">...</td>
+                                    @endif
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                    @else
+                    <div class="no-data-found">
+                        <i class="far fa-clipboard"></i> 
+                        <span class="mx-2">{{ __('crm_role.No Roles Found') }}</span>
+                    </div>
+                    @endif
                 </div>
-                {{ $roles->links('layout.components.pagination') }}
-            </div>
+
+            @else
+                {{-- no permissions to view --}}
+                <div class="no-data-found">
+                    <i class="fas fa-ban"></i> 
+                    <span class="mx-2">{{ __('crud.You do not have permission to view the table') }}</span>
+                </div>
             @endif
+
+
+
+
+
         </div>
     </div>
 </div>
@@ -204,25 +207,9 @@
 @endsection
 
 
-@push('style')
-<style>
-    #filter-section{
-        display:none;
-    }
-</style>
-@endpush
 
 @push('scripts')
 <script>
-
-function openFilters() {
-    const filterSection = document.getElementById('filter-section');
-    if (filterSection.style.display === 'block') {
-        filterSection.style.display = 'none';
-    } else {
-        filterSection.style.display = 'block';
-    }
-}
 
 document.querySelector('.drop-zone').addEventListener('click', function () {
         document.querySelector('#csvFile').click();

@@ -20,7 +20,7 @@
             </div> --}}
             <div class="my-3">
                 <x-label for="buyer_id" value="{{ __('Buyer Identification Number') }}" />
-                <x-input id="buyer_id" class="block mt-1 w-full" type="text" name="buyer_id" :value="1732077969" required autofocus autocomplete="buyer_id" />
+                <x-input id="buyer_id" class="block mt-1 w-full" type="text" name="buyer_id" :value="1732283373" required autofocus autocomplete="buyer_id" />
             </div>
           
             <div>

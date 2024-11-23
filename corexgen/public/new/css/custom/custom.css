@@ -1,0 +1,41 @@
+.logo {
+    height: 30px;
+}
+
+
+.divider-v{
+    height: 20px;
+    width: 2px;
+    background-color: var(--primary-color);
+    margin: 0 10px;
+}
+
+.sidebar-brand {
+    background-color: var( --dark-black-001);
+}
+
+.h-200 {
+    height: 200px;
+}
+
+
+.no-data-found {
+    height: 250px;
+    width: 100%;
+    border: 3px dotted var(--primary-color);
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    font-size:20px;
+}
+
+#filter-section {
+    display:none;
+    border-bottom:0.3px dotted var(--body-color);
+    display:flex;
+    align-items: center;
+    margin:20px 0;
+    justify-content: center;
+    padding-top:10px;
+}
+

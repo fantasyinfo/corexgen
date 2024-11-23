@@ -75,36 +75,36 @@ final class PermissionsIds
 
 !defined('CRM_MENU_ITEMS') && define('CRM_MENU_ITEMS', [
     'Dashboard' => [
-        'menu_icon' => 'feather-airplay',
+        'menu_icon' => 'fa-tachometer-alt',
         'permission_id' => PermissionsIds::$PARENT_PERMISSION_IDS['1'],
         'children' => [
             'CRM' => [
                 'menu_url' => 'home',
-                'menu_icon' => 'feather-corner-down-right',
+                'menu_icon' => 'fa-tachometer-alt',
                 'permission_id' => PermissionsIds::findPermissionKey('DASHBOARD', 'READ_ALL')
             ]
         ]
     ],
     'Roles & Permissions' => [
-        'menu_icon' => 'feather-command',
+        'menu_icon' => 'fa-users',
         'permission_id' => PermissionsIds::$PARENT_PERMISSION_IDS['2'],
         'children' => [
-            'Role' => ['menu_url' => 'crm.role.index', 'menu_icon' => 'feather-corner-down-right', 'permission_id' => PermissionsIds::findPermissionKey('ROLE', 'READ_ALL')],
-            'Permissions' => ['menu_url' => 'crm.permissions.index', 'menu_icon' => 'feather-corner-down-right', 'permission_id' => PermissionsIds::findPermissionKey('PERMISSIONS', 'READ_ALL')],
+            'Role' => ['menu_url' => 'crm.role.index', 'menu_icon' => 'fa-users', 'permission_id' => PermissionsIds::findPermissionKey('ROLE', 'READ_ALL')],
+            'Permissions' => ['menu_url' => 'crm.permissions.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsIds::findPermissionKey('PERMISSIONS', 'READ_ALL')],
         ]
     ],
     'Users' => [
-        'menu_icon' => 'feather-user-plus',
+        'menu_icon' => 'fa-user',
         'permission_id' => PermissionsIds::$PARENT_PERMISSION_IDS['3'],
         'children' => [
-            'Users' => ['menu_url' => 'crm.users.index', 'menu_icon' => 'feather-corner-down-right', 'permission_id' => PermissionsIds::findPermissionKey('USERS', 'READ_ALL')],
+            'Users' => ['menu_url' => 'crm.users.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsIds::findPermissionKey('USERS', 'READ_ALL')],
         ]
     ],
     'Settings' => [
-        'menu_icon' => 'feather-settings',
+        'menu_icon' => 'fa-cog',
         'permission_id' => PermissionsIds::$PARENT_PERMISSION_IDS['4'],
         'children' => [
-            'Settings' => ['menu_url' => 'crm.settings.index', 'menu_icon' => 'feather-corner-down-right', 'permission_id' => PermissionsIds::findPermissionKey('SETTINGS', 'READ')],
+            'Settings' => ['menu_url' => 'crm.settings.index', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsIds::findPermissionKey('SETTINGS', 'READ')],
         ]
     ],
 ]);

@@ -1,0 +1,239 @@
+/* General Layout */
+body {
+  background-color: var(--body-bg);
+  color: var(--body-color);
+  transition: background-color 0.3s, color 0.3s;
+  min-height: 100vh;
+}
+
+/* Header Styles */
+.header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 250px;
+  height: 70px;
+  background-color: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+  padding: 10px 30px;
+  z-index: 1020;
+  transition: left 0.3s;
+}
+
+.sidebar-collapsed .header {
+  left: 0;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 250px;
+  background: var(--sidebar-bg);
+  color: #fff;
+  transition: transform 0.3s;
+  z-index: 1030;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-collapsed .sidebar {
+  transform: translateX(-250px);
+}
+
+.sidebar-brand {
+  height: 70px;
+  padding: 0 20px;
+  font-size: 1.5rem;
+  background: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar .nav-link {
+  color: #fff;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar .nav-link i.fa-chevron-down {
+  margin-left: auto;
+  font-size: 0.8rem;
+}
+
+.sidebar .submenu .nav-link {
+  padding-left: 40px;
+}
+
+.sidebar .sub-submenu .nav-link {
+  padding-left: 60px;
+}
+
+.sidebar .nav-link:hover, 
+.sidebar .nav-link.active {
+  background: var( --dark-black-001);
+  border-top: 1px solid var(--body-bg);
+}
+
+/* Main Content Area */
+.main-content {
+  margin-left: 250px;
+  padding-top: 70px;
+  transition: margin-left 0.3s;
+  min-height: 100vh;
+}
+
+.sidebar-collapsed .main-content {
+  margin-left: 0;
+}
+
+/* Toggle Button */
+.toggle-btn {
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  color: var(--body-color);
+}
+
+.toggle-btn:hover {
+  background-color: var(--border-color);
+}
+
+/* Theme Toggle */
+.theme-toggle {
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  color: var(--body-color);
+}
+
+.theme-toggle:hover {
+  background-color: var(--border-color);
+}
+
+/* User Dropdown */
+.dropdown-toggle {
+  color: var(--body-color) !important;
+}
+
+.dropdown-menu {
+  background-color: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+.dropdown-item {
+  color: var(--body-color);
+}
+
+.dropdown-item:hover {
+  background-color: var(--border-color);
+  color: var(--body-color);
+}
+
+/* Content Area Styles */
+.content-area {
+  padding: 30px;
+}
+
+/* Form Section */
+.form-section {
+  padding: 0 30px;
+}
+
+.card {
+  background-color: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+.form-control,
+.form-select {
+  background-color: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--body-color);
+}
+
+.form-control:focus,
+.form-select:focus {
+  background-color: var(--input-bg);
+  border-color: var(--primary-color);
+  color: var(--body-color);
+}
+
+/* DataTable Dark Mode Fixes */
+.table {
+  color: var(--body-color);
+}
+
+.dataTables_wrapper .dataTables_filter input {
+  background-color: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--body-color);
+  padding: 6px 12px;
+}
+
+.dataTables_wrapper .dataTables_length select {
+  background-color: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--body-color);
+}
+
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  color: var(--body-color) !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+  background: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  color: #fff !important;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) {
+  background-color: var(--card-bg);
+  color:var(--body-color);
+}
+
+.table-striped > tbody > tr:nth-of-type(even) {
+  background-color: var(--body-bg);
+  color:var(--body-color);
+}
+
+/* Footer */
+.footer {
+  margin-top: auto;
+  background-color: var(--card-bg);
+  border-top: 1px solid var(--border-color);
+  color: var(--body-color);
+  padding: 1rem 0;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .header {
+    left: 0;
+  }
+  
+  .sidebar {
+    z-index: 1040;
+  }
+  
+  .sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1035;
+    display: none;
+  }
+  
+  body:not(.sidebar-collapsed) .sidebar-overlay {
+    display: block;
+  }
+}

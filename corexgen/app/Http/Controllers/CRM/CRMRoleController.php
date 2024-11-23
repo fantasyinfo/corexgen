@@ -17,38 +17,33 @@ class CRMRoleController extends Controller
 
     public function index(Request $request)
     {
-      
-
-        $query = CRMRole::query()->where('buyer_id',auth()->user()->buyer_id);
-
+        $query = CRMRole::query()->where('buyer_id', auth()->user()->buyer_id);
+    
         // Advanced Filtering
         $query->when($request->filled('name'), function ($q) use ($request) {
             $q->where('role_name', 'LIKE', "%{$request->name}%");
         });
-
+    
         $query->when($request->filled('status'), function ($q) use ($request) {
             $q->where('status', $request->status);
         });
-
+    
         $query->when($request->filled('start_date'), function ($q) use ($request) {
             $q->whereDate('created_at', '>=', $request->start_date);
         });
-
+    
         $query->when($request->filled('end_date'), function ($q) use ($request) {
             $q->whereDate('created_at', '<=', $request->end_date);
         });
-
+    
         // Sorting
         $sortField = $request->input('sort', 'created_at');
         $sortDirection = $request->input('direction', 'desc');
         $query->orderBy($sortField, $sortDirection);
-
-        // Pagination with additional parameters
-        $roles = $query->paginate($request->input('per_page', $this->perPage));
-
-        // Add query parameters to pagination links
-        $roles->appends($request->all());
-
+    
+        // Get all results since we're using client-side DataTables
+        $roles = $query->get();
+    
         return view('dashboard.crm.role.index', [
             'roles' => $roles,
             'filters' => $request->all(),
