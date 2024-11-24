@@ -1,9 +1,0 @@
-{
-    "name": "blog-module",
-    "version": "1.0.0",
-    "description": "Blog management module with CRUD functionality",
-    "providers": ["BlogModuleServiceProvider"],
-    "dependencies": {
-        "core": ">=1.0.0"
-    }
-}

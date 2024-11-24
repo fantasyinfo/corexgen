@@ -30,14 +30,32 @@ class ModuleManager
                 throw new \Exception('Invalid module package');
             }
 
+            Log::info("Module Loaded $modulePath validation Passeed.");
             // Extract module
             $moduleData = $this->extractModule($modulePath);
 
+            Log::info("Module Extracted.");
             // Register module in database
             $this->registerModule($moduleData);
 
+            Log::info("Module Registerd.");
+
             // Run migrations and seeders
             $this->runMigrations($moduleData['id']);
+
+            Log::info("Migrations Ran.");
+
+
+
+            $this->loadModules();
+
+            Log::info(message: "Modules Ran.");
+
+            // Call the updateComposerJson.php script
+
+
+            Log::info("composer dump-autoload executed.");
+
 
             return true;
         } catch (\Exception $e) {
@@ -46,6 +64,8 @@ class ModuleManager
             return false;
         }
     }
+
+    
 
     protected function validateModule(string $path): bool
     {
@@ -233,23 +253,95 @@ class ModuleManager
         );
     }
 
+    // protected function runMigrations(string $moduleId): void
+    // {
+    //     Log::info("Running migrations for module: $moduleId");
+    //     $migrationPath = $this->moduleDirectory . '/' . $moduleId . '/database/migrations';
+
+    //     Log::info("Migration path: $migrationPath");
+
+    //     if (File::exists($migrationPath)) {
+    //         Log::info("Migration directory exists.");
+
+    //         // Make the migration path relative to base_path
+    //         $relativePath = str_replace(base_path() . '/', '', $migrationPath);
+
+    //         Log::info("Relative path for migration: $relativePath");
+
+    //         // Log all files in the directory
+    //         $files = File::files($migrationPath);
+    //         foreach ($files as $file) {
+    //             Log::info("File Name: " . $file->getFilename());
+    //         }
+
+    //         try {
+    //             // Call the Artisan migrate command with the correct relative path
+    //             $exitCode = Artisan::call('migrate', [
+    //                 '--path' => $relativePath,
+    //                 '--force' => true,
+    //             ]);
+
+    //             Log::info("Artisan migrate output: " . Artisan::output());
+    //             Log::info("Artisan migrate exit code: $exitCode");
+
+    //             if ($exitCode !== 0) {
+    //                 Log::error("Migration command failed with exit code: $exitCode");
+    //             } else {
+    //                 Log::info("Migrations executed successfully for module: $moduleId");
+    //             }
+    //         } catch (\Exception $e) {
+    //             Log::error("Error running migration command: " . $e->getMessage());
+    //         }
+    //     } else {
+    //         Log::error('Migration path does not exist: ' . $migrationPath);
+    //     }
+    // }
+
+
+
     protected function runMigrations(string $moduleId): void
     {
-        $migrationPath = $this->moduleDirectory . '/' . $moduleId . '/database/migrations';
+        Log::info("Running migrations for module: $moduleId");
 
-        // Ensure the module path is correctly set and the migrations folder exists
-        if (File::exists($migrationPath)) {
-            $relativePath = str_replace(base_path('database/migrations'), '', $migrationPath);
+        // Set relative migration path based on module
+        $migrationPath = 'modules/' . $moduleId . '/database/migrations'; // Relative path to base directory
+        Log::info("Relative Migration Path: $migrationPath");
 
-            Artisan::call('migrate', [
-                '--path' => $relativePath, // Use relative path from base migration directory
-                '--force' => true
-            ]);
+        // Check if the migration directory exists
+        if (File::exists(base_path($migrationPath))) {
+            Log::info("Migration directory exists.");
+
+            // Log all files in the migration directory
+            $files = File::files(base_path($migrationPath));
+            foreach ($files as $file) {
+                Log::info("Found migration file: " . $file->getFilename());
+            }
+
+            try {
+                // Run the migrations
+                $exitCode = Artisan::call('migrate', [
+                    '--path' => $migrationPath,  // Relative path
+                    '--force' => true,
+                ]);
+
+                Log::info("Artisan migrate output: " . Artisan::output());
+                Log::info("Artisan migrate exit code: $exitCode");
+
+                // Check if migration was successful
+                if ($exitCode !== 0) {
+                    Log::error("Migration command failed with exit code: $exitCode");
+                } else {
+                    Log::info("Migrations executed successfully for module: $moduleId");
+                }
+            } catch (\Exception $e) {
+                // Catch any exception during the migration process
+                Log::error("Error running migration command: " . $e->getMessage());
+            }
         } else {
+            // Log an error if the migration path doesn't exist
             Log::error('Migration path does not exist: ' . $migrationPath);
         }
     }
-
 
     public function loadModules(): void
     {
@@ -277,16 +369,83 @@ class ModuleManager
             ->first();
     }
 
+
     protected function bootModule(object $module): void
     {
+        Log::info("Coming from bootModule...");
+
+        // Decode providers from the module and check if it's an array
         $providers = json_decode($module->providers, true);
+
+        // Check if providers are in a valid format
+        if (!is_array($providers)) {
+            Log::warning("The providers for module {$module->name} are not in a valid format.");
+            return;
+        }
+
+        // Loop through each provider to register it
         foreach ($providers as $provider) {
+            Log::info("Providers Found: $provider");
+
+            // Log the namespace for debugging
+            Log::info("Namespace: " . $this->namespace);
+
+         
+
+            // Build the full provider class name path (PascalCase)
             $providerClass = $this->namespace . '\\' . $module->name . '\\' . $provider;
-            if (class_exists($providerClass)) {
-                app()->register(new $providerClass());
+
+            // Log the full provider class path being checked
+            Log::info("Full Provider Class Path: $providerClass");
+
+
+
+            // Build the full file path based on the kebab-case format
+            $filePath = base_path("modules/{$module->name}/{$provider}.php");
+
+            // Log the full file path where the class should be located
+            Log::info("Checking for provider class at path: $filePath");
+
+            try {
+                // Check if the class exists before attempting to register it
+                if (class_exists($providerClass)) {
+
+
+                    // Register the provider if the class exists
+                    // Log before registering the provider
+                    Log::info("Attempting to register provider: $providerClass");
+
+                    try {
+                        // Register the provider dynamically
+                        app()->register(new $providerClass(app()));
+
+                        // Log after successfully registering the provider
+                        Log::info("Provider successfully registered: $providerClass");
+                    } catch (\Exception $e) {
+                        // Log any exception that occurs during registration
+                        Log::error("Failed to register provider $providerClass: " . $e->getMessage());
+                    }
+                } else {
+                    // Log a warning if the provider class does not exist at the given path
+                    Log::warning("Provider class $providerClass does not exist at $filePath.");
+
+                    // Try to check if the file itself exists as a fallback
+                    if (file_exists($filePath)) {
+                        Log::warning("File exists at $filePath, but the class cannot be found. There might be a namespace or autoloading issue.");
+                    } else {
+                        Log::warning("Provider file does not exist at $filePath.");
+                    }
+                }
+            } catch (\Exception $e) {
+                // Log any errors that occur during the provider registration
+                Log::error("Error registering provider: " . $e->getMessage());
             }
         }
     }
+
+ 
+
+
 
     public function uninstall(string $moduleId): bool
     {

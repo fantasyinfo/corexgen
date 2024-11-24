@@ -19,6 +19,10 @@ php artisan optimize
 
 
 
+php artisan tinker
+
+app()->getLoadedProviders();
+
 // for learning
 php artisan migrate:rollback --step=1
 php artisan make:job SeedCountriesCities

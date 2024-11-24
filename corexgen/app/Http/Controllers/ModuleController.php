@@ -7,6 +7,8 @@ use App\Core\ModuleManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+
 
 class ModuleController extends Controller
 {
@@ -35,6 +37,10 @@ class ModuleController extends Controller
 
         try {
             if ($this->moduleManager->install($fullPath)) {
+
+                $this->updateComposerJson();
+                $this->runComposerDumpAutoload();
+
                 return redirect()->route('admin.modules.index')
                     ->with('success', 'Module installed successfully');
             }
@@ -44,6 +50,25 @@ class ModuleController extends Controller
         } finally {
             // Cleanup temp file
             Storage::disk('local')->delete($path);
+        }
+    }
+
+
+    private function updateComposerJson()
+    {
+        // Run the updateComposerJson.php script
+        require_once base_path('updateComposerJson.php');
+    }
+
+    private function runComposerDumpAutoload()
+    {
+        // Run composer dump-autoload
+        $output = shell_exec('composer dump-autoload');
+
+        if ($output === null) {
+            Log::error('Failed to execute composer dump-autoload');
+        } else {
+            Log::info('composer dump-autoload executed successfully.');
         }
     }
 

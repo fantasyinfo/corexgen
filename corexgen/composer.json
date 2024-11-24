@@ -2,7 +2,10 @@
     "name": "corexgen/corexgen",
     "type": "project",
     "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
+    "keywords": [
+        "laravel",
+        "framework"
+    ],
     "license": "MIT",
     "require": {
         "php": "^8.1",
@@ -27,12 +30,28 @@
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/"
+            "Database\\Seeders\\": "database/seeders/",
+            "Modules\\": "modules/",
+            "Modules\\BlogModule\\": "modules/BlogModule/src"
         },
         "files": [
             "app/Helpers/helpers.php"
         ]
     },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "modules/BlogModule"
+        },
+        {
+            "type": "path",
+            "url": "modules/BlogModule"
+        },
+        {
+            "type": "path",
+            "url": "modules/BlogModule"
+        }
+    ],
     "autoload-dev": {
         "psr-4": {
             "Tests\\": "tests/"
