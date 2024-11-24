@@ -5,6 +5,7 @@ use App\Http\Controllers\CountryCitySeederController;
 use App\Http\Controllers\CRM\CRMRoleController;
 use App\Http\Controllers\CRM\CRMRolePermissionsController;
 use App\Http\Controllers\CRM\CRMSettingsController;
+use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\SystemInstallerController;
 use App\Http\Controllers\UserController;
 use App\Models\CRM\CRMRole;
@@ -27,6 +28,13 @@ use Illuminate\Support\Facades\File;
 
 
 
+Route::middleware(['web', 'auth'])->prefix('admin')->group(function () {
+    Route::get('/modules', [ModuleController::class, 'index'])->name('admin.modules.index');
+    Route::post('/modules/upload', [ModuleController::class, 'upload'])->name('admin.modules.upload');
+    Route::post('/modules/{module}/enable', [ModuleController::class, 'enable'])->name('admin.modules.enable');
+    Route::post('/modules/{module}/disable', [ModuleController::class, 'disable'])->name('admin.modules.disable');
+    Route::delete('/modules/{module}', [ModuleController::class, 'destroy'])->name('admin.modules.destroy');
+});
 
 
 

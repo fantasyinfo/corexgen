@@ -1,22 +1,8 @@
-Hey, I have got a admin template with licence key from my team mates he has the unlimited download subscription, i have attached the details below, 
+i m going to make a saas software to sell that on codecanyon 
+ so any buyer can buy and he can be a saas owner and he can make new clients inside that software
 
-My query is i m a creating a laravel software using this admin html template, with full fledged backend & database, is i m allow to sell my software on codecanyon, i have a doubt using this template does not means to get a copyright because i have the licence key also it clearly write, i can commercialy sell this. i m just using the html of it, rest entire laravel project is mine.
-
-
-
-
-LICENSE CERTIFICATE: Envato Elements Item
-=================================================
-This license certificate documents a license to use the item listed below
-on a non-exclusive, commercial, worldwide and revokable basis, for
-one Single Use for this Registered Project.
-
-Item Title:                      Duralux - CRM Admin Dashboard Bootstrap Template
-Item URL:                        https://elements.envato.com/duralux-crm-admin-dashboard-bootstrap-template-YNQVKGJ
-Item ID:                         YNQVKGJ
-Author Username:                 maryinparis
-Licensee:                        Akshay Tikle
-Registered Project Name:         Ckuriosity
-License Date:                    November 17th, 2024
-Item License Code:               Hidden as per this textbox rule
-
+ problem: 
+ # i want to make my core software/project future ready in future
+ # if user buy the core & in future if i have new module that easily uploaded by my user without touching the core, 
+    just a upload function in my core software and user can buy the new module and upload it via the core software module uploader menu
+# how do i design my entire project like that, i need to make it professional, industry ready, easy to update, diffrent modules in future

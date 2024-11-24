@@ -189,4 +189,8 @@ return [
         'DataTables' => Yajra\DataTables\Facades\DataTables::class,
     ])->toArray(),
 
+
+    // App Version
+    'version' => env('APP_VERSION', '1.0.0'), 
+
 ];
