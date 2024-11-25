@@ -9,16 +9,23 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
-
+use App\Traits\TenantFilter;
 class CRMRoleController extends Controller
 {
+    use TenantFilter;
     protected $perPage = 10;
 
+
+    private $tenantRoute;
 
 
     public function index(Request $request)
     {
-        $query = CRMRole::query()->where('buyer_id', auth()->user()->buyer_id);
+        $query = CRMRole::query();
+        $query = $this->applyTenantFilter($query);
+        $this->tenantRoute = $this->getTenantRoute();
+       
+
 
         // Apply filters
         $query->when($request->filled('name'), function ($q) use ($request) {
@@ -37,6 +44,8 @@ class CRMRoleController extends Controller
             $q->whereDate('created_at', '<=', $request->end_date);
         });
 
+
+
         // Server-side DataTables response
         if ($request->ajax()) {
             return DataTables::of($query)
@@ -45,13 +54,13 @@ class CRMRoleController extends Controller
                     $deleteButton = '';
 
                     if (hasPermission('ROLE.UPDATE')) {
-                        $editButton = '<a href="' . route('crm.role.edit', $role->id) . '" class="btn btn-sm btn-warning" data-toggle="tooltip" title="Edit">
+                        $editButton = '<a href="' . route($this->tenantRoute . 'role.edit', $role->id) . '" class="btn btn-sm btn-warning" data-toggle="tooltip" title="Edit">
                                <i class="fas fa-pencil-alt"></i>
                            </a>';
                     }
 
                     if (hasPermission('ROLE.DELETE')) {
-                        $deleteButton = '<form action="' . route('crm.role.destroy', $role->id) . '" method="POST" style="display:inline;" onsubmit="return confirm(\'Are you sure?\');">
+                        $deleteButton = '<form action="' . route($this->tenantRoute .'role.destroy', $role->id) . '" method="POST" style="display:inline;" onsubmit="return confirm(\'Are you sure?\');">
                                  ' . csrf_field() . method_field('DELETE') . '
                                  <button type="submit" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Delete">
                                      <i class="fas fa-trash-alt"></i>
@@ -70,7 +79,7 @@ class CRMRoleController extends Controller
                         data-toggle='tooltip' 
                         data-placement='top' 
                         title='" . ($role->status == 'active' ? 'De Active' : 'Active') . "' 
-                        href='" . route('crm.role.changeStatus', ['id' => $role->id]) . "'>
+                        href='" . route($this->tenantRoute .'role.changeStatus', ['id' => $role->id]) . "'>
                             <span class='badge " . ($role->status == 'active' ? 'bg-success' : 'bg-danger') . "'>
                                 " . ucfirst($role->status) . "
                             </span>

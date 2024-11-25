@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Buyer;
+use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -30,7 +31,8 @@ class SystemInstallerController extends Controller
         'xml',
         'curl',
         'openssl',
-        'json'
+        'json',
+        'zip'
     ];
 
     public function checkSystemRequirements()
@@ -259,7 +261,7 @@ class SystemInstallerController extends Controller
 
             \Log::info('Super Admin Creating...');
             // Create super admin
-            $buyer = $this->createSuperAdmin($request);
+            $user = $this->createSuperAdmin($request);
 
           
 
@@ -269,7 +271,7 @@ class SystemInstallerController extends Controller
 
             \Log::info('Updating the .env file...');
             // Update environment file
-            $this->updateEnvironmentFile($request, $buyer->buyer_id);
+            $this->updateEnvironmentFile($request);
 
             \Log::info('Artisan Calls...');
 
@@ -316,7 +318,7 @@ class SystemInstallerController extends Controller
         return true;
     }
 
-    private function updateEnvironmentFile(Request $request, $buyerId)
+    private function updateEnvironmentFile(Request $request)
     {
         $envPath = base_path('.env');
         
@@ -340,8 +342,7 @@ class SystemInstallerController extends Controller
             'MAIL_ENCRYPTION' => $request->smtp_encryption,
             'MAIL_FROM_ADDRESS' => $request->mail_from_address,
             'MAIL_FROM_NAME' => '"'.str_replace('"', '', $request->mail_from_name).'"',
-            'SESSION_DRIVER' => 'database',
-            'BUYER_ID' => $buyerId
+            'SESSION_DRIVER' => 'database'
         ];
 
         $envContent = File::get($envPath);
@@ -382,32 +383,29 @@ class SystemInstallerController extends Controller
 
     private function createSuperAdmin(Request $request)
     {
-        $buyerIdToMaintain = time();
-        $buyer = Buyer::create([
+     
+        $tenant = Tenant::create([
             'name' => $request->name,
-            'email' => $request->admin_email,
-            'buyer_id' => $buyerIdToMaintain,
-            'password' => Hash::make(value: $request->admin_password),
+            'domain' => $request->admin_email,
+            'settings' => json_encode([$request->all()])
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->admin_email,
-            'role_id' => 1,
             'password' => Hash::make($request->admin_password),
-            'buyer_id' => $buyer->id,
             'email_verified_at' => now(),
-            'is_super_user' => true
+            'is_tenant' => true,
+            'tenant_id' => $tenant->id
         ]);
 
         $details = [
             'name' => $request->name,
-            'email' => $request->admin_email,
-            'buyer_id' => $buyer->buyer_id
+            'email' => $request->admin_email
         ];
 
-        \Mail::to($user->email)->send(new \App\Mail\WelcomeSuperAdmin($details));
+        // \Mail::to($user->email)->send(new \App\Mail\WelcomeSuperAdmin($details));
 
-        return $buyer;
+        return $details;
     }
 }

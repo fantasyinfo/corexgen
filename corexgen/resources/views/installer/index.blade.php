@@ -466,9 +466,6 @@
             <a href="/super-admin-login" class="px-8 py-3 bg-blue-600 text-white rounded-full shadow-md hover:bg-blue-500 transition transform hover:scale-105">
                 <i class="fas fa-user-shield mr-2"></i> Super Admin Panel
             </a>
-            <a href="/login" class="px-8 py-3 bg-green-500 text-white rounded-full shadow-md hover:bg-green-400 transition transform hover:scale-105">
-                <i class="fas fa-user-tie mr-2"></i> Buyer Admin Panel
-            </a>
         </div>
         <p class="text-gray-500 text-sm mb-4">
             If you have any questions, feel free to reach out to our support team. We are here to help!

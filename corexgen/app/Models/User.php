@@ -29,9 +29,11 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'status',
         'role_id',
-        'buyer_id',
-        'is_super_user'
+        'is_tenant',
+        'tenant_id',
+        'company_id',
     ];
 
     /**
@@ -68,8 +70,25 @@ class User extends Authenticatable
     {
         return $this->belongsTo(CRMRole::class, 'id');
     }
-    public function buyer()
+
+    public function tenant()
     {
-        return $this->belongsTo(Buyer::class, 'id');
+        return $this->belongsTo(Tenant::class);
     }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
+
+
+    protected static function boot(){
+        parent::boot();
+
+        static::creating(function($user){
+            $user->status = $user->status ?? CRM_STATUS_TYPES['USERS']['STATUS']['ACTIVE'];
+        });
+
+    }   
+
 }

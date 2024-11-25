@@ -24,6 +24,14 @@ class CheckUserRole
 
         $user = Auth::user();
 
+        $userRoleId = $user->role_id;
+
+
+        // return true for superadmin or role id 1
+        if ($user->is_tenant && $userRoleId === null) {
+            return $next($request);
+        }
+
         // Fetch the role_name from the CRMRole model
         $role = CRMRole::find($user->role_id);
 

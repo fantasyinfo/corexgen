@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\CRM\CRMMenu;
 use App\Models\User;
 use App\Models\CRM\CRMRole;
 use App\Models\CRM\CRMRolePermissions;
@@ -7,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Media;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-
+use Illuminate\Support\Facades\Auth;
 
 class PermissionsIds
 {
@@ -95,29 +96,29 @@ class PermissionsIds
         'menu_icon' => 'fa-users',
         'permission_id' => PermissionsIds::$PARENT_PERMISSION_IDS['2'],
         'children' => [
-            'Role' => ['menu_url' => 'crm.role.index', 'menu_icon' => 'fa-users', 'permission_id' => PermissionsIds::findPermissionKey('ROLE', 'READ_ALL')],
-            'Permissions' => ['menu_url' => 'crm.permissions.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsIds::findPermissionKey('PERMISSIONS', 'READ_ALL')],
+            'Role' => ['menu_url' => 'role.index', 'menu_icon' => 'fa-users', 'permission_id' => PermissionsIds::findPermissionKey('ROLE', 'READ_ALL')],
+            'Permissions' => ['menu_url' => 'permissions.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsIds::findPermissionKey('PERMISSIONS', 'READ_ALL')],
         ]
     ],
     'Users' => [
         'menu_icon' => 'fa-user',
         'permission_id' => PermissionsIds::$PARENT_PERMISSION_IDS['3'],
         'children' => [
-            'Users' => ['menu_url' => 'crm.users.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsIds::findPermissionKey('USERS', 'READ_ALL')],
+            'Users' => ['menu_url' => 'users.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsIds::findPermissionKey('USERS', 'READ_ALL')],
         ]
     ],
     'Settings' => [
         'menu_icon' => 'fa-cog',
         'permission_id' => PermissionsIds::$PARENT_PERMISSION_IDS['4'],
         'children' => [
-            'Settings' => ['menu_url' => 'crm.settings.index', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsIds::findPermissionKey('SETTINGS', 'READ')],
+            'Settings' => ['menu_url' => 'settings.index', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsIds::findPermissionKey('SETTINGS', 'READ')],
         ]
     ],
     'Modules' => [
         'menu_icon' => 'fa-box',
         'permission_id' => PermissionsIds::$PARENT_PERMISSION_IDS['5'],
         'children' => [
-            'Modules' => ['menu_url' => 'crm.modules.index', 'menu_icon' => 'fa-box', 'permission_id' => PermissionsIds::findPermissionKey('MODULES', 'READ_ALL')],
+            'Modules' => ['menu_url' => 'modules.index', 'menu_icon' => 'fa-box', 'permission_id' => PermissionsIds::findPermissionKey('MODULES', 'READ_ALL')],
         ]
     ],
 ]);
@@ -341,7 +342,13 @@ function prePrintR($arr)
 
 function getCRMMenus()
 {
-    return DB::table('crm_menu')->where('buyer_id', 1)->get();
+    $user = Auth::user();
+
+    if($user->is_tenant && session('panelAccess') === PANEL_TYPES['SUPER_PANEL']){
+
+        return CRMMenu::where('panel_type',PANEL_TYPES['SUPER_PANEL'])->get();
+    }
+    return CRMMenu::where('panel_type',PANEL_TYPES['COMPANY_PANEL'])->get();
 }
 
 /**
@@ -354,12 +361,16 @@ function hasPermission($permissionKey)
 {
 
     // Get the current user's role ID
-    $userRoleId = auth()->user()->role_id;
+    $user = Auth::user();
+  
+    $userRoleId = $user->role_id;
+
 
     // return true for superadmin or role id 1
-    if ($userRoleId == 1) {
+    if ($user->is_tenant && $userRoleId === null) {
         return true;
     }
+
     // Split the permission key into module and permission type
     $parts = explode('.', $permissionKey);
 
@@ -423,9 +434,16 @@ function hasPermission($permissionKey)
 function hasMenuPermission($permissionId = null)
 {
     // for superadmins
-    $userRoleId = auth()->user()->role_id;
-
-    if ($userRoleId == 1) return true;
+     // Get the current user's role ID
+     $user = Auth::user();
+  
+     $userRoleId = $user->role_id;
+ 
+ 
+     // return true for superadmin or role id 1
+     if ($user->is_tenant && $userRoleId === null) {
+         return true;
+     }
 
     if ($permissionId == null)
         return false;
@@ -439,4 +457,18 @@ function hasMenuPermission($permissionId = null)
         ->exists();
 
     return $permissionExists;
+}
+
+
+
+function panelAccess(){
+    return session('panelAccess');
+}
+
+function getPanelUrl($string){
+    return strtolower(str_replace('_', '-', $string));
+}
+
+function getPanelRoutes($route){
+   return getPanelUrl(panelAccess()) . '.' . $route ;
 }

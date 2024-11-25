@@ -27,7 +27,6 @@ class CRMMenuSeeder extends Seeder
                 'parent_menu_id' => null,
                 'menu_icon' => $menuData['menu_icon'],
                 'permission_id' => $menuData['permission_id'],
-                'buyer_id' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -41,7 +40,6 @@ class CRMMenuSeeder extends Seeder
                     'parent_menu_id' => $parentMenuId,
                     'menu_icon' => $childMenuData['menu_icon'],
                     'permission_id' => $childMenuData['permission_id'],
-                    'buyer_id' => 1,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);

@@ -7,14 +7,15 @@
                 <h5 class="card-title">{{ __('crm_role.Roles Management') }}</h5>
                 <div class="card-header-action">
                     @if (hasPermission('ROLE.CREATE'))
-                        <a data-toggle="tooltip" data-placement="top" title="Create New" href="{{ route('crm.role.create') }}"
+                        <a data-toggle="tooltip" data-placement="top" title="Create New" 
+                        href="{{ route(getPanelRoutes('role.create')) }}"
                             class="btn btn-md btn-primary me-2">
                             <i class="fas fa-plus"></i> <span>{{ __('crm_role.Create Role') }}</span>
                         </a>
                     @endif
                     @if (hasPermission('ROLE.EXPORT'))
                         <a data-toggle="tooltip" data-placement="top" title="Export Data"
-                            href="{{ route('crm.role.export', request()->all()) }}"
+                            href="{{ route(getPanelRoutes('role.export'), request()->all()) }}"
                             class="btn btn-md btn-outline-secondary">
                             <i class="fas fa-download"></i> <span>{{ __('crud.Export') }}</span>
                         </a>
@@ -213,7 +214,7 @@
             e.preventDefault();
 
             const formData = new FormData(this);
-            const response = await fetch('{{ route('crm.role.import') }}', {
+            const response = await fetch('{{ route(getPanelRoutes("role.import")) }}', {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
@@ -242,7 +243,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ route('crm.role.index') }}",
+                    url: "{{ route(getPanelRoutes('role.index')) }}",
                     data: function(d) {
                         // Add filters if required
                         d.name = nameFilter.val();

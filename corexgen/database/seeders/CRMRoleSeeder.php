@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\CRM\CRMRole;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -13,12 +14,9 @@ class CRMRoleSeeder extends Seeder
     public function run(): void
     {
         //
-        \App\Models\CRM\CRMRole::create([
+       CRMRole::create([
             'role_name' => 'Super Admin',
             'role_desc' => 'for super admins',
-            'status' => 'active',
-            'buyer_id' => 1,
-            'created_by' => 1,
         ]);
     }
 }

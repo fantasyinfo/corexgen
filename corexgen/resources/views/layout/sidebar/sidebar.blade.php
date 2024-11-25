@@ -44,8 +44,8 @@
                             @foreach($childMenus as $childMenu)
                                 @if(hasMenuPermission($childMenu->permission_id))
                                     <li class="nav-item ">
-                                        <a class="nav-link  font-12 {{ $currentRoute === $childMenu->menu_url ? 'active' : '' }}" 
-                                           href="{{ route($childMenu->menu_url) }}"> 
+                                        <a class="nav-link  font-12 {{ $currentRoute === getPanelRoutes($childMenu->menu_url) ? 'active' : '' }}" 
+                                           href="{{ route(getPanelRoutes($childMenu->menu_url)) }}"> 
                                            <i class="fas fa-angle-double-right"></i>
                                             {{ $childMenu->menu_name }}
                                         </a>

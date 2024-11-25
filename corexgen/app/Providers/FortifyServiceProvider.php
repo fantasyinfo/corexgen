@@ -6,6 +6,8 @@ use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
 use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
+use App\Models\Tenant;
+use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -50,26 +52,38 @@ class FortifyServiceProvider extends ServiceProvider
 
         // Custom Authentication Logic
         Fortify::authenticateUsing(function (Request $request) {
-            $buyerId = $request->input('buyer_id');
+            $isTenant = filter_var($request->input('is_tenant'), FILTER_VALIDATE_BOOLEAN); // Ensure boolean value
             $email = $request->input('email');
             $password = $request->input('password');
         
-            // Query the `users` table and join with the `buyers` table directly
-            $user = DB::table('users')
-                ->join('buyers', 'buyers.id', '=', 'users.buyer_id')
-                ->where('users.email', $email)
-                ->where('users.status', 'active')
-                ->where('buyers.buyer_id', $buyerId)
-                ->select('users.*') // Select user fields
+            // Fetch active user by email
+            $user = User::where('email', $email)
+                ->where('status', CRM_STATUS_TYPES['USERS']['STATUS']['ACTIVE'])
                 ->first();
         
-            // Verify password
             if ($user && Hash::check($password, $user->password)) {
-                return \App\Models\User::find($user->id);
+                // Super admin / tenant check
+                if ($isTenant && $user->is_tenant && $user->tenant_id !== null) {
+                    $tenant = Tenant::where('id', $user->tenant_id)
+                        ->where('status', CRM_STATUS_TYPES['TENANTS']['STATUS']['ACTIVE'])
+                        ->first();
+                    if ($tenant) {
+                        $user->tenant_id = $tenant->id;
+                        session(['panelAccess' => PANEL_TYPES['SUPER_PANEL']]);
+                        return $user;
+                    }
+                    return null; // Tenant is inactive
+                }
+        
+                // Normal user
+    
+                session(['panelAccess' => PANEL_TYPES['COMPANY_PANEL']]);
+                return $user;
             }
         
-            return null;
+            return null; // Invalid credentials or inactive user
         });
+        
         
     }
 }

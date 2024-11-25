@@ -14,14 +14,11 @@
 
         <form method="POST" action="{{ route('login') }}">
             @csrf
-            {{-- <div class="my-3">
-                <x-label for="buyer_id" value="{{ __('Buyer Identification Number') }}" />
-                <x-input id="buyer_id" class="block mt-1 w-full" type="text" name="buyer_id" :value="old('buyer_id')" required autofocus autocomplete="buyer_id" />
-            </div> --}}
-            <div class="my-3">
-                <x-label for="buyer_id" value="{{ __('Buyer Identification Number') }}" />
-                <x-input id="buyer_id" class="block mt-1 w-full" type="text" name="buyer_id" :value="1732283373" required autofocus autocomplete="buyer_id" />
-            </div>
+      
+         
+            @if(isset($is_tenant) && $is_tenant)
+                <input type='hidden' name='is_tenant' value='true' />
+            @endif
           
             <div>
                 <x-label for="email" value="{{ __('Email') }}" />
