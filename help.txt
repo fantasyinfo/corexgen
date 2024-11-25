@@ -1,8 +1,3 @@
-i m going to make a saas software to sell that on codecanyon 
- so any buyer can buy and he can be a saas owner and he can make new clients inside that software
-
- problem: 
- # i want to make my core software/project future ready in future
- # if user buy the core & in future if i have new module that easily uploaded by my user without touching the core, 
-    just a upload function in my core software and user can buy the new module and upload it via the core software module uploader menu
-# how do i design my entire project like that, i need to make it professional, industry ready, easy to update, diffrent modules in future
+remove that provider class from config/app.php providers array
+composer file remove the autoload of that module
+composer run dump-autoload

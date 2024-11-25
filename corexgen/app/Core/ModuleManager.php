@@ -416,11 +416,19 @@ class ModuleManager
                     Log::info("Attempting to register provider: $providerClass");
 
                     try {
-                        // Register the provider dynamically
-                        app()->register(new $providerClass(app()));
+                       // Ensure the provider class exists
+                        if (class_exists($providerClass)) {
+                            Log::info("Registering provider: {$providerClass}");
+                            app()->register(new $providerClass(app()));
 
-                        // Log after successfully registering the provider
-                        Log::info("Provider successfully registered: $providerClass");
+                            $this->addProviderToConfig($providerClass);
+                            Log::info("Provider registered successfully: {$providerClass}");
+                        } else {
+                            Log::warning("Provider class does not exist: {$providerClass}");
+                            if (file_exists($filePath)) {
+                                Log::warning("File exists at {$filePath}, but namespace or autoloading may be incorrect.");
+                            }
+                        }
                     } catch (\Exception $e) {
                         // Log any exception that occurs during registration
                         Log::error("Failed to register provider $providerClass: " . $e->getMessage());
@@ -445,7 +453,134 @@ class ModuleManager
 
  
 
+    // protected function addProviderToConfig(string $providerClass): void
+    // {
+    //     // Path to the config/app.php file
+    //     $configPath = config_path('app.php');
+    
+    //     // Get the content of the config file
+    //     $configContent = file_get_contents($configPath);
+        
+    //     // Check if the provider is already in the config file
+    //     if (strpos($configContent, $providerClass) === false) {
+    //         // Using a more targeted regex approach to insert the provider within the 'providers' array
+    //         $pattern = '/\'providers\' => \[.*?\]/s'; // This will match the entire providers array
+    //         $replacement = function ($matches) use ($providerClass) {
+    //             // Append the new provider before the closing bracket of the array
+    //             return preg_replace(
+    //                 '/\]$/',
+    //                 "\n        {$providerClass}::class,\n    ]",
+    //                 $matches[0]
+    //             );
+    //         };
+            
+    //         // Apply the regex replacement
+    //         $configContent = preg_replace_callback($pattern, $replacement, $configContent);
+    
+    //         // Write the updated content back to the config file
+    //         file_put_contents($configPath, $configContent);
+    
+    //         Log::info("Provider {$providerClass} added to config/app.php");
+    //     } else {
+    //         Log::info("Provider {$providerClass} already exists in config/app.php");
+    //     }
+    // }
+    
+    
 
+    protected function addProviderToConfig(string $providerClass): void
+    {
+        // Path to the config/app.php file
+        $configPath = config_path('app.php');
+    
+        // Get the content of the config file
+        $configContent = file_get_contents($configPath);
+        
+        // Check if the provider is already in the config file
+        if (strpos($configContent, $providerClass) === false) {
+            // Using a more targeted regex pattern that matches the merge structure
+            $pattern = '/ServiceProvider::defaultProviders\(\)->merge\(\[(.*?)\]\)->toArray\(\)/s';
+            
+            $replacement = function ($matches) use ($providerClass) {
+                // Get the existing content within the merge array
+                $currentContent = $matches[1];
+                
+                // Find the last provider in the array
+                $lastCommaPosition = strrpos($currentContent, ',');
+                
+                if ($lastCommaPosition !== false) {
+                    // Insert the new provider after the last existing provider
+                    $newContent = substr_replace(
+                        $currentContent,
+                        ",\n        {$providerClass}::class",
+                        $lastCommaPosition,
+                        0
+                    );
+                } else {
+                    // If there are no existing providers, add as first
+                    $newContent = $currentContent . "\n        {$providerClass}::class";
+                }
+                
+                return "ServiceProvider::defaultProviders()->merge([" . $newContent . "])->toArray()";
+            };
+            
+            // Apply the regex replacement
+            $newContent = preg_replace_callback($pattern, $replacement, $configContent);
+            
+            if ($newContent !== null && $newContent !== $configContent) {
+                // Write the updated content back to the config file
+                file_put_contents($configPath, $newContent);
+                Log::info("Provider {$providerClass} added to config/app.php");
+            } else {
+                Log::error("Failed to update config/app.php with provider {$providerClass}");
+            }
+        } else {
+            Log::info("Provider {$providerClass} already exists in config/app.php");
+        }
+    }
+
+    protected function removeProviderFromConfig(string $providerClass): void
+{
+    // Path to the config/app.php file
+    $configPath = config_path('app.php');
+    
+    // Get the content of the config file
+    $configContent = file_get_contents($configPath);
+
+    // Check if the provider is in the config file
+    if (strpos($configContent, $providerClass) !== false) {
+        // Using a more targeted regex pattern that matches the merge structure
+        $pattern = '/ServiceProvider::defaultProviders\(\)->merge\(\[(.*?)\]\)->toArray\(\)/s';
+        
+        $replacement = function ($matches) use ($providerClass) {
+            // Get the existing content within the merge array
+            $currentContent = $matches[1];
+
+            // Remove the provider class from the content
+            $newContent = preg_replace(
+                '/,\s*' . preg_quote($providerClass . '::class', '/') . '\s*/',
+                '',
+                $currentContent
+            );
+            
+            // Rebuild the merge statement with the updated content
+            return "ServiceProvider::defaultProviders()->merge([" . $newContent . "])->toArray()";
+        };
+        
+        // Apply the regex replacement
+        $newContent = preg_replace_callback($pattern, $replacement, $configContent);
+        
+        if ($newContent !== null && $newContent !== $configContent) {
+            // Write the updated content back to the config file
+            file_put_contents($configPath, $newContent);
+            Log::info("Provider {$providerClass} removed from config/app.php");
+        } else {
+            Log::error("Failed to update config/app.php, provider {$providerClass} not found for removal");
+        }
+    } else {
+        Log::info("Provider {$providerClass} does not exist in config/app.php");
+    }
+}
 
     public function uninstall(string $moduleId): bool
     {
@@ -458,6 +593,16 @@ class ModuleManager
 
             // Remove module files
             File::deleteDirectory($this->moduleDirectory . '/' . $moduleId);
+
+
+            // create provider class
+            // $moduleId = 'BlogModule';
+            //Modules\BlogModule\BlogModuleServiceProvider
+
+            $providerClassName = "Modules\\$moduleId\\$moduleId" . "ServiceProvider";
+         
+
+            $this->removeProviderFromConfig($providerClassName);
 
             // Remove from database
             DB::table('modules')->where('name', $moduleId)->delete();

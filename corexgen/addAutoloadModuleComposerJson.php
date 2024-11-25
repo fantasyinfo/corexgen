@@ -14,9 +14,9 @@ if (!file_exists($composerJsonPath)) {
 $composerJson = json_decode(file_get_contents($composerJsonPath), true);
 
 // Check if repositories and autoload sections exist, if not create them
-if (!isset($composerJson['repositories'])) {
-    $composerJson['repositories'] = [];
-}
+// if (!isset($composerJson['repositories'])) {
+//     $composerJson['repositories'] = [];
+// }
 if (!isset($composerJson['autoload']['psr-4'])) {
     $composerJson['autoload']['psr-4'] = [];
 }
@@ -31,10 +31,10 @@ foreach ($modules as $moduleDir) {
     $moduleNamespace = 'Modules\\' . $moduleName;
 
     // Add module to repositories section
-    $composerJson['repositories'][] = [
-        'type' => 'path',
-        'url' => 'modules/' . $moduleName
-    ];
+    // $composerJson['repositories'][] = [
+    //     'type' => 'path',
+    //     'url' => 'modules/' . $moduleName
+    // ];
 
     // Add module to autoload section if the 'src' directory exists
     $moduleSrcDir = $moduleDir . '/src';

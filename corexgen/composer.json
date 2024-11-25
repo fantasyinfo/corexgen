@@ -38,20 +38,7 @@
             "app/Helpers/helpers.php"
         ]
     },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "modules/BlogModule"
-        },
-        {
-            "type": "path",
-            "url": "modules/BlogModule"
-        },
-        {
-            "type": "path",
-            "url": "modules/BlogModule"
-        }
-    ],
+    "repositories": [],
     "autoload-dev": {
         "psr-4": {
             "Tests\\": "tests/"
