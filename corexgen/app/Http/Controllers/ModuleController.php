@@ -22,7 +22,7 @@ class ModuleController extends Controller
     public function index()
     {
         $modules = DB::table('modules')->get();
-        return view('modules.index', compact('modules'));
+        return view('modules.index', ['modules' => $modules, 'title' => 'Modules Management']);
     }
 
     public function create(Request $request)
