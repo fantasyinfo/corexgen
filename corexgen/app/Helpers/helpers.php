@@ -14,9 +14,10 @@ final class PermissionsIds
     public static $PERMISSIONS_IDS = [
         'DASHBOARD' => [501 => 'READ', 502 => 'READ_ALL'],
         'ROLE' => [551 => 'CREATE', 552 => 'READ', 553 => 'READ_ALL', 554 => 'UPDATE', 555 => 'DELETE', 556 => 'IMPORT', 557 => 'EXPORT', 558 => 'FILTER', 559 => 'CHANGE_STATUS',],
-        'USERS' => [601 => 'CREATE', 602 => 'READ', 103 => 'READ_ALL', 604 => 'UPDATE', 605 => 'DELETE', 606 => 'IMPORT', 607 => 'EXPORT', 608 => 'FILTER', 609 => 'CHANGE_STATUS',],
+        'USERS' => [601 => 'CREATE', 602 => 'READ', 603 => 'READ_ALL', 604 => 'UPDATE', 605 => 'DELETE', 606 => 'IMPORT', 607 => 'EXPORT', 608 => 'FILTER', 609 => 'CHANGE_STATUS',],
         'PERMISSIONS' => [651 => 'CREATE', 652 => 'READ', 653 => 'READ_ALL', 654 => 'UPDATE', 655 => 'DELETE', 656 => 'FILTER',],
-        'SETTINGS' => [701 => 'READ', 654 => 'UPDATE',],
+        'SETTINGS' => [701 => 'READ', 702 => 'UPDATE',],
+        'MODULES' => [751 => 'CREATE', 752 => 'READ', 753 => 'READ_ALL', 754 => 'UPDATE', 755 => 'DELETE', 756 => 'IMPORT', 757 => 'EXPORT', 758 => 'FILTER', 759 => 'CHANGE_STATUS',],
 
     ];
 
@@ -71,6 +72,11 @@ final class PermissionsIds
         'id' => PermissionsIds::$PARENT_PERMISSION_IDS['5'],
         'children' => PermissionsIds::$PERMISSIONS_IDS['SETTINGS']
     ],
+    'MODULES' => [
+        'name' => 'CRM_MODULES',
+        'id' => PermissionsIds::$PARENT_PERMISSION_IDS['6'],
+        'children' => PermissionsIds::$PERMISSIONS_IDS['MODULES']
+    ],
 ]);
 
 !defined('CRM_MENU_ITEMS') && define('CRM_MENU_ITEMS', [
@@ -105,6 +111,13 @@ final class PermissionsIds
         'permission_id' => PermissionsIds::$PARENT_PERMISSION_IDS['4'],
         'children' => [
             'Settings' => ['menu_url' => 'crm.settings.index', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsIds::findPermissionKey('SETTINGS', 'READ')],
+        ]
+    ],
+    'Modules' => [
+        'menu_icon' => 'fa-box',
+        'permission_id' => PermissionsIds::$PARENT_PERMISSION_IDS['5'],
+        'children' => [
+            'Modules' => ['menu_url' => 'crm.modules.index', 'menu_icon' => 'fa-box', 'permission_id' => PermissionsIds::findPermissionKey('MODULES', 'READ_ALL')],
         ]
     ],
 ]);

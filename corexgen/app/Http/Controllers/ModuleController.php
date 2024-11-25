@@ -25,7 +25,7 @@ class ModuleController extends Controller
         return view('modules.index', compact('modules'));
     }
 
-    public function upload(Request $request)
+    public function create(Request $request)
     {
         $request->validate([
             'module' => 'required|file|mimes:zip|max:10240' // max 10MB
@@ -44,11 +44,11 @@ class ModuleController extends Controller
                 // Run the "php artisan optimize" command
                 Artisan::call('optimize');
 
-                return redirect()->route('admin.modules.index')
+                return redirect()->route('crm.modules.index')
                     ->with('success', 'Module installed successfully');
             }
 
-            return redirect()->route('admin.modules.index')
+            return redirect()->route('crm.modules.index')
                 ->with('error', 'Failed to install module');
         } finally {
             // Cleanup temp file
@@ -82,27 +82,27 @@ class ModuleController extends Controller
     
     
 
-    public function enable(string $module)
-    {
-        if ($this->moduleManager->enable($module)) {
-            return redirect()->route('admin.modules.index')
-                ->with('success', 'Module enabled successfully');
-        }
+    // public function enable(string $module)
+    // {
+    //     if ($this->moduleManager->enable($module)) {
+    //         return redirect()->route('modules.index')
+    //             ->with('success', 'Module enabled successfully');
+    //     }
 
-        return redirect()->route('admin.modules.index')
-            ->with('error', 'Failed to enable module');
-    }
+    //     return redirect()->route('modules.index')
+    //         ->with('error', 'Failed to enable module');
+    // }
 
-    public function disable(string $module)
-    {
-        if ($this->moduleManager->disable($module)) {
-            return redirect()->route('admin.modules.index')
-                ->with('success', 'Module disabled successfully');
-        }
+    // public function disable(string $module)
+    // {
+    //     if ($this->moduleManager->disable($module)) {
+    //         return redirect()->route('modules.index')
+    //             ->with('success', 'Module disabled successfully');
+    //     }
 
-        return redirect()->route('admin.modules.index')
-            ->with('error', 'Failed to disable module');
-    }
+    //     return redirect()->route('modules.index')
+    //         ->with('error', 'Failed to disable module');
+    // }
 
     public function destroy(string $module)
     {
@@ -114,12 +114,12 @@ class ModuleController extends Controller
             // Run the "php artisan optimize" command
             Artisan::call('optimize');
 
-            
-            return redirect()->route('admin.modules.index')
+
+            return redirect()->route('crm.modules.index')
                 ->with('success', 'Module uninstalled successfully');
         }
 
-        return redirect()->route('admin.modules.index')
+        return redirect()->route('crm.modules.index')
             ->with('error', 'Failed to uninstall module');
     }
 }

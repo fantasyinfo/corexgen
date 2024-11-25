@@ -6,7 +6,7 @@
         <h1 class="text-2xl font-bold mb-6">Module Management</h1>
 
         <!-- Upload Form -->
-        <form action="{{ route('admin.modules.upload') }}" 
+        <form action="{{ route('crm.modules.create') }}" 
               method="POST" 
               enctype="multipart/form-data"
               class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
@@ -66,19 +66,7 @@
                     <td class="px-6 py-4 border-b">{{ $module->description }}</td>
                     <td class="px-6 py-4 border-b">{{ ucfirst($module->status) }}</td>
                     <td class="px-6 py-4 border-b">
-                        @if($module->status === 'active')
-                            <form action="{{ route('admin.modules.disable', $module->name) }}" method="POST" class="inline">
-                                @csrf
-                                <button type="submit" class="text-yellow-500 mr-4">Disable</button>
-                            </form>
-                        @else
-                            <form action="{{ route('admin.modules.enable', $module->name) }}" method="POST" class="inline">
-                                @csrf
-                                <button type="submit" class="text-green-500 mr-4">Enable</button>
-                            </form>
-                        @endif
-
-                        <form action="{{ route('admin.modules.destroy', $module->name) }}" method="POST" class="inline">
+                        <form action="{{ route('crm.modules.destroy', $module->name) }}" method="POST" class="inline">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="text-red-500" onclick="return confirm('Are you sure you want to uninstall this module?')">

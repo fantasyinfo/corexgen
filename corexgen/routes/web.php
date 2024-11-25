@@ -172,6 +172,15 @@ Route::middleware([
     });
 
 
+    // modules routes
+    Route::prefix('modules')->as('modules.')->group(function () {
+        Route::get('/', [ModuleController::class, 'index'])->name('index')->middleware('check.permission:MODULES.READ_ALL');
+        Route::post('/', [ModuleController::class, 'create'])->name('create')->middleware('check.permission:MODULES.CREATE');
+        Route::delete('/destroy/{module}', [ModuleController::class, 'destroy'])->name('destroy')->middleware('check.permission:MODULES.DELETE');
+    });
+
+    
+
 
 
     // add country, city tables in bg
