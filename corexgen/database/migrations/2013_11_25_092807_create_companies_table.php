@@ -11,13 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('buyers', function (Blueprint $table) {
+        Schema::create('companies', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('email')->unique();
-            $table->string('password');
-            $table->bigInteger('buyer_id')->unique();
-            $table->enum('status',['active','deactive'])->default('active');
+            $table->string('email');
+            $table->string('phone')->nullable();
+            $table->enum('status', CRM_STATUS_TYPES['COMPANY']['TABLE_STATUS']);
+            $table->unsignedBigInteger('tenant_id');
+
+            $table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('cascade');
+
+            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -27,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('buyers');
+        Schema::dropIfExists('company');
     }
 };

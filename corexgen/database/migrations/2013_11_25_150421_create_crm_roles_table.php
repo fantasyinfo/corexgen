@@ -11,20 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('crm_role_permissions', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('role_id');
-            $table->unsignedBigInteger('company_id')->nullable();
-            $table->bigInteger('permission_id');
 
+        Schema::create('crm_roles', function (Blueprint $table) {
+            $table->id();
+            $table->string('role_name');
+            $table->string('role_desc')->nullable();
+            $table->unsignedBigInteger('company_id')->nullable();
+            $table->enum('status', CRM_STATUS_TYPES['CRM_ROLES']['TABLE_STATUS']);
+            $table->timestamps();
 
 
             // foreign keys
-            $table->foreign('role_id')->references('id')->on('crm_roles')->onDelete('cascade');
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
-    
-
-            $table->timestamps();
         });
     }
 
@@ -33,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('crm_role_permissions');
+        Schema::dropIfExists('crm_roles');
     }
 };

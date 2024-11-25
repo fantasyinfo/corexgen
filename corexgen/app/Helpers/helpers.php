@@ -9,7 +9,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
 
-final class PermissionsIds
+class PermissionsIds
 {
     public static $PERMISSIONS_IDS = [
         'DASHBOARD' => [501 => 'READ', 502 => 'READ_ALL'],
@@ -122,10 +122,6 @@ final class PermissionsIds
     ],
 ]);
 
-
-
-
-
 !defined('CRM_SETTINGS') && define('CRM_SETTINGS', [
 
     'COMPANY_NAME' => [
@@ -167,6 +163,35 @@ final class PermissionsIds
 
 
 ]);
+
+!defined('CRM_STATUS_TYPES') && define('CRM_STATUS_TYPES', [
+    'TENANTS' => [
+        'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE'],
+        'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE']
+    ],
+    'COMPANY' => [
+        'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE', 'BANNED'],
+        'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE', 'BANNED' => 'BANNED']
+    ],
+    'USERS' => [
+        'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE', 'BANNED'],
+        'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE', 'BANNED' => 'BANNED']
+    ],
+    'CRM_ROLES' => [
+        'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE'],
+        'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE']
+    ],
+
+]);
+
+
+
+!defined('PANEL_TYPES') && define('PANEL_TYPES', [
+    'SUPER_PANEL' => 'SUPER_PANEL',
+    'COMPANY_PANEL' => 'COMPANY_PANEL'
+]);
+
+
 
 
 
