@@ -1,3 +1,4 @@
+
 <div class='text-end'>
     @if (isset($permissions['UPDATE']) && hasPermission($permissions['UPDATE']))
         <a href="{{ route($tenantRoute . $module . '.edit', $id) }}" class="btn btn-sm btn-outline-warning"

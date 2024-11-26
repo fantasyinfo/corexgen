@@ -5,14 +5,14 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="card stretch stretch-full">
-                <form id="roleForm" action="{{ route('crm.permissions.store') }}" method="POST">
+                <form id="roleForm" action="{{ route(getPanelRoutes('permissions.store')) }}" method="POST">
                     @csrf
                     <div class="card-body general-info">
                         <div class="mb-5 d-flex align-items-center justify-content-between">
-                            <h5 class="fw-bold mb-0 me-4">
+                            <p class="fw-bold mb-0 me-4">
                                 <span class="d-block mb-2">{{ __('crm_permissions.Create New Permissions') }}</span>
                                 <span class="fs-12 fw-normal text-muted text-truncate-1-line">{{ __('crud.Please add correct information') }}</span>
-                            </h5>
+                            </p>
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-plus"></i>  <span>{{ __('crm_permissions.Create Permissions') }}</span>
                             </button>
