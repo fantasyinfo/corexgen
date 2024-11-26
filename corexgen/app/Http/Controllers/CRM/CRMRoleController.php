@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
 use App\Traits\TenantFilter;
 use Illuminate\Support\Facades\View;
+use App\Helpers\PermissionsHelper;
 
 /**
  * CRMRoleController handles CRUD operations for CRM Roles
@@ -57,6 +58,12 @@ class CRMRoleController extends Controller
         return $this->viewDir . $filename;
     }
 
+
+
+
+
+
+
     /**
      * Display list of roles with filtering and DataTables support
      * 
@@ -80,26 +87,41 @@ class CRMRoleController extends Controller
         if ($request->ajax()) {
             return DataTables::of($query)
                 ->addColumn('actions', function ($role) {
-                    return View::make($this->getViewFilePath('components.table-actions'), [
-                        'role' => $role,
+                return View::make(getComponentsDirFilePath('dt-actions-buttons'), [
+
                         'tenantRoute' => $this->tenantRoute,
+                    'permissions' => PermissionsHelper::getPermissionsArray('ROLE'),
+                    'module' => PANEL_MODULES['SUPER_PANEL']['role'],
+                    'id' => $role->id
+
                     ])->render();
                 })
                 ->editColumn('created_at', fn($role) => $role->created_at->format('d M Y'))
                 ->editColumn('status', function ($role) {
-                    return View::make($this->getViewFilePath('components.table-status'), [
-                        'role' => $role,
-                        'tenantRoute' => $this->tenantRoute,
+                return View::make(getComponentsDirFilePath('dt-status'), [
+
+                    'tenantRoute' => $this->tenantRoute,
+                    'permissions' => PermissionsHelper::getPermissionsArray('ROLE'),
+                    'module' => PANEL_MODULES['SUPER_PANEL']['role'],
+                    'id' => $role->id,
+                    'status' => [
+                        'current_status' => $role->status,
+                        'available_status' => CRM_STATUS_TYPES['CRM_ROLES']['STATUS'],
+                        'bt_class' => CRM_STATUS_TYPES['CRM_ROLES']['BT_CLASSES'],
+
+                    ]
                     ])->render();
                 })
                 ->rawColumns(['actions', 'status'])
                 ->make(true);
         }
 
-        // Render index view with filters
+        // Render index view with filterss
         return view($this->getViewFilePath('index'), [
             'filters' => $request->all(),
             'title' => 'Roles Management',
+            'permissions' => PermissionsHelper::getPermissionsArray('ROLE'),
+            'module' => PANEL_MODULES['SUPER_PANEL']['role'],
         ]);
     }
 
@@ -194,24 +216,15 @@ class CRMRoleController extends Controller
     public function export(Request $request)
     {
         // Initialize query with tenant filtering
-        $query = CRMRole::query()->where('buyer_id', auth()->user()->buyer_id);
+        $query = CRMRole::query();
+        $query = $this->applyTenantFilter($query);
 
-        // Apply filters
-        $query->when($request->filled('name'), function ($q) use ($request) {
-            $q->where('role_name', 'LIKE', "%{$request->name}%");
-        });
 
-        $query->when($request->filled('status'), function ($q) use ($request) {
-            $q->where('status', $request->status);
-        });
-
-        $query->when($request->filled('start_date'), function ($q) use ($request) {
-            $q->whereDate('created_at', '>=', $request->start_date);
-        });
-
-        $query->when($request->filled('end_date'), function ($q) use ($request) {
-            $q->whereDate('created_at', '<=', $request->end_date);
-        });
+        // Apply dynamic filters based on request input
+        $query->when($request->filled('name'), fn($q) => $q->where('role_name', 'LIKE', "%{$request->name}%"));
+        $query->when($request->filled('status'), fn($q) => $q->where('status', $request->status));
+        $query->when($request->filled('start_date'), fn($q) => $q->whereDate('created_at', '>=', $request->start_date));
+        $query->when($request->filled('end_date'), fn($q) => $q->whereDate('created_at', '<=', $request->end_date));
 
         // Get filtered roles
         $roles = $query->get();
@@ -269,6 +282,7 @@ class CRMRoleController extends Controller
             $data = array_map('str_getcsv', file($file->getRealPath()));
             $header = array_shift($data);
 
+        
             // Import each row from CSV
             foreach ($data as $row) {
                 $row = array_combine($header, $row);
@@ -276,10 +290,7 @@ class CRMRoleController extends Controller
                 CRMRole::create([
                     'role_name' => $row['role_name'] ?? '',
                     'role_desc' => $row['role_desc'] ?? '',
-                    'status' => $row['status'] ?? 'active',
-                    'buyer_id' => auth()->user()->buyer_id,
-                    'created_by' => auth()->user()->id,
-                    'updated_by' => auth()->user()->id,
+                    'status' => CRM_STATUS_TYPES['CRM_ROLES']['STATUS']['ACTIVE'],
                 ]);
             }
 
@@ -323,20 +334,13 @@ class CRMRoleController extends Controller
      * @param int $id
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function changeStatus($id)
+    public function changeStatus($id, $status)
     {
         try {
             // Apply tenant filtering and find role
             $query = CRMRole::query()->where('id', $id);
             $query = $this->applyTenantFilter($query);
-            $role = $query->firstOrFail();
-
-            // Toggle status
-            $role->status = $role->status === CRM_STATUS_TYPES['CRM_ROLES']['STATUS']['ACTIVE'] 
-                ? CRM_STATUS_TYPES['CRM_ROLES']['STATUS']['DEACTIVE'] 
-                : CRM_STATUS_TYPES['CRM_ROLES']['STATUS']['ACTIVE'];
-            $role->save();
-
+            $query->update(['status' => $status]);
             // Redirect with success message
             return redirect()->back()->with('success', 'Role status changed successfully.');
         } catch (\Exception $e) {

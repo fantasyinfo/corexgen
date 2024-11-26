@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", function () {
     // Ensure sidebar is open on desktop initially
     if (window.innerWidth > 768) {
@@ -94,56 +93,62 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+// Get the drop zone element
+const dropZone = document.querySelector(".drop-zone");
+const fileInput = document.querySelector("#csvFile");
 
- // Get the drop zone element
- const dropZone = document.querySelector('.drop-zone');
- const fileInput = document.querySelector('#csvFile');
+// Click handler (you already have this)
+dropZone.addEventListener("click", function () {
+    fileInput.click();
+});
 
- // Click handler (you already have this)
- dropZone.addEventListener('click', function() {
-     fileInput.click();
- });
+// File input change handler (you already have this)
+fileInput.addEventListener("change", function () {
+    const file = this.files[0];
+    if (file) {
+        this.nextElementSibling.textContent = file.name;
+    }
+});
 
- // File input change handler (you already have this)
- fileInput.addEventListener('change', function() {
-     const file = this.files[0];
-     if (file) {
-         this.nextElementSibling.textContent = file.name;
-     }
- });
+// Add drag and drop event listeners
+dropZone.addEventListener("dragover", function (e) {
+    e.preventDefault();
+    dropZone.style.backgroundColor = "#f8f9fa";
+    dropZone.style.borderColor = "#0d6efd";
+});
 
- // Add drag and drop event listeners
- dropZone.addEventListener('dragover', function(e) {
-     e.preventDefault();
-     dropZone.style.backgroundColor = '#f8f9fa';
-     dropZone.style.borderColor = '#0d6efd';
- });
+dropZone.addEventListener("dragleave", function (e) {
+    e.preventDefault();
+    dropZone.style.backgroundColor = "";
+    dropZone.style.borderColor = "#ddd";
+});
 
- dropZone.addEventListener('dragleave', function(e) {
-     e.preventDefault();
-     dropZone.style.backgroundColor = '';
-     dropZone.style.borderColor = '#ddd';
- });
+dropZone.addEventListener("drop", function (e) {
+    e.preventDefault();
+    dropZone.style.backgroundColor = "";
+    dropZone.style.borderColor = "#ddd";
 
- dropZone.addEventListener('drop', function(e) {
-     e.preventDefault();
-     dropZone.style.backgroundColor = '';
-     dropZone.style.borderColor = '#ddd';
+    const files = e.dataTransfer.files;
+    if (files.length) {
+        fileInput.files = files;
+        // Trigger the change event manually
+        const event = new Event("change", {
+            bubbles: true,
+        });
+        fileInput.dispatchEvent(event);
 
-     const files = e.dataTransfer.files;
-     if (files.length) {
-         fileInput.files = files;
-         // Trigger the change event manually
-         const event = new Event('change', {
-             bubbles: true
-         });
-         fileInput.dispatchEvent(event);
+        // Update the text
+        fileInput.nextElementSibling.textContent = files[0].name;
+    }
+});
 
-         // Update the text
-         fileInput.nextElementSibling.textContent = files[0].name;
-     }
- });
+$("#deleteModal").on("show.bs.modal", function (event) {
+    console.log("first");
+    var button = $(event.relatedTarget); // The button that triggered the modal
+    var roleId = button.data("id"); // Get the role ID
+    var route = button.data("route"); // Get the delete route
 
- 
-
-
+    // Set the form action to the appropriate route
+    var form = $("#deleteForm");
+    form.attr("action", route);
+});

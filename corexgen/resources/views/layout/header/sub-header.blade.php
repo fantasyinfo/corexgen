@@ -17,7 +17,7 @@
                 <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle" id="langDropDown" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fas fa-language"></i> <span class="badge text-success">{{ucwords(App::getLocale())}}</span>
                 </a>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langDropDown">
+                <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="langDropDown">
                     <li><a class="dropdown-item" href="{{ url('/setlang/en') }}"><span class="badge text-success">En</span>  {{__('general.English')}}</a></li>
                     <li><a class="dropdown-item" href="{{ url('/setlang/hi') }}"><span class="badge text-info">Hi</span>  {{__('general.Hindi')}}</a></li>
                 </ul>
@@ -27,7 +27,7 @@
                 <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                      {{ucwords(auth()->user()->name)}}
                 </a>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
                     <li><span class="badge bg-soft-success text-success ms-1">{{getRoleName(auth()->user()->role_id)}}</span></li>
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> {{__('general.Profile')}}</a></li>

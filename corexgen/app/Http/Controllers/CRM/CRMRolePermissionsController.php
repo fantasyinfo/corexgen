@@ -6,72 +6,109 @@ use App\Http\Controllers\Controller;
 use App\Models\CRM\CRMPermissions;
 use App\Models\CRM\CRMRole;
 use App\Models\CRM\CRMRolePermissions;
+use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\View;
+use App\Helpers\PermissionsHelper;
 
+/**
+ * CRMRolePermissionsController handles CRUD operations for CRM Roles Permissions
+ * 
+ * This controller manages role-related functionality including:
+ * - Listing permissions with server-side DataTables
+ * - Creating new permissions
+ * - Editing existing permissions
+ * - Deleting the existing permissions
+ */
 class CRMRolePermissionsController extends Controller
 {
+    use TenantFilter;
     /**
      * Display a listing of the resource.
      */
+
+    /**
+     * Number of items per page for pagination
+     * @var int
+     */
     protected $perPage = 10;
 
+    /**
+     * Tenant-specific route prefix
+     * @var string
+     */
+    private $tenantRoute;
 
+    /**
+     * Base directory for view files
+     * @var string
+     */
+    private $viewDir = 'dashboard.crm.permissions.';
 
+    /**
+     * Generate full view file path
+     * 
+     * @param string $filename
+     * @return string
+     */
+    private function getViewFilePath($filename)
+    {
+        return $this->viewDir . $filename;
+    }
+
+    /**
+     * Display list of permissions with filtering and DataTables support
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Http\JsonResponse
+     */
     public function index(Request $request)
     {
-
-
 
 
         $query = CRMRolePermissions::query()
             ->join('crm_roles', 'crm_role_permissions.role_id', '=', 'crm_roles.id')
             ->join('crm_permissions', 'crm_role_permissions.permission_id', '=', 'crm_permissions.permission_id')
-            ->where('crm_role_permissions.buyer_id', auth()->user()->buyer_id)
             ->groupBy('crm_roles.id', 'crm_roles.role_name')
             ->select('crm_roles.id', 'crm_roles.role_name');
+
+        $query = $this->applyTenantFilter($query, 'crm_permissions');
+        $this->tenantRoute = $this->getTenantRoute();
+
 
 
 
         if ($request->ajax()) {
             return DataTables::of($query)
-            ->addColumn('actions', function ($permissions) {
-                $editButton = '';
-                $deleteButton = '';
+                ->addColumn('actions', function ($permission) {
+                    View::make(getComponentsDirFilePath('dt-actions-buttons'), [
 
-                if (hasPermission('PERMISSIONS.UPDATE')) {
-                    $editButton = '<a href="' . route('crm.permissions.edit', $permissions->id) . '" class="btn btn-sm btn-warning" data-toggle="tooltip" title="Edit">
-                               <i class="fas fa-pencil-alt"></i>
-                           </a>';
-                }
+                    'tenantRoute' => $this->tenantRoute,
+                    'permissions' => PermissionsHelper::getPermissionsArray('PERMISSIONS'),
+                    'module' => PANEL_MODULES['SUPER_PANEL']['permissions'],
+                    'id' => $permission->id
 
-                if (hasPermission('PERMISSIONS.DELETE')) {
-                    $deleteButton = '<form action="' . route('crm.permissions.destroy', $permissions->id) . '" method="POST" style="display:inline;" onsubmit="return confirm(\'Are you sure?\');">
-                                 ' . csrf_field() . method_field('DELETE') . '
-                                 <button type="submit" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Delete">
-                                     <i class="fas fa-trash-alt"></i>
-                                 </button>
-                             </form>';
-                }
-
-                    return "<div class='text-end'> $editButton  $deleteButton </div>";
+                ])->render();
                 })
-                ->rawColumns(['actions', 'status']) // Add 'status' to raw columns
+                ->rawColumns(['actions'])
                 ->make(true);
         }
 
 
-        $roles = CRMRole::where('buyer_id', auth()->user()->buyer_id)
-            ->get();
+        $roleQuery = CRMRole::query();
+        $roleQuery =  $this->applyTenantFilter($roleQuery);
+        $roles = $roleQuery->get();
 
 
-        return view('dashboard.crm.permissions.index', [
-          
+        return view($this->getViewFilePath('index'), [
+
             'filters' => $request->all(),
             'roles' => $roles,
-            'title' => 'Permissions Management'
+            'title' => 'Permissions Management',
+            'permissions' => PermissionsHelper::getPermissionsArray('PERMISSIONS'),
+            'module' => PANEL_MODULES['SUPER_PANEL']['permissions'],
         ]);
     }
 
@@ -155,8 +192,7 @@ class CRMRolePermissionsController extends Controller
 
             // Redirect with success message
             return redirect()->route('crm.permissions.create')
-                ->with('success', 'Permissions created successfully.');
-
+            ->with('success', 'Permissions created successfully.');
         } catch (\Exception $e) {
             // Rollback the transaction
             DB::rollBack();
@@ -210,7 +246,7 @@ class CRMRolePermissionsController extends Controller
      */
     public function update(Request $request)
     {
-     
+
         // Validate the request
         $validator = Validator::make($request->all(), [
             'role_id' => ['required', 'exists:crm_roles,id'],
@@ -265,8 +301,7 @@ class CRMRolePermissionsController extends Controller
 
             // Redirect with success message
             return redirect()->route('crm.permissions.index')
-                ->with('success', 'Permissions updated successfully.');
-
+            ->with('success', 'Permissions updated successfully.');
         } catch (\Exception $e) {
             // Rollback the transaction
             DB::rollBack();

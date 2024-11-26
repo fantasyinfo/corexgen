@@ -10,188 +10,6 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 
-class PermissionsIds
-{
-    public static $PERMISSIONS_IDS = [
-        'DASHBOARD' => [501 => 'READ', 502 => 'READ_ALL'],
-        'ROLE' => [551 => 'CREATE', 552 => 'READ', 553 => 'READ_ALL', 554 => 'UPDATE', 555 => 'DELETE', 556 => 'IMPORT', 557 => 'EXPORT', 558 => 'FILTER', 559 => 'CHANGE_STATUS',],
-        'USERS' => [601 => 'CREATE', 602 => 'READ', 603 => 'READ_ALL', 604 => 'UPDATE', 605 => 'DELETE', 606 => 'IMPORT', 607 => 'EXPORT', 608 => 'FILTER', 609 => 'CHANGE_STATUS',],
-        'PERMISSIONS' => [651 => 'CREATE', 652 => 'READ', 653 => 'READ_ALL', 654 => 'UPDATE', 655 => 'DELETE', 656 => 'FILTER',],
-        'SETTINGS' => [701 => 'READ', 702 => 'UPDATE',],
-        'MODULES' => [751 => 'CREATE', 752 => 'READ', 753 => 'READ_ALL', 754 => 'UPDATE', 755 => 'DELETE', 756 => 'IMPORT', 757 => 'EXPORT', 758 => 'FILTER', 759 => 'CHANGE_STATUS',],
-
-    ];
-
-    // 500 reserved for featueres
-    public static $PARENT_PERMISSION_IDS = [
-        1 => 1,
-        2 => 2,
-        3 => 3,
-        4 => 4,
-        5 => 5,
-        6 => 6,
-        7 => 7,
-        8 => 8,
-        9 => 9,
-        10 => 10,
-
-    ];
-
-    // Method to find the key for a given value in a specific category
-    public static function findPermissionKey($category, $permission)
-    {
-        if (isset(self::$PERMISSIONS_IDS[$category])) {
-            return array_search($permission, self::$PERMISSIONS_IDS[$category], true);
-        }
-        return null; // Return null if category or permission not found
-    }
-}
-
-!defined('CRMPERMISSIONS') && define('CRMPERMISSIONS', [
-    'DASHBOARD' => [
-        'name' => 'CRM_DASHBOARD',
-        'id' => PermissionsIds::$PARENT_PERMISSION_IDS['1'],
-        'children' => PermissionsIds::$PERMISSIONS_IDS['DASHBOARD']
-    ],
-    'ROLE' => [
-        'name' => 'CRM_ROLE',
-        'id' => PermissionsIds::$PARENT_PERMISSION_IDS['2'],
-        'children' => PermissionsIds::$PERMISSIONS_IDS['ROLE']
-    ],
-    'USERS' => [
-        'name' => 'CRM_USERS',
-        'id' => PermissionsIds::$PARENT_PERMISSION_IDS['3'],
-        'children' => PermissionsIds::$PERMISSIONS_IDS['USERS']
-    ],
-    'PERMISSIONS' => [
-        'name' => 'CRM_PERMISSIONS',
-        'id' => PermissionsIds::$PARENT_PERMISSION_IDS['4'],
-        'children' => PermissionsIds::$PERMISSIONS_IDS['PERMISSIONS']
-    ],
-    'SETTINGS' => [
-        'name' => 'CRM_SETTINGS',
-        'id' => PermissionsIds::$PARENT_PERMISSION_IDS['5'],
-        'children' => PermissionsIds::$PERMISSIONS_IDS['SETTINGS']
-    ],
-    'MODULES' => [
-        'name' => 'CRM_MODULES',
-        'id' => PermissionsIds::$PARENT_PERMISSION_IDS['6'],
-        'children' => PermissionsIds::$PERMISSIONS_IDS['MODULES']
-    ],
-]);
-
-!defined('CRM_MENU_ITEMS') && define('CRM_MENU_ITEMS', [
-    'Dashboard' => [
-        'menu_icon' => 'fa-tachometer-alt',
-        'permission_id' => PermissionsIds::$PARENT_PERMISSION_IDS['1'],
-        'children' => [
-            'CRM' => [
-                'menu_url' => 'home',
-                'menu_icon' => 'fa-tachometer-alt',
-                'permission_id' => PermissionsIds::findPermissionKey('DASHBOARD', 'READ_ALL')
-            ]
-        ]
-    ],
-    'Roles & Permissions' => [
-        'menu_icon' => 'fa-users',
-        'permission_id' => PermissionsIds::$PARENT_PERMISSION_IDS['2'],
-        'children' => [
-            'Role' => ['menu_url' => 'role.index', 'menu_icon' => 'fa-users', 'permission_id' => PermissionsIds::findPermissionKey('ROLE', 'READ_ALL')],
-            'Permissions' => ['menu_url' => 'permissions.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsIds::findPermissionKey('PERMISSIONS', 'READ_ALL')],
-        ]
-    ],
-    'Users' => [
-        'menu_icon' => 'fa-user',
-        'permission_id' => PermissionsIds::$PARENT_PERMISSION_IDS['3'],
-        'children' => [
-            'Users' => ['menu_url' => 'users.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsIds::findPermissionKey('USERS', 'READ_ALL')],
-        ]
-    ],
-    'Settings' => [
-        'menu_icon' => 'fa-cog',
-        'permission_id' => PermissionsIds::$PARENT_PERMISSION_IDS['4'],
-        'children' => [
-            'Settings' => ['menu_url' => 'settings.index', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsIds::findPermissionKey('SETTINGS', 'READ')],
-        ]
-    ],
-    'Modules' => [
-        'menu_icon' => 'fa-box',
-        'permission_id' => PermissionsIds::$PARENT_PERMISSION_IDS['5'],
-        'children' => [
-            'Modules' => ['menu_url' => 'modules.index', 'menu_icon' => 'fa-box', 'permission_id' => PermissionsIds::findPermissionKey('MODULES', 'READ_ALL')],
-        ]
-    ],
-]);
-
-!defined('CRM_SETTINGS') && define('CRM_SETTINGS', [
-
-    'COMPANY_NAME' => [
-        'key' => 'Company Name',
-        'value' => 'Core X Gen',
-        'is_media_setting' => false,
-        'media_id' => null,
-        'input_type' => 'text'
-    ],
-    'COMPANY_TAGLINE' => [
-        'key' => 'Company Tagline',
-        'value' => 'Next Generation CRM',
-        'is_media_setting' => false,
-        'media_id' => null,
-        'input_type' => 'text'
-    ],
-    'COMPANY_LOGO' => [
-        'key' => 'Company Logo',
-        'value' => '/',
-        'is_media_setting' => true,
-        'media_id' => null,
-        'input_type' => 'image'
-    ],
-    'DATE_FORMAT' => [
-        'key' => 'Date Format',
-        'value' => 'DD/MM/YYYY',
-        'is_media_setting' => false,
-        'media_id' => null,
-        'input_type' => 'date'
-    ],
-    'TIME_FORMAT' => [
-        'key' => 'Time Format',
-        'value' => '12 Hours',
-        'is_media_setting' => false,
-        'media_id' => null,
-        'input_type' => 'time'
-    ],
-
-
-
-]);
-
-!defined('CRM_STATUS_TYPES') && define('CRM_STATUS_TYPES', [
-    'TENANTS' => [
-        'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE'],
-        'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE']
-    ],
-    'COMPANY' => [
-        'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE', 'BANNED'],
-        'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE', 'BANNED' => 'BANNED']
-    ],
-    'USERS' => [
-        'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE', 'BANNED'],
-        'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE', 'BANNED' => 'BANNED']
-    ],
-    'CRM_ROLES' => [
-        'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE'],
-        'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE']
-    ],
-
-]);
-
-
-
-!defined('PANEL_TYPES') && define('PANEL_TYPES', [
-    'SUPER_PANEL' => 'SUPER_PANEL',
-    'COMPANY_PANEL' => 'COMPANY_PANEL'
-]);
-
 
 
 
@@ -344,11 +162,11 @@ function getCRMMenus()
 {
     $user = Auth::user();
 
-    if($user->is_tenant && session('panelAccess') === PANEL_TYPES['SUPER_PANEL']){
+    if ($user->is_tenant && session('panelAccess') === PANEL_TYPES['SUPER_PANEL']) {
 
-        return CRMMenu::where('panel_type',PANEL_TYPES['SUPER_PANEL'])->get();
+        return CRMMenu::where('panel_type', PANEL_TYPES['SUPER_PANEL'])->get();
     }
-    return CRMMenu::where('panel_type',PANEL_TYPES['COMPANY_PANEL'])->get();
+    return CRMMenu::where('panel_type', PANEL_TYPES['COMPANY_PANEL'])->get();
 }
 
 /**
@@ -362,7 +180,7 @@ function hasPermission($permissionKey)
 
     // Get the current user's role ID
     $user = Auth::user();
-  
+
     $userRoleId = $user->role_id;
 
 
@@ -434,16 +252,16 @@ function hasPermission($permissionKey)
 function hasMenuPermission($permissionId = null)
 {
     // for superadmins
-     // Get the current user's role ID
-     $user = Auth::user();
-  
-     $userRoleId = $user->role_id;
- 
- 
-     // return true for superadmin or role id 1
-     if ($user->is_tenant && $userRoleId === null) {
-         return true;
-     }
+    // Get the current user's role ID
+    $user = Auth::user();
+
+    $userRoleId = $user->role_id;
+
+
+    // return true for superadmin or role id 1
+    if ($user->is_tenant && $userRoleId === null) {
+        return true;
+    }
 
     if ($permissionId == null)
         return false;
@@ -461,14 +279,23 @@ function hasMenuPermission($permissionId = null)
 
 
 
-function panelAccess(){
+function panelAccess()
+{
     return session('panelAccess');
 }
 
-function getPanelUrl($string){
+function getPanelUrl($string)
+{
     return strtolower(str_replace('_', '-', $string));
 }
 
-function getPanelRoutes($route){
-   return getPanelUrl(panelAccess()) . '.' . $route ;
+function getPanelRoutes($route)
+{
+    return getPanelUrl(panelAccess()) . '.' . $route;
+}
+
+
+function getComponentsDirFilePath($filename)
+{
+    return 'layout.components.' . $filename;
 }

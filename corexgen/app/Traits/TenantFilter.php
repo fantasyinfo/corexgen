@@ -11,17 +11,23 @@ trait TenantFilter
 
 
 
-    public function applyTenantFilter($query)
+    public function applyTenantFilter($query, $table = null)
     {
 
         $this->user = Auth::user();
         $this->panelAccess = panelAccess();
 
-        if ($this->user) {
+        if ($this->user && $table == null) {
             if ($this->user->is_tenant && $this->panelAccess === PANEL_TYPES['SUPER_PANEL']) {
                 $query->where('company_id', null);
             } elseif ($this->user->company_id !== null && $this->panelAccess === PANEL_TYPES['COMPANY_PANEL']) {
                 $query->where('company_id', $this->user->company_id);
+            }
+        } else if ($this->user && $table != null) {
+            if ($this->user->is_tenant && $this->panelAccess === PANEL_TYPES['SUPER_PANEL']) {
+                $query->where($table . '.company_id', null);
+            } elseif ($this->user->company_id !== null && $this->panelAccess === PANEL_TYPES['COMPANY_PANEL']) {
+                $query->where($table . '.company_id', $this->user->company_id);
             }
         }
 

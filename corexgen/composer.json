@@ -35,6 +35,7 @@
             "Modules\\BlogModule\\": "modules/BlogModule/src"
         },
         "files": [
+            "app/Helpers/constHelper.php",
             "app/Helpers/helpers.php"
         ]
     },
