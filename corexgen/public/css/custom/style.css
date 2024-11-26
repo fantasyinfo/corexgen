@@ -14,7 +14,7 @@ body {
   left: 250px;
   height: 70px;
   background-color: var(--card-bg);
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--primary-color);
   padding: 10px 30px;
   z-index: 1020;
   transition: left 0.3s;
@@ -236,4 +236,16 @@ body {
   body:not(.sidebar-collapsed) .sidebar-overlay {
     display: block;
   }
+
+
+  body:not(.sidebar-collapsed) .content-area, body:not(.sidebar-collapsed) .footer {
+    display:none;
+
+  }
+  .content-area{
+    padding:10px;
+  }
+
+
+
 }

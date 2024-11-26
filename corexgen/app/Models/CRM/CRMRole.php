@@ -16,8 +16,6 @@ class CRMRole extends Model
         'role_name', 
         'role_desc',
         'company_id',
-        'created_by',
-        'updated_by',
         'status',
     ];
 

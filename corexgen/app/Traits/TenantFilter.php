@@ -35,10 +35,10 @@ trait TenantFilter
 
         if ($this->user) {
             if ($this->user->is_tenant && $this->panelAccess === PANEL_TYPES['SUPER_PANEL']) {
-                return PANEL_TYPES['SUPER_PANEL'] . '.';
+                return getPanelUrl(PANEL_TYPES['SUPER_PANEL']) . '.';
             }
         }
 
-        return PANEL_TYPES['COMPANY_PANEL'] . '.';
+        return getPanelUrl(PANEL_TYPES['COMPANY_PANEL']) . '.';
     }
 }

@@ -1,6 +1,6 @@
 
 
-<header class="header"> 
+<header class="header shadow-sm"> 
     <div class="d-flex justify-content-between align-items-center w-100">
         <div class="d-flex align-items-center">
             <div class="toggle-btn" id="sidebarToggle">

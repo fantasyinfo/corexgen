@@ -33,5 +33,9 @@ php artisan make:job SeedCountriesCities
 php artisan queue:work
 
 
+// migrate specific table
+php artisan migrate --path=/database/migrations/2013_11_25_150421_create_crm_roles_table.php
+
+
 u804660301_corexgen
 Corexgen!123

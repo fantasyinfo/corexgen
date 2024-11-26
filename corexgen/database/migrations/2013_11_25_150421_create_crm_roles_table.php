@@ -23,6 +23,7 @@ return new class extends Migration
 
             // foreign keys
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
+            $table->unique(['role_name', 'company_id'], 'unique_role_name_per_company');
         });
     }
 

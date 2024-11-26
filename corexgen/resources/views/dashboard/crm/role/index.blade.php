@@ -1,96 +1,25 @@
 @extends('layout.app')
 
 @section('content')
-    <div class="container-fluid">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center border-bottom pb-2">
-                <h5 class="card-title">{{ __('crm_role.Roles Management') }}</h5>
-                <div class="card-header-action">
-                    @if (hasPermission('ROLE.CREATE'))
-                        <a data-toggle="tooltip" data-placement="top" title="Create New" 
-                        href="{{ route(getPanelRoutes('role.create')) }}"
-                            class="btn btn-md btn-primary me-2">
-                            <i class="fas fa-plus"></i> <span>{{ __('crm_role.Create Role') }}</span>
-                        </a>
-                    @endif
-                    @if (hasPermission('ROLE.EXPORT'))
-                        <a data-toggle="tooltip" data-placement="top" title="Export Data"
-                            href="{{ route(getPanelRoutes('role.export'), request()->all()) }}"
-                            class="btn btn-md btn-outline-secondary">
-                            <i class="fas fa-download"></i> <span>{{ __('crud.Export') }}</span>
-                        </a>
-                    @endif
-                    @if (hasPermission('ROLE.IMPORT'))
-                        <button data-toggle="tooltip" data-placement="top" title="Import Data" data-bs-toggle="modal"
-                            data-bs-target="#bulkImportModal" class="btn btn-md btn-outline-info">
-                            <i class="fas fa-upload"></i><span> {{ __('crud.Import') }}</span>
-                        </button>
-                    @endif
-                    @if (hasPermission('ROLE.FILTER'))
-                        <button data-toggle="tooltip" data-placement="top" title="Filter Data" onclick="openFilters()"
-                            class="btn btn-md btn-outline-warning">
-                            <i class="fas fa-filter"></i>
-                            <span>{{ __('crud.Filter') }}</span>
-                        </button>
-                    @endif
+    <div class="container-fluid ">
+        <div class="card shadow-sm rounded p-3">
+            <div class="card-header  border-bottom pb-2">
+                <div class="row ">
+                    <div class="col-md-4">
+                        <h5 class="card-title">{{ __('crm_role.Roles Management') }}</h5>
+                    </div>
+                    @include('dashboard.crm.role.components.role-actions')
                 </div>
+
+
             </div>
 
             <div class="card-body">
-
-
-                @if (hasPermission('ROLE.FILTER'))
-                    <div id="filter-section">
-
-                        <div class="card-title">
-                            {{ __('crud.Filter') }}
-
-                        </div>
-                        <!-- Advanced Filter Form -->
-
-                        <div class="row g-3">
-                            <!-- Search Input -->
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <input type="text" id="nameFilter" name="name" class="form-control"
-                                        placeholder="{{ __('crm_role.Role Name') }}" value="{{ request('name') }}">
-                                </div>
-                            </div>
-
-                            <!-- Status Dropdown -->
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <select name="status" class="form-select" id="statusFilter">
-                                        <option value="">{{ __('crm_role.All Statuses') }}</option>
-                                        <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>
-                                            {{ __('Active') }}
-                                        </option>
-                                        <option value="deactive" {{ request('status') == 'deactive' ? 'selected' : '' }}>
-                                            {{ __('Inactive') }}
-                                        </option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <!-- Buttons -->
-                            <div class="col-md-4">
-                                <div class="d-flex gap-2">
-                                    <button type="button" id="filterBtn" class="btn btn-primary">
-                                        <i class="fas fa-search me-1"></i>{{ __('Search') }}
-                                    </button>
-                                    <button type="button" id="clearFilter" class="btn btn-light">
-                                        <i class="fas fa-trash-alt me-1"></i>{{ __('Clear') }}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                @endif
+                @include('dashboard.crm.role.components.role-filters')
 
 
                 @if (hasPermission('ROLE.READ_ALL') || hasPermission('ROLE.READ'))
-                    <div class="table-responsive card">
+                    <div class="table-responsive ">
 
                         <table id="roleTable" class="table table-striped table-bordered ui celled">
                             <thead>
@@ -160,61 +89,12 @@
 
 @push('scripts')
     <script type="text/javascript">
-        // Get the drop zone element
-        const dropZone = document.querySelector('.drop-zone');
-        const fileInput = document.querySelector('#csvFile');
-
-        // Click handler (you already have this)
-        dropZone.addEventListener('click', function() {
-            fileInput.click();
-        });
-
-        // File input change handler (you already have this)
-        fileInput.addEventListener('change', function() {
-            const file = this.files[0];
-            if (file) {
-                this.nextElementSibling.textContent = file.name;
-            }
-        });
-
-        // Add drag and drop event listeners
-        dropZone.addEventListener('dragover', function(e) {
-            e.preventDefault();
-            dropZone.style.backgroundColor = '#f8f9fa';
-            dropZone.style.borderColor = '#0d6efd';
-        });
-
-        dropZone.addEventListener('dragleave', function(e) {
-            e.preventDefault();
-            dropZone.style.backgroundColor = '';
-            dropZone.style.borderColor = '#ddd';
-        });
-
-        dropZone.addEventListener('drop', function(e) {
-            e.preventDefault();
-            dropZone.style.backgroundColor = '';
-            dropZone.style.borderColor = '#ddd';
-
-            const files = e.dataTransfer.files;
-            if (files.length) {
-                fileInput.files = files;
-                // Trigger the change event manually
-                const event = new Event('change', {
-                    bubbles: true
-                });
-                fileInput.dispatchEvent(event);
-
-                // Update the text
-                fileInput.nextElementSibling.textContent = files[0].name;
-            }
-        });
-
         // Form submit handler (you already have this)
         document.querySelector('#bulkImportForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
             const formData = new FormData(this);
-            const response = await fetch('{{ route(getPanelRoutes("role.import")) }}', {
+            const response = await fetch('{{ route(getPanelRoutes('role.import')) }}', {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
@@ -231,7 +111,6 @@
             }
         });
 
-
         $(document).ready(function() {
 
             const nameFilter = $('#nameFilter');
@@ -242,6 +121,9 @@
             const dbTableAjax = $("#roleTable").DataTable({
                 processing: true,
                 serverSide: true,
+                "language": {
+                    "lengthMenu": "_MENU_ per page",
+                },
                 ajax: {
                     url: "{{ route(getPanelRoutes('role.index')) }}",
                     data: function(d) {
@@ -291,6 +173,17 @@
 
             $('#filterBtn').click(function() {
                 dbTableAjax.ajax.reload();
+            });
+
+            $('#deleteModal').on('show.bs.modal', function(event) {
+                console.log('first')
+                var button = $(event.relatedTarget); // The button that triggered the modal
+                var roleId = button.data('id'); // Get the role ID
+                var route = button.data('route'); // Get the delete route
+
+                // Set the form action to the appropriate route
+                var form = $('#deleteForm');
+                form.attr('action', route);
             });
         });
     </script>

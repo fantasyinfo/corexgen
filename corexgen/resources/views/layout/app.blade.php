@@ -25,6 +25,7 @@
       </nav>
 
           @include('layout.components.alert')
+          @include('layout.components.delete-confirm')
           
          <div class="toast-container" id="toastContainer"></div>
 

@@ -63,7 +63,7 @@ Route::middleware(['check.installation'])->group(function () {
         if (Auth::check()) {
             return view('welcome');
         } else {
-            return redirect()->route('login');
+            return redirect()->route('super.panel.login');
         }
     })->name('home');
 
@@ -85,8 +85,8 @@ Route::get('/register', function () {
 
 
 Route::get('/super-admin-login',function(){
-    return view('auth.login',['is_tenant' => true]);
-});
+    return view('auth.login',['is_tenant' => true,'path' => 'super-admin-login']);
+})->name('super.panel.login');
 
 
 // language set
@@ -126,7 +126,7 @@ Route::middleware([
         // validate, export, import
         Route::get('/export', [CRMRoleController::class, 'export'])->name('export')->middleware('check.permission:ROLE.EXPORT');
         Route::post('/import', [CRMRoleController::class, 'import'])->name('import')->middleware('check.permission:ROLE.IMPORT');
-        Route::post('/validate-field', [CRMRoleController::class, 'validateField'])->name('validate-field');
+    
     });
 
     // users routes
@@ -222,7 +222,7 @@ Route::middleware([
         // validate, export, import
         Route::get('/export', [CRMRoleController::class, 'export'])->name('export')->middleware('check.permission:ROLE.EXPORT');
         Route::post('/import', [CRMRoleController::class, 'import'])->name('import')->middleware('check.permission:ROLE.IMPORT');
-        Route::post('/validate-field', [CRMRoleController::class, 'validateField'])->name('validate-field');
+      
     });
 
     // users routes

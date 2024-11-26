@@ -4,7 +4,7 @@
 @endphp
    
 <!-- Sidebar -->
-<nav class="sidebar">
+<nav class="sidebar shadow-sm">
     <div class="sidebar-brand">
         <a href="">
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/800px-Google_2015_logo.svg.png" 
