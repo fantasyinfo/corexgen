@@ -3,7 +3,9 @@
 use App\Helpers\PermissionsHelper;
 
 
-
+/**
+ * Constant Helpers Inside the APP
+ */
 !defined('CRMPERMISSIONS') && define('CRMPERMISSIONS', [
     'DASHBOARD' => [
         'name' => 'CRM_DASHBOARD',

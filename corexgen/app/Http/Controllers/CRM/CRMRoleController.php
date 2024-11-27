@@ -87,29 +87,29 @@ class CRMRoleController extends Controller
         if ($request->ajax()) {
             return DataTables::of($query)
                 ->addColumn('actions', function ($role) {
-                return View::make(getComponentsDirFilePath('dt-actions-buttons'), [
+                    return View::make(getComponentsDirFilePath('dt-actions-buttons'), [
 
                         'tenantRoute' => $this->tenantRoute,
-                    'permissions' => PermissionsHelper::getPermissionsArray('ROLE'),
-                    'module' => PANEL_MODULES['SUPER_PANEL']['role'],
-                    'id' => $role->id
+                        'permissions' => PermissionsHelper::getPermissionsArray('ROLE'),
+                        'module' => PANEL_MODULES[$this->getPanelModule()]['role'],
+                        'id' => $role->id
 
                     ])->render();
                 })
                 ->editColumn('created_at', fn($role) => $role->created_at->format('d M Y'))
                 ->editColumn('status', function ($role) {
-                return View::make(getComponentsDirFilePath('dt-status'), [
+                    return View::make(getComponentsDirFilePath('dt-status'), [
 
-                    'tenantRoute' => $this->tenantRoute,
-                    'permissions' => PermissionsHelper::getPermissionsArray('ROLE'),
-                    'module' => PANEL_MODULES['SUPER_PANEL']['role'],
-                    'id' => $role->id,
-                    'status' => [
-                        'current_status' => $role->status,
-                        'available_status' => CRM_STATUS_TYPES['CRM_ROLES']['STATUS'],
-                        'bt_class' => CRM_STATUS_TYPES['CRM_ROLES']['BT_CLASSES'],
+                        'tenantRoute' => $this->tenantRoute,
+                        'permissions' => PermissionsHelper::getPermissionsArray('ROLE'),
+                        'module' => PANEL_MODULES[$this->getPanelModule()]['role'],
+                        'id' => $role->id,
+                        'status' => [
+                            'current_status' => $role->status,
+                            'available_status' => CRM_STATUS_TYPES['CRM_ROLES']['STATUS'],
+                            'bt_class' => CRM_STATUS_TYPES['CRM_ROLES']['BT_CLASSES'],
 
-                    ]
+                        ]
                     ])->render();
                 })
                 ->rawColumns(['actions', 'status'])
@@ -121,7 +121,7 @@ class CRMRoleController extends Controller
             'filters' => $request->all(),
             'title' => 'Roles Management',
             'permissions' => PermissionsHelper::getPermissionsArray('ROLE'),
-            'module' => PANEL_MODULES['SUPER_PANEL']['role'],
+            'module' => PANEL_MODULES[$this->getPanelModule()]['role'],
         ]);
     }
 
@@ -140,7 +140,7 @@ class CRMRoleController extends Controller
             CRMRole::create($validated);
 
             // Redirect with success message
-            return redirect()->route($this->tenantRoute . 'role.create')
+            return redirect()->route($this->tenantRoute . 'role.index')
                 ->with('success', 'Role created successfully.');
         } catch (\Exception $e) {
             // Handle any errors during role creation
@@ -282,7 +282,7 @@ class CRMRoleController extends Controller
             $data = array_map('str_getcsv', file($file->getRealPath()));
             $header = array_shift($data);
 
-        
+
             // Import each row from CSV
             foreach ($data as $row) {
                 $row = array_combine($header, $row);
@@ -329,7 +329,7 @@ class CRMRoleController extends Controller
     }
 
     /**
-     * Toggle role status between active and inactive
+     * Chaning the status for role
      * 
      * @param int $id
      * @return \Illuminate\Http\RedirectResponse

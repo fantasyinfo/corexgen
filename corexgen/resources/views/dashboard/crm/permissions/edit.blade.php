@@ -30,7 +30,7 @@
                                   
                                     <select 
                                     disabled
-                                    class="form-control select2-hidden-accessible @error('role_id') is-invalid @enderror" 
+                                    class="form-control searchSelectBox select2-hidden-accessible @error('role_id') is-invalid @enderror" 
                                     {{-- name="role_id" --}}
                                     id="role_id">
                                 @if($roles && $roles->isNotEmpty())

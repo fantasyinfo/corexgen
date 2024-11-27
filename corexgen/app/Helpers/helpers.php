@@ -16,6 +16,13 @@ use Illuminate\Support\Facades\Auth;
 
 
 
+/**
+ * Method createMedia
+ *
+ * @param UploadedFile $file [for creating the media files]
+ *
+ * @return void
+ */
 function createMedia(UploadedFile $file)
 {
     // Validate or process the file as needed

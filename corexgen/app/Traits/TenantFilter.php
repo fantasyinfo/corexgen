@@ -47,4 +47,18 @@ trait TenantFilter
 
         return getPanelUrl(PANEL_TYPES['COMPANY_PANEL']) . '.';
     }
+
+    public function getPanelModule()
+    {
+        $this->user = Auth::user();
+        $this->panelAccess = panelAccess();
+
+        if ($this->user) {
+            if ($this->user->is_tenant && $this->panelAccess === PANEL_TYPES['SUPER_PANEL']) {
+                return 'SUPER_PANEL';
+            }
+        }
+
+        return 'COMPANY_PANEL';
+    }
 }

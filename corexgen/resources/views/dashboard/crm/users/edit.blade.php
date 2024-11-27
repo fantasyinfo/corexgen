@@ -4,14 +4,15 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-lg-12">
+        <div class="col-lg-9">
             <div class="card stretch stretch-full">
            
 
-                <form id="userForm" action="{{ route('crm.users.store') }}" method="POST">
+                <form id="userForm" action="{{ route(getPanelRoutes('users.store')) }}" method="POST">
                     @csrf
                     @method('PUT')
                     <input type='hidden' name='id' value='{{$user["id"]}}' />
+                    <input type='hidden' name='email' value='{{$user["email"]}}' />
                     <div class="card-body general-info">
                         <div class="mb-5 d-flex align-items-center justify-content-between">
                             <h5 class="fw-bold mb-0 me-4">
@@ -79,7 +80,7 @@
                             <div class="col-lg-8">
                                 <div class="input-group">
                           
-                                    <select class="form-control select2-hidden-accessible @error('role_id') is-invalid @enderror" name="role_id" id="role_id">
+                                    <select class="form-control searchSelectBox select2-hidden-accessible @error('role_id') is-invalid @enderror" name="role_id" id="role_id">
                                         @if($roles && $roles->isNotEmpty())
                                             @foreach($roles as $role)
                                                 <option value="{{ $role->id }}" {{ $user->role_id == $role->id ? 'selected' : '' }}>

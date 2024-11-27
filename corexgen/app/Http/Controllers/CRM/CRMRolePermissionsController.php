@@ -87,7 +87,7 @@ class CRMRolePermissionsController extends Controller
                     return View::make(getComponentsDirFilePath('dt-actions-buttons'), [
                         'tenantRoute' => $this->tenantRoute,
                         'permissions' => PermissionsHelper::getPermissionsArray('PERMISSIONS'),
-                        'module' => PANEL_MODULES['SUPER_PANEL']['permissions'],
+                        'module' => PANEL_MODULES[$this->getPanelModule()]['permissions'],
                         'id' => $permission->id
 
                     ])->render();
@@ -108,7 +108,7 @@ class CRMRolePermissionsController extends Controller
             'roles' => $roles,
             'title' => 'Permissions Management',
             'permissions' => PermissionsHelper::getPermissionsArray('PERMISSIONS'),
-            'module' => PANEL_MODULES['SUPER_PANEL']['permissions'],
+            'module' => PANEL_MODULES[$this->getPanelModule()]['permissions'],
         ]);
     }
 

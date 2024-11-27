@@ -8,6 +8,7 @@ use App\Models\Buyer;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
@@ -68,7 +69,7 @@ class User extends Authenticatable
 
     public function role()
     {
-        return $this->belongsTo(CRMRole::class, 'id');
+        return $this->belongsTo(CRMRole::class, 'role_id');  // The correct foreign key is 'role_id'
     }
 
     public function tenant()
@@ -82,13 +83,16 @@ class User extends Authenticatable
     }
 
 
-    protected static function boot(){
+    protected static function boot()
+    {
         parent::boot();
 
-        static::creating(function($user){
+        static::creating(function ($user) {
             $user->status = $user->status ?? CRM_STATUS_TYPES['USERS']['STATUS']['ACTIVE'];
+            $user->is_tenant = Auth::user()->is_tenant ?? 0;
+            $user->company_id = Auth::user()->company_id ?? null;
         });
 
-    }   
+    }
 
 }

@@ -141,7 +141,7 @@ Route::middleware([
         // create, edit, change status, delete
         Route::get('/create', [UserController::class, 'create'])->name('create')->middleware('check.permission:USERS.CREATE');
         Route::get('/edit/{id}', [UserController::class, 'edit'])->name('edit')->middleware('check.permission:USERS.UPDATE');
-        Route::get('/changeStatus/{id}', [UserController::class, 'changeStatus'])->name('changeStatus')->middleware('check.permission:USERS.CHANGE_STATUS');
+        Route::get('/changeStatus/{id}/{status}', [UserController::class, 'changeStatus'])->name('changeStatus')->middleware('check.permission:USERS.CHANGE_STATUS');
         Route::delete('/destroy/{id}', [UserController::class, 'destroy'])->name('destroy')->middleware('check.permission:USERS.DELETE');
 
         // validate, export, import
@@ -239,7 +239,7 @@ Route::middleware([
         // create, edit, change status, delete
         Route::get('/create', [UserController::class, 'create'])->name('create')->middleware('check.permission:USERS.CREATE');
         Route::get('/edit/{id}', [UserController::class, 'edit'])->name('edit')->middleware('check.permission:USERS.UPDATE');
-        Route::get('/changeStatus/{id}', [UserController::class, 'changeStatus'])->name('changeStatus')->middleware('check.permission:USERS.CHANGE_STATUS');
+        Route::get('/changeStatus/{id}/{status}', [UserController::class, 'changeStatus'])->name('changeStatus')->middleware('check.permission:USERS.CHANGE_STATUS');
         Route::delete('/destroy/{id}', [UserController::class, 'destroy'])->name('destroy')->middleware('check.permission:USERS.DELETE');
 
         // validate, export, import

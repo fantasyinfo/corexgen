@@ -2,8 +2,16 @@
 
 namespace App\Helpers;
 
+/**
+ * PermissionsHelper Class
+ * All App Permissions Defined here
+ */
 class PermissionsHelper
 {
+    /**
+     * Permission of PERMISSIONS_IDS for menu
+     * @var array
+     */
     public static $PERMISSIONS_IDS = [
         'DASHBOARD' => [501 => 'READ', 502 => 'READ_ALL'],
         'ROLE' => [551 => 'CREATE', 552 => 'READ', 553 => 'READ_ALL', 554 => 'UPDATE', 555 => 'DELETE', 556 => 'IMPORT', 557 => 'EXPORT', 558 => 'FILTER', 559 => 'CHANGE_STATUS',],
@@ -15,6 +23,11 @@ class PermissionsHelper
     ];
 
 
+    /**
+     * Summary of getPermissionsArray getting the permission array values
+     * @param mixed $type
+     * @return array
+     */
     public static function getPermissionsArray($type)
     {
         $permissions = self::$PERMISSIONS_IDS[$type]; // Original array

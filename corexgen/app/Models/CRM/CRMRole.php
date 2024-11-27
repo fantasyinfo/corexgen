@@ -26,6 +26,7 @@ class CRMRole extends Model
     {
         return $this->hasMany(User::class, 'role_id');
     }
+    
 
     protected static function boot(){
         parent::boot();

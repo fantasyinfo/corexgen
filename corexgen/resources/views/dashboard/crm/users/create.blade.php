@@ -4,18 +4,18 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-lg-12">
+        <div class="col-lg-9">
             <div class="card stretch stretch-full">
            
 
-                <form id="userForm" action="{{ route('crm.users.store') }}" method="POST">
+                <form id="userForm" action="{{ route(getPanelRoutes('users.store')) }}" method="POST">
                     @csrf
                     <div class="card-body general-info">
                         <div class="mb-5 d-flex align-items-center justify-content-between">
-                            <h5 class="fw-bold mb-0 me-4">
+                            <p class="fw-bold mb-0 me-4">
                                 <span class="d-block mb-2">{{ __('users.Create New User') }}</span>
                                 <span class="fs-12 fw-normal text-muted text-truncate-1-line">{{ __('crud.Please add correct information') }}</span>
-                            </h5>
+                            </p>
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-plus"></i>  <span>{{ __('users.Create User') }}</span>
                             </button>
@@ -77,7 +77,7 @@
                             <div class="col-lg-8">
                                 <div class="input-group">
                                   
-                                    <select class="form-control select2-hidden-accessible @error('role_id') is-invalid @enderror" name="role_id" id="role_id">
+                                    <select class="form-control searchSelectBox select2-hidden-accessible @error('role_id') is-invalid @enderror" name="role_id" id="role_id">
                                         @if($roles && $roles->isNotEmpty())
                                             @foreach($roles as $role)
                                                 <option value="{{ $role->id }}" {{ old('role_id') == $role->id ? 'selected' : '' }}>

@@ -1,4 +1,15 @@
 document.addEventListener("DOMContentLoaded", function () {
+    // dselect init
+
+    if ($(".searchSelectBox").length > 0) {
+        $(".searchSelectBox").each(function () {
+            // `this` refers to the current DOM element in the loop
+            dselect(this, {
+                search: true, // Enable search functionality
+            });
+        });
+    }
+
     // Ensure sidebar is open on desktop initially
     if (window.innerWidth > 768) {
         document.body.classList.remove("sidebar-collapsed");
