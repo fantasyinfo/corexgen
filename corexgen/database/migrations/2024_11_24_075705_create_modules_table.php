@@ -20,7 +20,7 @@ return new class extends Migration
             $table->text('description');
             $table->json('providers');
             $table->string('path');
-            $table->enum('panel_type', array_keys(PANEL_TYPES))->default(PANEL_TYPES['COMPANY_PANEL']);
+            $table->enum('panel_type', array_keys(PANEL_TYPES))->default(PANEL_TYPES['SUPER_PANEL']);
             $table->enum('status', ['active', 'inactive']);
             $table->timestamps();
         });

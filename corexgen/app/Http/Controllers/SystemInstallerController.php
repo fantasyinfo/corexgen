@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Buyer;
+
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -11,11 +11,21 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Config;
+
+
+/**
+ * Installer for software SystemInstallerController
+ */
 class SystemInstallerController extends Controller
-{
+{    
+    /**
+     * Method showInstaller
+     * showing the view of installer
+     *
+     * @return void
+     */
     public function showInstaller()
     {
         if (File::exists(storage_path('installed.lock'))) {
@@ -23,7 +33,12 @@ class SystemInstallerController extends Controller
         }
         return view('installer.index');
     }
-
+    
+    /**
+     * requiredExtensions for software to run
+     *
+     * @var array
+     */
     protected $requiredExtensions = [
         'pdo',
         'mbstring',
@@ -34,7 +49,13 @@ class SystemInstallerController extends Controller
         'json',
         'zip'
     ];
-
+    
+    /**
+     * Method checkSystemRequirements
+     * checking system requirements
+     *
+     * @return void
+     */
     public function checkSystemRequirements()
     {
         $requirements = [
@@ -50,6 +71,14 @@ class SystemInstallerController extends Controller
         ]);
     }
 
+        
+    /**
+     * Method verifyPurchaseCodeEndpoint
+     *
+     * @param Request $request verify purchase code endppint
+     *
+     * @return void
+     */
     public function verifyPurchaseCodeEndpoint(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -67,7 +96,14 @@ class SystemInstallerController extends Controller
             'message' => $isValid ? 'Purchase code verified successfully' : 'Invalid purchase code'
         ]);
     }
-
+    
+    /**
+     * Method testSmtpConnection
+     *
+     * @param Request $request testing the mailing connections
+     *
+     * @return void
+     */
     public function testSmtpConnection(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -109,7 +145,14 @@ class SystemInstallerController extends Controller
             ], 500);
         }
     }
-
+    
+    /**
+     * Method testDatabaseConnection
+     *
+     * @param Request $request testing database connections
+     *
+     * @return void
+     */
     public function testDatabaseConnection(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -147,7 +190,14 @@ class SystemInstallerController extends Controller
         }
     }
 
-
+    
+    /**
+     * Method reConnectDB
+     *
+     * @param $request $request reconnection of db 
+     *
+     * @return void
+     */
     private function reConnectDB($request)
     {
         config(['database.default' => 'mysql']);
@@ -175,7 +225,18 @@ class SystemInstallerController extends Controller
         \Log::info('DB is Reconnected.');
     }
 
-
+    
+    /**
+     * Method ensureDatabaseExists
+     * checking database is exists
+     * @param $host $host
+     * @param $port $port 
+     * @param $username $username 
+     * @param $password $password 
+     * @param $database $database 
+     *
+     * @return void
+     */
     private function ensureDatabaseExists($host, $port, $username, $password, $database)
     {
         try {
@@ -194,7 +255,14 @@ class SystemInstallerController extends Controller
         }
     }
 
-
+    
+    /**
+     * Method installApplication
+     *
+     * @param Request $request installing the application
+     *
+     * @return void
+     */
     public function installApplication(Request $request)
     {
         \Log::info('Reached to the installation function');
@@ -310,14 +378,28 @@ class SystemInstallerController extends Controller
             ], 500);
         }
     }
-
+    
+    /**
+     * Method verifyPurchaseCode
+     *
+     * @param $code $code verification of purchase code ::todo api call
+     *
+     * @return void
+     */
     private function verifyPurchaseCode($code)
     {
         // Implement your purchase code verification logic here
         // This is a placeholder - replace with actual verification
         return true;
     }
-
+    
+    /**
+     * Method updateEnvironmentFile
+     *
+     * @param Request $request updating the .env file after
+     *
+     * @return void
+     */
     private function updateEnvironmentFile(Request $request)
     {
         $envPath = base_path('.env');
@@ -364,13 +446,24 @@ class SystemInstallerController extends Controller
 
         File::put($envPath, implode("\n", $lines));
     }
-
+    
+    /**
+     * Method checkExtensions
+     * checking extenstions
+     * @return void
+     */
     private function checkExtensions()
     {
         return collect($this->requiredExtensions)
             ->mapWithKeys(fn($ext) => [$ext => extension_loaded($ext)]);
     }
-
+    
+    /**
+     * Method runSeeders
+     * running the seeder to create required data into db
+     *
+     * @return void
+     */
     private function runSeeders()
     {
         Artisan::call('db:seed');
@@ -380,7 +473,14 @@ class SystemInstallerController extends Controller
         Artisan::call('db:seed', ['--class' => 'CRMSettingsSeeder']);
     
     }
-
+    
+    /**
+     * Method createSuperAdmin
+     *
+     * @param Request $request creating a super admin user to access the admin panel
+     *
+     * @return void
+     */
     private function createSuperAdmin(Request $request)
     {
      

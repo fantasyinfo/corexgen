@@ -19,6 +19,7 @@ class PermissionsHelper
         'PERMISSIONS' => [651 => 'CREATE', 652 => 'READ', 653 => 'READ_ALL', 654 => 'UPDATE', 655 => 'DELETE'],
         'SETTINGS' => [701 => 'READ', 702 => 'UPDATE',],
         'MODULES' => [751 => 'CREATE', 752 => 'READ', 753 => 'READ_ALL', 754 => 'UPDATE', 755 => 'DELETE', 756 => 'IMPORT', 757 => 'EXPORT', 758 => 'FILTER', 759 => 'CHANGE_STATUS',],
+        'APPUPDATES' => [801 => 'CREATE', 802 => 'READ', 803 => 'READ_ALL', 804 => 'UPDATE', 805 => 'DELETE', 806 => 'IMPORT', 807 => 'EXPORT', 808 => 'FILTER', 809 => 'CHANGE_STATUS',],
 
     ];
 
@@ -38,19 +39,13 @@ class PermissionsHelper
 
 
     // 500 reserved for featueres
-    public static $PARENT_PERMISSION_IDS = [
-        1 => 1,
-        2 => 2,
-        3 => 3,
-        4 => 4,
-        5 => 5,
-        6 => 6,
-        7 => 7,
-        8 => 8,
-        9 => 9,
-        10 => 10,
 
-    ];
+    public static function getParentPermissionId($key)
+    {
+        $parentPermissionId = array_combine(range(1, 500), range(1, 500));
+        return $parentPermissionId[$key];
+
+    }
 
     // Method to find the key for a given value in a specific category
     public static function findPermissionKey($category, $permission)

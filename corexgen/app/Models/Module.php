@@ -13,5 +13,5 @@ class Module extends Model
 
     protected $table = self::table;
 
-    protected $fillable = ['name', 'version', 'description', 'providers', 'path', 'status'];
+    protected $fillable = ['name', 'version', 'description', 'providers', 'path', 'status','panel_type'];
 }

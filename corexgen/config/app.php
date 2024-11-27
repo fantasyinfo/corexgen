@@ -170,7 +170,6 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\FortifyServiceProvider::class,
         App\Providers\JetstreamServiceProvider::class,
-        Modules\BlogModule\BlogModuleServiceProvider::class,
         Yajra\DataTables\DataTablesServiceProvider::class
     ])->toArray(),
 
@@ -193,5 +192,6 @@ return [
 
     // App Version
     'version' => env('APP_VERSION', '1.0.0'), 
+    'app_status' => env('APP_STATUS', 'live'), 
 
 ];

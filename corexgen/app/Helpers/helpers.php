@@ -42,7 +42,7 @@ function createMedia(UploadedFile $file)
         'file_type' => $file->getMimeType(),
         'file_extension' => $file->getClientOriginalExtension(),
         'size' => $file->getSize(),
-        'buyer_id' =>  auth()->user()->buyer_id,
+        'buyer_id' => auth()->user()->buyer_id,
         'is_super_user' => auth()->user()->is_super_user,
         'created_by' => auth()->user()->id,
         'updated_by' => auth()->user()->id,
@@ -288,7 +288,12 @@ function hasMenuPermission($permissionId = null)
 
 function panelAccess()
 {
-    return session('panelAccess');
+    $user = Auth::user();
+
+    if ($user->is_tenant) {
+        return PANEL_TYPES['SUPER_PANEL'];
+    }
+    return PANEL_TYPES['COMPANY_PANEL'];
 }
 
 function getPanelUrl($string)

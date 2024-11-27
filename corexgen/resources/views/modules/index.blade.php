@@ -3,10 +3,6 @@
 @section('content')
     <div class="container-fluid">
 
-
-
-
-
         <div class="card">
             <div class="card-header">
                 <div class="card-title">
@@ -16,7 +12,7 @@
                     <div class="container py-4">
                         <div class="row justify-content-center border-dotted">
                             <div class="card-body">
-                                <form action="{{ route('crm.modules.create') }}" method="POST" enctype="multipart/form-data">
+                                <form action="{{ route(getPanelRoutes($module .'.create')) }}" method="POST" enctype="multipart/form-data">
                                     @csrf
 
                                     <div class="row align-items-center">
@@ -68,15 +64,15 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($modules as $module)
+                                @foreach ($modules as $module1)
                                     <tr>
-                                        <td class="px-6 py-4 border-b">{{ $module->name }}</td>
-                                        <td class="px-6 py-4 border-b">{{ $module->version }}</td>
-                                        <td class="px-6 py-4 border-b">{{ $module->description }}</td>
-                                        <td class="px-6 py-4 border-b">{{ ucfirst($module->status) }}</td>
+                                        <td class="px-6 py-4 border-b">{{ $module1->name }}</td>
+                                        <td class="px-6 py-4 border-b">{{ $module1->version }}</td>
+                                        <td class="px-6 py-4 border-b">{{ $module1->description }}</td>
+                                        <td class="px-6 py-4 border-b">{{ ucfirst($module1->status) }}</td>
                                         <td class="px-6 py-4 border-b">
                                             @if (hasPermission('MODULES.CREATE'))
-                                                <form action="{{ route('crm.modules.destroy', $module->name) }}"
+                                                <form action="{{ route(getPanelRoutes($module .'.destroy'), $module1->name) }}"
                                                     method="POST" class="inline">
                                                     @csrf
                                                     @method('DELETE')

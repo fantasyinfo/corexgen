@@ -1,6 +1,7 @@
 <?php
 
 // crm routes
+use App\Http\Controllers\AppUpdateController;
 use App\Http\Controllers\CountryCitySeederController;
 use App\Http\Controllers\CRM\CRMRoleController;
 use App\Http\Controllers\CRM\CRMRolePermissionsController;
@@ -283,6 +284,14 @@ Route::middleware([
         Route::get('/', [ModuleController::class, 'index'])->name('index')->middleware('check.permission:MODULES.READ_ALL');
         Route::post('/', [ModuleController::class, 'create'])->name('create')->middleware('check.permission:MODULES.CREATE');
         Route::delete('/destroy/{module}', [ModuleController::class, 'destroy'])->name('destroy')->middleware('check.permission:MODULES.DELETE');
+    });
+
+
+    // appupdates routes
+    Route::prefix('appupdates')->as('appupdates.')->group(function () {
+        Route::get('/', [AppUpdateController::class, 'index'])->name('index')->middleware('check.permission:APPUPDATES.READ_ALL');
+        Route::post('/', [AppUpdateController::class, 'create'])->name('create')->middleware('check.permission:APPUPDATES.CREATE');
+
     });
 
 

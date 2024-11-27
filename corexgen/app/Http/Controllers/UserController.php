@@ -9,7 +9,6 @@ use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Yajra\DataTables\Facades\DataTables;
@@ -230,40 +229,40 @@ class UserController extends Controller
             ->with('success', 'User updated successfully.');
     }
 
+
+        
+    /**
+     * Method export 
+     *
+     * @param Request $request [exporting the users]
+     *
+     * @return void
+     */
     public function export(Request $request)
     {
-        $query = User::query()
-            ->join('crm_roles', 'users.role_id', '=', 'crm_roles.id')
-            ->where('users.buyer_id', auth()->user()->buyer_id)
-            ->select('users.*', 'crm_roles.role_name');
+        $query = User::query()->with('role');
+    
+        if (panelAccess() == PANEL_TYPES['SUPER_PANEL']) {
+            $query->where('is_tenant', '=', true);
+        }
+    
+        // Apply tenant filter (if necessary)
+        $query = $this->applyTenantFilter($query, 'users');
+    
+        // Apply dynamic filters based on request input
+        $query->when($request->filled('name'), fn($q) => $q->where('name', 'LIKE', "%{$request->name}%"));
+        $query->when($request->filled('email'), fn($q) => $q->where('email', 'LIKE', "%{$request->status}%"));
 
-        // Apply filters as in index method
-        $query->when($request->filled('name'), function ($q) use ($request) {
-            $q->where('users.name', 'LIKE', "%{$request->name}%");
-        });
+        if($request->filled('role_id') && $request->role_id != '0'){
 
+            $query->when($request->filled('role_id'), fn($q) => $q->where('role_id', $request->role_id));
+        }
 
-        $query->when($request->filled('email'), function ($q) use ($request) {
-            $q->where('users.email', 'LIKE', "%{$request->name}%");
-        });
-
-
-        $query->when($request->filled('status'), function ($q) use ($request) {
-            $q->where('users.status', $request->status);
-        });
-
-        $query->when($request->filled('role_id'), function ($q) use ($request) {
-            $q->where('users.role_id', $request->role_id);
-        });
-
-
-        $query->when($request->filled('start_date'), function ($q) use ($request) {
-            $q->whereDate('users.created_at', '>=', $request->start_date);
-        });
-
-        $query->when($request->filled('end_date'), function ($q) use ($request) {
-            $q->whereDate('users.created_at', '<=', $request->end_date);
-        });
+        $query->when($request->filled('status'), fn($q) => $q->where('status', $request->status));
+        $query->when($request->filled('start_date'), fn($q) => $q->whereDate('created_at', '>=', $request->start_date));
+        $query->when($request->filled('end_date'), fn($q) => $q->whereDate('created_at', '<=', $request->end_date));
+   
+        // For debugging: dd the SQL and bindings
 
         // Get the filtered data
         $roles = $query->get();
@@ -296,7 +295,14 @@ class UserController extends Controller
             ->header('Content-Type', 'text/csv')
             ->header('Content-Disposition', "attachment; filename={$fileName}");
     }
-
+    
+    /**
+     * Method import bulk import users
+     *
+     * @param Request $request [bulk import users]
+     *
+     * @return void
+     */
     public function import(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -336,7 +342,7 @@ class UserController extends Controller
                     'email' => $row['email'] ?? '',
                     'password' => Hash::make($row['password']) ?? '',
                     'role_id' => $row['role_id'] ?? '',
-                    'buyer_id' => auth()->user()->buyer_id,
+                    'company_id' => Auth::user()->company_id
 
                 ]);
             }
@@ -375,7 +381,15 @@ class UserController extends Controller
         }
     }
 
-
+    
+    /**
+     * Method changeStatus (change user status)
+     *
+     * @param $id $id [explicite id of user]
+     * @param $status $status [explicite status to change]
+     *
+     * @return void
+     */
     public function changeStatus($id, $status)
     {
         try {

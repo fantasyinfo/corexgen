@@ -9,19 +9,52 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 
-
+/**
+ * Summary of ModuleManager
+ * Installting, Running Seeder, Database Migrations, Artisans, Composer autoloads, cleanups
+ */
 class ModuleManager
 {
+    /**
+     * Summary of modules
+     * modules array data
+     * @var array
+     */
     protected $modules = [];
+
+    /**
+     * Summary of moduleDirectory
+     * dir
+     * @var 
+     */
     protected $moduleDirectory;
+
+    /**
+     * Summary of namespace
+     * getting name space
+     * @var 
+     */
     protected $namespace;
 
+    /**
+     * Method __construct
+     * getting instaltion dir and namespace config
+     *
+     * @return void
+     */
     public function __construct()
     {
         $this->moduleDirectory = config('modules.module_directory');
         $this->namespace = config('modules.namespace');
     }
 
+    /**
+     * Method install
+     *
+     * @param string $modulePath installing the module
+     *
+     * @return bool
+     */
     public function install(string $modulePath): bool
     {
         try {
@@ -65,8 +98,15 @@ class ModuleManager
         }
     }
 
-    
 
+
+    /**
+     * Method validateModule
+     *
+     * @param string $path validation of module required files check
+     *
+     * @return bool
+     */
     protected function validateModule(string $path): bool
     {
         if (!file_exists($path)) {
@@ -97,8 +137,8 @@ class ModuleManager
             if ($moduleJsonPath === null) {
                 throw new \Exception(
                     "module.json not found in the ZIP archive.\n" .
-                        "Files found in ZIP:\n" .
-                        implode("\n", $fileList)
+                    "Files found in ZIP:\n" .
+                    implode("\n", $fileList)
                 );
             }
 
@@ -142,6 +182,13 @@ class ModuleManager
         }
     }
 
+    /**
+     * Method validateModuleJson
+     *
+     * @param array $moduleJson validation of json file of module
+     *
+     * @return bool
+     */
     protected function validateModuleJson(array $moduleJson): bool
     {
         $requiredFields = [
@@ -188,6 +235,13 @@ class ModuleManager
 
 
 
+    /**
+     * Method checkDependencies
+     *
+     * @param array $dependencies checking versions
+     *
+     * @return bool
+     */
     protected function checkDependencies(array $dependencies): bool
     {
         foreach ($dependencies as $module => $version) {
@@ -206,11 +260,26 @@ class ModuleManager
         return true;
     }
 
+    /**
+     * Method isCompatibleVersion
+     *
+     * @param string $current version compitable check
+     * @param string $required [explicite description]
+     *
+     * @return bool
+     */
     protected function isCompatibleVersion(string $current, string $required): bool
     {
         return version_compare($current, trim($required, '>=<~^'), '>=');
     }
 
+    /**
+     * Method extractModule
+     *
+     * @param string $path extracting a module zip file
+     *
+     * @return array
+     */
     protected function extractModule(string $path): array
     {
         $zip = new ZipArchive();
@@ -238,6 +307,13 @@ class ModuleManager
         ];
     }
 
+    /**
+     * Method registerModule
+     *
+     * @param array $moduleData register the module into db
+     *
+     * @return void
+     */
     protected function registerModule(array $moduleData): void
     {
         DB::table('modules')->updateOrInsert(
@@ -248,6 +324,7 @@ class ModuleManager
                 'providers' => json_encode($moduleData['providers']),
                 'path' => $moduleData['path'],
                 'status' => 'active',
+                'panel_type' => panelAccess(),
                 'updated_at' => now()
             ]
         );
@@ -299,6 +376,13 @@ class ModuleManager
 
 
 
+    /**
+     * Method runMigrations
+     *
+     * @param string $moduleId running the migrations of module
+     *
+     * @return void
+     */
     protected function runMigrations(string $moduleId): void
     {
         Log::info("Running migrations for module: $moduleId");
@@ -343,6 +427,11 @@ class ModuleManager
         }
     }
 
+    /**
+     * Method loadModules
+     *
+     * @return void
+     */
     public function loadModules(): void
     {
         foreach ($this->getInstalledModules() as $module) {
@@ -350,10 +439,17 @@ class ModuleManager
         }
     }
 
+    /**
+     * Method getInstalledModules
+     * getting all modules
+     *
+     * @return array
+     */
     protected function getInstalledModules(): array
     {
         if (empty($this->modules)) {
             $this->modules = DB::table('modules')
+                ->where('panel_type', '=', panelAccess())
                 ->where('status', 'active')
                 ->get()
                 ->toArray();
@@ -390,7 +486,7 @@ class ModuleManager
             // Log the namespace for debugging
             Log::info("Namespace: " . $this->namespace);
 
-         
+
 
             // Build the full provider class name path (PascalCase)
             $providerClass = $this->namespace . '\\' . $module->name . '\\' . $provider;
@@ -416,7 +512,7 @@ class ModuleManager
                     Log::info("Attempting to register provider: $providerClass");
 
                     try {
-                       // Ensure the provider class exists
+                        // Ensure the provider class exists
                         if (class_exists($providerClass)) {
                             Log::info("Registering provider: {$providerClass}");
                             app()->register(new $providerClass(app()));
@@ -451,16 +547,16 @@ class ModuleManager
         }
     }
 
- 
+
 
     // protected function addProviderToConfig(string $providerClass): void
     // {
     //     // Path to the config/app.php file
     //     $configPath = config_path('app.php');
-    
+
     //     // Get the content of the config file
     //     $configContent = file_get_contents($configPath);
-        
+
     //     // Check if the provider is already in the config file
     //     if (strpos($configContent, $providerClass) === false) {
     //         // Using a more targeted regex approach to insert the provider within the 'providers' array
@@ -473,41 +569,41 @@ class ModuleManager
     //                 $matches[0]
     //             );
     //         };
-            
+
     //         // Apply the regex replacement
     //         $configContent = preg_replace_callback($pattern, $replacement, $configContent);
-    
+
     //         // Write the updated content back to the config file
     //         file_put_contents($configPath, $configContent);
-    
+
     //         Log::info("Provider {$providerClass} added to config/app.php");
     //     } else {
     //         Log::info("Provider {$providerClass} already exists in config/app.php");
     //     }
     // }
-    
-    
+
+
 
     protected function addProviderToConfig(string $providerClass): void
     {
         // Path to the config/app.php file
         $configPath = config_path('app.php');
-    
+
         // Get the content of the config file
         $configContent = file_get_contents($configPath);
-        
+
         // Check if the provider is already in the config file
         if (strpos($configContent, $providerClass) === false) {
             // Using a more targeted regex pattern that matches the merge structure
             $pattern = '/ServiceProvider::defaultProviders\(\)->merge\(\[(.*?)\]\)->toArray\(\)/s';
-            
+
             $replacement = function ($matches) use ($providerClass) {
                 // Get the existing content within the merge array
                 $currentContent = $matches[1];
-                
+
                 // Find the last provider in the array
                 $lastCommaPosition = strrpos($currentContent, ',');
-                
+
                 if ($lastCommaPosition !== false) {
                     // Insert the new provider after the last existing provider
                     $newContent = substr_replace(
@@ -520,13 +616,13 @@ class ModuleManager
                     // If there are no existing providers, add as first
                     $newContent = $currentContent . "\n        {$providerClass}::class";
                 }
-                
+
                 return "ServiceProvider::defaultProviders()->merge([" . $newContent . "])->toArray()";
             };
-            
+
             // Apply the regex replacement
             $newContent = preg_replace_callback($pattern, $replacement, $configContent);
-            
+
             if ($newContent !== null && $newContent !== $configContent) {
                 // Write the updated content back to the config file
                 file_put_contents($configPath, $newContent);
@@ -540,47 +636,47 @@ class ModuleManager
     }
 
     protected function removeProviderFromConfig(string $providerClass): void
-{
-    // Path to the config/app.php file
-    $configPath = config_path('app.php');
-    
-    // Get the content of the config file
-    $configContent = file_get_contents($configPath);
+    {
+        // Path to the config/app.php file
+        $configPath = config_path('app.php');
 
-    // Check if the provider is in the config file
-    if (strpos($configContent, $providerClass) !== false) {
-        // Using a more targeted regex pattern that matches the merge structure
-        $pattern = '/ServiceProvider::defaultProviders\(\)->merge\(\[(.*?)\]\)->toArray\(\)/s';
-        
-        $replacement = function ($matches) use ($providerClass) {
-            // Get the existing content within the merge array
-            $currentContent = $matches[1];
+        // Get the content of the config file
+        $configContent = file_get_contents($configPath);
 
-            // Remove the provider class from the content
-            $newContent = preg_replace(
-                '/,\s*' . preg_quote($providerClass . '::class', '/') . '\s*/',
-                '',
-                $currentContent
-            );
-            
-            // Rebuild the merge statement with the updated content
-            return "ServiceProvider::defaultProviders()->merge([" . $newContent . "])->toArray()";
-        };
-        
-        // Apply the regex replacement
-        $newContent = preg_replace_callback($pattern, $replacement, $configContent);
-        
-        if ($newContent !== null && $newContent !== $configContent) {
-            // Write the updated content back to the config file
-            file_put_contents($configPath, $newContent);
-            Log::info("Provider {$providerClass} removed from config/app.php");
+        // Check if the provider is in the config file
+        if (strpos($configContent, $providerClass) !== false) {
+            // Using a more targeted regex pattern that matches the merge structure
+            $pattern = '/ServiceProvider::defaultProviders\(\)->merge\(\[(.*?)\]\)->toArray\(\)/s';
+
+            $replacement = function ($matches) use ($providerClass) {
+                // Get the existing content within the merge array
+                $currentContent = $matches[1];
+
+                // Remove the provider class from the content
+                $newContent = preg_replace(
+                    '/,\s*' . preg_quote($providerClass . '::class', '/') . '\s*/',
+                    '',
+                    $currentContent
+                );
+
+                // Rebuild the merge statement with the updated content
+                return "ServiceProvider::defaultProviders()->merge([" . $newContent . "])->toArray()";
+            };
+
+            // Apply the regex replacement
+            $newContent = preg_replace_callback($pattern, $replacement, $configContent);
+
+            if ($newContent !== null && $newContent !== $configContent) {
+                // Write the updated content back to the config file
+                file_put_contents($configPath, $newContent);
+                Log::info("Provider {$providerClass} removed from config/app.php");
+            } else {
+                Log::error("Failed to update config/app.php, provider {$providerClass} not found for removal");
+            }
         } else {
-            Log::error("Failed to update config/app.php, provider {$providerClass} not found for removal");
+            Log::info("Provider {$providerClass} does not exist in config/app.php");
         }
-    } else {
-        Log::info("Provider {$providerClass} does not exist in config/app.php");
     }
-}
 
     public function uninstall(string $moduleId): bool
     {
@@ -600,7 +696,7 @@ class ModuleManager
             //Modules\BlogModule\BlogModuleServiceProvider
 
             $providerClassName = "Modules\\$moduleId\\$moduleId" . "ServiceProvider";
-         
+
 
             $this->removeProviderFromConfig($providerClassName);
 

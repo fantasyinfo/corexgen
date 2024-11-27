@@ -9,40 +9,45 @@ use App\Helpers\PermissionsHelper;
 !defined('CRMPERMISSIONS') && define('CRMPERMISSIONS', [
     'DASHBOARD' => [
         'name' => 'CRM_DASHBOARD',
-        'id' => PermissionsHelper::$PARENT_PERMISSION_IDS['1'],
+        'id' => PermissionsHelper::getParentPermissionId('1'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['DASHBOARD']
     ],
     'ROLE' => [
         'name' => 'CRM_ROLE',
-        'id' => PermissionsHelper::$PARENT_PERMISSION_IDS['2'],
+        'id' => PermissionsHelper::getParentPermissionId('2'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['ROLE']
     ],
     'USERS' => [
         'name' => 'CRM_USERS',
-        'id' => PermissionsHelper::$PARENT_PERMISSION_IDS['3'],
+        'id' => PermissionsHelper::getParentPermissionId('3'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['USERS']
     ],
     'PERMISSIONS' => [
         'name' => 'CRM_PERMISSIONS',
-        'id' => PermissionsHelper::$PARENT_PERMISSION_IDS['4'],
+        'id' => PermissionsHelper::getParentPermissionId('4'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['PERMISSIONS']
     ],
     'SETTINGS' => [
         'name' => 'CRM_SETTINGS',
-        'id' => PermissionsHelper::$PARENT_PERMISSION_IDS['5'],
+        'id' => PermissionsHelper::getParentPermissionId('5'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['SETTINGS']
     ],
     'MODULES' => [
         'name' => 'CRM_MODULES',
-        'id' => PermissionsHelper::$PARENT_PERMISSION_IDS['6'],
+        'id' => PermissionsHelper::getParentPermissionId('6'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['MODULES']
+    ],
+    'APPUPDATES' => [
+        'name' => 'CRM_APPUPDATES',
+        'id' => PermissionsHelper::getParentPermissionId('7'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['APPUPDATES']
     ],
 ]);
 
 !defined('CRM_MENU_ITEMS') && define('CRM_MENU_ITEMS', [
     'Dashboard' => [
         'menu_icon' => 'fa-tachometer-alt',
-        'permission_id' => PermissionsHelper::$PARENT_PERMISSION_IDS['1'],
+        'permission_id' => PermissionsHelper::getParentPermissionId('1'),
         'children' => [
             'CRM' => [
                 'menu_url' => 'home',
@@ -53,7 +58,7 @@ use App\Helpers\PermissionsHelper;
     ],
     'Roles & Permissions' => [
         'menu_icon' => 'fa-users',
-        'permission_id' => PermissionsHelper::$PARENT_PERMISSION_IDS['2'],
+        'permission_id' => PermissionsHelper::getParentPermissionId('2'),
         'children' => [
             'Role' => ['menu_url' => 'role.index', 'menu_icon' => 'fa-users', 'permission_id' => PermissionsHelper::findPermissionKey('ROLE', 'READ_ALL')],
             'Permissions' => ['menu_url' => 'permissions.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey('PERMISSIONS', 'READ_ALL')],
@@ -61,23 +66,24 @@ use App\Helpers\PermissionsHelper;
     ],
     'Users' => [
         'menu_icon' => 'fa-user',
-        'permission_id' => PermissionsHelper::$PARENT_PERMISSION_IDS['3'],
+        'permission_id' => PermissionsHelper::getParentPermissionId('3'),
         'children' => [
             'Users' => ['menu_url' => 'users.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey('USERS', 'READ_ALL')],
         ]
     ],
     'Settings' => [
         'menu_icon' => 'fa-cog',
-        'permission_id' => PermissionsHelper::$PARENT_PERMISSION_IDS['4'],
+        'permission_id' => PermissionsHelper::getParentPermissionId('4'),
         'children' => [
             'Settings' => ['menu_url' => 'settings.index', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey('SETTINGS', 'READ')],
         ]
     ],
     'Modules' => [
         'menu_icon' => 'fa-box',
-        'permission_id' => PermissionsHelper::$PARENT_PERMISSION_IDS['5'],
+        'permission_id' => PermissionsHelper::getParentPermissionId('5'),
         'children' => [
             'Modules' => ['menu_url' => 'modules.index', 'menu_icon' => 'fa-box', 'permission_id' => PermissionsHelper::findPermissionKey('MODULES', 'READ_ALL')],
+            'AppUpdates' => ['menu_url' => 'appupdates.index', 'menu_icon' => 'fa-box', 'permission_id' => PermissionsHelper::findPermissionKey('APPUPDATES', 'READ_ALL')],
         ]
     ],
 ]);
@@ -160,6 +166,7 @@ use App\Helpers\PermissionsHelper;
         'settings' => 'settings',
         'users' => 'users',
         'modules' => 'modules',
+        'appupdates' => 'appupdates',
 
     ],
     'COMPANY_PANEL' => [
@@ -168,6 +175,7 @@ use App\Helpers\PermissionsHelper;
         'permissions' => 'permissions',
         'settings' => 'settings',
         'users' => 'users',
-        'modules' => 'modules'
+        'modules' => 'modules',
+        'appupdates' => 'appupdates',
     ]
 ]);
