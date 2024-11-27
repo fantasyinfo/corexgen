@@ -272,6 +272,7 @@
             const dbTableAjax = $("#userTable").DataTable({
                 processing: true,
                 serverSide: true,
+                stateSave: true,
                 ajax: {
                     url: "{{ route('crm.users.index') }}",
                     data: function(d) {

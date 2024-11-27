@@ -64,7 +64,7 @@
                                             name='permissions[]'
                                             value='{{$parentMenu->permission_id}}'
                                         />
-                                        <label class="form-check-label" for='parent_{{$parentMenu->id}}'>
+                                        <label class="form-check-label" for='parent_{{$parentMenu->permission_id}}'>
                                             {{$parentMenu->name}}
                                         </label>
                                         
@@ -79,7 +79,7 @@
                                                             name='permissions[]'
                                                             value='{{$childMenu->permission_id}}'
                                                         />
-                                                        <label class="form-check-label" for='child_{{$childMenu->id}}'>
+                                                        <label class="form-check-label" for='child_{{$childMenu->permission_id}}'>
                                                             {{$childMenu->name}}
                                                         </label>
                                                     </li>

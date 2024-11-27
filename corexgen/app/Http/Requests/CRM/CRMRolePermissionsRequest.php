@@ -3,6 +3,8 @@
 namespace App\Http\Requests\CRM;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class CRMRolePermissionsRequest extends FormRequest
 {
@@ -24,6 +26,7 @@ class CRMRolePermissionsRequest extends FormRequest
      */
     public function rules(): array
     {
+      
         return [
             'role_id' => ['required', 'exists:crm_roles,id'], // Add exists validation
             'permissions' => ['required', 'array'], // Ensure permissions is an array

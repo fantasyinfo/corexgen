@@ -73,6 +73,7 @@
             const dbTableAjax = $("#roleTable").DataTable({
                 processing: true,
                 serverSide: true,
+                stateSave: true,
                 language: {
                     "lengthMenu": "_MENU_ per page",
                 },

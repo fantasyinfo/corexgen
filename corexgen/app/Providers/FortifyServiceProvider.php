@@ -64,6 +64,7 @@ class FortifyServiceProvider extends ServiceProvider
                 ->first();
 
             if ($user && Hash::check($password, $user->password)) {
+           
                 // Super admin / tenant check
                 if ($isTenant && $user->is_tenant && $user->tenant_id !== null && $path === 'super-admin-login') {
                     $tenant = Tenant::where('id', $user->tenant_id)
@@ -75,7 +76,7 @@ class FortifyServiceProvider extends ServiceProvider
                         return $user;
                     }
                     return null; // Tenant is inactive
-                } else if ($path === '' && !$user->is_tenant && $user->company_id !== null) {
+                } else if ($path == '' && !$user->is_tenant && $user->company_id !== null) {
                     session(['panelAccess' => PANEL_TYPES['COMPANY_PANEL']]);
                     return $user;
                 } else {
