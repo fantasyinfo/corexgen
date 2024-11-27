@@ -94,23 +94,33 @@
                 },
                 columns: [{
                         data: 'name',
-                        name: 'name'
+                        name: 'name',
+                        searchable: true, 
+                        orderable: true
                     },
                     {
                         data: 'email',
-                        name: 'email'
+                        name: 'email',
+                        searchable: true, 
+                        orderable: true
                     },
                     {
                         data: 'role_name',
-                        name: 'role_name'
+                        name: 'role_name',
+                        searchable: false, 
+                        orderable: true
                     },
                     {
                         data: 'status',
-                        name: 'status'
+                        name: 'status',
+                        searchable: false, 
+                        orderable: true
                     },
                     {
                         data: 'created_at',
-                        name: 'created_at'
+                        name: 'created_at',
+                        searchable: true, 
+                        orderable: true
                     },
                     {
                         data: 'actions',

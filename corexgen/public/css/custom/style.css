@@ -58,6 +58,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
+  border-left: 2px solid var(--sidebar-bg);
 }
 
 .sidebar .nav-link i.fa-chevron-down {
@@ -76,7 +77,7 @@ body {
 .sidebar .nav-link:hover, 
 .sidebar .nav-link.active {
   background: var( --dark-black-001);
-  border-top: 1px solid var(--body-bg);
+  border-left: 2px solid var(--primary-color);
 }
 
 /* Main Content Area */

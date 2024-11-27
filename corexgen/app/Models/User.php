@@ -89,7 +89,7 @@ class User extends Authenticatable
 
         static::creating(function ($user) {
             $user->status = $user->status ?? CRM_STATUS_TYPES['USERS']['STATUS']['ACTIVE'];
-            $user->is_tenant = Auth::user()->is_tenant ?? 0;
+         
             $user->company_id = Auth::user()->company_id ?? null;
         });
 

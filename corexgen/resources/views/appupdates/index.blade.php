@@ -6,7 +6,12 @@
         <div class="card">
             <div class="card-header">
                 <div class="card-title">
-                    <h5> {{ __('App Updates Management') }} </h5>
+                    <h5> {{ __('App Updates Management') }}  </h5>
+                    <div class="p-3 border-1 my-2">
+                        <div class="alert alert-warning">
+                            Current version {{env('APP_VERSION')}}
+                        </div>
+                    </div>
                 </div>
                 @if (hasPermission('APPUPDATES.CREATE'))
                     <div class="container py-4">

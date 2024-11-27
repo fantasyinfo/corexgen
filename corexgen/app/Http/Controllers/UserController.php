@@ -76,11 +76,11 @@ class UserController extends Controller
         $query = User::query()->with('role')->where('id' ,'!=', Auth::user()->id);
     
         if (panelAccess() == PANEL_TYPES['SUPER_PANEL']) {
-            $query->where('is_tenant', '=', true);
+            $query->where('is_tenant', '=', '1');
         }
     
         // Apply tenant filter (if necessary)
-        $query = $this->applyTenantFilter($query, 'users');
+        $query = $this->applyTenantFilter($query);
     
         // Apply dynamic filters based on request input
         $query->when($request->filled('name'), fn($q) => $q->where('name', 'LIKE', "%{$request->name}%"));
@@ -98,6 +98,7 @@ class UserController extends Controller
         // For debugging: dd the SQL and bindings
        
     
+     
         // Server-side DataTables response
         if ($request->ajax()) {
             return DataTables::of($query)
@@ -155,7 +156,9 @@ class UserController extends Controller
         $this->tenantRoute = $this->getTenantRoute();
 
         try {
+
             $validated = $request->validated();
+            $validated['is_tenant'] = Auth::user()->is_tenant;
             $validated['password'] = Hash::make($validated['password']);
 
             User::create($validated);

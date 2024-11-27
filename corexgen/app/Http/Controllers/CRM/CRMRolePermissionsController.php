@@ -83,13 +83,21 @@ class CRMRolePermissionsController extends Controller
 
         if ($request->ajax()) {
             return DataTables::of($query)
+                ->filter(function ($query) use ($request) {
+                    if ($request->has('search') && $searchValue = $request->input('search')['value']) {
+                        $query->where(function ($query) use ($searchValue) {
+                            $query->orWhere('crm_roles.role_name', 'like', "%$searchValue%");
+                            // Add more columns as needed
+                            // $query->orWhere('another_column', 'like', "%$searchValue%");
+                        });
+                    }
+                })
                 ->addColumn('actions', function ($permission) {
                     return View::make(getComponentsDirFilePath('dt-actions-buttons'), [
                         'tenantRoute' => $this->tenantRoute,
                         'permissions' => PermissionsHelper::getPermissionsArray('PERMISSIONS'),
                         'module' => PANEL_MODULES[$this->getPanelModule()]['permissions'],
-                        'id' => $permission->id
-
+                        'id' => $permission->id,
                     ])->render();
                 })
                 ->rawColumns(['actions'])
