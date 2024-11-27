@@ -23,7 +23,8 @@ class AppUpdateManager
 
             // 
             $currentVersion = config('app.version') ?? env('APP_VERSION', '1.0.0');
-            if ($this->isNewerVersion($currentVersion, $newVersion)) {
+            if (!$this->isNewerVersion($currentVersion, $newVersion)) {
+                \Log::info('Hey, coming here');
                 throw new \Exception("Update version {$newVersion} is not newer than current version {$currentVersion}");
             }
 
@@ -106,6 +107,7 @@ class AppUpdateManager
      */
     protected function isNewerVersion(string $currentVersion, string $newVersion): bool
     {
+        \Log::info("Version Checking.... " . $newVersion > $currentVersion);
         return $newVersion > $currentVersion;
     }
 
