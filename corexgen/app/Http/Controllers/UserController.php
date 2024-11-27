@@ -23,7 +23,8 @@ use Illuminate\Support\Facades\Auth;
  * - Editing existing User
  * - Exporting User to CSV
  * - Importing User from CSV
- * - Changing user status
+ * - Changing user here status removed,
+ *  - New VErsion Check
  */
 
 class UserController extends Controller

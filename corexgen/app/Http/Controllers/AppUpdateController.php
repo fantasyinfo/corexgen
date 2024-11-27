@@ -72,7 +72,7 @@ class AppUpdateController extends Controller
         $this->updateManager = new AppUpdateManager();
 
         $request->validate([
-            'appupdate' => 'required|file|mimes:zip|max:10240' // max 10MB
+            'appupdate' => 'required|file|mimes:zip' // max 10MB
         ]);
 
 
