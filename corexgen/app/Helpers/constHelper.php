@@ -42,6 +42,11 @@ use App\Helpers\PermissionsHelper;
         'id' => PermissionsHelper::getParentPermissionId('7'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['APPUPDATES']
     ],
+    'COMPANIES' => [
+        'name' => 'CRM_COMPANIES',
+        'id' => PermissionsHelper::getParentPermissionId('8'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['COMPANIES']
+    ],
 ]);
 
 !defined('CRM_MENU_ITEMS') && define('CRM_MENU_ITEMS', [
@@ -69,6 +74,13 @@ use App\Helpers\PermissionsHelper;
         'permission_id' => PermissionsHelper::getParentPermissionId('3'),
         'children' => [
             'Users' => ['menu_url' => 'users.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey('USERS', 'READ_ALL')],
+        ]
+    ],
+    'Compaines' => [
+        'menu_icon' => 'fa-building',
+        'permission_id' => PermissionsHelper::getParentPermissionId('3'),
+        'children' => [
+            'Compaines' => ['menu_url' => 'companies.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey('COMPANIES', 'READ_ALL')],
         ]
     ],
     'Settings' => [
@@ -136,8 +148,9 @@ use App\Helpers\PermissionsHelper;
         'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE'],
         'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger'],
     ],
-    'COMPANY' => [
+    'COMPANIES' => [
         'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE', 'BANNED'],
+        'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE', 'BANNED' => 'BANNED'],
         'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger', 'BANNED' => 'warning'],
     ],
     'USERS' => [
@@ -167,6 +180,7 @@ use App\Helpers\PermissionsHelper;
         'users' => 'users',
         'modules' => 'modules',
         'appupdates' => 'appupdates',
+        'companies' => 'companies'
 
     ],
     'COMPANY_PANEL' => [

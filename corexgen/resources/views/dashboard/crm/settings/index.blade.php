@@ -21,7 +21,7 @@
                         {{-- $general_settings --}}
                         <div class="justify-content-md-center ">
                             <div class="card stretch stretch-full">
-                                <form id="generalSettingsForm" action="{{ route('crm.settings.update') }}" method="POST">
+                                <form id="generalSettingsForm" action="{{ route(getPanelRoutes($module . '.update')) }}" method="POST">
                                     @csrf
                                     @method('PUT')
                                     <div class="card-body general-info">
