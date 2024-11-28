@@ -82,7 +82,7 @@
                                        id="phone" 
                                        name="phone" 
                                        required
-                                       placeholder="{{ __('john@doe.com') }}"
+                                       placeholder="{{ __('9876543210') }}"
                                        value="{{ old('phone') }}">
                                 <div class="invalid-feedback" id="phoneError">
                                     @error('phone')

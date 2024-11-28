@@ -65,7 +65,7 @@ Route::middleware(['check.installation'])->group(function () {
         if (Auth::check()) {
             return view('welcome');
         } else {
-            return redirect()->route('super.panel.login');
+            return redirect()->route('login');
         }
     })->name('home');
 

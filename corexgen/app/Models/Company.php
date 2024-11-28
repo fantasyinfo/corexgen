@@ -15,7 +15,7 @@ class Company extends Model
 
     protected $table = self::table;
 
-    protected $fillable = ['name', 'email','phone','status','tenant_id'];
+    protected $fillable = ['name', 'email', 'phone', 'status', 'tenant_id', 'address_id'];
 
 
     public function tenant(){

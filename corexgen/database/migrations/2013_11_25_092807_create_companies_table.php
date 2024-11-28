@@ -16,7 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('email');
             $table->string('phone')->nullable();
-            $table->enum('status', CRM_STATUS_TYPES['COMPANY']['TABLE_STATUS']);
+            $table->string('address_id')->nullable();
+            $table->enum('status', CRM_STATUS_TYPES['COMPANIES']['TABLE_STATUS']);
             $table->unsignedBigInteger('tenant_id');
 
             $table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('cascade');

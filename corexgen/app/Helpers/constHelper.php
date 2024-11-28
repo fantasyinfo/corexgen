@@ -163,6 +163,26 @@ use App\Helpers\PermissionsHelper;
         'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE'],
         'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger'],
     ],
+    'TAX_RATES' => [
+        'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE'],
+        'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE'],
+        'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger'],
+    ],
+    'PLANS' => [
+        'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE'],
+        'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE'],
+        'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger'],
+    ],
+    'SUBSCRIPTION' => [
+        'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE'],
+        'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE'],
+        'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger'],
+    ],
+    'TRANSACTIONS' => [
+        'TABLE_STATUS' => ['SUCCESS', 'FAILED', 'PENDING'],
+        'STATUS' => ['SUCCESS' => 'SUCCESS', 'FAILED' => 'FAILED', 'PENDING' => 'PENDING'],
+        'BT_CLASSES' => ['SUCCESS' => 'success', 'FAILED' => 'danger', 'PENDING' => 'warning'],
+    ],
 
 ]);
 
@@ -192,4 +212,16 @@ use App\Helpers\PermissionsHelper;
         'modules' => 'modules',
         'appupdates' => 'appupdates',
     ]
+]);
+
+
+!defined('PLANS_BILLING_CYCLES') && define('PLANS_BILLING_CYCLES', [
+    'BILLINGS_TABLE' => ['1 MONTH', '3 MONTHS', '6 MONTHS', '1 YEAR', 'UNLIMITED'],
+    'BILLINGS' => [
+        '1 MONTH' => '1 MONTH',
+        '3 MONTHS' => '3 MONTHS',
+        '6 MONTHS' => '6 MONTHS',
+        '1 YEAR' => '1 YEAR',
+        'UNLIMITED' => 'UNLIMITED'
+    ],
 ]);
