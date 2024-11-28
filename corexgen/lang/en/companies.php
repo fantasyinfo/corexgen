@@ -5,7 +5,7 @@ return [
     'Companies'=> "Companies",
     'Companies Management' => 'Companies Management',
     'Create Company' => 'Create Company',
-    'Name' => 'Name',
+    'Full Name' => 'Full Name',
     'Email' => 'Email',
     'Phone' => 'Phone',
     'Role' => 'Role',
@@ -15,8 +15,13 @@ return [
     'Create New Company' => 'Create New Company',
     'Update Company' => 'Update Company',
     'Password' => 'Password',
-    'Full Name' => 'Full Company Name',
-    'No Companies Found' => 'No Companies Found'
+    'Company Name' => 'Company Name',
+    'No Companies Found' => 'No Companies Found',
+    'General' =>'General',
+    'Contact' => 'Contact',
+    'Address' => 'Address',
+
+
 
 
 ];

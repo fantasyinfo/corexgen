@@ -14,10 +14,13 @@ return new class extends Migration
         Schema::create('tax_rates', function (Blueprint $table) {
             $table->id();
             $table->string('name')->default('Tax');
+            $table->unsignedBigInteger('country_id')->nullable();
             $table->decimal('tax_rate')->default(18.0);
             $table->string('tax_type')->nullable()->default('GST');
             $table->enum('status', CRM_STATUS_TYPES['TAX_RATES']['TABLE_STATUS'])->default(CRM_STATUS_TYPES['TAX_RATES']['STATUS']['ACTIVE']);
             $table->timestamps();
+
+            $table->foreign('country_id')->references('id')->on('countries')->onDelete('cascade');
         });
     }
 

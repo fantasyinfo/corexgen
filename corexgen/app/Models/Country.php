@@ -14,4 +14,10 @@ class Country extends Model
     protected $table = self::table;
 
     protected $fillable = ['name', 'code'];
+
+
+    public function tax()
+    {
+        $this->hasOne(Tax::class);
+    }
 }

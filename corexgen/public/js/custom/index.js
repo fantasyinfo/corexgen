@@ -92,10 +92,13 @@ document.addEventListener("DOMContentLoaded", function () {
             filterSidebar.classList.toggle("show");
         });
 
-        // Close filter sidebar
-        closeFilter.addEventListener("click", function () {
-            filterSidebar.classList.remove("show");
-        });
+        if(closeFilter){
+
+            // Close filter sidebar
+            closeFilter.addEventListener("click", function () {
+                filterSidebar.classList.remove("show");
+            });
+        }
     }
 });
 

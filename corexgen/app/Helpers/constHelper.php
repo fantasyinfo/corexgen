@@ -69,7 +69,7 @@ use App\Helpers\PermissionsHelper;
             'Permissions' => ['menu_url' => 'permissions.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey('PERMISSIONS', 'READ_ALL')],
         ]
     ],
-    'Users' => [
+    'Users & Employees' => [
         'menu_icon' => 'fa-user',
         'permission_id' => PermissionsHelper::getParentPermissionId('3'),
         'children' => [
@@ -78,21 +78,29 @@ use App\Helpers\PermissionsHelper;
     ],
     'Compaines' => [
         'menu_icon' => 'fa-building',
-        'permission_id' => PermissionsHelper::getParentPermissionId('3'),
+        'permission_id' => PermissionsHelper::getParentPermissionId('4'),
         'children' => [
             'Compaines' => ['menu_url' => 'companies.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey('COMPANIES', 'READ_ALL')],
         ]
     ],
+    'Plans & Taxes' => [
+        'menu_icon' => 'fa-clipboard-list',
+        'permission_id' => PermissionsHelper::getParentPermissionId('5'),
+        'children' => [
+            'Plans' => ['menu_url' => 'plans.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey('PLANS', 'READ_ALL')],
+            'Tax' => ['menu_url' => 'tax.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey('TAX', 'READ_ALL')],
+        ]
+    ],
     'Settings' => [
         'menu_icon' => 'fa-cog',
-        'permission_id' => PermissionsHelper::getParentPermissionId('4'),
+        'permission_id' => PermissionsHelper::getParentPermissionId('6'),
         'children' => [
             'Settings' => ['menu_url' => 'settings.index', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey('SETTINGS', 'READ')],
         ]
     ],
     'Modules' => [
         'menu_icon' => 'fa-box',
-        'permission_id' => PermissionsHelper::getParentPermissionId('5'),
+        'permission_id' => PermissionsHelper::getParentPermissionId('7'),
         'children' => [
             'Modules' => ['menu_url' => 'modules.index', 'menu_icon' => 'fa-box', 'permission_id' => PermissionsHelper::findPermissionKey('MODULES', 'READ_ALL')],
             'AppUpdates' => ['menu_url' => 'appupdates.index', 'menu_icon' => 'fa-box', 'permission_id' => PermissionsHelper::findPermissionKey('APPUPDATES', 'READ_ALL')],
@@ -200,7 +208,9 @@ use App\Helpers\PermissionsHelper;
         'users' => 'users',
         'modules' => 'modules',
         'appupdates' => 'appupdates',
-        'companies' => 'companies'
+        'companies' => 'companies',
+        'plans' => 'plans',
+        'tax' => 'tax',
 
     ],
     'COMPANY_PANEL' => [

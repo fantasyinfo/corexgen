@@ -9,6 +9,7 @@ use App\Http\Controllers\CRM\CRMRolePermissionsController;
 use App\Http\Controllers\CRM\CRMSettingsController;
 use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\SystemInstallerController;
+use App\Http\Controllers\TaxController;
 use App\Http\Controllers\UserController;
 use App\Models\CRM\CRMRole;
 use Illuminate\Support\Facades\Route;
@@ -255,7 +256,7 @@ Route::middleware([
 
 
 
-    // users routes
+    // companies routes
     Route::prefix('companies')->as('companies.')->group(function () {
         // role for fetch, store, update
         Route::get('/', [CompaniesController::class, 'index'])->name('index')->middleware('check.permission:USERS.READ_ALL');
@@ -292,6 +293,44 @@ Route::middleware([
     });
 
 
+      // tax routes
+      Route::prefix('tax')->as('tax.')->group(function () {
+        // role for fetch, store, update
+        Route::get('/', [TaxController::class, 'index'])->name('index')->middleware('check.permission:TAX.READ_ALL');
+        Route::post('/', [TaxController::class, 'store'])->name('store')->middleware('check.permission:TAX.CREATE');
+        Route::put('/', [TaxController::class, 'update'])->name('update')->middleware('check.permission:TAX.UPDATE');
+
+        // create, edit, change status, delete
+        Route::get('/create', [TaxController::class, 'create'])->name('create')->middleware('check.permission:TAX.CREATE');
+        Route::get('/edit/{id}', [TaxController::class, 'edit'])->name('edit')->middleware('check.permission:TAX.UPDATE');
+        Route::get(
+            '/changeStatus/{id}/{status}',
+            [TaxController::class, 'changeStatus']
+        )->name('changeStatus')->middleware('check.permission:TAX.CHANGE_STATUS');
+        Route::delete('/destroy/{id}', [TaxController::class, 'destroy'])->name('destroy')->middleware('check.permission:TAX.DELETE');
+
+
+    });
+
+
+      // plans routes
+      Route::prefix('plans')->as('plans.')->group(function () {
+        // role for fetch, store, update
+        Route::get('/', [TaxController::class, 'index'])->name('index')->middleware('check.permission:PLANS.READ_ALL');
+        Route::post('/', [TaxController::class, 'store'])->name('store')->middleware('check.permission:PLANS.CREATE');
+        Route::put('/', [TaxController::class, 'update'])->name('update')->middleware('check.permission:PLANS.UPDATE');
+
+        // create, edit, change status, delete
+        Route::get('/create', [TaxController::class, 'create'])->name('create')->middleware('check.permission:PLANS.CREATE');
+        Route::get('/edit/{id}', [TaxController::class, 'edit'])->name('edit')->middleware('check.permission:PLANS.UPDATE');
+        Route::get(
+            '/changeStatus/{id}/{status}',
+            [TaxController::class, 'changeStatus']
+        )->name('changeStatus')->middleware('check.permission:PLANS.CHANGE_STATUS');
+        Route::delete('/destroy/{id}', [TaxController::class, 'destroy'])->name('destroy')->middleware('check.permission:PLANS.DELETE');
+
+
+    });
 
 
     // settings routes

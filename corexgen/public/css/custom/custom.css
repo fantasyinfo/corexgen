@@ -146,3 +146,78 @@ table tr {
             right: -100%;
         }
     }
+
+
+    /* Custom Nav Tabs Styling */
+.nav-tabs {
+    border-bottom: 0.1px solid var(--body-color);
+    margin-bottom: 20px;
+}
+
+.nav-tabs .nav-link {
+    color: var(--body-color);
+    font-weight: 600;
+    position: relative;
+    transition: all 0.3s ease;
+    margin-right: 15px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 6px 6px 0 0;
+}
+
+.nav-tabs .nav-link:hover {
+    color: var(--primary-color);
+    background-color: rgba(103, 61, 230, 0.05);
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--primary-color);
+    background-color: transparent;
+}
+
+.nav-tabs .nav-link.active::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 100%;
+    height: 3px;
+    background-color: var(--primary-color);
+    transition: all 0.3s ease;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .nav-tabs {
+        flex-direction: column;
+    }
+
+    .nav-tabs .nav-link {
+        margin-bottom: 10px;
+        text-align: center;
+    }
+
+    .nav-tabs .nav-link.active::after {
+        width: 100%;
+        left: 0;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .dark-mode .nav-tabs {
+        border-bottom-color: rgba(230, 230, 230, 0.2);
+    }
+
+    .dark-mode .nav-tabs .nav-link {
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .dark-mode .nav-tabs .nav-link:hover {
+        color: var(--primary-color);
+    }
+
+    .dark-mode .nav-tabs .nav-link.active {
+        color: var(--primary-color);
+    }
+}

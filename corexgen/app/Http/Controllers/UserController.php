@@ -114,7 +114,7 @@ class UserController extends Controller
                     return $user->created_at->format('d M Y');
                 })
                 ->editColumn('role_name', function ($user) {
-                    return  $user->role->role_name;
+                    return  $user->role ? $user->role->role_name : '';
                 })
                 ->editColumn('status', function ($user) {
                     return View::make(getComponentsDirFilePath('dt-status'), [
