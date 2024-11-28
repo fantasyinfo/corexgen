@@ -1,35 +1,41 @@
 @if (hasPermission('USERS.FILTER'))
-    <div id="filter-section">
+    <div class="filter-sidebar" id="filterSidebar">
 
-        <div class="card-title">
-            {{ __('crud.Filter') }}
+        <div class="filter-sidebar-content">
 
-        </div>
-        <!-- Advanced Filter Form -->
 
-        <div class="row g-3">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="mb-0">Advanced {{ __('crud.Filter') }}</h5>
+             
+                <button type="button" class="btn btn-light" id="closeFilter" aria-label="Close">
+                    <i class="fas fa-times me-2"></i>Close
+                </button>
+            </div>
+            <!-- Advanced Filter Form -->
+
+
             <!-- Search Input -->
-            <div class="col-md-3">
+            <div class="mb-3">
                 <div class="form-group">
                     <label for="nameFilter" class="mb-2 font-12">{{ __('users.Name') }}</label>
                     <input type="text" id="nameFilter" name="name" class="form-control"
                         placeholder="{{ __('users.Name') }}" value="{{ request('name') }}">
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="mb-3">
                 <div class="form-group">
                     <label for="emailFilter" class="mb-2 font-12">{{ __('users.Email') }}</label>
                     <input type="text" id="emailFilter" name="email" class="form-control"
                         placeholder="{{ __('users.Email') }}" value="{{ request('email') }}">
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="mb-3">
                 <div class="form-group">
                     <label for="roleFilter" class="mb-2 font-12">{{ __('users.Role') }}</label>
                     <select id="roleFilter"
                         class="form-control searchSelectBox select2-hidden-accessible @error('role_id') is-invalid @enderror"
                         name="role_id" id="role_id">
-                        <option selected value="0" >Select Role</option>
+                        <option selected value="0">Select Role</option>
                         @if ($roles && $roles->isNotEmpty())
                             @foreach ($roles as $role)
                                 <option value="{{ $role->id }}"
@@ -43,10 +49,8 @@
                     </select>
                 </div>
             </div>
-
-
             <!-- Status Dropdown -->
-            <div class="col-md-3">
+            <div class="mb-3">
                 <div class="form-group">
                     <label for="statusFilter" class="mb-2 font-12">{{ __('users.All Statuses') }}</label>
                     <select name="status" class="form-select" id="statusFilter">
@@ -61,18 +65,16 @@
                 </div>
             </div>
 
-            <!-- Buttons -->
-            <div class="col-md-4">
-                <div class="d-flex gap-2">
-                    <button type="button" id="filterBtn" class="btn btn-primary">
-                        <i class="fas fa-search me-1"></i>{{ __('Search') }}
-                    </button>
-                    <button type="button" id="clearFilter" class="btn btn-light">
-                        <i class="fas fa-trash-alt me-1"></i>{{ __('Clear') }}
-                    </button>
-                </div>
+            <!-- Filter Action Buttons -->
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-primary w-100" id="filterBtn">
+                    <i class="fas fa-search me-2"></i>Apply Filters
+                </button>
+                <button type="button" class="btn btn-light w-100" id="clearFilter">
+                    <i class="fas fa-trash-alt me-2"></i>Clear
+                </button>
             </div>
-        </div>
 
+        </div>
     </div>
 @endif

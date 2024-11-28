@@ -147,6 +147,8 @@
 
             $('#filterBtn').click(function() {
                 dbTableAjax.ajax.reload();
+                const filterSidebar = document.getElementById("filterSidebar");
+                filterSidebar.classList.remove('show');
             });
         });
     </script>

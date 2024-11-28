@@ -111,3 +111,38 @@ table tr {
     transition: all 0.3s ease;
 
 }
+
+
+     /* Custom styling for filter sidebar */
+     .filter-sidebar {
+        width: 350px;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        right: -350px;
+        background: #14071e;
+        color: #fff;
+   
+        box-shadow: -4px 0 6px rgba(0,0,0,0.1);
+        transition: right 0.3s ease-in-out;
+        z-index: 1050;
+        overflow-y: auto;
+    }
+
+    .filter-sidebar.show {
+        right: 0;
+    }
+
+
+    .filter-sidebar-content {
+        padding: 20px;
+    }
+
+   
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .filter-sidebar {
+            width: 100%;
+            right: -100%;
+        }
+    }

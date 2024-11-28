@@ -27,7 +27,7 @@
         @endif
         @if (isset($permissions['FILTER']) && hasPermission($permissions['FILTER']))
             <div class="col-12 col-md-auto">
-                <button data-toggle="tooltip" data-placement="top" title="Filter Data" onclick="openFilters()"
+                <button data-toggle="tooltip" data-placement="top" title="Filter Data" id="filterToggle"
                     class="btn btn-md btn-outline-warning w-100">
                     <i class="fas fa-filter"></i>
                     <span>{{ __('crud.Filter') }}</span>

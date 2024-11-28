@@ -79,28 +79,23 @@ $(function () {
 });
 
 // Function to toggle the filter section
-function openFilters() {
-    const filterSection = document.getElementById("filter-section");
-    if (filterSection.style.display === "block") {
-        filterSection.style.display = "none";
-        localStorage.setItem("filterVisible", "false"); // Save state
-    } else {
-        filterSection.style.display = "block";
-        localStorage.setItem("filterVisible", "true"); // Save state
-    }
-}
 
 // Function to check filter state on page load
 document.addEventListener("DOMContentLoaded", function () {
-    const filterSection = document.getElementById("filter-section");
-    const filterVisible = localStorage.getItem("filterVisible");
+    const filterToggle = document.getElementById("filterToggle");
+    const filterSidebar = document.getElementById("filterSidebar");
+    const closeFilter = document.getElementById('closeFilter');
 
-    if (filterSection) {
-        if (filterVisible === "true") {
-            filterSection.style.display = "block";
-        } else {
-            filterSection.style.display = "none";
-        }
+    if (filterToggle) {
+        // Toggle filter sidebar
+        filterToggle.addEventListener("click", function () {
+            filterSidebar.classList.toggle("show");
+        });
+
+        // Close filter sidebar
+        closeFilter.addEventListener("click", function () {
+            filterSidebar.classList.remove("show");
+        });
     }
 });
 

@@ -9,7 +9,7 @@
                     <h5> {{ __('App Updates Management') }}  </h5>
                     <div class="p-3 border-1 my-2">
                         <div class="alert alert-warning">
-                            Current version {{env('APP_VERSION')}}
+                            Current version {{config('app.version')}}
                         </div>
                     </div>
                 </div>
