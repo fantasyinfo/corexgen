@@ -22,9 +22,7 @@ return new class extends Migration
             $table->enum('status', CRM_STATUS_TYPES['PLANS']['TABLE_STATUS'])->default(CRM_STATUS_TYPES['PLANS']['STATUS']['ACTIVE']);
 
 
-            // features
-            $table->integer('users_limit')->default(10);
-            $table->integer('roles_limit')->default(10);
+        
 
 
             $table->timestamps();

@@ -62,7 +62,9 @@
 @endpush
 @extends('layout.app')
 @section('content')
-
+@php
+    prePrintR($plans);
+@endphp
 <div class="card shadow-sm rounded p-3 mb-3">
     <div class="card-header  border-bottom pb-2">
         <div class="row ">

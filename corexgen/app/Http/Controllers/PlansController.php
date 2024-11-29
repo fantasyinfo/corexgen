@@ -12,6 +12,7 @@ use App\Http\Requests\PlansRequest;
 use App\Http\Requests\TaxRequest;
 use App\Models\Country;
 use App\Models\Plans;
+use App\Models\PlansFeatures;
 use App\Models\Tax;
 
 /**
@@ -72,7 +73,7 @@ class PlansController extends Controller
      */
     public function index(Request $request)
     {
-        $plans = Plans::query()->get();
+        $plans = Plans::query()->with('plans_features')->get();
 
         $this->tenantRoute = $this->getTenantRoute();
 
@@ -112,11 +113,29 @@ class PlansController extends Controller
     public function store(PlansRequest $request)
     {
         $this->tenantRoute = $this->getTenantRoute();
+    
         try {
-            // Validate and create role
+            // Validate and create the plan
             $validated = $request->validated();
-            Plans::create($validated);
-
+            $plan = Plans::create($validated); // This returns the model instance
+            $planId = $plan->id; // Extract the ID from the created plan
+    
+            // Loop through all request input
+            foreach ($request->all() as $key => $value) {
+                // Check if the key starts with 'features_'
+                if (str_starts_with($key, 'features_')) {
+                    // Extract the feature name (remove the 'features_' prefix)
+                    $featureName = str_replace('features_', '', $key);
+    
+                    // Create a new feature entry
+                    PlansFeatures::create([
+                        'plan_id' => $planId,
+                        'module_name' => $featureName,
+                        'value' => $value
+                    ]);
+                }
+            }
+    
             // Redirect with success message
             return redirect()->route($this->tenantRoute . 'plans.index')
                 ->with('success', 'Plan created successfully.');
@@ -126,6 +145,7 @@ class PlansController extends Controller
                 ->with('error', 'An error occurred while creating the plan: ' . $e->getMessage());
         }
     }
+    
 
 
     /**

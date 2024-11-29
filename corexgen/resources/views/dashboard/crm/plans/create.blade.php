@@ -8,7 +8,7 @@
                 <div class="card stretch stretch-full">
 
 
-                    <form id="userForm" action="{{ route(getPanelRoutes('plans.store')) }}" method="POST">
+                    <form id="plansForm" action="{{ route(getPanelRoutes('plans.store')) }}" method="POST">
                         @csrf
                         <div class="card-body general-info">
                             <div class="mb-5 d-flex align-items-center justify-content-between">
@@ -168,51 +168,34 @@
                                     </div>
                                 </div>
                                 <div class="tab-pane fade" id="features" role="tabpanel">
+                                    @foreach(PLANS_FEATURES as $pf)
                                     <div class="row mb-4 align-items-center">
                                         <div class="col-lg-4">
-                                            <label for="nameName" class="mb-2 fw-semibold">{{ __('plans.Users Limit') }}:
+                                            <label for="{{$pf}}" class="mb-2 fw-semibold">
+                                                {{ ucwords(strtolower(str_replace('_', ' ',$pf ))) }}:
                                                 <span class="text-danger">*</span></label>
                                         </div>
                                         <div class="col-lg-8">
                                             <div class="input-group">
-
+                                                @php        $pfs = strtolower(str_replace(' ', '_', $pf)); @endphp
                                                 <input type="number"
-                                                    class="form-control @error('users_limit') is-invalid @enderror"
-                                                    id="nameName" name="users_limit" placeholder="{{ __('10') }}"
+                                                    class="form-control @error('features.'.$pfs) is-invalid @enderror"
+                                                    id="{{$pfs}}" name="features.{{$pfs}}" placeholder="{{ __('10') }}"
                                                     value="10" required>
-                                                <div class="invalid-feedback" id="nameNameError">
-                                                    @error('users_limit')
+                                                <div class="invalid-feedback" id="{{$pfs}}Error">
+                                                    @error('features.'.$pfs)
                                                         {{ $message }}
                                                     @enderror
                                                 </div>
                                             </div>
                                         </div>
-                                        <p class="offset-lg-4 font-12 my-2 text-secondary">For Unlimited typoe <span
+                                        <p class="offset-lg-4 font-12 my-2 text-secondary">For Unlimited type <span
                                                 class="text-success"> -1</span>.</p>
                                     </div>
+                                    @endforeach
+                                  
 
-                                    <div class="row mb-4 align-items-center">
-                                        <div class="col-lg-4">
-                                            <label for="nameName" class="mb-2 fw-semibold">{{ __('plans.Roles Limit') }}:
-                                                <span class="text-danger">*</span></label>
-                                        </div>
-                                        <div class="col-lg-8">
-                                            <div class="input-group">
-
-                                                <input type="number"
-                                                    class="form-control @error('roles_limit') is-invalid @enderror"
-                                                    id="nameName" name="roles_limit" placeholder="{{ __('10') }}"
-                                                    value="10" required>
-                                                <div class="invalid-feedback" id="nameNameError">
-                                                    @error('roles_limit')
-                                                        {{ $message }}
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <p class="offset-lg-4 font-12 my-2 text-secondary">For Unlimited typoe <span
-                                                class="text-success"> -1</span>.</p>
-                                    </div>
+                                    
                                 </div>
                             </div>
 
@@ -241,5 +224,9 @@
                 });
             });
         });
+
+
+        
+
     </script>
 @endpush

@@ -14,11 +14,11 @@ class Plans extends Model
 
     protected $table = self::table;
 
-    protected $fillable = ['name', 'desc','users_limit','roles_limit','price','offer_price','billing_cycle','status','tax_rates_id'];
+    protected $fillable = ['name', 'desc','price','offer_price','billing_cycle','status','tax_rates_id'];
 
 
-    public function tax()
-    {
-        return $this->belongsTo(Tax::class, 'tax_rate_id');
+    public function plans_features(){
+       return $this->hasMany(PlansFeatures::class,'plan_id');
     }
+  
 }

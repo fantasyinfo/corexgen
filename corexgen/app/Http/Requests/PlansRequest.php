@@ -24,14 +24,32 @@ class PlansRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+
+
+        $baseRules = [
             'name' => ['string', 'required'],
             'desc' => ['string', 'required'],
-            'price' => ['integer', 'required'],
-            'offer_price' => ['integer', 'required'],
+            'price' => ['numeric', 'required'],
+            'offer_price' => ['numeric', 'required'],
             'billing_cycle' => ['required'],
-            'users_limit' => ['integer'],
-            'roles_limit' => ['integer'],
         ];
+    
+        // Add validation rules for PLANS_FEATURES
+        $featureRules = [];
+        foreach (PLANS_FEATURES as $featureKey) {
+            $featureKey = strtolower(str_replace(' ', '_', $featureKey));
+            $featureRules["features_{$featureKey}"] = ['required', 'numeric']; 
+        }
+    
+        return array_merge($baseRules, $featureRules);
     }
+
+    public function messages(): array
+{
+    return [
+        'features.*.required' => 'The :attribute is required for all plan features.',
+        'features.*.integer' => 'The :attribute must be a valid integer.',
+   
+    ];
+}
 }
