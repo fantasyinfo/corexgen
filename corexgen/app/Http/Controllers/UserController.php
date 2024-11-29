@@ -71,22 +71,22 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $this->tenantRoute = $this->getTenantRoute();
-    
-       
-        $query = User::query()->with('role')->where('id' ,'!=', Auth::user()->id);
-    
+
+
+        $query = User::query()->with('role')->where('id', '!=', Auth::user()->id);
+
         if (panelAccess() == PANEL_TYPES['SUPER_PANEL']) {
             $query->where('is_tenant', '=', '1');
         }
-    
+
         // Apply tenant filter (if necessary)
         $query = $this->applyTenantFilter($query);
-    
+
         // Apply dynamic filters based on request input
         $query->when($request->filled('name'), fn($q) => $q->where('name', 'LIKE', "%{$request->name}%"));
         $query->when($request->filled('email'), fn($q) => $q->where('email', 'LIKE', "%{$request->status}%"));
 
-        if($request->filled('role_id') && $request->role_id != '0'){
+        if ($request->filled('role_id') && $request->role_id != '0') {
 
             $query->when($request->filled('role_id'), fn($q) => $q->where('role_id', $request->role_id));
         }
@@ -94,11 +94,11 @@ class UserController extends Controller
         $query->when($request->filled('status'), fn($q) => $q->where('status', $request->status));
         $query->when($request->filled('start_date'), fn($q) => $q->whereDate('created_at', '>=', $request->start_date));
         $query->when($request->filled('end_date'), fn($q) => $q->whereDate('created_at', '<=', $request->end_date));
-   
+
         // For debugging: dd the SQL and bindings
-       
-    
-     
+
+
+
         // Server-side DataTables response
         if ($request->ajax()) {
             return DataTables::of($query)
@@ -114,7 +114,7 @@ class UserController extends Controller
                     return $user->created_at->format('d M Y');
                 })
                 ->editColumn('role_name', function ($user) {
-                    return  $user->role ? $user->role->role_name : '';
+                    return $user->role ? $user->role->role_name : '';
                 })
                 ->editColumn('status', function ($user) {
                     return View::make(getComponentsDirFilePath('dt-status'), [
@@ -132,9 +132,9 @@ class UserController extends Controller
                 ->rawColumns(['actions', 'status', 'role_name']) // Add 'status' to raw columns
                 ->make(true);
         }
-    
+
         $roles = $this->applyTenantFilter(CRMRole::query())->get();
-     
+
         return view($this->getViewFilePath('index'), [
             'filters' => $request->all(),
             'title' => 'Users Management',
@@ -143,7 +143,7 @@ class UserController extends Controller
             'module' => PANEL_MODULES[$this->getPanelModule()]['users'],
         ]);
     }
-    
+
 
 
     /**
@@ -234,7 +234,7 @@ class UserController extends Controller
     }
 
 
-        
+
     /**
      * Method export 
      *
@@ -245,19 +245,19 @@ class UserController extends Controller
     public function export(Request $request)
     {
         $query = User::query()->with('role');
-    
+
         if (panelAccess() == PANEL_TYPES['SUPER_PANEL']) {
             $query->where('is_tenant', '=', true);
         }
-    
+
         // Apply tenant filter (if necessary)
         $query = $this->applyTenantFilter($query, 'users');
-    
+
         // Apply dynamic filters based on request input
         $query->when($request->filled('name'), fn($q) => $q->where('name', 'LIKE', "%{$request->name}%"));
         $query->when($request->filled('email'), fn($q) => $q->where('email', 'LIKE', "%{$request->status}%"));
 
-        if($request->filled('role_id') && $request->role_id != '0'){
+        if ($request->filled('role_id') && $request->role_id != '0') {
 
             $query->when($request->filled('role_id'), fn($q) => $q->where('role_id', $request->role_id));
         }
@@ -265,7 +265,7 @@ class UserController extends Controller
         $query->when($request->filled('status'), fn($q) => $q->where('status', $request->status));
         $query->when($request->filled('start_date'), fn($q) => $q->whereDate('created_at', '>=', $request->start_date));
         $query->when($request->filled('end_date'), fn($q) => $q->whereDate('created_at', '<=', $request->end_date));
-   
+
         // For debugging: dd the SQL and bindings
 
         // Get the filtered data
@@ -299,7 +299,7 @@ class UserController extends Controller
             ->header('Content-Type', 'text/csv')
             ->header('Content-Disposition', "attachment; filename={$fileName}");
     }
-    
+
     /**
      * Method import bulk import users
      *
@@ -385,7 +385,7 @@ class UserController extends Controller
         }
     }
 
-    
+
     /**
      * Method changeStatus (change user status)
      *
@@ -405,6 +405,40 @@ class UserController extends Controller
         } catch (\Exception $e) {
             // Handle any exceptions
             return redirect()->back()->with('error', 'Failed to changed the user status: ' . $e->getMessage());
+        }
+    }
+
+
+
+    /**
+     * Bulk Delete the user
+     * Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function bulkDelete(Request $request)
+    {
+
+        $ids = $request->input('ids');
+
+        try {
+            // Delete the user
+
+            if (is_array($ids) && count($ids) > 0) {
+                // Validate ownership/permissions if necessary
+                $this->applyTenantFilter(User::query()->whereIn('id', $ids))->delete();
+
+                return response()->json(['message' => 'Selected users deleted successfully.'], 200);
+            }
+
+            return response()->json(['message' => 'No users selected for deletion.'], 400);
+
+
+
+
+
+        } catch (\Exception $e) {
+            // Handle any exceptions
+            return redirect()->back()->with('error', 'Failed to delete the user: ' . $e->getMessage());
         }
     }
 }

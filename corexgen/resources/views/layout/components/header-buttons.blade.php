@@ -34,5 +34,15 @@
                 </button>
             </div>
         @endif
+        @if (isset($permissions['BULK_DELETE']) && hasPermission($permissions['BULK_DELETE']))
+            <div class="col-12 col-md-auto">
+                <button data-toggle="tooltip" data-placement="top" title="Bulk Delete Data" id="bulk-delete-btn"
+                    class="btn btn-md btn-outline-danger w-100">
+                    <i class="fas fa-trash"></i>
+                    <span>{{ __('crud.Bulk Delete') }}</span>
+                </button>
+              
+            </div>
+        @endif
     </div>
 </div>

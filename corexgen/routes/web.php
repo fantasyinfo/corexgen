@@ -151,7 +151,7 @@ Route::middleware([
         // validate, export, import
         Route::get('/export', [UserController::class, 'export'])->name('export')->middleware('check.permission:USERS.EXPORT');
         Route::post('/import', [UserController::class, 'import'])->name('import')->middleware('check.permission:USERS.IMPORT');
-
+        Route::post('/bulkDelete', [UserController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:USERS.BULK_DELETE');
     });
 
 
@@ -251,6 +251,7 @@ Route::middleware([
         // validate, export, import
         Route::get('/export', [UserController::class, 'export'])->name('export')->middleware('check.permission:USERS.EXPORT');
         Route::post('/import', [UserController::class, 'import'])->name('import')->middleware('check.permission:USERS.IMPORT');
+        Route::post('/bulkDelete', [UserController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:USERS.BULK_DELETE');
 
     });
 

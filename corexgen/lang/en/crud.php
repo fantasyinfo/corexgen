@@ -8,6 +8,7 @@ return [
     'Select' => 'Select',
     'SelectAll' => 'Select All',
     'DeleteAll' => 'Delete All',
+    'Bulk Delete' => 'Bulk Delete',
     'Search' => 'Search',
     'Form' => 'Form',
     'Submit' => 'Submit',
