@@ -15,7 +15,7 @@
             </div>
 
             <div class="card-body">
-                {{-- @include('dashboard.crm.role.components.role-filters') --}}
+                @include('dashboard.crm.tax.components.tax-filters')
 
 
                 @if (hasPermission('TAX.READ_ALL') || hasPermission('TAX.READ'))
@@ -72,6 +72,7 @@
             const taxTypeFilter = $('#taxTypeFilter');
             const startDateFilter = $('#startDateFilter');
             const endDateFilter = $('#endDateFilter');
+            const countryFilter = $('#countryFilter');
 
             const dbTableAjax = $("#taxTable").DataTable({
                 processing: true,
@@ -89,6 +90,7 @@
                         d.status = statusFilter.val();
                         d.start_date = startDateFilter.val();
                         d.end_date = endDateFilter.val();
+                        d.country_id = countryFilter.val();
                     },
                 },
                 columns: [{
@@ -134,6 +136,7 @@
                 statusFilter.val('');
                 startDateFilter.val('');
                 endDateFilter.val('');
+                countryFilter.val('');
                 // Reset the DataTable's search and reload
                 dbTableAjax.ajax.reload();
             });

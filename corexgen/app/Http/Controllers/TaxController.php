@@ -79,9 +79,18 @@ class TaxController extends Controller
 
         // Apply dynamic filters based on request input
         $query->when($request->filled('name'), fn($q) => $q->where('tax_rates.name', 'LIKE', "%{$request->name}%"));
+
+
+        if($request->filled('country_id') && $request->country_id != '0') {
+            $query->when($request->filled('country_id'), fn($q) => $q->where('country_id', $request->country_id));
+        }
+
+
+
+
         $query->when($request->filled('status'), fn($q) => $q->where('tax_rates.status', $request->status));
-        $query->when($request->filled('tax_rate'), fn($q) => $q->where('tax_rates.tax_rate', $request->tax_rate));
-        $query->when($request->filled('tax_type'), fn($q) => $q->where('tax_rates.tax_type', $request->tax_type));
+        $query->when($request->filled('tax_rate'), fn($q) => $q->where('tax_rates.tax_rate', 'LIKE', "%{$request->tax_rate}%"));
+        $query->when($request->filled('tax_type'), fn($q) => $q->where('tax_rates.tax_type', 'LIKE', "%{$request->tax_type}%"));
 
         if ($request->ajax()) {
             return DataTables::of($query)
@@ -112,11 +121,14 @@ class TaxController extends Controller
                 ->make(true);
         }
 
+        $countries = Country::all();
+
         return view($this->getViewFilePath('index'), [
             'filters' => $request->all(),
             'title' => 'Tax Management',
             'permissions' => PermissionsHelper::getPermissionsArray('TAX'),
             'module' => PANEL_MODULES[$this->getPanelModule()]['tax'],
+            'countries' => $countries
         ]);
     }
 
@@ -161,6 +173,94 @@ class TaxController extends Controller
     }
 
 
+     /**
+     * Show edit tax form
+     * 
+     * @param int $id
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function edit($id)
+    {
+        // Apply tenant filtering to tax query
+        $query = Tax::query()->where('id', $id);
+        $tax = $query->firstOrFail();
 
+        $countries = Country::all();
+
+        return view($this->getViewFilePath('edit'), [
+            'title' => 'Edit Tax',
+            'tax' => $tax,
+            'countries' => $countries
+        ]);
+    }
+
+
+     /**
+     * Update an existing tax
+     * 
+     * @param TaxRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function update(TaxRequest $request)
+    {
+        $this->tenantRoute = $this->getTenantRoute();
+
+        try {
+            // Validate and update role
+            $validated = $request->validated();
+            $query = Tax::query()->where('id', $request->id);
+            $query->update($validated);
+
+            // Redirect with success message
+            return redirect()->route($this->tenantRoute . 'tax.index')
+                ->with('success', 'Tax updated successfully.');
+        } catch (\Exception $e) {
+            // Handle any errors during tax update
+            return redirect()->back()
+                ->with('error', 'An error occurred while updating the tax: ' . $e->getMessage());
+        }
+    }
+
+
+     /**
+     * Delete a tax
+     * 
+     * @param int $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function destroy($id)
+    {
+        try {
+            // Apply tenant filtering and delete role
+            $query = Tax::query()->where('id', $id);
+            $query->delete();
+
+            // Redirect with success message
+            return redirect()->back()->with('success', 'Tax deleted successfully.');
+        } catch (\Exception $e) {
+            // Handle any deletion errors
+            return redirect()->back()->with('error', 'Failed to delete the tax: ' . $e->getMessage());
+        }
+    }
+
+     /**
+     * Chaning the status for tax
+     * 
+     * @param int $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function changeStatus($id, $status)
+    {
+        try {
+            // Apply tenant filtering and find role
+            $query = Tax::query()->where('id', $id);
+            $query->update(['status' => $status]);
+            // Redirect with success message
+            return redirect()->back()->with('success', 'Tax status changed successfully.');
+        } catch (\Exception $e) {
+            // Handle any status change errors
+            return redirect()->back()->with('error', 'Failed to change the tax status: ' . $e->getMessage());
+        }
+    }
 
 }

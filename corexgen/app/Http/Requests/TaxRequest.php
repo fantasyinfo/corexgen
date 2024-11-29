@@ -3,7 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 class TaxRequest extends FormRequest
 {
     /**
@@ -24,11 +25,16 @@ class TaxRequest extends FormRequest
      */
     public function rules(): array
     {
+        $tax_id = $this->input('id'); // countries.id
+
         return [
-            'name' => ['required', 'string',],
+            'name' => ['required', 'string'],
             'tax_type' => ['required', 'string'],
             'tax_rate' => ['required'],
-            'country_id' => ['required', 'unique:countries,id'],
+            'country_id' => [
+                'required',
+                Rule::unique('tax_rates', 'country_id')->ignore($tax_id), // Ignore current tax ID
+            ],
         ];
     }
 }

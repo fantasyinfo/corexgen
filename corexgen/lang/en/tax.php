@@ -3,7 +3,7 @@
 return [
 
     'Tax'=> "Tax",
-    'Taxs Management' => 'Taxs Management',
+    'Tax Management' => 'Tax Management',
     'Create Tax' => 'Create Tax',
     'Tax Name' => 'Tax Name',
     'All Statuses' => 'All Statuses',
