@@ -14,6 +14,8 @@ return [
     'Tax Rate' => 'Tax Rate',
     'Tax Type' => 'Tax Type',
     'Country' => 'Country',
+    'Select Country' => 'Select Country',
+    'Name' => 'Name'
 
 
 ];

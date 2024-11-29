@@ -18,6 +18,6 @@ class Country extends Model
 
     public function tax()
     {
-        $this->hasOne(Tax::class);
+        return $this->hasOne(Tax::class,'country_id');
     }
 }

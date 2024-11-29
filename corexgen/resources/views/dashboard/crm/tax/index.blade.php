@@ -16,7 +16,7 @@
 
             <div class="card-body">
                 {{-- @include('dashboard.crm.role.components.role-filters') --}}
-       
+
 
                 @if (hasPermission('TAX.READ_ALL') || hasPermission('TAX.READ'))
                     <div class="table-responsive ">
@@ -25,9 +25,9 @@
                             <thead>
                                 <tr>
                                     <th> {{ __('tax.Name') }}</th>
+                                    <th>{{ __('tax.Country') }}</th>
                                     <th>{{ __('tax.Tax Rate') }}</th>
                                     <th>{{ __('tax.Tax Type') }}</th>
-                                    <th>{{ __('tax.Country') }}</th>
                                     <th>{{ __('crud.Status') }}</th>
                                     <th>{{ __('crud.Created At') }}</th>
 
@@ -83,7 +83,6 @@
                 ajax: {
                     url: "{{ route(getPanelRoutes($module . '.index')) }}",
                     data: function(d) {
-                        // Add filters if required
                         d.name = nameFilter.val();
                         d.tax_rate = taxRateFilter.val();
                         d.tax_type = taxTypeFilter.val();
@@ -94,27 +93,27 @@
                 },
                 columns: [{
                         data: 'name',
-                        name: 'name'
+                        name: 'tax_rates.name'
                     },
                     {
                         data: 'country_name',
-                        name: 'country_name'
-                    },
+                        name: 'countries.name'
+                    }, // Correct alias
                     {
                         data: 'tax_rate',
-                        name: 'tax_rate'
+                        name: 'tax_rates.tax_rate'
                     },
                     {
                         data: 'tax_type',
-                        name: 'tax_type'
+                        name: 'tax_rates.tax_type'
                     },
                     {
                         data: 'status',
-                        name: 'status'
+                        name: 'tax_rates.status'
                     },
                     {
                         data: 'created_at',
-                        name: 'created_at'
+                        name: 'tax_rates.created_at'
                     },
                     {
                         data: 'actions',
@@ -124,6 +123,7 @@
                     },
                 ],
             });
+
 
             // Clear Filter Button
             $('#clearFilter').on('click', function() {
