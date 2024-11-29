@@ -23,7 +23,7 @@
                           <!-- Role Selection Field -->
                           <div class="row mb-4 align-items-center">
                             <div class="col-lg-4">
-                                <label for="role_id" class="fw-semibold">{{ __('crm_permissions.Select Role') }}: <span class="text-danger">*</span></label>
+                                <label for="role_id" class="mb-2 fw-semibold">{{ __('crm_permissions.Select Role') }}: <span class="text-danger">*</span></label>
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">

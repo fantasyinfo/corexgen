@@ -42,7 +42,7 @@
                             <div class="tab-pane fade show active" id="general" role="tabpanel">
                                 <div class="row mb-4 align-items-center">
                                     <div class="col-lg-4">
-                                        <label for="companyName" class="fw-semibold">{{ __('companies.Company Name') }}: <span class="text-danger">*</span></label>
+                                        <label for="companyName" class="mb-2  fw-semibold">{{ __('companies.Company Name') }}: <span class="text-danger">*</span></label>
                                     </div>
                                     <div class="col-lg-8">
                                         <input type="text" 
@@ -61,7 +61,7 @@
                                 </div>
                                 <div class="row mb-4 align-items-center">
                                     <div class="col-lg-4">
-                                        <label for="primaryContactName" class="fw-semibold">{{ __('companies.Full Name') }}: <span class="text-danger">*</span></label>
+                                        <label for="primaryContactName" class="mb-2  fw-semibold">{{ __('companies.Full Name') }}: <span class="text-danger">*</span></label>
                                     </div>
                                     <div class="col-lg-8">
                                         <input type="text" 
@@ -80,7 +80,7 @@
                                 </div>
                                 <div class="row mb-4 align-items-center">
                                     <div class="col-lg-4">
-                                        <label for="emailName" class="fw-semibold">{{ __('companies.Email') }}: <span class="text-danger">*</span></label>
+                                        <label for="emailName" class="mb-2  fw-semibold">{{ __('companies.Email') }}: <span class="text-danger">*</span></label>
                                     </div>
                                     <div class="col-lg-8">
                                         <input type="email" 
@@ -99,7 +99,7 @@
                                 </div>
                                 <div class="row mb-4 align-items-center">
                                     <div class="col-lg-4">
-                                        <label for="phone" class="fw-semibold">{{ __('companies.Phone') }}: <span class="text-danger">*</span></label>
+                                        <label for="phone" class="mb-2  fw-semibold">{{ __('companies.Phone') }}: <span class="text-danger">*</span></label>
                                     </div>
                                     <div class="col-lg-8">
                                         <input type="tel" 
@@ -118,7 +118,7 @@
                                 </div>
                                 <div class="row mb-4 align-items-center">
                                     <div class="col-lg-4">
-                                        <label for="password" class="fw-semibold">{{ __('companies.Password') }}: <span class="text-danger">*</span></label>
+                                        <label for="password" class="mb-2 fw-semibold">{{ __('companies.Password') }}: <span class="text-danger">*</span></label>
                                     </div>
                                     <div class="col-lg-8">
                                         <input type="password" 
@@ -137,7 +137,7 @@
                                 </div>
                                 <div class="row mb-4 align-items-center">
                                     <div class="col-lg-4">
-                                        <label for="password" class="fw-semibold">{{ __('companies.Select Plan') }}: <span class="text-danger">*</span></label>
+                                        <label for="password" class="mb-2 fw-semibold">{{ __('companies.Select Plan') }}: <span class="text-danger">*</span></label>
                                     </div>
                                     <div class="col-lg-8">
                                         <input type="password" 
@@ -161,7 +161,7 @@
                             <div class="tab-pane fade" id="address" role="tabpanel">
                                 <div class="row mb-4 align-items-center">
                                     <div class="col-lg-4">
-                                        <label for="registeredAddress" class="fw-semibold">{{ __('address.Address') }}:</label>
+                                        <label for="registeredAddress" class="mb-2 fw-semibold">{{ __('address.Address') }}:</label>
                                     </div>
                                     <div class="col-lg-8">
                                         <textarea class="form-control" 
@@ -173,7 +173,7 @@
                                 </div>
                                 <div class="row mb-4 align-items-center">
                                     <div class="col-lg-4">
-                                        <label for="pincode" class="fw-semibold">{{ __('address.Pincode') }}:</label>
+                                        <label for="pincode" class="mb-2 fw-semibold">{{ __('address.Pincode') }}:</label>
                                     </div>
                                     <div class="col-lg-8">
                                         <input type="text" 
@@ -186,7 +186,7 @@
                                 </div>
                                 <div class="row mb-4 align-items-center">
                                     <div class="col-lg-4">
-                                        <label for="city" class="fw-semibold">{{ __('address.City') }}:</label>
+                                        <label for="city" class="mb-2 fw-semibold">{{ __('address.City') }}:</label>
                                     </div>
                                     <div class="col-lg-8">
                                         <input type="text" 
@@ -199,7 +199,7 @@
                                 </div>
                                 <div class="row mb-4 align-items-center">
                                     <div class="col-lg-4">
-                                        <label for="country" class="fw-semibold">{{ __('address.Country') }}:</label>
+                                        <label for="country" class="mb-2 fw-semibold">{{ __('address.Country') }}:</label>
                                     </div>
                                     <div class="col-lg-8">
                                         <select class="form-select" id="country" name="country">
@@ -222,6 +222,9 @@
     </div>
 </div>
 
+
+@endsection
+
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -236,4 +239,3 @@
     });
 </script>
 @endpush
-@endsection

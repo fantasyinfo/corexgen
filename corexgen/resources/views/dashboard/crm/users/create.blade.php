@@ -24,7 +24,7 @@
                         <!-- Full Name Field -->
                         <div class="row mb-4 align-items-center">
                             <div class="col-lg-4">
-                                <label for="nameName" class="fw-semibold">{{ __('users.Full Name') }}: <span class="text-danger">*</span></label>
+                                <label for="nameName" class="mb-2 fw-semibold">{{ __('users.Full Name') }}: <span class="text-danger">*</span></label>
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">
@@ -48,7 +48,7 @@
                         <!-- Email Field -->
                         <div class="row mb-4 align-items-center">
                             <div class="col-lg-4">
-                                <label for="emailName" class="fw-semibold">{{ __('users.Email') }}: <span class="text-danger">*</span></label>
+                                <label for="emailName" class="mb-2 fw-semibold">{{ __('users.Email') }}: <span class="text-danger">*</span></label>
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">
@@ -72,7 +72,7 @@
                         <!-- Role Selection Field -->
                         <div class="row mb-4 align-items-center">
                             <div class="col-lg-4">
-                                <label for="role_id" class="fw-semibold">{{ __('users.Select Role') }}: <span class="text-danger">*</span></label>
+                                <label for="role_id" class="mb-2 fw-semibold">{{ __('users.Select Role') }}: <span class="text-danger">*</span></label>
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">
@@ -100,7 +100,7 @@
                         <!-- Password Field -->
                         <div class="row mb-4 align-items-center">
                             <div class="col-lg-4">
-                                <label for="passName" class="fw-semibold">{{ __('users.Password') }}: <span class="text-danger">*</span></label>
+                                <label for="passName" class="fmb-2 w-semibold">{{ __('users.Password') }}: <span class="text-danger">*</span></label>
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">

@@ -32,6 +32,11 @@ use App\Helpers\PermissionsHelper;
         'id' => PermissionsHelper::getParentPermissionId('5'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['SETTINGS']
     ],
+    'PLANS' => [
+        'name' => 'CRM_PLANS',
+        'id' => PermissionsHelper::getParentPermissionId('5'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['PLANS']
+    ],
     'MODULES' => [
         'name' => 'CRM_MODULES',
         'id' => PermissionsHelper::getParentPermissionId('6'),
@@ -83,12 +88,12 @@ use App\Helpers\PermissionsHelper;
             'Compaines' => ['menu_url' => 'companies.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey('COMPANIES', 'READ_ALL')],
         ]
     ],
-    'Plans & Taxes' => [
+    'Plans' => [
         'menu_icon' => 'fa-clipboard-list',
         'permission_id' => PermissionsHelper::getParentPermissionId('5'),
         'children' => [
             'Plans' => ['menu_url' => 'plans.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey('PLANS', 'READ_ALL')],
-            'Tax' => ['menu_url' => 'tax.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey('TAX', 'READ_ALL')],
+   
         ]
     ],
     'Settings' => [
@@ -210,7 +215,7 @@ use App\Helpers\PermissionsHelper;
         'appupdates' => 'appupdates',
         'companies' => 'companies',
         'plans' => 'plans',
-        'tax' => 'tax',
+
 
     ],
     'COMPANY_PANEL' => [

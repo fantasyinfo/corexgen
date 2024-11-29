@@ -22,7 +22,7 @@
 
                         <div class="row mb-4 align-items-center">
                             <div class="col-lg-4">
-                                <label for="roleName" class="fw-semibold">{{ __('crm_role.Role Name') }}: <span class="text-danger">*</span></label>
+                                <label for="roleName" class="mb-2 fw-semibold">{{ __('crm_role.Role Name') }}: <span class="text-danger">*</span></label>
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">
@@ -45,7 +45,7 @@
 
                         <div class="row mb-4 align-items-center">
                             <div class="col-lg-4">
-                                <label for="roleDesc" class="fw-semibold">{{ __('crm_role.Description') }}:</label>
+                                <label for="roleDesc" class="mb-2 fw-semibold">{{ __('crm_role.Description') }}:</label>
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">

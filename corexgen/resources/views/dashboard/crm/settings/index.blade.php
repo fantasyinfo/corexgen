@@ -41,7 +41,7 @@
                                             @foreach($general_settings as $gs)
                                                 <div class="row mb-4 align-items-center">
                                                     <div class="col-lg-4">
-                                                        <label for="{{ $gs->key }}" class="fw-semibold">{{ $gs->key }}: </label>
+                                                        <label for="{{ $gs->key }}" class="fw-semibold mb-2 " >{{ $gs->key }}: </label>
                                                     </div>
                                                     <div class="col-lg-8">
                                                         <div class="input-group">

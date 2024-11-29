@@ -3,16 +3,15 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
-class TaxRequest extends FormRequest
+
+class PlansRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        if (hasPermission('TAX.CREATE')) {
+        if (hasPermission('PLANS.CREATE')) {
             return true;
         }
         return false;
@@ -25,16 +24,14 @@ class TaxRequest extends FormRequest
      */
     public function rules(): array
     {
-        $tax_id = $this->input('id'); // countries.id
-
         return [
-            'name' => ['required', 'string'],
-            'tax_type' => ['required', 'string'],
-            'tax_rate' => ['required'],
-            'country_id' => [
-                'required',
-                Rule::unique('tax_rates', 'country_id')->ignore($tax_id), // Ignore current tax ID
-            ],
+            'name' => ['string', 'required'],
+            'desc' => ['string', 'required'],
+            'price' => ['integer', 'required'],
+            'offer_price' => ['integer', 'required'],
+            'billing_cycle' => ['required'],
+            'users_limit' => ['integer'],
+            'roles_limit' => ['integer'],
         ];
     }
 }
