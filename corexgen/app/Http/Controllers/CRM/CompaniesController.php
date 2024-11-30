@@ -7,7 +7,9 @@ use App\Helpers\PermissionsHelper;
 use App\Http\Requests\CRM\CompaniesRequest;
 use App\Http\Requests\CRM\CRMUserRequest;
 use App\Models\Company;
+use App\Models\Country;
 use App\Models\CRM\CRMRole;
+use App\Models\Plans;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -79,6 +81,9 @@ class CompaniesController extends Controller
 
         $query = Company::query();
 
+        $plans = Plans::with('plans_features')->get();
+        $country = Country::with('cities')->get();
+        
 
         // Apply dynamic filters based on request input
         $query->when($request->filled('name'), fn($q) => $q->where('name', 'LIKE', "%{$request->name}%"));
@@ -125,9 +130,10 @@ class CompaniesController extends Controller
         return view($this->getViewFilePath('index'), [
             'filters' => $request->all(),
             'title' => 'Companies Management',
-            'roles' => $roles,
             'permissions' => PermissionsHelper::getPermissionsArray('COMPANIES'),
             'module' => PANEL_MODULES[$this->getPanelModule()]['companies'],
+            'plans' => $plans,
+            'country' => $country 
         ]);
     }
 
@@ -176,15 +182,21 @@ class CompaniesController extends Controller
 
 
     /**
-     * Return the view for creating new user with roles
+     * Return the view for creating new company with plans
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function create()
     {
-        $roles = $this->applyTenantFilter(CRMRole::query())->get();
+
+        $plans = Plans::with('plans_features')->get();
+        $country = Country::all();
+        
+
         return view($this->getViewFilePath('create'), [
-            'title' => 'Create User',
-            'roles' => $roles
+            'title' => 'Create Company',
+            'plans' => $plans,
+            'country' => $country
+
         ]);
     }
 

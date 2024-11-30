@@ -24,6 +24,7 @@ return [
     'Roles Limit' => 'Roles Limit',
     'General' => 'General',
     'Features' => 'Features',
+    'Update Plan' => 'Update Plan'
 
 
 ];

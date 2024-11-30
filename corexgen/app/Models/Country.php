@@ -16,8 +16,7 @@ class Country extends Model
     protected $fillable = ['name', 'code'];
 
 
-    public function tax()
-    {
-        return $this->hasOne(Tax::class,'country_id');
-    }
+   public function cities(){
+    return $this->hasMany(City::class,'country_id');
+   }
 }

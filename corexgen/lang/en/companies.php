@@ -20,6 +20,7 @@ return [
     'General' =>'General',
     'Contact' => 'Contact',
     'Address' => 'Address',
+    'Select Plan' => 'Select Plan'
 
 
 
