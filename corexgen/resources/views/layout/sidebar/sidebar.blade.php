@@ -2,13 +2,14 @@
     $menus = getCRMMenus();
     $currentRoute = Route::currentRouteName();
 
+
 @endphp
 
 <!-- Sidebar -->
 <nav class="sidebar shadow-sm">
     <div class="sidebar-brand">
         <a href="">
-            <img src="https://assets.elements.envato.com/apps/storefront/EnvatoLogoLight-b794a434513b3b975d91.svg"
+            <img src=""
                 alt="logo" class="logo">
         </a>
     </div>

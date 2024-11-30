@@ -113,20 +113,20 @@ class PlansController extends Controller
     public function store(PlansRequest $request)
     {
         $this->tenantRoute = $this->getTenantRoute();
-    
+
         try {
             // Validate and create the plan
             $validated = $request->validated();
             $plan = Plans::create($validated); // This returns the model instance
             $planId = $plan->id; // Extract the ID from the created plan
-    
+
             // Loop through all request input
             foreach ($request->all() as $key => $value) {
                 // Check if the key starts with 'features_'
                 if (str_starts_with($key, 'features_')) {
                     // Extract the feature name (remove the 'features_' prefix)
                     $featureName = str_replace('features_', '', $key);
-    
+
                     // Create a new feature entry
                     PlansFeatures::create([
                         'plan_id' => $planId,
@@ -135,7 +135,7 @@ class PlansController extends Controller
                     ]);
                 }
             }
-    
+
             // Redirect with success message
             return redirect()->route($this->tenantRoute . 'plans.index')
                 ->with('success', 'Plan created successfully.');
@@ -145,7 +145,7 @@ class PlansController extends Controller
                 ->with('error', 'An error occurred while creating the plan: ' . $e->getMessage());
         }
     }
-    
+
 
 
     /**
@@ -157,15 +157,15 @@ class PlansController extends Controller
     public function edit($id)
     {
         // Apply tenant filtering to tax query
-        $query = Tax::query()->where('id', $id);
-        $tax = $query->firstOrFail();
+        $query = Plans::with('plans_features')->where('id', $id);
+        $plan = $query->firstOrFail();
 
-        $countries = Country::all();
+
 
         return view($this->getViewFilePath('edit'), [
-            'title' => 'Edit Tax',
-            'tax' => $tax,
-            'countries' => $countries
+            'title' => 'Edit Plan',
+            'plan' => $plan,
+
         ]);
     }
 
@@ -173,26 +173,43 @@ class PlansController extends Controller
     /**
      * Update an existing tax
      * 
-     * @param TaxRequest $request
+     * @param PlansRequest $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(TaxRequest $request)
+    public function update(PlansRequest $request)
     {
         $this->tenantRoute = $this->getTenantRoute();
 
         try {
-            // Validate and update role
+            // Validate and update plan
             $validated = $request->validated();
-            $query = Tax::query()->where('id', $request->id);
-            $query->update($validated);
+            $plan = Plans::findOrFail($request->id);
+            $plan->update($validated);
+
+            // Update or create plan features
+            foreach (PLANS_FEATURES as $featureKey) {
+                $featureName = strtolower(str_replace(' ', '_', $featureKey));
+                $featureValue = $request->input("features_{$featureName}");
+
+                // Find existing feature or create a new one
+                $planFeature = PlansFeatures::updateOrCreate(
+                    [
+                        'plan_id' => $plan->id,
+                        'module_name' => $featureName
+                    ],
+                    [
+                        'value' => $featureValue
+                    ]
+                );
+            }
 
             // Redirect with success message
-            return redirect()->route($this->tenantRoute . 'tax.index')
-                ->with('success', 'Tax updated successfully.');
+            return redirect()->route($this->tenantRoute . 'plans.index')
+                ->with('success', 'Plan updated successfully.');
         } catch (\Exception $e) {
-            // Handle any errors during tax update
+            // Handle any errors during plan update
             return redirect()->back()
-                ->with('error', 'An error occurred while updating the tax: ' . $e->getMessage());
+                ->with('error', 'An error occurred while updating the plan: ' . $e->getMessage());
         }
     }
 
@@ -207,14 +224,14 @@ class PlansController extends Controller
     {
         try {
             // Apply tenant filtering and delete role
-            $query = Tax::query()->where('id', $id);
+            $query = Plans::query()->where('id', $id);
             $query->delete();
 
             // Redirect with success message
-            return redirect()->back()->with('success', 'Tax deleted successfully.');
+            return redirect()->back()->with('success', 'Plan deleted successfully.');
         } catch (\Exception $e) {
             // Handle any deletion errors
-            return redirect()->back()->with('error', 'Failed to delete the tax: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to delete the plan: ' . $e->getMessage());
         }
     }
 
@@ -228,13 +245,13 @@ class PlansController extends Controller
     {
         try {
             // Apply tenant filtering and find role
-            $query = Tax::query()->where('id', $id);
-            $query->update(['status' => $status]);
+            $query = Plans::query()->where('id', $id);
+            $query->update(['status' => $status === 'DEACTIVE' ? 'ACTIVE' : 'DEACTIVE']);
             // Redirect with success message
-            return redirect()->back()->with('success', 'Tax status changed successfully.');
+            return redirect()->back()->with('success', 'Plan status changed successfully.');
         } catch (\Exception $e) {
             // Handle any status change errors
-            return redirect()->back()->with('error', 'Failed to change the tax status: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to change the plan status: ' . $e->getMessage());
         }
     }
 

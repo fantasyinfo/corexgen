@@ -1,4 +1,3 @@
-
 @push('style')
     <style>
         .plan-card {
@@ -24,6 +23,15 @@
 
         .plan-card-body {
             padding: 30px;
+        }
+
+        .plan-price-strike{
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--primary-secondary);
+            margin-bottom: 20px;
+            text-align: center;
+            text-decoration: line-through;
         }
 
         .plan-price {
@@ -62,62 +70,102 @@
 @endpush
 @extends('layout.app')
 @section('content')
-@php
-    prePrintR($plans);
-@endphp
-<div class="card shadow-sm rounded p-3 mb-3">
-    <div class="card-header  border-bottom pb-2">
-        <div class="row ">
-            <div class="col-md-4">
-                <h5 class="card-title">{{ __('plans.Plans Management') }}</h5>
-            </div>
-            @include('layout.components.header-buttons')
-        </div>
 
-
-    </div>
-</div>
-
-
-    <div class="row justify-content-center">
-
-        @if(isset($plans) && $plans->isNotEmpty())
-            @foreach($plans as $plan)
-            <div class="col-md-4">
-                <div class="card plan-card">
-                    <div class="plan-card-header">
-                        <h3 class="mb-0">{{$plan->name}} Plan</h3>
-                        <p>{{$plan->desc}} </p>
-                    </div>
-                    <div class="plan-card-body">
-                        <div class="plan-price text-center">
-                            $ {{$plan->price}}  <span class="text-muted" style="font-size: 1rem;">/{{$plan->billing_cycle}} </span>
-                        </div>
-                        <div class="plan-features">
-                            @if($plan->users_limit === -1)
-                            <div class="feature-item">
-                                <span class="feature-icon">✓</span>
-                                Unlimited Users Limit
-                            </div>
-                            @elseif($plan->users_limit > 0)
-                            @endif
-                         
-                            <div class="feature-item text-muted">
-                                <span class="feature-icon">✗</span>
-                                Advanced Reporting
-                            </div>
-                        </div>
-                        <div class="mt-4">
-                            <button class="btn btn-outline-primary btn-plan-action">
-                                Select Plan
-                            </button>
-                        </div>
-                    </div>
+    <div class="card shadow-sm rounded p-3 mb-3">
+        <div class="card-header  border-bottom pb-2">
+            <div class="row ">
+                <div class="col-md-4">
+                    <h5 class="card-title">{{ __('plans.Plans Management') }}</h5>
                 </div>
+                @include('layout.components.header-buttons')
             </div>
-            @endforeach
-        @endif
- 
-       
+
+
+        </div>
     </div>
+
+    @if (hasPermission('PLANS.READ_ALL') || hasPermission('PLANS.READ'))
+        <div class="row justify-content-center">
+
+            @if (isset($plans) && $plans->isNotEmpty())
+                @foreach ($plans as $plan)
+                    <div class="col-md-4">
+                        <div class="card plan-card">
+                            <div class="plan-card-header">
+                                <h3 class="mb-0">{{ $plan->name }} Plan</h3>
+                                <p>{{ $plan->desc }} </p>
+                            </div>
+                            <div class="plan-card-body">
+                                <div class="plan-price-strike">
+                                    $ <span>{{$plan->price}}</span>
+                                </div>
+                                <div class="plan-price text-center">
+                                    $ {{ $plan->offer_price }} <span class="text-muted"
+                                        style="font-size: 1rem;">/{{ $plan->billing_cycle }} </span>
+                                </div>
+                                @if ($plan->plans_features)
+                                    <div class="plan-features">
+                                        @foreach ($plan->plans_features as $features)
+                                            @if ($features->value === -1)
+                                                <div class="feature-item">
+                                                    <span class="feature-icon">✓</span>
+                                                    Unlimited {{ ucwords($features->module_name) }} Create
+                                                </div>
+                                            @elseif($features->value > 0)
+                                                <div class="feature-item">
+                                                    <span class="feature-icon">✓</span>
+                                                    {{ $features->value }} {{ ucwords($features->module_name) }} Create
+                                                </div>
+                                            @elseif($features->value === 0)
+                                                <div class="feature-item text-muted">
+                                                    <span class="feature-icon">✗</span>
+                                                    {{ $features->value }} {{ ucwords($features->module_name) }} Create
+                                                </div>
+                                            @endif
+                                        @endforeach
+                                    </div>
+
+                                    <hr>
+                                    <div class="row my-2">
+
+                                        <h6 class="my-2 text-center ">Actions</h6>
+                                      
+                                        @if (hasPermission('PLANS.UPDATE'))
+                                        <div class="col">
+                                                <a href="{{ route(getPanelRoutes($module . '.edit'), ['id' => $plan->id]) }}"
+                                                    class="btn btn-outline-primary btn-plan-action">
+                                                    <i class="fas fa-pencil-alt"></i>
+                                                </a>
+                                            </div>
+                                        @endif
+                                        @if (hasPermission('PLANS.CHANGE_STATUS'))
+                                            <div class="col">
+                                                <a href="{{ route(getPanelRoutes($module . '.changeStatus'), ['id' => $plan->id, 'status' => $plan->status]) }}"
+                                                    class="btn btn-outline-warning btn-plan-action">
+                                                    {{ $plan->status }}
+                                                </a>
+                                            </div>
+                                        @endif
+                                        @if (hasPermission('PLANS.DELETE'))
+                                            <div class="col">
+                                                <button class="btn btn-outline-danger btn-plan-action"
+                                                    data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                                    data-id="{{ $plan->id }}"
+                                                    data-route="{{ route(getPanelRoutes($module . '.destroy'), ['id' => $plan->id]) }}"
+                                                    data-toggle="tooltip" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            @endif
+
+
+        </div>
+    @endif
 @endsection

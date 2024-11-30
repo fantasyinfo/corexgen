@@ -10,15 +10,17 @@
 
                     <form id="plansForm" action="{{ route(getPanelRoutes('plans.store')) }}" method="POST">
                         @csrf
+                        @method('PUT')
+                        <input type='hidden' name='id' value="{{$plan->id}}" />
                         <div class="card-body general-info">
                             <div class="mb-5 d-flex align-items-center justify-content-between">
                                 <p class="fw-bold mb-0 me-4">
-                                    <span class="d-block mb-2">{{ __('plans.Create Plan') }}</span>
+                                    <span class="d-block mb-2">{{ __('plans.Update Plan') }}</span>
                                     <span
                                         class="fs-12 fw-normal text-muted text-truncate-1-line">{{ __('crud.Please add correct information') }}</span>
                                 </p>
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-plus"></i> <span>{{ __('plans.Create Plan') }}</span>
+                                    <i class="fas fa-plus"></i> <span>{{ __('plans.Update Plan') }}</span>
                                 </button>
                             </div>
 
@@ -56,7 +58,7 @@
                                                 <input type="text"
                                                     class="form-control @error('name') is-invalid @enderror" id="nameName"
                                                     name="name" placeholder="{{ __('Premium') }}"
-                                                    value="{{ old('name') }}" required>
+                                                    value="{{ $plan->name }}" required>
                                                 <div class="invalid-feedback" id="nameNameError">
                                                     @error('name')
                                                         {{ $message }}
@@ -77,7 +79,7 @@
                                                 <input type="text"
                                                     class="form-control @error('desc') is-invalid @enderror" id="nameName"
                                                     name="desc" placeholder="{{ __('For Startups') }}"
-                                                    value="{{ old('desc') }}" required>
+                                                    value="{{ $plan->desc }}" required>
                                                 <div class="invalid-feedback" id="nameNameError">
                                                     @error('desc')
                                                         {{ $message }}
@@ -100,7 +102,7 @@
                                                 step="0.001"
                                                     class="form-control @error('price') is-invalid @enderror" id="nameName"
                                                     name="price" placeholder="{{ __('129.99') }}"
-                                                    value="{{ old('price') }}" required>
+                                                    value="{{ $plan->price }}" required>
                                                 <div class="invalid-feedback" id="nameNameError">
                                                     @error('price')
                                                         {{ $message }}
@@ -123,7 +125,7 @@
                                                     step="0.001"
                                                     class="form-control @error('offer_price') is-invalid @enderror"
                                                     id="nameName" name="offer_price" placeholder="{{ __('99.99') }}"
-                                                    value="{{ old('offer_price') }}" required>
+                                                    value="{{ $plan->offer_price}}" required>
                                                 <div class="invalid-feedback" id="nameNameError">
                                                     @error('offer_price')
                                                         {{ $message }}
@@ -149,7 +151,7 @@
                                                     @if (PLANS_BILLING_CYCLES['BILLINGS'])
                                                         @foreach (PLANS_BILLING_CYCLES['BILLINGS'] as $billingcycle)
                                                             <option value="{{ $billingcycle }}"
-                                                                {{ old('billing_cycle') == $billingcycle ? 'selected' : '' }}>
+                                                                {{ $plan->billing_cycle == $billingcycle ? 'selected' : '' }}>
                                                                 {{ $billingcycle }}
                                                             </option>
                                                         @endforeach
@@ -178,15 +180,20 @@
                                         <div class="col-lg-4">
                                             <label for="{{$pf}}" class="mb-2 fw-semibold">
                                                 {{ ucwords(strtolower(str_replace('_', ' ',$pf ))) }} Create:
-                                                <span class="text-danger">*</span></label>
+                                                <span class="text-danger">*</span>
+                                            </label>
                                         </div>
                                         <div class="col-lg-8">
                                             <div class="input-group">
-                                                @php        $pfs = strtolower(str_replace(' ', '_', $pf)); @endphp
+                                                @php 
+                                                    $pfs = strtolower(str_replace(' ', '_', $pf)); 
+                                                    $featureValue = $plan->plans_features->firstWhere('module_name', strtolower($pfs))->value ?? 0;
+                                                @endphp
                                                 <input type="number"
                                                     class="form-control @error('features.'.$pfs) is-invalid @enderror"
-                                                    id="{{$pfs}}" name="features.{{$pfs}}" placeholder="{{ __('10') }}"
-                                                    value="10" required>
+                                                    id="{{$pfs}}" name="features.{{$pfs}}" 
+                                                    placeholder="{{ __('10') }}"
+                                                    value="{{ $featureValue }}" required>
                                                 <div class="invalid-feedback" id="{{$pfs}}Error">
                                                     @error('features.'.$pfs)
                                                         {{ $message }}
@@ -195,9 +202,10 @@
                                             </div>
                                         </div>
                                         <p class="offset-lg-4 font-12 my-2 text-secondary">
-                                            <span class="text-success"> -1</span> For Unlimited. || <span class="text-success">0</span> Means this feature is disable </p>
+                                            <span class="text-success"> -1</span> For Unlimited. || <span class="text-success">0</span> Means this feature is disable 
+                                        </p>
                                     </div>
-                                    @endforeach
+                                @endforeach
                                   
 
                                     

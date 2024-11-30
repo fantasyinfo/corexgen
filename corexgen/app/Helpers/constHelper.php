@@ -244,6 +244,6 @@ use App\Helpers\PermissionsHelper;
 
 
 !defined('PLANS_FEATURES') && define('PLANS_FEATURES',[
-    'TOTAL_ROLES' => 'TOTAL_ROLES',
-    'TOTAL_USERS' => 'TOTAL_USERS',
+    'ROLES' => 'ROLES',
+    'USERS' => 'USERS',
 ]);

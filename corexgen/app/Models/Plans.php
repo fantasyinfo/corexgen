@@ -14,7 +14,7 @@ class Plans extends Model
 
     protected $table = self::table;
 
-    protected $fillable = ['name', 'desc','price','offer_price','billing_cycle','status','tax_rates_id'];
+    protected $fillable = ['name', 'desc','price','offer_price','billing_cycle','status'];
 
 
     public function plans_features(){
