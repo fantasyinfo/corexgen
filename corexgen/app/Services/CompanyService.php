@@ -10,6 +10,8 @@ use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use App\Helpers\PermissionsHelper;
+use App\Models\CRM\CRMRolePermissions;
 
 class CompanyService
 {
@@ -23,7 +25,7 @@ class CompanyService
                 'address_id' => $address?->id,
             ]));
 
-            $this->createCompanyUser($company, $validatedData);
+            $companyAdminUser = $this->createCompanyUser($company, $validatedData);
 
             // todo:: add payment trasation 
             $paymentDetails = [];
@@ -32,6 +34,7 @@ class CompanyService
             // add subscription
 
 
+            $this->givePermissionsToCompany($company,$companyAdminUser);
 
             // todo:: add permissions to this user
 
@@ -146,5 +149,100 @@ class CompanyService
             'subscription' => $subscription
         ];
     }
+
+
+
+    public function givePermissionsToCompany($company, $companyAdminUser)
+    {
+        // Validate input
+        if (!$company || !$company->plan_id) {
+            \Log::error('Company or plan_id is missing', [
+                'company' => $company,
+            ]);
+            return false;
+        }
+    
+        $plan = Plans::where('id', $company->plan_id)->with('planFeatures')->first();
+    
+        // Check if plan exists
+        if (!$plan) {
+            \Log::warning('No plan found for company', [
+                'company_id' => $company->id,
+                'plan_id' => $company->plan_id
+            ]);
+            return false;
+        }
+    
+        // Check if plan has features
+        if (!$plan->planFeatures->isNotEmpty()) {
+            \Log::info('No plan features found', [
+                'company_id' => $company->id,
+                'plan_id' => $company->plan_id
+            ]);
+            return false;
+        }
+    
+        $permissionToPush = [];
+        try {
+            foreach ($plan->planFeatures as $pf) {
+                $featureName = strtoupper($pf->module_name);
+    
+                // Skip if feature is disabled
+                if ($pf->value == 0) {
+                    continue;
+                }
+    
+                // Check if feature exists in permissions
+                if (!isset(PermissionsHelper::$PERMISSIONS_IDS[$featureName])) {
+                    \Log::warning('Unknown feature in plan', [
+                        'feature_name' => $featureName,
+                        'plan_id' => $company->plan_id
+                    ]);
+                    continue;
+                }
+    
+                // Get permissions for this feature
+                $permissionOFModule = PermissionsHelper::$PERMISSIONS_IDS[$featureName];
+                $permissionKeys = array_keys($permissionOFModule);
+    
+                foreach ($permissionKeys as $p) {
+                    $permissionToPush[] = [
+                        'company_id' => $company->id, // Note: changed from plan_id to company->id
+                        'role_id' => null,
+                        'permission_id' => $p,
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ];
+                }
+            }
+    
+            // Bulk insert with chunk to handle large datasets
+            if (!empty($permissionToPush)) {
+                $chunks = array_chunk($permissionToPush, 100);
+                foreach ($chunks as $chunk) {
+                    CRMRolePermissions::insert($chunk);
+                }
+            }
+    
+            return true;
+        } catch (\Exception $e) {
+            \Log::error('Error assigning permissions', [
+                'company_id' => $company->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+    
+            return false;
+        }
+    }
+
+
+
+
+
+
+
+
+
 }
 

@@ -187,7 +187,7 @@
                                             <div class="input-group">
                                                 @php 
                                                     $pfs = strtolower(str_replace(' ', '_', $pf)); 
-                                                    $featureValue = $plan->plans_features->firstWhere('module_name', strtolower($pfs))->value ?? 0;
+                                                    $featureValue = $plan->planFeatures->firstWhere('module_name', strtolower($pfs))->value ?? 0;
                                                 @endphp
                                                 <input type="number"
                                                     class="form-control @error('features.'.$pfs) is-invalid @enderror"

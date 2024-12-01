@@ -17,7 +17,7 @@ class Plans extends Model
     protected $fillable = ['name', 'desc','price','offer_price','billing_cycle','status'];
 
 
-    public function plans_features(){
+    public function planFeatures(){
        return $this->hasMany(PlansFeatures::class,'plan_id');
     }
 

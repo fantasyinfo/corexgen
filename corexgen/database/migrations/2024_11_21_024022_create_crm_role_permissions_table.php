@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('crm_role_permissions', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('role_id');
+            $table->unsignedBigInteger('role_id')->nullable();
             $table->unsignedBigInteger('company_id')->nullable();
             $table->bigInteger('permission_id');
 

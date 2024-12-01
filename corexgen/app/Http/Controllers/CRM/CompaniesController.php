@@ -82,7 +82,7 @@ class CompaniesController extends Controller
 
         $query = Company::query();
 
-        $plans = Plans::with('plans_features')->get();
+        $plans = Plans::with('planFeatures')->get();
         $country = Country::with('cities')->get();
 
 
@@ -178,7 +178,7 @@ class CompaniesController extends Controller
     public function create()
     {
 
-        $plans = Plans::with('plans_features')->get();
+        $plans = Plans::with('planFeatures')->get();
         $country = Country::all();
 
 

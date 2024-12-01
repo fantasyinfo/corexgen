@@ -103,9 +103,9 @@
                                     $ {{ $plan->offer_price }} <span class="text-muted"
                                         style="font-size: 1rem;">/{{ $plan->billing_cycle }} </span>
                                 </div>
-                                @if ($plan->plans_features)
+                                @if ($plan->planFeatures)
                                     <div class="plan-features">
-                                        @foreach ($plan->plans_features as $features)
+                                        @foreach ($plan->planFeatures as $features)
                                             @if ($features->value === -1)
                                                 <div class="feature-item">
                                                     <span class="feature-icon">✓</span>

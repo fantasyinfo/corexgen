@@ -243,8 +243,9 @@ use App\Helpers\PermissionsHelper;
 
 
 
+// these values must match with permissionHelper::PERMISSIONS_IDS keys otherwise permission not working properly
 !defined('PLANS_FEATURES') && define('PLANS_FEATURES',[
-    'ROLES' => 'ROLES',
+    'ROLE' => 'ROLE',
     'USERS' => 'USERS',
 ]);
 

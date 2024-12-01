@@ -73,7 +73,7 @@ class PlansController extends Controller
      */
     public function index(Request $request)
     {
-        $plans = Plans::query()->with('plans_features')->get();
+        $plans = Plans::query()->with('planFeatures')->get();
 
         $this->tenantRoute = $this->getTenantRoute();
 
@@ -157,7 +157,7 @@ class PlansController extends Controller
     public function edit($id)
     {
         // Apply tenant filtering to tax query
-        $query = Plans::with('plans_features')->where('id', $id);
+        $query = Plans::with('planFeatures')->where('id', $id);
         $plan = $query->firstOrFail();
 
 
