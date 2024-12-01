@@ -13,9 +13,17 @@ return new class extends Migration
     {
         Schema::create('crm_role_permissions', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('role_id');
-            $table->bigInteger('buyer_id');
+            $table->unsignedBigInteger('role_id')->nullable();
+            $table->unsignedBigInteger('company_id')->nullable();
             $table->bigInteger('permission_id');
+
+
+
+            // foreign keys
+            $table->foreign('role_id')->references('id')->on('crm_roles')->onDelete('cascade');
+            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
+    
+
             $table->timestamps();
         });
     }

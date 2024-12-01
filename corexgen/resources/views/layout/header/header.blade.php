@@ -11,7 +11,8 @@
     <meta name="author" content="{{ config('app.name') }}" />
 
 
-    <title>{{$title ? $title : ''}} || {{ config('app.name') }}</title>
+    <title>{{ $title ?? '' }} || {{ config('app.name') }}</title>
+
 
 
     @include('layout.header.css-links')

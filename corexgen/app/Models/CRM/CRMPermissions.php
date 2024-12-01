@@ -13,14 +13,18 @@ class CRMPermissions extends Model
 
     protected $fillable = [
         'name', 
-        'buyer_id',
         'parent_menu',
         'parent_menu_id',
         'permission_id',
-        'is_super_user'
+        'company_id'
     ];
 
     protected $table = self::table;
 
+
+    protected static function boot(){
+        parent::boot();
+
+    }
 
 }

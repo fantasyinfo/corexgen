@@ -15,11 +15,8 @@ class CRMRole extends Model
     protected $fillable = [
         'role_name', 
         'role_desc',
-        'buyer_id',
-        'created_by',
-        'updated_by',
+        'company_id',
         'status',
-        'is_super_user'
     ];
 
     protected $table = self::table;
@@ -28,6 +25,16 @@ class CRMRole extends Model
     public function users()
     {
         return $this->hasMany(User::class, 'role_id');
+    }
+    
+
+    protected static function boot(){
+        parent::boot();
+
+        static::creating(function($crmrole){
+            $crmrole->status = $crmrole->status ?? CRM_STATUS_TYPES['CRM_ROLES']['STATUS']['ACTIVE'];
+        });
+
     }
 
 

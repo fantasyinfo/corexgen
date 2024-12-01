@@ -8,6 +8,7 @@ return [
     'Select' => 'Select',
     'SelectAll' => 'Select All',
     'DeleteAll' => 'Delete All',
+    'Bulk Delete' => 'Bulk Delete',
     'Search' => 'Search',
     'Form' => 'Form',
     'Submit' => 'Submit',
@@ -25,4 +26,5 @@ return [
     'results' => 'results',
     'You do not have permission to view the table' => 'You do not have permission to view the table',
     'No Permission' => 'No Permission',
+    'Create New' => 'Create New'
 ];

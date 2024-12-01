@@ -1,5 +1,10 @@
-
 document.addEventListener("DOMContentLoaded", function () {
+    // dselect init
+
+    if ($(".searchSelectBox").length > 0) {
+        $(".searchSelectBox").select2();
+    }
+
     // Ensure sidebar is open on desktop initially
     if (window.innerWidth > 768) {
         document.body.classList.remove("sidebar-collapsed");
@@ -69,28 +74,87 @@ $(function () {
 });
 
 // Function to toggle the filter section
-function openFilters() {
-    const filterSection = document.getElementById("filter-section");
-    if (filterSection.style.display === "block") {
-        filterSection.style.display = "none";
-        localStorage.setItem("filterVisible", "false"); // Save state
-    } else {
-        filterSection.style.display = "block";
-        localStorage.setItem("filterVisible", "true"); // Save state
-    }
-}
 
 // Function to check filter state on page load
 document.addEventListener("DOMContentLoaded", function () {
-    const filterSection = document.getElementById("filter-section");
-    const filterVisible = localStorage.getItem("filterVisible");
+    const filterToggle = document.getElementById("filterToggle");
+    const filterSidebar = document.getElementById("filterSidebar");
+    const closeFilter = document.getElementById('closeFilter');
 
-    if (filterSection) {
-        if (filterVisible === "true") {
-            filterSection.style.display = "block";
-        } else {
-            filterSection.style.display = "none";
+    if (filterToggle) {
+        // Toggle filter sidebar
+        filterToggle.addEventListener("click", function () {
+            filterSidebar.classList.toggle("show");
+        });
+
+        if(closeFilter){
+
+            // Close filter sidebar
+            closeFilter.addEventListener("click", function () {
+                filterSidebar.classList.remove("show");
+            });
         }
     }
 });
 
+// Get the drop zone element
+const dropZone = document.querySelector(".drop-zone");
+const fileInput = document.querySelector("#csvFile");
+
+if (dropZone) {
+    // Click handler (you already have this)
+    dropZone.addEventListener("click", function () {
+        fileInput.click();
+    });
+
+    // File input change handler (you already have this)
+    fileInput.addEventListener("change", function () {
+        const file = this.files[0];
+        if (file) {
+            this.nextElementSibling.textContent = file.name;
+        }
+    });
+
+    // Add drag and drop event listeners
+    dropZone.addEventListener("dragover", function (e) {
+        e.preventDefault();
+        dropZone.style.backgroundColor = "#f8f9fa";
+        dropZone.style.borderColor = "#0d6efd";
+    });
+
+    dropZone.addEventListener("dragleave", function (e) {
+        e.preventDefault();
+        dropZone.style.backgroundColor = "";
+        dropZone.style.borderColor = "#ddd";
+    });
+
+    dropZone.addEventListener("drop", function (e) {
+        e.preventDefault();
+        dropZone.style.backgroundColor = "";
+        dropZone.style.borderColor = "#ddd";
+
+        const files = e.dataTransfer.files;
+        if (files.length) {
+            fileInput.files = files;
+            // Trigger the change event manually
+            const event = new Event("change", {
+                bubbles: true,
+            });
+            fileInput.dispatchEvent(event);
+
+            // Update the text
+            fileInput.nextElementSibling.textContent = files[0].name;
+        }
+    });
+}
+
+$("#deleteModal").on("show.bs.modal", function (event) {
+    console.log("first");
+    var button = $(event.relatedTarget); // The button that triggered the modal
+    var roleId = button.data("id"); // Get the role ID
+    var route = button.data("route"); // Get the delete route
+
+    // Set the form action to the appropriate route
+    var form = $("#deleteForm");
+    form.attr("action", route);
+});

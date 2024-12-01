@@ -5,15 +5,16 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="card stretch stretch-full">
-                <form id="roleForm" action="{{ route('crm.permissions.store') }}" method="POST">
+                <form id="roleForm" action="{{ route(getPanelRoutes('permissions.store')) }}" method="POST">
                     @csrf
                     @method('PUT')
+                    <input type="hidden" name="role_id" value="{{$role->id}}" />
                     <div class="card-body general-info">
                         <div class="mb-5 d-flex align-items-center justify-content-between">
-                            <h5 class="fw-bold mb-0 me-4">
+                            <p class="fw-bold mb-0 me-4">
                                 <span class="d-block mb-2">{{ __('crm_permissions.Update Permissions') }}</span>
                                 <span class="fs-12 fw-normal text-muted text-truncate-1-line">{{ __('crud.Please add correct information') }}</span>
-                            </h5>
+                            </p>
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-plus"></i>  <span>{{ __('crm_permissions.Update Permissions') }}</span>
                             </button>
@@ -22,13 +23,15 @@
                           <!-- Role Selection Field -->
                           <div class="row mb-4 align-items-center">
                             <div class="col-lg-4">
-                                <label for="role_id" class="fw-semibold">{{ __('crm_permissions.Select Role') }}: <span class="text-danger">*</span></label>
+                                <label for="role_id" class="mb-2 fw-semibold">{{ __('crm_permissions.Select Role') }}: <span class="text-danger">*</span></label>
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">
                                   
-                                    <select class="form-control select2-hidden-accessible @error('role_id') is-invalid @enderror" 
-                                    name="role_id" 
+                                    <select 
+                                    disabled
+                                    class="form-control searchSelectBox  @error('role_id') is-invalid @enderror" 
+                                    {{-- name="role_id" --}}
                                     id="role_id">
                                 @if($roles && $roles->isNotEmpty())
                                     @foreach($roles as $role1)
@@ -69,7 +72,7 @@
                                         value='{{$parentMenu->permission_id}}'
                                         {{ in_array($parentMenu->permission_id, $existingPermissions) ? 'checked' : '' }}
                                     />
-                                        <label class="form-check-label" for='parent_{{$parentMenu->id}}'>
+                                        <label class="form-check-label" for='parent_{{$parentMenu->permission_id}}'>
                                             {{$parentMenu->name}}
                                         </label>
                                         
@@ -85,7 +88,7 @@
                                                         value='{{$childMenu->permission_id}}'
                                                         {{ in_array($childMenu->permission_id, $existingPermissions) ? 'checked' : '' }}
                                                     />
-                                                        <label class="form-check-label" for='child_{{$childMenu->id}}'>
+                                                        <label class="form-check-label" for='child_{{$childMenu->permission_id}}'>
                                                             {{$childMenu->name}}
                                                         </label>
                                                     </li>

@@ -8,6 +8,7 @@ use App\Models\Buyer;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
@@ -29,9 +30,11 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'status',
         'role_id',
-        'buyer_id',
-        'is_super_user'
+        'is_tenant',
+        'tenant_id',
+        'company_id',
     ];
 
     /**
@@ -66,10 +69,28 @@ class User extends Authenticatable
 
     public function role()
     {
-        return $this->belongsTo(CRMRole::class, 'id');
+        return $this->belongsTo(CRMRole::class, 'role_id');  // The correct foreign key is 'role_id'
     }
-    public function buyer()
+
+    public function tenant()
     {
-        return $this->belongsTo(Buyer::class, 'id');
+        return $this->belongsTo(Tenant::class);
     }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
+
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($user) {
+            $user->status = $user->status ?? CRM_STATUS_TYPES['USERS']['STATUS']['ACTIVE'];
+        });
+
+    }
+
 }

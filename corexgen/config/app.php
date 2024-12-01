@@ -70,7 +70,8 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+
+    'timezone' => 'Asia/Kolkata', // todo:: create a dropdown on setting to set this value
 
     /*
     |--------------------------------------------------------------------------
@@ -83,7 +84,7 @@ return [
     |
     */
 
-    'locale' => 'en',
+    'locale' => 'en', // todo:: create a dropdown on setting to set this value
 
     /*
     |--------------------------------------------------------------------------
@@ -170,7 +171,8 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\FortifyServiceProvider::class,
         App\Providers\JetstreamServiceProvider::class,
-        Yajra\DataTables\DataTablesServiceProvider::class,
+        Modules\BlogModule\BlogModuleServiceProvider::class,
+        Yajra\DataTables\DataTablesServiceProvider::class
     ])->toArray(),
 
     /*
@@ -188,5 +190,10 @@ return [
         // 'Example' => App\Facades\Example::class,
         'DataTables' => Yajra\DataTables\Facades\DataTables::class,
     ])->toArray(),
+
+
+    // App Version
+    'version' => env('APP_VERSION', '1.0.0'), 
+    'app_status' => env('APP_STATUS', 'live'), 
 
 ];

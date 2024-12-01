@@ -2,146 +2,168 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\PermissionsHelper;
+use App\Http\Requests\CRM\CRMUserRequest;
 use App\Models\CRM\CRMRole;
+use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Auth;
+/**
+ * UserController handles CRUD operations for Users
+ * 
+ * This controller manages user-related functionality including:
+ * - Listing User with server-side DataTables
+ * - Creating new User
+ * - Editing existing User
+ * - Exporting User to CSV
+ * - Importing User from CSV
+ * - Changing user here status removed,
+ *  - New VErsion Check
+ */
+
 class UserController extends Controller
 {
+
+    use TenantFilter;
+
+    /**
+     * Number of items per page for pagination
+     * @var int
+     */
     protected $perPage = 10;
 
+    /**
+     * Tenant-specific route prefix
+     * @var string
+     */
+    private $tenantRoute;
+
+    /**
+     * Base directory for view files
+     * @var string
+     */
+    private $viewDir = 'dashboard.crm.users.';
+
+    /**
+     * Generate full view file path
+     * 
+     * @param string $filename
+     * @return string
+     */
+    private function getViewFilePath($filename)
+    {
+        return $this->viewDir . $filename;
+    }
 
 
+    /**
+     * Display list of users with filtering and DataTables support
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Http\JsonResponse
+     */
     public function index(Request $request)
     {
+        $this->tenantRoute = $this->getTenantRoute();
 
-        $query = User::query()
-            ->join('crm_roles', 'users.role_id', '=', 'crm_roles.id')
-            ->where('users.buyer_id', auth()->user()->buyer_id)
-            ->select('users.*', 'crm_roles.role_name');
 
-        // Advanced Filtering
-        $query->when($request->filled('name'), function ($q) use ($request) {
-            $q->where('users.name', 'LIKE', "%{$request->name}%");
-        });
+        $query = User::query()->with('role')->where('id', '!=', Auth::user()->id);
 
-        $query->when($request->filled('email'), function ($q) use ($request) {
-            $q->where('users.email', 'LIKE', "%{$request->email}%");
-        });
+        if (panelAccess() == PANEL_TYPES['SUPER_PANEL']) {
+            $query->where('is_tenant', '=', '1');
+        }
 
-        $query->when($request->filled('role_id'), function ($q) use ($request) {
-            $q->where('users.role_id', 'LIKE', "%{$request->role_id}%");
-        });
+        // Apply tenant filter (if necessary)
+        $query = $this->applyTenantFilter($query);
 
-        $query->when($request->filled('status'), function ($q) use ($request) {
-            $q->where('users.status', $request->status);
-        });
+        // Apply dynamic filters based on request input
+        $query->when($request->filled('name'), fn($q) => $q->where('name', 'LIKE', "%{$request->name}%"));
+        $query->when($request->filled('email'), fn($q) => $q->where('email', 'LIKE', "%{$request->status}%"));
 
-        $query->when($request->filled('role_id'), function ($q) use ($request) {
-            $q->where('users.role_id', $request->role_id);
-        });
+        if ($request->filled('role_id') && $request->role_id != '0') {
 
-        $query->when($request->filled('start_date'), function ($q) use ($request) {
-            $q->whereDate('users.created_at', '>=', $request->start_date);
-        });
+            $query->when($request->filled('role_id'), fn($q) => $q->where('role_id', $request->role_id));
+        }
 
-        $query->when($request->filled('end_date'), function ($q) use ($request) {
-            $q->whereDate('users.created_at', '<=', $request->end_date);
-        });
+        $query->when($request->filled('status'), fn($q) => $q->where('status', $request->status));
+        $query->when($request->filled('start_date'), fn($q) => $q->whereDate('created_at', '>=', $request->start_date));
+        $query->when($request->filled('end_date'), fn($q) => $q->whereDate('created_at', '<=', $request->end_date));
 
-         // Server-side DataTables response
-         if ($request->ajax()) {
+        // For debugging: dd the SQL and bindings
+
+
+
+        // Server-side DataTables response
+        if ($request->ajax()) {
             return DataTables::of($query)
                 ->addColumn('actions', function ($user) {
-                    $editButton = '';
-                    $deleteButton = '';
-
-                    if (hasPermission('USERS.UPDATE')) {
-                        $editButton = '<a href="' . route('crm.users.edit', $user->id) . '" class="btn btn-sm btn-warning" data-toggle="tooltip" title="Edit">
-                               <i class="fas fa-pencil-alt"></i>
-                           </a>';
-                    }
-
-                    if (hasPermission('USERS.DELETE')) {
-                        $deleteButton = '<form action="' . route('crm.users.destroy', $user->id) . '" method="POST" style="display:inline;" onsubmit="return confirm(\'Are you sure?\');">
-                                 ' . csrf_field() . method_field('DELETE') . '
-                                 <button type="submit" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Delete">
-                                     <i class="fas fa-trash-alt"></i>
-                                 </button>
-                             </form>';
-                    }
-
-                    return "<div class='text-end'> $editButton  $deleteButton </div>";
+                    return View::make(getComponentsDirFilePath('dt-actions-buttons'), [
+                        'tenantRoute' => $this->tenantRoute,
+                        'permissions' => PermissionsHelper::getPermissionsArray('USERS'),
+                        'module' => PANEL_MODULES[$this->getPanelModule()]['users'],
+                        'id' => $user->id
+                    ])->render();
                 })
                 ->editColumn('created_at', function ($user) {
                     return $user->created_at->format('d M Y');
                 })
-                ->editColumn('status', function ($user) {
-                    if (hasPermission('USERS.CHANGE_STATUS')) {
-                        return "<a 
-                        data-toggle='tooltip' 
-                        data-placement='top' 
-                        title='" . ($user->status == 'active' ? 'De Active' : 'Active') . "' 
-                        href='" . route('crm.users.changeStatus', ['id' => $user->id]) . "'>
-                            <span class='badge " . ($user->status == 'active' ? 'bg-success' : 'bg-danger') . "'>
-                                " . ucfirst($user->status) . "
-                            </span>
-                        </a>";
-                    }
-
-                    return "<span class='badge " . ($user->status == 'active' ? 'bg-success' : 'bg-danger') . "'>
-                        " . ucfirst($user->status) . "
-                    </span>";
+                ->editColumn('role_name', function ($user) {
+                    return $user->role ? $user->role->role_name : '';
                 })
-                ->rawColumns(['actions', 'status']) // Add 'status' to raw columns
+                ->editColumn('status', function ($user) {
+                    return View::make(getComponentsDirFilePath('dt-status'), [
+                        'tenantRoute' => $this->tenantRoute,
+                        'permissions' => PermissionsHelper::getPermissionsArray('USERS'),
+                        'module' => PANEL_MODULES[$this->getPanelModule()]['users'],
+                        'id' => $user->id,
+                        'status' => [
+                            'current_status' => $user->status,
+                            'available_status' => CRM_STATUS_TYPES['USERS']['STATUS'],
+                            'bt_class' => CRM_STATUS_TYPES['USERS']['BT_CLASSES'],
+                        ]
+                    ])->render();
+                })
+                ->rawColumns(['actions', 'status', 'role_name']) // Add 'status' to raw columns
                 ->make(true);
         }
 
-        $roles = CRMRole::where('buyer_id', auth()->user()->buyer_id)
-            ->get();
+        $roles = $this->applyTenantFilter(CRMRole::query())->get();
 
-        return view('dashboard.crm.users.index', [
+        return view($this->getViewFilePath('index'), [
             'filters' => $request->all(),
             'title' => 'Users Management',
-            'roles' => $roles
+            'roles' => $roles,
+            'permissions' => PermissionsHelper::getPermissionsArray('USERS'),
+            'module' => PANEL_MODULES[$this->getPanelModule()]['users'],
         ]);
     }
 
-    public function store(Request $request)
+
+
+    /**
+     * Storing the data of user into db
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function store(CRMUserRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => [
-                'required',
-                'max:255',
-            ],
-            'email' => 'required|email|string|max:1000',
-            'password' => ['required', 'string'],
-            'role_id' => 'required|integer'
-        ]);
-
-
-        // Handle form submission
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput()
-                ->with('error', 'Please correct the form errors.');
-        }
+        $this->tenantRoute = $this->getTenantRoute();
 
         try {
-            $validated = $validator->validated();
-            $validated['buyer_id'] = auth()->user()->buyer_id;
 
-            $validated['status'] = $validated['status'] ?? 'active';
+            $validated = $request->validated();
+            $validated['is_tenant'] = Auth::user()->is_tenant;
             $validated['password'] = Hash::make($validated['password']);
 
-            $user = User::create($validated);
+            User::create($validated);
 
-            return redirect()->route('crm.users.create')
+            return redirect()->route($this->tenantRoute . 'users.index')
                 ->with('success', 'User created successfully.');
         } catch (\Exception $e) {
             return redirect()->back()
@@ -152,92 +174,99 @@ class UserController extends Controller
 
 
 
+    /**
+     * Return the view for creating new user with roles
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     */
     public function create()
     {
-        $roles = CRMRole::where('buyer_id', auth()->user()->buyer_id)
-            ->get();
-
-        return view('dashboard.crm.users.create', [
-
+        $roles = $this->applyTenantFilter(CRMRole::query())->get();
+        return view($this->getViewFilePath('create'), [
             'title' => 'Create User',
             'roles' => $roles
         ]);
     }
 
+    /**
+     * showing the edit user view
+     * @param mixed $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     */
     public function edit($id)
     {
-        $user = User::where('id', $id)
-            ->where('buyer_id', auth()->user()->buyer_id)
-            ->firstOrFail();
 
-        $roles = CRMRole::where('buyer_id', auth()->user()->buyer_id)
-            ->get();
+        $query = User::query()->where('id', $id);
+        $query = $this->applyTenantFilter($query);
+        $user = $query->firstOrFail();
+
+        $roles = $this->applyTenantFilter(CRMRole::query())->get();
 
 
-        return view('dashboard.crm.users.edit', [
+        return view($this->getViewFilePath('edit'), [
 
             'title' => 'Edit User',
             'user' => $user,
             'roles' => $roles
         ]);
     }
-    public function update(Request $request)
+
+
+    /**
+     * Method update 
+     * for updating the user
+     *
+     * @param Request $request [explicite description]
+     *
+     * @return void
+     */
+    public function update(CRMUserRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => [
-                'required',
-                'max:255',
-            ],
-            'role_id' => 'required|integer'
-        ]);
+
+        $this->tenantRoute = $this->getTenantRoute();
 
 
-        $role = User::where('id', $request->id)
-            ->where('buyer_id', auth()->user()->buyer_id)
-            ->firstOrFail();
+        $this->applyTenantFilter(User::query()->where('id', '=', $request->id))->update($request->validated());
 
 
-        $validated = $validator->validated();
-        $role->update($validated);
 
-        return redirect()->route('crm.users.index')
+        return redirect()->route($this->tenantRoute . 'users.index')
             ->with('success', 'User updated successfully.');
     }
 
+
+
+    /**
+     * Method export 
+     *
+     * @param Request $request [exporting the users]
+     *
+     * @return void
+     */
     public function export(Request $request)
     {
-        $query = User::query()
-            ->join('crm_roles', 'users.role_id', '=', 'crm_roles.id')
-            ->where('users.buyer_id', auth()->user()->buyer_id)
-            ->select('users.*', 'crm_roles.role_name');
+        $query = User::query()->with('role');
 
-        // Apply filters as in index method
-        $query->when($request->filled('name'), function ($q) use ($request) {
-            $q->where('users.name', 'LIKE', "%{$request->name}%");
-        });
+        if (panelAccess() == PANEL_TYPES['SUPER_PANEL']) {
+            $query->where('is_tenant', '=', true);
+        }
 
+        // Apply tenant filter (if necessary)
+        $query = $this->applyTenantFilter($query, 'users');
 
-        $query->when($request->filled('email'), function ($q) use ($request) {
-            $q->where('users.email', 'LIKE', "%{$request->name}%");
-        });
+        // Apply dynamic filters based on request input
+        $query->when($request->filled('name'), fn($q) => $q->where('name', 'LIKE', "%{$request->name}%"));
+        $query->when($request->filled('email'), fn($q) => $q->where('email', 'LIKE', "%{$request->status}%"));
 
+        if ($request->filled('role_id') && $request->role_id != '0') {
 
-        $query->when($request->filled('status'), function ($q) use ($request) {
-            $q->where('users.status', $request->status);
-        });
+            $query->when($request->filled('role_id'), fn($q) => $q->where('role_id', $request->role_id));
+        }
 
-        $query->when($request->filled('role_id'), function ($q) use ($request) {
-            $q->where('users.role_id', $request->role_id);
-        });
+        $query->when($request->filled('status'), fn($q) => $q->where('status', $request->status));
+        $query->when($request->filled('start_date'), fn($q) => $q->whereDate('created_at', '>=', $request->start_date));
+        $query->when($request->filled('end_date'), fn($q) => $q->whereDate('created_at', '<=', $request->end_date));
 
-
-        $query->when($request->filled('start_date'), function ($q) use ($request) {
-            $q->whereDate('users.created_at', '>=', $request->start_date);
-        });
-
-        $query->when($request->filled('end_date'), function ($q) use ($request) {
-            $q->whereDate('users.created_at', '<=', $request->end_date);
-        });
+        // For debugging: dd the SQL and bindings
 
         // Get the filtered data
         $roles = $query->get();
@@ -271,6 +300,13 @@ class UserController extends Controller
             ->header('Content-Disposition', "attachment; filename={$fileName}");
     }
 
+    /**
+     * Method import bulk import users
+     *
+     * @param Request $request [bulk import users]
+     *
+     * @return void
+     */
     public function import(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -310,7 +346,7 @@ class UserController extends Controller
                     'email' => $row['email'] ?? '',
                     'password' => Hash::make($row['password']) ?? '',
                     'role_id' => $row['role_id'] ?? '',
-                    'buyer_id' => auth()->user()->buyer_id,
+                    'company_id' => Auth::user()->company_id
 
                 ]);
             }
@@ -328,16 +364,19 @@ class UserController extends Controller
     }
 
 
+    /**
+     * Deleting the user
+     * @param mixed $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function destroy($id)
     {
 
         try {
-            // Delete the role
-            $user = User::where('id', $id)
-                ->where('buyer_id', auth()->user()->buyer_id)
-                ->firstOrFail();
+            // Delete the user
 
-            $user->delete();
+            $this->applyTenantFilter(User::query()->where('id', '=', $id))->delete();
+
             // Return success response
             return redirect()->back()->with('success', 'User deleted successfully.');
         } catch (\Exception $e) {
@@ -347,22 +386,59 @@ class UserController extends Controller
     }
 
 
-    public function changeStatus($id)
+    /**
+     * Method changeStatus (change user status)
+     *
+     * @param $id $id [explicite id of user]
+     * @param $status $status [explicite status to change]
+     *
+     * @return void
+     */
+    public function changeStatus($id, $status)
     {
         try {
             // Delete the role
-            $user = User::where('id', $id)
-                ->where('buyer_id', auth()->user()->buyer_id)
-                ->firstOrFail();
 
-
-            $user->status = $user->status === 'active' ? 'deactive' : 'active';
-            $user->save();
+            $this->applyTenantFilter(User::query()->where('id', '=', $id))->update(['status' => $status]);
             // Return success response
             return redirect()->back()->with('success', 'User status changed successfully.');
         } catch (\Exception $e) {
             // Handle any exceptions
             return redirect()->back()->with('error', 'Failed to changed the user status: ' . $e->getMessage());
+        }
+    }
+
+
+
+    /**
+     * Bulk Delete the user
+     * Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function bulkDelete(Request $request)
+    {
+
+        $ids = $request->input('ids');
+
+        try {
+            // Delete the user
+
+            if (is_array($ids) && count($ids) > 0) {
+                // Validate ownership/permissions if necessary
+                $this->applyTenantFilter(User::query()->whereIn('id', $ids))->delete();
+
+                return response()->json(['message' => 'Selected users deleted successfully.'], 200);
+            }
+
+            return response()->json(['message' => 'No users selected for deletion.'], 400);
+
+
+
+
+
+        } catch (\Exception $e) {
+            // Handle any exceptions
+            return redirect()->back()->with('error', 'Failed to delete the user: ' . $e->getMessage());
         }
     }
 }

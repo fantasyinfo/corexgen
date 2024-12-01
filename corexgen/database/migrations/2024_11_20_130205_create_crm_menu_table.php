@@ -17,8 +17,9 @@ return new class extends Migration
             $table->string('menu_url');
             $table->enum('parent_menu',['1','2'])->default('1');
             $table->bigInteger('parent_menu_id',)->nullable();
+            $table->bigInteger('permission_id',)->nullable();
             $table->string('menu_icon')->nullable();
-            $table->bigInteger('buyer_id');
+            $table->enum('panel_type', array_keys(PANEL_TYPES));
             $table->timestamps();
         });
     }

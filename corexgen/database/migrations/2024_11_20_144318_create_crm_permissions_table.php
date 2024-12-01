@@ -11,13 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
+        
         Schema::create('crm_permissions', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->enum('parent_menu',['1','2'])->default('1');
             $table->bigInteger('parent_menu_id',)->nullable();
-            $table->bigInteger('buyer_id')->default(1);
+            $table->unsignedBigInteger('company_id')->nullable();
             $table->bigInteger('permission_id');
+
+            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
+
             $table->timestamps();
         });
     }

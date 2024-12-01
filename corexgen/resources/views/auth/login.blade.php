@@ -14,23 +14,23 @@
 
         <form method="POST" action="{{ route('login') }}">
             @csrf
-            {{-- <div class="my-3">
-                <x-label for="buyer_id" value="{{ __('Buyer Identification Number') }}" />
-                <x-input id="buyer_id" class="block mt-1 w-full" type="text" name="buyer_id" :value="old('buyer_id')" required autofocus autocomplete="buyer_id" />
-            </div> --}}
-            <div class="my-3">
-                <x-label for="buyer_id" value="{{ __('Buyer Identification Number') }}" />
-                <x-input id="buyer_id" class="block mt-1 w-full" type="text" name="buyer_id" :value="1732283373" required autofocus autocomplete="buyer_id" />
-            </div>
-          
+
+
+            @if (isset($is_tenant) && $is_tenant)
+                <input type='hidden' name='is_tenant' value='true' />
+                <input type='hidden' name='path' value="{{ $path }}" />
+            @endif
+
             <div>
                 <x-label for="email" value="{{ __('Email') }}" />
-                <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
+                <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')"
+                    required autofocus autocomplete="username" />
             </div>
 
             <div class="mt-4">
                 <x-label for="password" value="{{ __('Password') }}" />
-                <x-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="current-password" />
+                <x-input id="password" class="block mt-1 w-full" type="password" name="password" required
+                    autocomplete="current-password" />
             </div>
 
             <div class="block mt-4">
@@ -42,7 +42,8 @@
 
             <div class="flex items-center justify-end mt-4">
                 @if (Route::has('password.request'))
-                    <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('password.request') }}">
+                    <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
+                        href="{{ route('password.request') }}">
                         {{ __('Forgot your password?') }}
                     </a>
                 @endif

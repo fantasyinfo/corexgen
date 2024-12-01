@@ -16,10 +16,19 @@ class CRMMenu extends Model
         'parent_menu',
         'parent_menu_id',
         'menu_icon',
-        'buyer_id',
         'permission_id',
-        'is_super_user'
+        'panel_type'
     ];
 
     protected $table = self::table;
+
+
+    protected static function boot(){
+        parent::boot();
+
+        static::creating(function($crmmenu){
+            $crmmenu->panel_type = $crmmenu->panel_type ?? PANEL_TYPES['COMPANY_PANEL'];
+        });
+
+    }
 }

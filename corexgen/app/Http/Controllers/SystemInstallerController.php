@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Buyer;
+
+use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -10,11 +11,21 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Config;
+
+
+/**
+ * Installer for software SystemInstallerController
+ */
 class SystemInstallerController extends Controller
-{
+{    
+    /**
+     * Method showInstaller
+     * showing the view of installer
+     *
+     * @return void
+     */
     public function showInstaller()
     {
         if (File::exists(storage_path('installed.lock'))) {
@@ -22,7 +33,12 @@ class SystemInstallerController extends Controller
         }
         return view('installer.index');
     }
-
+    
+    /**
+     * requiredExtensions for software to run
+     *
+     * @var array
+     */
     protected $requiredExtensions = [
         'pdo',
         'mbstring',
@@ -30,9 +46,16 @@ class SystemInstallerController extends Controller
         'xml',
         'curl',
         'openssl',
-        'json'
+        'json',
+        'zip'
     ];
-
+    
+    /**
+     * Method checkSystemRequirements
+     * checking system requirements
+     *
+     * @return void
+     */
     public function checkSystemRequirements()
     {
         $requirements = [
@@ -48,6 +71,14 @@ class SystemInstallerController extends Controller
         ]);
     }
 
+        
+    /**
+     * Method verifyPurchaseCodeEndpoint
+     *
+     * @param Request $request verify purchase code endppint
+     *
+     * @return void
+     */
     public function verifyPurchaseCodeEndpoint(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -65,7 +96,14 @@ class SystemInstallerController extends Controller
             'message' => $isValid ? 'Purchase code verified successfully' : 'Invalid purchase code'
         ]);
     }
-
+    
+    /**
+     * Method testSmtpConnection
+     *
+     * @param Request $request testing the mailing connections
+     *
+     * @return void
+     */
     public function testSmtpConnection(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -107,7 +145,14 @@ class SystemInstallerController extends Controller
             ], 500);
         }
     }
-
+    
+    /**
+     * Method testDatabaseConnection
+     *
+     * @param Request $request testing database connections
+     *
+     * @return void
+     */
     public function testDatabaseConnection(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -145,7 +190,14 @@ class SystemInstallerController extends Controller
         }
     }
 
-
+    
+    /**
+     * Method reConnectDB
+     *
+     * @param $request $request reconnection of db 
+     *
+     * @return void
+     */
     private function reConnectDB($request)
     {
         config(['database.default' => 'mysql']);
@@ -173,7 +225,18 @@ class SystemInstallerController extends Controller
         \Log::info('DB is Reconnected.');
     }
 
-
+    
+    /**
+     * Method ensureDatabaseExists
+     * checking database is exists
+     * @param $host $host
+     * @param $port $port 
+     * @param $username $username 
+     * @param $password $password 
+     * @param $database $database 
+     *
+     * @return void
+     */
     private function ensureDatabaseExists($host, $port, $username, $password, $database)
     {
         try {
@@ -192,7 +255,14 @@ class SystemInstallerController extends Controller
         }
     }
 
-
+    
+    /**
+     * Method installApplication
+     *
+     * @param Request $request installing the application
+     *
+     * @return void
+     */
     public function installApplication(Request $request)
     {
         \Log::info('Reached to the installation function');
@@ -231,13 +301,13 @@ class SystemInstallerController extends Controller
                 'db_username' => 'required|string',
                 'db_password' => 'nullable|string',
                 'purchase_code' => 'required|string',
-                'smtp_host' => 'required',
-                'smtp_port' => 'required|integer',
-                'smtp_username' => 'required',
-                'smtp_password' => 'required',
-                'smtp_encryption' => 'required|in:tls,ssl',
-                'mail_from_address' => 'required|email',
-                'mail_from_name' => 'required'
+                'smtp_host' => 'nullable',
+                'smtp_port' => 'nullable|integer',
+                'smtp_username' => 'nullable',
+                'smtp_password' => 'nullable',
+                'smtp_encryption' => 'nullable|in:tls,ssl',
+                'mail_from_address' => 'nullable|email',
+                'mail_from_name' => 'nullable'
             ]);
 
             if ($validator->fails()) {
@@ -259,7 +329,7 @@ class SystemInstallerController extends Controller
 
             \Log::info('Super Admin Creating...');
             // Create super admin
-            $buyer = $this->createSuperAdmin($request);
+            $user = $this->createSuperAdmin($request);
 
           
 
@@ -269,7 +339,7 @@ class SystemInstallerController extends Controller
 
             \Log::info('Updating the .env file...');
             // Update environment file
-            $this->updateEnvironmentFile($request, $buyer->buyer_id);
+            $this->updateEnvironmentFile($request);
 
             \Log::info('Artisan Calls...');
 
@@ -279,6 +349,7 @@ class SystemInstallerController extends Controller
             // Clear and cache configuration
             Artisan::call('config:clear');
             Artisan::call('config:cache');
+            Artisan::call('optimize');
 
             \Log::info('DB Commit...');
 
@@ -308,15 +379,29 @@ class SystemInstallerController extends Controller
             ], 500);
         }
     }
-
+    
+    /**
+     * Method verifyPurchaseCode
+     *
+     * @param $code $code verification of purchase code ::todo api call
+     *
+     * @return void
+     */
     private function verifyPurchaseCode($code)
     {
         // Implement your purchase code verification logic here
         // This is a placeholder - replace with actual verification
         return true;
     }
-
-    private function updateEnvironmentFile(Request $request, $buyerId)
+    
+    /**
+     * Method updateEnvironmentFile
+     *
+     * @param Request $request updating the .env file after
+     *
+     * @return void
+     */
+    private function updateEnvironmentFile(Request $request)
     {
         $envPath = base_path('.env');
         
@@ -325,24 +410,24 @@ class SystemInstallerController extends Controller
         }
 
         $replacements = [
-            'APP_NAME' => '"'.str_replace('"', '', $request->site_name).'"',
+            'APP_NAME' => '"' . str_replace('"', '', $request->site_name) . '"',
             'APP_URL' => url('/'),
-            'DB_HOST' => $request->db_host,
-            'DB_PORT' => $request->db_port,
-            'DB_DATABASE' => $request->db_name,
-            'DB_USERNAME' => $request->db_username,
-            'DB_PASSWORD' => $request->db_password,
+            'DB_HOST' => $request->db_host ?? '127.0.0.1',
+            'DB_PORT' => $request->db_port ?? '3306',
+            'DB_DATABASE' => $request->db_name ?? '',
+            'DB_USERNAME' => $request->db_username ?? '',
+            'DB_PASSWORD' => $request->db_password ?? '',
             'MAIL_MAILER' => 'smtp',
-            'MAIL_HOST' => $request->smtp_host,
-            'MAIL_PORT' => $request->smtp_port,
-            'MAIL_USERNAME' => $request->smtp_username,
-            'MAIL_PASSWORD' => $request->smtp_password,
-            'MAIL_ENCRYPTION' => $request->smtp_encryption,
-            'MAIL_FROM_ADDRESS' => $request->mail_from_address,
-            'MAIL_FROM_NAME' => '"'.str_replace('"', '', $request->mail_from_name).'"',
-            'SESSION_DRIVER' => 'database',
-            'BUYER_ID' => $buyerId
+            'MAIL_HOST' => $request->smtp_host ?? '',
+            'MAIL_PORT' => $request->smtp_port ?? '',
+            'MAIL_USERNAME' => $request->smtp_username ?? '',
+            'MAIL_PASSWORD' => $request->smtp_password ?? '',
+            'MAIL_ENCRYPTION' => $request->smtp_encryption ?? 'tls',
+            'MAIL_FROM_ADDRESS' => $request->mail_from_address ?? '',
+            'MAIL_FROM_NAME' => '"' . str_replace('"', '', $request->mail_from_name ?? '') . '"',
+            'SESSION_DRIVER' => 'database'
         ];
+
 
         $envContent = File::get($envPath);
         $lines = explode("\n", $envContent);
@@ -363,13 +448,24 @@ class SystemInstallerController extends Controller
 
         File::put($envPath, implode("\n", $lines));
     }
-
+    
+    /**
+     * Method checkExtensions
+     * checking extenstions
+     * @return void
+     */
     private function checkExtensions()
     {
         return collect($this->requiredExtensions)
             ->mapWithKeys(fn($ext) => [$ext => extension_loaded($ext)]);
     }
-
+    
+    /**
+     * Method runSeeders
+     * running the seeder to create required data into db
+     *
+     * @return void
+     */
     private function runSeeders()
     {
         Artisan::call('db:seed');
@@ -377,37 +473,42 @@ class SystemInstallerController extends Controller
         Artisan::call('db:seed', ['--class' => 'CRMMenuSeeder']);
         Artisan::call('db:seed', ['--class' => 'CRMRoleSeeder']);
         Artisan::call('db:seed', ['--class' => 'CRMSettingsSeeder']);
+        Artisan::call('db:seed', ['--class' => 'PlansSeeder']);
     
     }
-
+    
+    /**
+     * Method createSuperAdmin
+     *
+     * @param Request $request creating a super admin user to access the admin panel
+     *
+     * @return void
+     */
     private function createSuperAdmin(Request $request)
     {
-        $buyerIdToMaintain = time();
-        $buyer = Buyer::create([
+     
+        $tenant = Tenant::create([
             'name' => $request->name,
-            'email' => $request->admin_email,
-            'buyer_id' => $buyerIdToMaintain,
-            'password' => Hash::make(value: $request->admin_password),
+            'domain' => $request->admin_email,
+            'settings' => json_encode([$request->all()])
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->admin_email,
-            'role_id' => 1,
             'password' => Hash::make($request->admin_password),
-            'buyer_id' => $buyer->id,
             'email_verified_at' => now(),
-            'is_super_user' => true
+            'is_tenant' => true,
+            'tenant_id' => $tenant->id
         ]);
 
         $details = [
             'name' => $request->name,
-            'email' => $request->admin_email,
-            'buyer_id' => $buyer->buyer_id
+            'email' => $request->admin_email
         ];
 
-        \Mail::to($user->email)->send(new \App\Mail\WelcomeSuperAdmin($details));
+        // \Mail::to($user->email)->send(new \App\Mail\WelcomeSuperAdmin($details));
 
-        return $buyer;
+        return $details;
     }
 }

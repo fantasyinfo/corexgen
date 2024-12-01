@@ -3,246 +3,235 @@
 namespace App\Http\Controllers\CRM;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CRM\CRMRoleRequest;
 use Illuminate\Http\Request;
 use App\Models\CRM\CRMRole;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
+use App\Traits\TenantFilter;
+use Illuminate\Support\Facades\View;
+use App\Helpers\PermissionsHelper;
 
+/**
+ * CRMRoleController handles CRUD operations for CRM Roles
+ * 
+ * This controller manages role-related functionality including:
+ * - Listing roles with server-side DataTables
+ * - Creating new roles
+ * - Editing existing roles
+ * - Exporting roles to CSV
+ * - Importing roles from CSV
+ * - Changing role status
+ */
 class CRMRoleController extends Controller
 {
+    use TenantFilter;
+
+    /**
+     * Number of items per page for pagination
+     * @var int
+     */
     protected $perPage = 10;
 
+    /**
+     * Tenant-specific route prefix
+     * @var string
+     */
+    private $tenantRoute;
+
+    /**
+     * Base directory for view files
+     * @var string
+     */
+    private $viewDir = 'dashboard.crm.role.';
+
+    /**
+     * Generate full view file path
+     * 
+     * @param string $filename
+     * @return string
+     */
+    private function getViewFilePath($filename)
+    {
+        return $this->viewDir . $filename;
+    }
 
 
+
+
+
+
+
+    /**
+     * Display list of roles with filtering and DataTables support
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Http\JsonResponse
+     */
     public function index(Request $request)
     {
-        $query = CRMRole::query()->where('buyer_id', auth()->user()->buyer_id);
+        // Initialize query with tenant filtering
+        $query = CRMRole::query();
+        $query = $this->applyTenantFilter($query);
+        $this->tenantRoute = $this->getTenantRoute();
 
-        // Apply filters
-        $query->when($request->filled('name'), function ($q) use ($request) {
-            $q->where('role_name', 'LIKE', "%{$request->name}%");
-        });
-
-        $query->when($request->filled('status'), function ($q) use ($request) {
-            $q->where('status', $request->status);
-        });
-
-        $query->when($request->filled('start_date'), function ($q) use ($request) {
-            $q->whereDate('created_at', '>=', $request->start_date);
-        });
-
-        $query->when($request->filled('end_date'), function ($q) use ($request) {
-            $q->whereDate('created_at', '<=', $request->end_date);
-        });
+        // Apply dynamic filters based on request input
+        $query->when($request->filled('name'), fn($q) => $q->where('role_name', 'LIKE', "%{$request->name}%"));
+        $query->when($request->filled('status'), fn($q) => $q->where('status', $request->status));
+        $query->when($request->filled('start_date'), fn($q) => $q->whereDate('created_at', '>=', $request->start_date));
+        $query->when($request->filled('end_date'), fn($q) => $q->whereDate('created_at', '<=', $request->end_date));
 
         // Server-side DataTables response
         if ($request->ajax()) {
             return DataTables::of($query)
                 ->addColumn('actions', function ($role) {
-                    $editButton = '';
-                    $deleteButton = '';
+                    return View::make(getComponentsDirFilePath('dt-actions-buttons'), [
 
-                    if (hasPermission('ROLE.UPDATE')) {
-                        $editButton = '<a href="' . route('crm.role.edit', $role->id) . '" class="btn btn-sm btn-warning" data-toggle="tooltip" title="Edit">
-                               <i class="fas fa-pencil-alt"></i>
-                           </a>';
-                    }
+                        'tenantRoute' => $this->tenantRoute,
+                        'permissions' => PermissionsHelper::getPermissionsArray('ROLE'),
+                        'module' => PANEL_MODULES[$this->getPanelModule()]['role'],
+                        'id' => $role->id
 
-                    if (hasPermission('ROLE.DELETE')) {
-                        $deleteButton = '<form action="' . route('crm.role.destroy', $role->id) . '" method="POST" style="display:inline;" onsubmit="return confirm(\'Are you sure?\');">
-                                 ' . csrf_field() . method_field('DELETE') . '
-                                 <button type="submit" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Delete">
-                                     <i class="fas fa-trash-alt"></i>
-                                 </button>
-                             </form>';
-                    }
-
-                    return "<div class='text-end'> $editButton  $deleteButton </div>";
+                    ])->render();
                 })
-                ->editColumn('created_at', function ($role) {
-                    return $role->created_at->format('d M Y');
-                })
+                ->editColumn('created_at', fn($role) => $role->created_at->format('d M Y'))
                 ->editColumn('status', function ($role) {
-                    if (hasPermission('ROLE.CHANGE_STATUS')) {
-                        return "<a 
-                        data-toggle='tooltip' 
-                        data-placement='top' 
-                        title='" . ($role->status == 'active' ? 'De Active' : 'Active') . "' 
-                        href='" . route('crm.role.changeStatus', ['id' => $role->id]) . "'>
-                            <span class='badge " . ($role->status == 'active' ? 'bg-success' : 'bg-danger') . "'>
-                                " . ucfirst($role->status) . "
-                            </span>
-                        </a>";
-                    }
+                    return View::make(getComponentsDirFilePath('dt-status'), [
 
-                    return "<span class='badge " . ($role->status == 'active' ? 'bg-success' : 'bg-danger') . "'>
-                        " . ucfirst($role->status) . "
-                    </span>";
+                        'tenantRoute' => $this->tenantRoute,
+                        'permissions' => PermissionsHelper::getPermissionsArray('ROLE'),
+                        'module' => PANEL_MODULES[$this->getPanelModule()]['role'],
+                        'id' => $role->id,
+                        'status' => [
+                            'current_status' => $role->status,
+                            'available_status' => CRM_STATUS_TYPES['CRM_ROLES']['STATUS'],
+                            'bt_class' => CRM_STATUS_TYPES['CRM_ROLES']['BT_CLASSES'],
+
+                        ]
+                    ])->render();
                 })
-                ->rawColumns(['actions', 'status']) // Add 'status' to raw columns
+                ->rawColumns(['actions', 'status'])
                 ->make(true);
         }
 
-        return view('dashboard.crm.role.index', [
+        // Render index view with filterss
+        return view($this->getViewFilePath('index'), [
             'filters' => $request->all(),
-            'title' => 'Roles Management'
+            'title' => 'Roles Management',
+            'permissions' => PermissionsHelper::getPermissionsArray('ROLE'),
+            'module' => PANEL_MODULES[$this->getPanelModule()]['role'],
         ]);
     }
 
-    public function store(Request $request)
+    /**
+     * Store a newly created role
+     * 
+     * @param CRMRoleRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function store(CRMRoleRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'role_name' => [
-                'required',
-                'max:255',
-                Rule::unique('crm_roles')->where(function ($query) use ($request) {
-                    return $query->where('buyer_id', auth()->user()->buyer_id ?? null);
-                }),
-            ],
-            'role_desc' => 'nullable|string|max:1000',
-            'status' => 'nullable|in:active,inactive'
-        ], [
-            'role_name.unique' => 'This role name already exists for your organization.',
-            'role_name.required' => 'Role name is required.',
-            'role_desc.max' => 'Role description cannot exceed 1000 characters.'
-        ]);
-
-        // Handle ajax validation requests
-        if ($request->ajax()) {
-            return response()->json([
-                'valid' => $validator->passes(),
-                'errors' => $validator->errors()
-            ]);
-        }
-
-        // Handle form submission
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput()
-                ->with('error', 'Please correct the form errors.');
-        }
-
+        $this->tenantRoute = $this->getTenantRoute();
         try {
-            $validated = $validator->validated();
-            $validated['buyer_id'] = auth()->user()->buyer_id;
-            $validated['created_by'] = auth()->user()->id;
-            $validated['updated_by'] = auth()->user()->id;
-            $validated['status'] = $validated['status'] ?? 'active';
+            // Validate and create role
+            $validated = $request->validated();
+            CRMRole::create($validated);
 
-            $role = CRMRole::create($validated);
-
-            return redirect()->route('crm.role.create')
+            // Redirect with success message
+            return redirect()->route($this->tenantRoute . 'role.index')
                 ->with('success', 'Role created successfully.');
         } catch (\Exception $e) {
+            // Handle any errors during role creation
             return redirect()->back()
                 ->with('error', 'An error occurred while creating the role: ' . $e->getMessage());
         }
     }
 
-    public function validateField(Request $request)
-    {
-        $field = $request->input('field');
-        $value = $request->input('value');
-
-        $validator = Validator::make(
-            [$field => $value],
-            [
-                'role_name' => [
-                    'required',
-                    'max:255',
-                    Rule::unique('crm_roles')->where(function ($query) use ($value) {
-                        return $query->where('buyer_id', auth()->user()->buyer_id ?? null);
-                    }),
-                ],
-                'role_desc' => 'nullable|string|max:1000'
-            ]
-        );
-
-        return response()->json([
-            'valid' => $validator->passes(),
-            'errors' => $validator->errors()->get($field)
-        ]);
-    }
-
-
+    /**
+     * Show create role form
+     * 
+     * @return \Illuminate\Contracts\View\View
+     */
     public function create()
     {
-        return view('dashboard.crm.role.create', [
-
+        return view($this->getViewFilePath('create'), [
             'title' => 'Create Role'
         ]);
     }
 
+    /**
+     * Show edit role form
+     * 
+     * @param int $id
+     * @return \Illuminate\Contracts\View\View
+     */
     public function edit($id)
     {
-        $roleData = CRMRole::where('id', $id)
-        ->where('buyer_id', auth()->user()->buyer_id)
-            ->firstOrFail();
-        return view('dashboard.crm.role.edit', [
+        // Apply tenant filtering to role query
+        $query = CRMRole::query()->where('id', $id);
+        $query = $this->applyTenantFilter($query);
+        $roleData = $query->firstOrFail();
 
+        return view($this->getViewFilePath('edit'), [
             'title' => 'Edit Role',
             'role' => $roleData
         ]);
     }
-    public function update(Request $request)
+
+    /**
+     * Update an existing role
+     * 
+     * @param CRMRoleRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function update(CRMRoleRequest $request)
     {
-        $validated = $request->validate([
-            'role_name' => [
-                'required',
-                'max:255',
-                Rule::unique('crm_roles')
-                    ->ignore($request->id)
-                    ->where(function ($query) use ($request) {
-                        return $query->where('buyer_id', $request->buyer_id);
-                    }),
-            ],
-            'role_desc' => 'nullable|string',
-            'status' => 'nullable|in:active,inactive'
-        ]);
+        $this->tenantRoute = $this->getTenantRoute();
 
+        try {
+            // Validate and update role
+            $validated = $request->validated();
+            $query = CRMRole::query()->where('id', $request->id);
+            $query = $this->applyTenantFilter($query);
+            $query->update($validated);
 
-        $role = CRMRole::where('id', $request->id)
-            ->where('buyer_id', auth()->user()->buyer_id)
-            ->firstOrFail();
-
-        $validated['updated_by'] = auth()->user()->id;
-
-        $role->update($validated);
-
-        return redirect()->route('crm.role.index')
-            ->with('success', 'Role updated successfully.');
+            // Redirect with success message
+            return redirect()->route($this->tenantRoute . 'role.index')
+                ->with('success', 'Role updated successfully.');
+        } catch (\Exception $e) {
+            // Handle any errors during role update
+            return redirect()->back()
+                ->with('error', 'An error occurred while updating the role: ' . $e->getMessage());
+        }
     }
 
+    /**
+     * Export roles to CSV
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
     public function export(Request $request)
     {
-        $query = CRMRole::query()->where('buyer_id', auth()->user()->buyer_id);
+        // Initialize query with tenant filtering
+        $query = CRMRole::query();
+        $query = $this->applyTenantFilter($query);
 
-        // Apply filters as in index method
-        $query->when($request->filled('name'), function ($q) use ($request) {
-            $q->where('role_name', 'LIKE', "%{$request->name}%");
-        });
 
-        $query->when($request->filled('status'), function ($q) use ($request) {
-            $q->where('status', $request->status);
-        });
+        // Apply dynamic filters based on request input
+        $query->when($request->filled('name'), fn($q) => $q->where('role_name', 'LIKE', "%{$request->name}%"));
+        $query->when($request->filled('status'), fn($q) => $q->where('status', $request->status));
+        $query->when($request->filled('start_date'), fn($q) => $q->whereDate('created_at', '>=', $request->start_date));
+        $query->when($request->filled('end_date'), fn($q) => $q->whereDate('created_at', '<=', $request->end_date));
 
-        $query->when($request->filled('start_date'), function ($q) use ($request) {
-            $q->whereDate('created_at', '>=', $request->start_date);
-        });
-
-        $query->when($request->filled('end_date'), function ($q) use ($request) {
-            $q->whereDate('created_at', '<=', $request->end_date);
-        });
-
-        // Get the filtered data
+        // Get filtered roles
         $roles = $query->get();
 
-        // Generate CSV content
+        // Prepare CSV data
         $csvData = [];
-        $csvData[] = ['ID', 'Role Name', 'Role Desc', 'Status', 'Created At', 'Updated At']; // CSV headers
+        $csvData[] = ['ID', 'Role Name', 'Role Desc', 'Status', 'Created At', 'Updated At'];
 
         foreach ($roles as $role) {
             $csvData[] = [
@@ -255,23 +244,30 @@ class CRMRoleController extends Controller
             ];
         }
 
-        // Convert the data to CSV string
+        // Convert to CSV string
         $csvContent = '';
         foreach ($csvData as $row) {
             $csvContent .= implode(',', $row) . "\n";
         }
 
-        // Return the response with the CSV content as a file
+        // Generate filename and return CSV file
         $fileName = 'roles_export_' . now()->format('Y_m_d_H_i_s') . '.csv';
         return response($csvContent)
             ->header('Content-Type', 'text/csv')
             ->header('Content-Disposition', "attachment; filename={$fileName}");
     }
 
+    /**
+     * Import roles from CSV
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function import(Request $request)
     {
+        // Validate uploaded file
         $validator = Validator::make($request->all(), [
-            'file' => 'required|mimes:csv,txt|max:2048', // Validate file type and size
+            'file' => 'required|mimes:csv,txt|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -286,16 +282,15 @@ class CRMRoleController extends Controller
             $data = array_map('str_getcsv', file($file->getRealPath()));
             $header = array_shift($data);
 
+
+            // Import each row from CSV
             foreach ($data as $row) {
                 $row = array_combine($header, $row);
 
                 CRMRole::create([
                     'role_name' => $row['role_name'] ?? '',
                     'role_desc' => $row['role_desc'] ?? '',
-                    'status' => $row['status'] ?? 'active',
-                    'buyer_id' => auth()->user()->buyer_id,
-                    'created_by' => auth()->user()->id,
-                    'updated_by' => auth()->user()->id,
+                    'status' => CRM_STATUS_TYPES['CRM_ROLES']['STATUS']['ACTIVE'],
                 ]);
             }
 
@@ -311,42 +306,46 @@ class CRMRoleController extends Controller
         }
     }
 
-
+    /**
+     * Delete a role
+     * 
+     * @param int $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function destroy($id)
     {
-
         try {
-            // Delete the role
-            $role = CRMRole::where('id', $id)
-            ->where('buyer_id', auth()->user()->buyer_id)
-            ->firstOrFail();
+            // Apply tenant filtering and delete role
+            $query = CRMRole::query()->where('id', $id);
+            $query = $this->applyTenantFilter($query);
+            $query->delete();
 
-            $role->delete();
-            // Return success response
+            // Redirect with success message
             return redirect()->back()->with('success', 'Role deleted successfully.');
         } catch (\Exception $e) {
-            // Handle any exceptions
+            // Handle any deletion errors
             return redirect()->back()->with('error', 'Failed to delete the role: ' . $e->getMessage());
         }
     }
 
-
-    public function changeStatus($id)
+    /**
+     * Chaning the status for role
+     * 
+     * @param int $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function changeStatus($id, $status)
     {
         try {
-            // Delete the role
-            $role = CRMRole::where('id', $id)
-            ->where('buyer_id', auth()->user()->buyer_id)
-            ->firstOrFail();
-
-            $role->updated_by = auth()->user()->id;
-            $role->status = $role->status === 'active' ? 'deactive' : 'active';
-            $role->save();
-            // Return success response
+            // Apply tenant filtering and find role
+            $query = CRMRole::query()->where('id', $id);
+            $query = $this->applyTenantFilter($query);
+            $query->update(['status' => $status]);
+            // Redirect with success message
             return redirect()->back()->with('success', 'Role status changed successfully.');
         } catch (\Exception $e) {
-            // Handle any exceptions
-            return redirect()->back()->with('error', 'Failed to changed the role status: ' . $e->getMessage());
+            // Handle any status change errors
+            return redirect()->back()->with('error', 'Failed to change the role status: ' . $e->getMessage());
         }
     }
 }

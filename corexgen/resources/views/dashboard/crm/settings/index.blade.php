@@ -21,7 +21,7 @@
                         {{-- $general_settings --}}
                         <div class="justify-content-md-center ">
                             <div class="card stretch stretch-full">
-                                <form id="generalSettingsForm" action="{{ route('crm.settings.update') }}" method="POST">
+                                <form id="generalSettingsForm" action="{{ route(getPanelRoutes($module . '.update')) }}" method="POST">
                                     @csrf
                                     @method('PUT')
                                     <div class="card-body general-info">
@@ -41,7 +41,7 @@
                                             @foreach($general_settings as $gs)
                                                 <div class="row mb-4 align-items-center">
                                                     <div class="col-lg-4">
-                                                        <label for="{{ $gs->key }}" class="fw-semibold">{{ $gs->key }}: </label>
+                                                        <label for="{{ $gs->key }}" class="fw-semibold mb-2 " >{{ $gs->key }}: </label>
                                                     </div>
                                                     <div class="col-lg-8">
                                                         <div class="input-group">

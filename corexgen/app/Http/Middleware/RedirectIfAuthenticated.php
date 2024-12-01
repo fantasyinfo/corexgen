@@ -17,11 +17,19 @@ class RedirectIfAuthenticated
      */
     public function handle(Request $request, Closure $next, string ...$guards): Response
     {
+
         $guards = empty($guards) ? [null] : $guards;
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
-                return redirect(RouteServiceProvider::HOME);
+
+                $panelAccess = panelAccess();
+
+                if ($panelAccess === PANEL_TYPES['SUPER_PANEL']) {
+                    return redirect(route(getPanelUrl(PANEL_TYPES['SUPER_PANEL']) . '.role.index'));
+                } else if ($panelAccess === PANEL_TYPES['COMPANY_PANEL']) {
+                    return redirect(route(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']) . '.role.index'));
+                }
             }
         }
 

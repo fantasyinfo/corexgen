@@ -1,12 +1,18 @@
 <?php
 
 // crm routes
+use App\Http\Controllers\AppUpdateController;
 use App\Http\Controllers\CountryCitySeederController;
+use App\Http\Controllers\CRM\CompaniesController;
 use App\Http\Controllers\CRM\CRMRoleController;
 use App\Http\Controllers\CRM\CRMRolePermissionsController;
 use App\Http\Controllers\CRM\CRMSettingsController;
+use App\Http\Controllers\ModuleController;
+use App\Http\Controllers\PlansController;
 use App\Http\Controllers\SystemInstallerController;
+use App\Http\Controllers\TaxController;
 use App\Http\Controllers\UserController;
+use App\Models\City;
 use App\Models\CRM\CRMRole;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\App;
@@ -27,12 +33,19 @@ use Illuminate\Support\Facades\File;
 
 
 
+Route::middleware(['web', 'auth'])->prefix('admin')->group(function () {
+    Route::get('/modules', [ModuleController::class, 'index'])->name('admin.modules.index');
+    Route::post('/modules/upload', [ModuleController::class, 'upload'])->name('admin.modules.upload');
+    Route::post('/modules/{module}/enable', [ModuleController::class, 'enable'])->name('admin.modules.enable');
+    Route::post('/modules/{module}/disable', [ModuleController::class, 'disable'])->name('admin.modules.disable');
+    Route::delete('/modules/{module}', [ModuleController::class, 'destroy'])->name('admin.modules.destroy');
+});
 
 
 
-Route::prefix('installer')->group(function() {
+Route::prefix('installer')->group(function () {
     Route::get('/install', [SystemInstallerController::class, 'showInstaller'])
-    ->name('installer.index');
+        ->name('installer.index');
     Route::get('/requirements', [SystemInstallerController::class, 'checkSystemRequirements']);
     Route::post('/verify-purchase', [SystemInstallerController::class, 'verifyPurchaseCodeEndpoint']);
     Route::post('/test-database', [SystemInstallerController::class, 'testDatabaseConnection']);
@@ -60,7 +73,7 @@ Route::middleware(['check.installation'])->group(function () {
     })->name('home');
 
 
-    Route::get('/login', function(){
+    Route::get('/login', function () {
         return view('auth.login');
     })->name('login');
 
@@ -76,6 +89,10 @@ Route::get('/register', function () {
 
 
 
+Route::get('/super-admin-login', function () {
+    return view('auth.login', ['is_tenant' => true, 'path' => 'super-admin-login']);
+})->name('super.panel.login');
+
 
 // language set
 Route::get('/setlang/{locale}', function (string $locale) {
@@ -87,15 +104,138 @@ Route::get('/setlang/{locale}', function (string $locale) {
     return redirect()->back()->with('success', 'Language Changed Successfully!');
 });
 
+
+// In your routes file, add a print statement to debug
+Route::get('/get-cities/{countryId}', function ($countryId) {
+ 
+    $cities = City::where('country_id', $countryId)->get(['id', 'name']);
+
+
+    return response()->json($cities);
+});
+
+
+
+    // add country, city tables in bg
+    Route::get('/add-default-countries-cities', [CountryCitySeederController::class, 'runSeeder']);
+
+
+
+
+
+
 // crm routes
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
-    'check.user.role',
     'check.installation'
-])->prefix('crm')->as('crm.')->group(function () {
-    
+])->prefix(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']))->as(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']) . '.')->group(function () {
+
+    Route::get('/', function () {
+        dd('Company Panel Home');
+    })->name('home');
+
+    // role routes
+    Route::prefix(PANEL_MODULES['COMPANY_PANEL']['role'])->as(PANEL_MODULES['COMPANY_PANEL']['role'] . '.')->group(function () {
+        // role for fetch, store, update
+        Route::get('/', [CRMRoleController::class, 'index'])->name('index')->middleware('check.permission:ROLE.READ_ALL');
+        Route::post('/', [CRMRoleController::class, 'store'])->name('store')->middleware('check.permission:ROLE.CREATE');
+        Route::put('/', [CRMRoleController::class, 'update'])->name('update')->middleware('check.permission:ROLE.UPDATE');
+
+        // create, edit, change status, delete
+        Route::get('/create', [CRMRoleController::class, 'create'])->name('create')->middleware('check.permission:ROLE.CREATE');
+        Route::get('/edit/{id}', [CRMRoleController::class, 'edit'])->name('edit')->middleware('check.permission:ROLE.UPDATE');
+        Route::get(
+            '/changeStatus/{id}/{status}',
+            [CRMRoleController::class, 'changeStatus']
+        )->name('changeStatus')->middleware('check.permission:ROLE.CHANGE_STATUS');
+        Route::delete('/destroy/{id}', [CRMRoleController::class, 'destroy'])->name('destroy')->middleware('check.permission:ROLE.DELETE');
+
+        // validate, export, import
+        Route::get('/export', [CRMRoleController::class, 'export'])->name('export')->middleware('check.permission:ROLE.EXPORT');
+        Route::post('/import', [CRMRoleController::class, 'import'])->name('import')->middleware('check.permission:ROLE.IMPORT');
+
+    });
+
+    // users routes
+    Route::prefix(PANEL_MODULES['COMPANY_PANEL']['users'])->as(PANEL_MODULES['COMPANY_PANEL']['users'] . '.')->group(function () {
+        // role for fetch, store, update
+        Route::get('/', [UserController::class, 'index'])->name('index')->middleware('check.permission:USERS.READ_ALL');
+        Route::post('/', [UserController::class, 'store'])->name('store')->middleware('check.permission:USERS.CREATE');
+        Route::put('/', [UserController::class, 'update'])->name('update')->middleware('check.permission:USERS.UPDATE');
+
+        // create, edit, change status, delete
+        Route::get('/create', [UserController::class, 'create'])->name('create')->middleware('check.permission:USERS.CREATE');
+        Route::get('/edit/{id}', [UserController::class, 'edit'])->name('edit')->middleware('check.permission:USERS.UPDATE');
+        Route::get('/changeStatus/{id}/{status}', [UserController::class, 'changeStatus'])->name('changeStatus')->middleware('check.permission:USERS.CHANGE_STATUS');
+        Route::delete('/destroy/{id}', [UserController::class, 'destroy'])->name('destroy')->middleware('check.permission:USERS.DELETE');
+
+        // validate, export, import
+        Route::get('/export', [UserController::class, 'export'])->name('export')->middleware('check.permission:USERS.EXPORT');
+        Route::post('/import', [UserController::class, 'import'])->name('import')->middleware('check.permission:USERS.IMPORT');
+        Route::post('/bulkDelete', [UserController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:USERS.BULK_DELETE');
+    });
+
+
+
+    // permissions routes
+    Route::prefix(PANEL_MODULES['COMPANY_PANEL']['permissions'])->as(PANEL_MODULES['COMPANY_PANEL']['permissions'] . '.')->group(function () {
+        // role for fetch, store, update
+        Route::get('/', [CRMRolePermissionsController::class, 'index'])->name('index')->middleware('check.permission:PERMISSIONS.READ_ALL');
+        Route::post('/', [CRMRolePermissionsController::class, 'store'])->name('store')->middleware('check.permission:PERMISSIONS.CREATE');
+        Route::put('/', [CRMRolePermissionsController::class, 'update'])->name('update')->middleware('check.permission:PERMISSIONS.UPDATE');
+
+        // create, edit, change status, delete
+        Route::get('/create', [CRMRolePermissionsController::class, 'create'])->name('create')->middleware('check.permission:PERMISSIONS.CREATE');
+        Route::get('/edit/{id}', [CRMRolePermissionsController::class, 'edit'])->name('edit')->middleware('check.permission:PERMISSIONS.UPDATE');
+
+        Route::delete('/destroy/{id}', [CRMRolePermissionsController::class, 'destroy'])->name('destroy')->middleware('check.permission:PERMISSIONS.DELETE');
+
+
+
+    });
+
+
+
+
+    // settings routes
+    Route::prefix(PANEL_MODULES['COMPANY_PANEL']['settings'])->as(PANEL_MODULES['COMPANY_PANEL']['settings'] . '.')->group(function () {
+        // role for fetch, store, update
+        Route::get('/', [CRMSettingsController::class, 'index'])->name('index')->middleware('check.permission:SETTINGS.READ_ALL');
+        Route::put('/', [CRMSettingsController::class, 'update'])->name('update')->middleware('check.permission:SETTINGS.UPDATE');
+    });
+
+
+    // modules routes
+    Route::prefix(PANEL_MODULES['COMPANY_PANEL']['modules'])->as(PANEL_MODULES['COMPANY_PANEL']['modules'] . '.')->group(function () {
+        Route::get('/', [ModuleController::class, 'index'])->name('index')->middleware('check.permission:MODULES.READ_ALL');
+        Route::post('/', [ModuleController::class, 'create'])->name('create')->middleware('check.permission:MODULES.CREATE');
+        Route::delete('/destroy/{module}', [ModuleController::class, 'destroy'])->name('destroy')->middleware('check.permission:MODULES.DELETE');
+    });
+
+
+
+
+
+
+
+
+});
+
+
+// super-panel routes
+
+Route::middleware([
+    'auth:sanctum',
+    config('jetstream.auth_session'),
+    'verified',
+    'check.installation'
+])->prefix(getPanelUrl(PANEL_TYPES['SUPER_PANEL']))->as(getPanelUrl(PANEL_TYPES['SUPER_PANEL']) . '.')->group(function () {
+
+    Route::get('/', function () {
+        dd('Super Panel Home');
+    })->name('home');
     // role routes
     Route::prefix('role')->as('role.')->group(function () {
         // role for fetch, store, update
@@ -106,13 +246,16 @@ Route::middleware([
         // create, edit, change status, delete
         Route::get('/create', [CRMRoleController::class, 'create'])->name('create')->middleware('check.permission:ROLE.CREATE');
         Route::get('/edit/{id}', [CRMRoleController::class, 'edit'])->name('edit')->middleware('check.permission:ROLE.UPDATE');
-        Route::get('/changeStatus/{id}', [CRMRoleController::class, 'changeStatus'])->name('changeStatus')->middleware('check.permission:ROLE.CHANGE_STATUS');
+        Route::get(
+            '/changeStatus/{id}/{status}',
+            [CRMRoleController::class, 'changeStatus']
+        )->name('changeStatus')->middleware('check.permission:ROLE.CHANGE_STATUS');
         Route::delete('/destroy/{id}', [CRMRoleController::class, 'destroy'])->name('destroy')->middleware('check.permission:ROLE.DELETE');
 
         // validate, export, import
         Route::get('/export', [CRMRoleController::class, 'export'])->name('export')->middleware('check.permission:ROLE.EXPORT');
         Route::post('/import', [CRMRoleController::class, 'import'])->name('import')->middleware('check.permission:ROLE.IMPORT');
-        Route::post('/validate-field', [CRMRoleController::class, 'validateField'])->name('validate-field');
+
     });
 
     // users routes
@@ -125,35 +268,76 @@ Route::middleware([
         // create, edit, change status, delete
         Route::get('/create', [UserController::class, 'create'])->name('create')->middleware('check.permission:USERS.CREATE');
         Route::get('/edit/{id}', [UserController::class, 'edit'])->name('edit')->middleware('check.permission:USERS.UPDATE');
-        Route::get('/changeStatus/{id}', [UserController::class, 'changeStatus'])->name('changeStatus')->middleware('check.permission:USERS.CHANGE_STATUS');
+        Route::get('/changeStatus/{id}/{status}', [UserController::class, 'changeStatus'])->name('changeStatus')->middleware('check.permission:USERS.CHANGE_STATUS');
         Route::delete('/destroy/{id}', [UserController::class, 'destroy'])->name('destroy')->middleware('check.permission:USERS.DELETE');
 
         // validate, export, import
         Route::get('/export', [UserController::class, 'export'])->name('export')->middleware('check.permission:USERS.EXPORT');
         Route::post('/import', [UserController::class, 'import'])->name('import')->middleware('check.permission:USERS.IMPORT');
-      
+        Route::post('/bulkDelete', [UserController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:USERS.BULK_DELETE');
+
     });
 
 
 
-        // permissions routes
-        Route::prefix('permissions')->as('permissions.')->group(function () {
-            // role for fetch, store, update
-            Route::get('/', [CRMRolePermissionsController::class, 'index'])->name('index')->middleware('check.permission:PERMISSIONS.READ_ALL');
-            Route::post('/', [CRMRolePermissionsController::class, 'store'])->name('store')->middleware('check.permission:PERMISSIONS.CREATE');
-            Route::put('/', [CRMRolePermissionsController::class, 'update'])->name('update')->middleware('check.permission:PERMISSIONS.UPDATE');
-    
-            // create, edit, change status, delete
-            Route::get('/create', [CRMRolePermissionsController::class, 'create'])->name('create')->middleware('check.permission:PERMISSIONS.CREATE');
-            Route::get('/edit/{id}', [CRMRolePermissionsController::class, 'edit'])->name('edit')->middleware('check.permission:PERMISSIONS.UPDATE');
-        
-            Route::delete('/destroy/{id}', [CRMRolePermissionsController::class, 'destroy'])->name('destroy')->middleware('check.permission:PERMISSIONS.DELETE');
-    
-      
-          
-        });
+    // companies routes
+    Route::prefix('companies')->as('companies.')->group(function () {
+        // role for fetch, store, update
+        Route::get('/', [CompaniesController::class, 'index'])->name('index')->middleware('check.permission:USERS.READ_ALL');
+        Route::post('/', [CompaniesController::class, 'store'])->name('store')->middleware('check.permission:USERS.CREATE');
+        Route::put('/', [CompaniesController::class, 'update'])->name('update')->middleware('check.permission:USERS.UPDATE');
+
+        // create, edit, change status, delete
+        Route::get('/create', [CompaniesController::class, 'create'])->name('create')->middleware('check.permission:USERS.CREATE');
+        Route::get('/edit/{id}', [CompaniesController::class, 'edit'])->name('edit')->middleware('check.permission:USERS.UPDATE');
+        Route::get('/changeStatus/{id}/{status}', [CompaniesController::class, 'changeStatus'])->name('changeStatus')->middleware('check.permission:USERS.CHANGE_STATUS');
+        Route::delete('/destroy/{id}', [CompaniesController::class, 'destroy'])->name('destroy')->middleware('check.permission:USERS.DELETE');
+
+        // validate, export, import
+        Route::get('/export', [CompaniesController::class, 'export'])->name('export')->middleware('check.permission:USERS.EXPORT');
+        Route::post('/import', [CompaniesController::class, 'import'])->name('import')->middleware('check.permission:USERS.IMPORT');
+
+    });
+
+    // permissions routes
+    Route::prefix('permissions')->as('permissions.')->group(function () {
+        // role for fetch, store, update
+        Route::get('/', [CRMRolePermissionsController::class, 'index'])->name('index')->middleware('check.permission:PERMISSIONS.READ_ALL');
+        Route::post('/', [CRMRolePermissionsController::class, 'store'])->name('store')->middleware('check.permission:PERMISSIONS.CREATE');
+        Route::put('/', [CRMRolePermissionsController::class, 'update'])->name('update')->middleware('check.permission:PERMISSIONS.UPDATE');
+
+        // create, edit, change status, delete
+        Route::get('/create', [CRMRolePermissionsController::class, 'create'])->name('create')->middleware('check.permission:PERMISSIONS.CREATE');
+        Route::get('/edit/{id}', [CRMRolePermissionsController::class, 'edit'])->name('edit')->middleware('check.permission:PERMISSIONS.UPDATE');
+
+        Route::delete('/destroy/{id}', [CRMRolePermissionsController::class, 'destroy'])->name('destroy')->middleware('check.permission:PERMISSIONS.DELETE');
 
 
+
+    });
+
+
+
+
+
+    // plans routes
+    Route::prefix('plans')->as('plans.')->group(function () {
+        // role for fetch, store, update
+        Route::get('/', [PlansController::class, 'index'])->name('index')->middleware('check.permission:PLANS.READ_ALL');
+        Route::post('/', [PlansController::class, 'store'])->name('store')->middleware('check.permission:PLANS.CREATE');
+        Route::put('/', [PlansController::class, 'update'])->name('update')->middleware('check.permission:PLANS.UPDATE');
+
+        // create, edit, change status, delete
+        Route::get('/create', [PlansController::class, 'create'])->name('create')->middleware('check.permission:PLANS.CREATE');
+        Route::get('/edit/{id}', [PlansController::class, 'edit'])->name('edit')->middleware('check.permission:PLANS.UPDATE');
+        Route::get(
+            '/changeStatus/{id}/{status}',
+            [PlansController::class, 'changeStatus']
+        )->name('changeStatus')->middleware('check.permission:PLANS.CHANGE_STATUS');
+        Route::delete('/destroy/{id}', [PlansController::class, 'destroy'])->name('destroy')->middleware('check.permission:PLANS.DELETE');
+
+
+    });
 
 
     // settings routes
@@ -164,10 +348,21 @@ Route::middleware([
     });
 
 
+    // modules routes
+    Route::prefix('modules')->as('modules.')->group(function () {
+        Route::get('/', [ModuleController::class, 'index'])->name('index')->middleware('check.permission:MODULES.READ_ALL');
+        Route::post('/', [ModuleController::class, 'create'])->name('create')->middleware('check.permission:MODULES.CREATE');
+        Route::delete('/destroy/{module}', [ModuleController::class, 'destroy'])->name('destroy')->middleware('check.permission:MODULES.DELETE');
+    });
 
 
-    // add country, city tables in bg
-    Route::get('/add-default-countries-cities', [CountryCitySeederController::class, 'runSeeder']);
+    // appupdates routes
+    Route::prefix('appupdates')->as('appupdates.')->group(function () {
+        Route::get('/', [AppUpdateController::class, 'index'])->name('index')->middleware('check.permission:APPUPDATES.READ_ALL');
+        Route::post('/', [AppUpdateController::class, 'create'])->name('create')->middleware('check.permission:APPUPDATES.CREATE');
+
+    });
+
 
 
 });

@@ -3,75 +3,120 @@
 namespace App\Http\Controllers\CRM;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CRM\CRMRolePermissionsRequest;
 use App\Models\CRM\CRMPermissions;
 use App\Models\CRM\CRMRole;
 use App\Models\CRM\CRMRolePermissions;
+use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\View;
+use App\Helpers\PermissionsHelper;
+use Illuminate\Support\Facades\Auth;
 
+/**
+ * CRMRolePermissionsController handles CRUD operations for CRM Roles Permissions
+ * 
+ * This controller manages role-related functionality including:
+ * - Listing permissions with server-side DataTables
+ * - Creating new permissions
+ * - Editing existing permissions
+ * - Deleting the existing permissions
+ */
 class CRMRolePermissionsController extends Controller
 {
+    use TenantFilter;
     /**
      * Display a listing of the resource.
      */
+
+    /**
+     * Number of items per page for pagination
+     * @var int
+     */
     protected $perPage = 10;
 
+    /**
+     * Tenant-specific route prefix
+     * @var string
+     */
+    private $tenantRoute;
 
+    /**
+     * Base directory for view files
+     * @var string
+     */
+    private $viewDir = 'dashboard.crm.permissions.';
 
+    /**
+     * Generate full view file path
+     * 
+     * @param string $filename
+     * @return string
+     */
+    private function getViewFilePath($filename)
+    {
+        return $this->viewDir . $filename;
+    }
+
+    /**
+     * Display list of permissions with filtering and DataTables support
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Http\JsonResponse
+     */
     public function index(Request $request)
     {
-
-
 
 
         $query = CRMRolePermissions::query()
             ->join('crm_roles', 'crm_role_permissions.role_id', '=', 'crm_roles.id')
             ->join('crm_permissions', 'crm_role_permissions.permission_id', '=', 'crm_permissions.permission_id')
-            ->where('crm_role_permissions.buyer_id', auth()->user()->buyer_id)
             ->groupBy('crm_roles.id', 'crm_roles.role_name')
             ->select('crm_roles.id', 'crm_roles.role_name');
+
+        $query = $this->applyTenantFilter($query, 'crm_permissions');
+        $this->tenantRoute = $this->getTenantRoute();
+
 
 
 
         if ($request->ajax()) {
             return DataTables::of($query)
-            ->addColumn('actions', function ($permissions) {
-                $editButton = '';
-                $deleteButton = '';
-
-                if (hasPermission('PERMISSIONS.UPDATE')) {
-                    $editButton = '<a href="' . route('crm.permissions.edit', $permissions->id) . '" class="btn btn-sm btn-warning" data-toggle="tooltip" title="Edit">
-                               <i class="fas fa-pencil-alt"></i>
-                           </a>';
-                }
-
-                if (hasPermission('PERMISSIONS.DELETE')) {
-                    $deleteButton = '<form action="' . route('crm.permissions.destroy', $permissions->id) . '" method="POST" style="display:inline;" onsubmit="return confirm(\'Are you sure?\');">
-                                 ' . csrf_field() . method_field('DELETE') . '
-                                 <button type="submit" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Delete">
-                                     <i class="fas fa-trash-alt"></i>
-                                 </button>
-                             </form>';
-                }
-
-                    return "<div class='text-end'> $editButton  $deleteButton </div>";
+                ->filter(function ($query) use ($request) {
+                    if ($request->has('search') && $searchValue = $request->input('search')['value']) {
+                        $query->where(function ($query) use ($searchValue) {
+                            $query->orWhere('crm_roles.role_name', 'like', "%$searchValue%");
+                            // Add more columns as needed
+                            // $query->orWhere('another_column', 'like', "%$searchValue%");
+                        });
+                    }
                 })
-                ->rawColumns(['actions', 'status']) // Add 'status' to raw columns
+                ->addColumn('actions', function ($permission) {
+                    return View::make(getComponentsDirFilePath('dt-actions-buttons'), [
+                        'tenantRoute' => $this->tenantRoute,
+                        'permissions' => PermissionsHelper::getPermissionsArray('PERMISSIONS'),
+                        'module' => PANEL_MODULES[$this->getPanelModule()]['permissions'],
+                        'id' => $permission->id,
+                    ])->render();
+                })
+                ->rawColumns(['actions'])
                 ->make(true);
         }
 
 
-        $roles = CRMRole::where('buyer_id', auth()->user()->buyer_id)
-            ->get();
+        $roleQuery = CRMRole::query();
+        $roleQuery = $this->applyTenantFilter($roleQuery);
+        $roles = $roleQuery->get();
 
 
-        return view('dashboard.crm.permissions.index', [
-          
+        return view($this->getViewFilePath('index'), [
+
             'filters' => $request->all(),
             'roles' => $roles,
-            'title' => 'Permissions Management'
+            'title' => 'Permissions Management',
+            'permissions' => PermissionsHelper::getPermissionsArray('PERMISSIONS'),
+            'module' => PANEL_MODULES[$this->getPanelModule()]['permissions'],
         ]);
     }
 
@@ -80,14 +125,18 @@ class CRMRolePermissionsController extends Controller
      */
     public function create()
     {
-        //
-        $roles = CRMRole::where('buyer_id', auth()->user()->buyer_id)
-            ->get();
+        // roles
+        $roleQuery = CRMRole::query();
+        $roleQuery = $this->applyTenantFilter($roleQuery);
+        $roles = $roleQuery->get();
 
-        $crm_permissions = CRMPermissions::where('buyer_id', 1)
-            ->get();
+        // permissions
+        $crm_p_query = CRMPermissions::query();
+        $crm_p_query = $this->applyTenantFilter($crm_p_query);
+        $crm_permissions = $crm_p_query->get();
 
-        return view('dashboard.crm.permissions.create', [
+
+        return view($this->getViewFilePath('create'), [
 
             'title' => 'Create Permission',
             'roles' => $roles,
@@ -98,29 +147,16 @@ class CRMRolePermissionsController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CRMRolePermissionsRequest $request)
     {
-        // Validate the request
-        $validator = Validator::make($request->all(), [
-            'role_id' => ['required', 'exists:crm_roles,id'], // Add exists validation
-            'permissions' => ['required', 'array'], // Ensure permissions is an array
-        ]);
-
-        // Handle validation failures
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput()
-                ->with('error', 'Please correct the form errors.');
-        }
 
         // Start a database transaction
         DB::beginTransaction();
 
         try {
             // Validated data
-            $validated = $validator->validated();
-            $buyerId = auth()->user()->buyer_id;
+            $validated = $request->validated();
+            $companyId = Auth::user()->company_id;
             $roleId = $validated['role_id'];
 
             // Remove any duplicate or invalid permission entries
@@ -132,9 +168,9 @@ class CRMRolePermissionsController extends Controller
             }
 
             // Bulk insert permissions
-            $permissionsToInsert = collect($permissions)->map(function ($permissionId) use ($buyerId, $roleId) {
+            $permissionsToInsert = collect($permissions)->map(function ($permissionId) use ($companyId, $roleId) {
                 return [
-                    'buyer_id' => $buyerId,
+                    'company_id' => $companyId,
                     'role_id' => $roleId,
                     'permission_id' => $permissionId,
                     'created_at' => now(),
@@ -143,9 +179,11 @@ class CRMRolePermissionsController extends Controller
             })->toArray();
 
             // Delete existing permissions for this role before inserting new ones
-            CRMRolePermissions::where('role_id', $roleId)
-                ->where('buyer_id', $buyerId)
-                ->delete();
+            $query = CRMRolePermissions::query();
+            $query = $this->applyTenantFilter($query);
+            $query = $query->where('role_id', '=', $roleId);
+            $query->delete();
+
 
             // Bulk insert new permissions
             CRMRolePermissions::insert($permissionsToInsert);
@@ -153,10 +191,11 @@ class CRMRolePermissionsController extends Controller
             // Commit the transaction
             DB::commit();
 
-            // Redirect with success message
-            return redirect()->route('crm.permissions.create')
-                ->with('success', 'Permissions created successfully.');
+            $this->tenantRoute = $this->getTenantRoute();
 
+            // Redirect with success message
+            return redirect()->route($this->tenantRoute . 'permissions.index')
+                ->with('success', 'Permissions created successfully.');
         } catch (\Exception $e) {
             // Rollback the transaction
             DB::rollBack();
@@ -177,61 +216,45 @@ class CRMRolePermissionsController extends Controller
     public function edit($id)
     {
         // Find the role to be edited
-        $role = CRMRole::where('id', $id)
-            ->where('buyer_id', auth()->user()->buyer_id)
-            ->firstOrFail();
+        $query = CRMRole::query()->where('id', '=', $id); // Use $id without quotes
+        $query = $this->applyTenantFilter($query);
+        $role = $query->firstOrFail(); // Corrected usage
 
         // Get the existing permissions for this role
-        $existingPermissions = CRMRolePermissions::where('role_id', $id)
-            ->where('buyer_id', auth()->user()->buyer_id)
-            ->pluck('permission_id')
-            ->toArray();
+        $queryRolePermission = CRMRolePermissions::query()->where('role_id', '=', $id);
+        $queryRolePermission = $this->applyTenantFilter($queryRolePermission);
+        $existingPermissions = $queryRolePermission->pluck('permission_id')->toArray();
 
         // Get all roles for the dropdown
-        $roles = CRMRole::where('buyer_id', auth()->user()->buyer_id)
-            ->get();
+        $roles = $this->applyTenantFilter(CRMRole::query())->get();
 
         // Get all permissions
-        $crm_permissions = CRMPermissions::where('buyer_id', 1)
-            ->get();
+        $crm_permissions = $this->applyTenantFilter(CRMPermissions::query())->get();
 
-        return view('dashboard.crm.permissions.edit', [
+        return view($this->getViewFilePath('edit'), [
             'title' => 'Edit Permissions',
             'role' => $role, // Pass the specific role being edited
             'existingPermissions' => $existingPermissions, // Pass existing permissions
             'roles' => $roles,
-            'crm_permissions' => $crm_permissions
+            'crm_permissions' => $crm_permissions,
         ]);
     }
+
 
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request)
+    public function update(CRMRolePermissionsRequest $request)
     {
-     
-        // Validate the request
-        $validator = Validator::make($request->all(), [
-            'role_id' => ['required', 'exists:crm_roles,id'],
-            'permissions' => ['sometimes', 'array'],
-        ]);
-
-        // Handle validation failures
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput()
-                ->with('error', 'Please correct the form errors.');
-        }
 
         // Start a database transaction
         DB::beginTransaction();
-
+        $this->tenantRoute = $this->getTenantRoute();
         try {
             // Validated data
-            $validated = $validator->validated();
-            $buyerId = auth()->user()->buyer_id;
+            $validated = $request->validated();
+            $companyId = Auth::user()->company_id;
             $roleId = $validated['role_id'];
 
             // Remove any duplicate or invalid permission entries
@@ -240,15 +263,13 @@ class CRMRolePermissionsController extends Controller
                 : [];
 
             // Delete existing permissions for this role before inserting new ones
-            CRMRolePermissions::where('role_id', $roleId)
-                ->where('buyer_id', $buyerId)
-                ->delete();
+            $this->applyTenantFilter(CRMRolePermissions::query()->where('role_id', '=', $roleId))->delete();
 
             // If permissions are provided, insert them
             if (!empty($permissions)) {
-                $permissionsToInsert = collect($permissions)->map(function ($permissionId) use ($buyerId, $roleId) {
+                $permissionsToInsert = collect($permissions)->map(function ($permissionId) use ($companyId, $roleId) {
                     return [
-                        'buyer_id' => $buyerId,
+                        'company_id' => $companyId,
                         'role_id' => $roleId,
                         'permission_id' => $permissionId,
                         'created_at' => now(),
@@ -264,9 +285,8 @@ class CRMRolePermissionsController extends Controller
             DB::commit();
 
             // Redirect with success message
-            return redirect()->route('crm.permissions.index')
+            return redirect()->route($this->tenantRoute . 'permissions.index')
                 ->with('success', 'Permissions updated successfully.');
-
         } catch (\Exception $e) {
             // Rollback the transaction
             DB::rollBack();
@@ -287,9 +307,8 @@ class CRMRolePermissionsController extends Controller
     {
         try {
             // Delete all rows with matching role_id and buyer_id
-            CRMRolePermissions::where('role_id', $id)
-                ->where('buyer_id', auth()->user()->buyer_id)
-                ->delete();
+
+            $this->applyTenantFilter(CRMRolePermissions::query()->where('role_id', '=', $id))->delete();
 
             // Return success response
             return redirect()->back()->with('success', 'Permissions deleted successfully.');

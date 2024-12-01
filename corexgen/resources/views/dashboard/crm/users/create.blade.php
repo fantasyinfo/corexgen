@@ -4,18 +4,18 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-lg-12">
+        <div class="col-lg-9">
             <div class="card stretch stretch-full">
            
 
-                <form id="userForm" action="{{ route('crm.users.store') }}" method="POST">
+                <form id="userForm" action="{{ route(getPanelRoutes('users.store')) }}" method="POST">
                     @csrf
                     <div class="card-body general-info">
                         <div class="mb-5 d-flex align-items-center justify-content-between">
-                            <h5 class="fw-bold mb-0 me-4">
+                            <p class="fw-bold mb-0 me-4">
                                 <span class="d-block mb-2">{{ __('users.Create New User') }}</span>
                                 <span class="fs-12 fw-normal text-muted text-truncate-1-line">{{ __('crud.Please add correct information') }}</span>
-                            </h5>
+                            </p>
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-plus"></i>  <span>{{ __('users.Create User') }}</span>
                             </button>
@@ -24,7 +24,7 @@
                         <!-- Full Name Field -->
                         <div class="row mb-4 align-items-center">
                             <div class="col-lg-4">
-                                <label for="nameName" class="fw-semibold">{{ __('users.Full Name') }}: <span class="text-danger">*</span></label>
+                                <label for="nameName" class="mb-2 fw-semibold">{{ __('users.Full Name') }}: <span class="text-danger">*</span></label>
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">
@@ -48,7 +48,7 @@
                         <!-- Email Field -->
                         <div class="row mb-4 align-items-center">
                             <div class="col-lg-4">
-                                <label for="emailName" class="fw-semibold">{{ __('users.Email') }}: <span class="text-danger">*</span></label>
+                                <label for="emailName" class="mb-2 fw-semibold">{{ __('users.Email') }}: <span class="text-danger">*</span></label>
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">
@@ -72,12 +72,12 @@
                         <!-- Role Selection Field -->
                         <div class="row mb-4 align-items-center">
                             <div class="col-lg-4">
-                                <label for="role_id" class="fw-semibold">{{ __('users.Select Role') }}: <span class="text-danger">*</span></label>
+                                <label for="role_id" class="mb-2 fw-semibold">{{ __('users.Select Role') }}: <span class="text-danger">*</span></label>
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">
                                   
-                                    <select class="form-control select2-hidden-accessible @error('role_id') is-invalid @enderror" name="role_id" id="role_id">
+                                    <select class="form-control searchSelectBox  @error('role_id') is-invalid @enderror" name="role_id" id="role_id">
                                         @if($roles && $roles->isNotEmpty())
                                             @foreach($roles as $role)
                                                 <option value="{{ $role->id }}" {{ old('role_id') == $role->id ? 'selected' : '' }}>
@@ -100,7 +100,7 @@
                         <!-- Password Field -->
                         <div class="row mb-4 align-items-center">
                             <div class="col-lg-4">
-                                <label for="passName" class="fw-semibold">{{ __('users.Password') }}: <span class="text-danger">*</span></label>
+                                <label for="passName" class="fmb-2 w-semibold">{{ __('users.Password') }}: <span class="text-danger">*</span></label>
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->bigInteger('media_id')->nullable();
             $table->bigInteger('buyer_id');
             $table->boolean('is_super_user')->default(false);
+            $table->string('input_type')->nullable();
             $table->bigInteger('updated_by')->nullable();
             $table->bigInteger('created_by')->nullable();
             $table->timestamps();

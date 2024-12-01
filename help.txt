@@ -1,22 +1,3 @@
-Hey, I have got a admin template with licence key from my team mates he has the unlimited download subscription, i have attached the details below, 
-
-My query is i m a creating a laravel software using this admin html template, with full fledged backend & database, is i m allow to sell my software on codecanyon, i have a doubt using this template does not means to get a copyright because i have the licence key also it clearly write, i can commercialy sell this. i m just using the html of it, rest entire laravel project is mine.
-
-
-
-
-LICENSE CERTIFICATE: Envato Elements Item
-=================================================
-This license certificate documents a license to use the item listed below
-on a non-exclusive, commercial, worldwide and revokable basis, for
-one Single Use for this Registered Project.
-
-Item Title:                      Duralux - CRM Admin Dashboard Bootstrap Template
-Item URL:                        https://elements.envato.com/duralux-crm-admin-dashboard-bootstrap-template-YNQVKGJ
-Item ID:                         YNQVKGJ
-Author Username:                 maryinparis
-Licensee:                        Akshay Tikle
-Registered Project Name:         Ckuriosity
-License Date:                    November 17th, 2024
-Item License Code:               Hidden as per this textbox rule
-
+remove that provider class from config/app.php providers array
+composer file remove the autoload of that module
+composer run dump-autoload

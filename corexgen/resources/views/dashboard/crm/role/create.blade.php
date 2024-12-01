@@ -3,18 +3,18 @@
 @section('content')
 <div class="container-fluid">
     <div class="row">
-        <div class="justify-content-md-center col-lg-8">
+        <div class="justify-content-md-center col-lg-9">
             <div class="card stretch stretch-full">
            
 
-                <form id="roleForm" action="{{ route('crm.role.store') }}" method="POST">
+                <form id="roleForm" action="{{ route(getPanelRoutes('role.store')) }}" method="POST">
                     @csrf
                     <div class="card-body general-info">
                         <div class="mb-5 d-flex align-items-center justify-content-between">
-                            <h5 class="fw-bold mb-0 me-4">
-                                <span class="d-block mb-2">{{ __('crm_role.Create New Role') }}</span>
+                            <p class="fw-bold mb-0 me-4">
+                                <span class="d-block">{{ __('crm_role.Create New Role') }}</span>
                                 <span class="fs-12 fw-normal text-muted text-truncate-1-line">{{ __('crud.Please add correct information') }}</span>
-                            </h5>
+                            </p>
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-plus"></i> <span>{{ __('crm_role.Create Role') }}</span>
                             </button>
@@ -22,7 +22,7 @@
 
                         <div class="row mb-4 align-items-center">
                             <div class="col-lg-4">
-                                <label for="roleName" class="fw-semibold">{{ __('crm_role.Role Name') }}: <span class="text-danger">*</span></label>
+                                <label for="roleName" class="mb-2 fw-semibold">{{ __('crm_role.Role Name') }}: <span class="text-danger">*</span></label>
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">
@@ -45,7 +45,7 @@
 
                         <div class="row mb-4 align-items-center">
                             <div class="col-lg-4">
-                                <label for="roleDesc" class="fw-semibold">{{ __('crm_role.Description') }}:</label>
+                                <label for="roleDesc" class="mb-2 fw-semibold">{{ __('crm_role.Description') }}:</label>
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">

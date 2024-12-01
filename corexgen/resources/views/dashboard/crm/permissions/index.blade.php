@@ -2,17 +2,13 @@
 
 @section('content')
     <div class="container-fluid">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center border-bottom pb-2">
-                <h5 class="card-title">{{ __('crm_permissions.Permissions Management') }}</h5>
-                <div class="card-header-action">
-                    @if (hasPermission('PERMISSIONS.CREATE'))
-                        <a data-toggle="tooltip" data-placement="top" title="Create New" href="{{ route('crm.permissions.create') }}"
-                            class="btn btn-md btn-primary me-2">
-                            <i class="fas fa-plus"></i> <span>{{ __('crm_permissions.Create Permissions') }}</span>
-                        </a>
-                    @endif
-                   
+        <div class="card shadow-sm rounded p-3">
+            <div class="card-header border-bottom pb-2">
+                <div class="row ">
+                    <div class="col-md-4">
+                        <h5 class="card-title">{{ __('crm_permissions.Permissions Management') }}</h5>
+                    </div>
+                    @include('layout.components.header-buttons')
                 </div>
             </div>
 
@@ -65,8 +61,12 @@
             const dbTableAjax = $("#permissionTable").DataTable({
                 processing: true,
                 serverSide: true,
+                stateSave: true,
+                 language: {
+                    "lengthMenu": "_MENU_ per page",
+                },
                 ajax: {
-                    url: "{{ route('crm.permissions.index') }}",
+                    url: "{{ route(getPanelRoutes($module . '.index')) }}",
                 },
                 columns: [{
                         data: 'role_name',
