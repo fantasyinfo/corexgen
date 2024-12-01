@@ -216,12 +216,7 @@ table tr {
 
 
 
-.select2 ,
-.select2-container--open, 
-.select2-container--focus ,
-.select2-container, 
-.select2-container--default, 
-.select2-container--above
+.select2
 {
     width: 100% !important;
 }

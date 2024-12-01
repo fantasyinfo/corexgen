@@ -4,3 +4,6 @@
     @csrf
     <button type="submit" class="btn btn-danger">Logout</button>
 </form>
+
+
+<a href="/add-default-countries-cities">Add Country & Cities if queue:work is running in bg</a>

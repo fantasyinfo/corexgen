@@ -135,6 +135,15 @@
         .step-item.completed span {
             display: none;
         }
+
+        #skipSmtpBtn {
+            background-color: #9ca3af;
+            color: white;
+        }
+
+        #skipSmtpBtn:hover {
+            background-color: #6b7280;
+        }
     </style>
 </head>
 
@@ -324,6 +333,14 @@
                                     class="w-full px-4 py-2 rounded border dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                             </div>
                         </div>
+
+                        <div class="mt-4 text-center">
+                            <button type="button" id="skipSmtpBtn" class="px-6 py-2 rounded hover:opacity-90">
+                                <i class="fas fa-forward mr-2"></i>Skip SMTP Configuration
+                            </button>
+                            <p class="text-sm text-gray-500 mt-2">You can configure SMTP settings later in the admin
+                                panel</p>
+                        </div>
                     </div>
 
                     <!-- Step 5: Admin Configuration -->
@@ -510,6 +527,7 @@
         const totalSteps = 5;
         const form = document.getElementById('installerForm');
         const nextBtn = document.getElementById('nextBtn');
+        const skipSmtpBtn = document.getElementById('skipSmtpBtn');
         const prevBtn = document.getElementById('prevBtn');
         const submitBtn = document.getElementById('submitBtn');
 
@@ -680,8 +698,18 @@
             }
         }
 
+         // Add a global variable to track SMTP skip status
+        let skipSmtp = false;
+
         // Test SMTP Connection
         async function testSmtp() {
+
+            // If SMTP is explicitly skipped, return true
+            if (skipSmtp) {
+                return true;
+            }
+
+            
             const smtpData = {
                 smtp_host: form.querySelector('[name="smtp_host"]').value,
                 smtp_port: form.querySelector('[name="smtp_port"]').value,
@@ -789,6 +817,19 @@
 
             try {
                 const formData = new FormData(form);
+
+                // If SMTP was skipped, don't send SMTP-related fields
+                if (skipSmtp) {
+                    formData.delete('smtp_host');
+                    formData.delete('smtp_port');
+                    formData.delete('smtp_username');
+                    formData.delete('smtp_password');
+                    formData.delete('smtp_encryption');
+                    formData.delete('mail_from_address');
+                    formData.delete('mail_from_name');
+                }
+
+
                 const response = await fetch('/installer/install', {
                     method: 'POST',
                     body: formData,
@@ -863,6 +904,24 @@
         });
 
 
+
+          // Add event listener for skipping SMTP configuration
+        skipSmtpBtn.addEventListener('click', () => {
+            // Mark SMTP as skipped
+            skipSmtp = true;
+            
+            document.querySelector(`#step${currentStep}`).classList.add('hidden');
+            currentStep++;
+            document.querySelector(`#step${currentStep}`).classList.remove('hidden');
+
+            // Update navigation buttons
+            if (currentStep === totalSteps) {
+                nextBtn.classList.add('hidden');
+                submitBtn.classList.remove('hidden');
+            }
+
+            updateProgress();
+        });
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             updateProgress();

@@ -301,13 +301,13 @@ class SystemInstallerController extends Controller
                 'db_username' => 'required|string',
                 'db_password' => 'nullable|string',
                 'purchase_code' => 'required|string',
-                'smtp_host' => 'required',
-                'smtp_port' => 'required|integer',
-                'smtp_username' => 'required',
-                'smtp_password' => 'required',
-                'smtp_encryption' => 'required|in:tls,ssl',
-                'mail_from_address' => 'required|email',
-                'mail_from_name' => 'required'
+                'smtp_host' => 'nullable',
+                'smtp_port' => 'nullable|integer',
+                'smtp_username' => 'nullable',
+                'smtp_password' => 'nullable',
+                'smtp_encryption' => 'nullable|in:tls,ssl',
+                'mail_from_address' => 'nullable|email',
+                'mail_from_name' => 'nullable'
             ]);
 
             if ($validator->fails()) {
@@ -349,6 +349,7 @@ class SystemInstallerController extends Controller
             // Clear and cache configuration
             Artisan::call('config:clear');
             Artisan::call('config:cache');
+            Artisan::call('optimize');
 
             \Log::info('DB Commit...');
 
@@ -409,23 +410,24 @@ class SystemInstallerController extends Controller
         }
 
         $replacements = [
-            'APP_NAME' => '"'.str_replace('"', '', $request->site_name).'"',
+            'APP_NAME' => '"' . str_replace('"', '', $request->site_name) . '"',
             'APP_URL' => url('/'),
-            'DB_HOST' => $request->db_host,
-            'DB_PORT' => $request->db_port,
-            'DB_DATABASE' => $request->db_name,
-            'DB_USERNAME' => $request->db_username,
-            'DB_PASSWORD' => $request->db_password,
+            'DB_HOST' => $request->db_host ?? '127.0.0.1',
+            'DB_PORT' => $request->db_port ?? '3306',
+            'DB_DATABASE' => $request->db_name ?? '',
+            'DB_USERNAME' => $request->db_username ?? '',
+            'DB_PASSWORD' => $request->db_password ?? '',
             'MAIL_MAILER' => 'smtp',
-            'MAIL_HOST' => $request->smtp_host,
-            'MAIL_PORT' => $request->smtp_port,
-            'MAIL_USERNAME' => $request->smtp_username,
-            'MAIL_PASSWORD' => $request->smtp_password,
-            'MAIL_ENCRYPTION' => $request->smtp_encryption,
-            'MAIL_FROM_ADDRESS' => $request->mail_from_address,
-            'MAIL_FROM_NAME' => '"'.str_replace('"', '', $request->mail_from_name).'"',
+            'MAIL_HOST' => $request->smtp_host ?? '',
+            'MAIL_PORT' => $request->smtp_port ?? '',
+            'MAIL_USERNAME' => $request->smtp_username ?? '',
+            'MAIL_PASSWORD' => $request->smtp_password ?? '',
+            'MAIL_ENCRYPTION' => $request->smtp_encryption ?? 'tls',
+            'MAIL_FROM_ADDRESS' => $request->mail_from_address ?? '',
+            'MAIL_FROM_NAME' => '"' . str_replace('"', '', $request->mail_from_name ?? '') . '"',
             'SESSION_DRIVER' => 'database'
         ];
+
 
         $envContent = File::get($envPath);
         $lines = explode("\n", $envContent);
@@ -471,6 +473,7 @@ class SystemInstallerController extends Controller
         Artisan::call('db:seed', ['--class' => 'CRMMenuSeeder']);
         Artisan::call('db:seed', ['--class' => 'CRMRoleSeeder']);
         Artisan::call('db:seed', ['--class' => 'CRMSettingsSeeder']);
+        Artisan::call('db:seed', ['--class' => 'PlansSeeder']);
     
     }
     
