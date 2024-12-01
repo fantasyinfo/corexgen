@@ -12,17 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('subscriptions', function (Blueprint $table) {
+            $table->id();
             $table->unsignedBigInteger('plan_id');
             $table->unsignedBigInteger('company_id');
             $table->unsignedBigInteger('payment_id');
             $table->date('start_date');
-            $table->date('end_date');
+            $table->date('end_date')->nullable();
             $table->date('next_billing_date');
             $table->enum('billing_cycle', PLANS_BILLING_CYCLES['BILLINGS_TABLE'])->default(PLANS_BILLING_CYCLES['BILLINGS']['1 MONTH']);
             $table->unsignedBigInteger('pervious_plan_id')->nullable();
             $table->date('upgrade_date')->nullable();
             $table->enum('status', CRM_STATUS_TYPES['SUBSCRIPTION']['TABLE_STATUS'])->default(CRM_STATUS_TYPES['SUBSCRIPTION']['STATUS']['ACTIVE']);
 
+            $table->timestamps();
 
             $table->foreign('plan_id')->references('id')->on('plans')->onDelete('cascade');
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');

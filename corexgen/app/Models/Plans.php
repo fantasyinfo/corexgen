@@ -21,6 +21,10 @@ class Plans extends Model
        return $this->hasMany(PlansFeatures::class,'plan_id');
     }
 
+    public function subscription(){
+        return $this->hasMany(Subscription::class,'plan_id');
+     }
+
     public function company(){
         return $this->hasOne(Company::class,'plan_id');
     }

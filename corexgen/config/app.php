@@ -70,7 +70,8 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+
+    'timezone' => 'Asia/Kolkata', // todo:: create a dropdown on setting to set this value
 
     /*
     |--------------------------------------------------------------------------
@@ -83,7 +84,7 @@ return [
     |
     */
 
-    'locale' => 'en',
+    'locale' => 'en', // todo:: create a dropdown on setting to set this value
 
     /*
     |--------------------------------------------------------------------------
