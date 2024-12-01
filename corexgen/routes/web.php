@@ -127,8 +127,7 @@ Route::get('/get-cities/{countryId}', function ($countryId) {
 // crm routes
 Route::middleware([
     'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
+    // config('jetstream.auth_session'),
     'check.installation'
 ])->prefix(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']))->as(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']) . '.')->group(function () {
 
@@ -283,19 +282,22 @@ Route::middleware([
     // companies routes
     Route::prefix('companies')->as('companies.')->group(function () {
         // role for fetch, store, update
-        Route::get('/', [CompaniesController::class, 'index'])->name('index')->middleware('check.permission:USERS.READ_ALL');
-        Route::post('/', [CompaniesController::class, 'store'])->name('store')->middleware('check.permission:USERS.CREATE');
-        Route::put('/', [CompaniesController::class, 'update'])->name('update')->middleware('check.permission:USERS.UPDATE');
+        Route::get('/', [CompaniesController::class, 'index'])->name('index')->middleware('check.permission:COMPANIES.READ_ALL');
+        Route::post('/', [CompaniesController::class, 'store'])->name('store')->middleware('check.permission:COMPANIES.CREATE');
+        Route::put('/', [CompaniesController::class, 'update'])->name('update')->middleware('check.permission:COMPANIES.UPDATE');
 
         // create, edit, change status, delete
-        Route::get('/create', [CompaniesController::class, 'create'])->name('create')->middleware('check.permission:USERS.CREATE');
-        Route::get('/edit/{id}', [CompaniesController::class, 'edit'])->name('edit')->middleware('check.permission:USERS.UPDATE');
-        Route::get('/changeStatus/{id}/{status}', [CompaniesController::class, 'changeStatus'])->name('changeStatus')->middleware('check.permission:USERS.CHANGE_STATUS');
-        Route::delete('/destroy/{id}', [CompaniesController::class, 'destroy'])->name('destroy')->middleware('check.permission:USERS.DELETE');
+        Route::get('/create', [CompaniesController::class, 'create'])->name('create')->middleware('check.permission:COMPANIES.CREATE');
+        Route::get('/edit/{id}', [CompaniesController::class, 'edit'])->name('edit')->middleware('check.permission:COMPANIES.UPDATE');
+        Route::get('/changeStatus/{id}/{status}', [CompaniesController::class, 'changeStatus'])->name('changeStatus')->middleware('check.permission:COMPANIES.CHANGE_STATUS');
+        Route::delete('/destroy/{id}', [CompaniesController::class, 'destroy'])->name('destroy')->middleware('check.permission:COMPANIES.DELETE');
 
         // validate, export, import
-        Route::get('/export', [CompaniesController::class, 'export'])->name('export')->middleware('check.permission:USERS.EXPORT');
-        Route::post('/import', [CompaniesController::class, 'import'])->name('import')->middleware('check.permission:USERS.IMPORT');
+        Route::get('/export', [CompaniesController::class, 'export'])->name('export')->middleware('check.permission:COMPANIES.EXPORT');
+        Route::post('/import', [CompaniesController::class, 'import'])->name('import')->middleware('check.permission:COMPANIES.IMPORT');
+
+        // view compnay login as company
+        Route::get('/view/{companyid}', [CompaniesController::class, 'view'])->name('view')->middleware('check.permission:COMPANIES.VIEW');
 
     });
 

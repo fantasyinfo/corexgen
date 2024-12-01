@@ -411,4 +411,75 @@ class CompaniesController extends Controller
             return redirect()->back()->with('error', 'Failed to changed the user status: ' . $e->getMessage());
         }
     }
+
+
+    public function view($companyid)
+    {
+        // Enable query logging for detailed investigation
+        \DB::enableQueryLog();
+    
+        // Fetch the company owner with extensive logging
+        $user = User::where('company_id', $companyid)
+            ->where('role_id', null)
+            ->where('is_tenant', 0)
+            ->first();
+    
+        \Log::info('User Switching Debug', [
+            'companyid' => $companyid,
+            'query' => \DB::getQueryLog(),
+            'user_found' => $user ? true : false,
+            'user_details' => $user ? $user->toArray() : null
+        ]);
+    
+        if (!$user) {
+            return redirect()->back()->with('error', 'Company account not found.');
+        }
+    
+        try {
+            // Explicitly use the 'web' guard
+            $guard = Auth::guard('web');
+    
+            \Log::info('Active Guard Before Logout', ['guard' => get_class($guard)]);
+    
+            // Logout the current user if authenticated
+            if ($guard->check()) {
+                $guard->logout();
+            }
+    
+            // Completely reset the session
+            request()->session()->flush();
+            request()->session()->invalidate();
+            request()->session()->regenerateToken();
+    
+            // Log in the new user using 'web' guard
+            $guard->loginUsingId($user->id);
+    
+            // Verify login
+            if (!$guard->check() || $guard->id() !== $user->id) {
+                throw new \Exception('Login verification failed.');
+            }
+    
+            \Log::info('Successful User Switch', [
+                'new_user_id' => $user->id,
+                'authenticated_user_id' => $guard->id(),
+                'authenticated_user_email' => $user->email,
+                'guard' => Auth::getDefaultDriver()
+            ]);
+    
+            // Redirect to the desired dashboard or view
+            return redirect()->route(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']) . '.home')
+                ->with('success', 'Logged in as company owner');
+    
+        } catch (\Exception $e) {
+            \Log::error('User Switching Failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'attempted_user_id' => $user->id,
+                'current_user_id' => Auth::id() ?: 'Not authenticated'
+            ]);
+    
+            return redirect()->back()->with('error', 'Failed to switch user account: ' . $e->getMessage());
+        }
+    }
+    
 }

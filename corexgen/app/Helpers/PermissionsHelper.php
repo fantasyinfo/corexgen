@@ -22,7 +22,7 @@ class PermissionsHelper
         'SETTINGS' => [701 => 'READ', 702 => 'UPDATE',],
         'MODULES' => [751 => 'CREATE', 752 => 'READ', 753 => 'READ_ALL', 754 => 'UPDATE', 755 => 'DELETE', 756 => 'IMPORT', 757 => 'EXPORT', 758 => 'FILTER', 759 => 'CHANGE_STATUS',],
         'APPUPDATES' => [801 => 'CREATE', 802 => 'READ', 803 => 'READ_ALL', 804 => 'UPDATE', 805 => 'DELETE', 806 => 'IMPORT', 807 => 'EXPORT', 808 => 'FILTER', 809 => 'CHANGE_STATUS',],
-        'COMPANIES' => [851 => 'CREATE', 852 => 'READ', 853 => 'READ_ALL', 854 => 'UPDATE', 855 => 'DELETE', 856 => 'IMPORT', 857 => 'EXPORT', 858 => 'FILTER', 859 => 'CHANGE_STATUS',],
+        'COMPANIES' => [851 => 'CREATE', 852 => 'READ', 853 => 'READ_ALL', 854 => 'UPDATE', 855 => 'DELETE', 856 => 'IMPORT', 857 => 'EXPORT', 858 => 'FILTER', 859 => 'CHANGE_STATUS', 860 => 'VIEW'],
         'PLANS' => [901 => 'CREATE', 902 => 'READ', 903 => 'READ_ALL', 904 => 'UPDATE', 905 => 'DELETE', 906 => 'CHANGE_STATUS',],
        
 
