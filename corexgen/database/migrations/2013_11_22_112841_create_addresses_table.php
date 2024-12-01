@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('postal_code')->nullable();
             $table->unsignedBigInteger('city_id');
             $table->unsignedBigInteger('country_id');
-            $table->enum('address_type', ['billing', 'shipping', 'headquarters', 'office', 'home', 'other'])->nullable(); // Optional address types
+            $table->enum('address_type', ADDRESS_TYPES['COMPANY']['TABLE'])->nullable(); // Optional address types
 
             $table->timestamps();
 

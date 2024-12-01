@@ -15,7 +15,7 @@ class Company extends Model
 
     protected $table = self::table;
 
-    protected $fillable = ['name', 'email', 'phone', 'status', 'tenant_id', 'address_id'];
+    protected $fillable = ['name', 'email', 'phone', 'status', 'tenant_id', 'address_id','plan_id'];
 
 
     public function tenant(){
@@ -26,6 +26,18 @@ class Company extends Model
     {
         return $this->hasMany(User::class);
     }
+
+
+    public function addresses(){
+        return $this->belongsTo(Address::class,'address_id');
+    }
+
+    public function plans(){
+        return $this->belongsTo(Plans::class,'plan_id');
+    }
+
+
+
 
     protected static function boot(){
         parent::boot();

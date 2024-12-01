@@ -171,8 +171,8 @@
                                                 class="mb-2 fw-semibold">{{ __('address.Address') }}:</label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <textarea class="form-control" id="registeredAddress" name="address" rows="3"
-                                                placeholder="{{ __('Enter Registered Address') }}">{{ old('address') }}</textarea>
+                                            <textarea class="form-control" id="registeredAddress" name="address.street_address" rows="3"
+                                                placeholder="{{ __('Enter Registered street_address') }}">{{ old('address.address') }}</textarea>
                                         </div>
                                     </div>
                                     <div class="row mb-4 align-items-center">
@@ -184,13 +184,13 @@
                                             <div class="input-group">
 
                                                 <select
-                                                    class="form-control searchSelectBox  @error('country_id') is-invalid @enderror"
-                                                    name="country_id" id="country_id">
+                                                    class="form-control searchSelectBox  @error('address.country_id') is-invalid @enderror"
+                                                    name="address.country_id" id="country_id">
                                                     <option value="0" selected> ----- Select Country ---------- </option>
                                                     @if ($country)
                                                         @foreach ($country as $country)
                                                             <option value="{{ $country->id }}"
-                                                                {{ old('country_id') == $country->id ? 'selected' : '' }}>
+                                                                {{ old('address.country_id') == $country->id ? 'selected' : '' }}>
                                                                 {{ $country->name }}
                                                             </option>
                                                         @endforeach
@@ -199,7 +199,7 @@
                                                     @endif
                                                 </select>
                                                 <div class="invalid-feedback" id="country_idError">
-                                                    @error('country_id')
+                                                    @error('address.country_id')
                                                         {{ $message }}
                                                     @enderror
                                                 </div>
@@ -215,8 +215,8 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <select
-                                                class="form-control searchSelectBox @error('city_id') is-invalid @enderror"
-                                                name="city_id" id="city_id">
+                                                class="form-control searchSelectBox @error('address.city_id') is-invalid @enderror"
+                                                name="address.city_id" id="city_id">
                                                 <option value="0" selected> ----- Select City ----------</option>
                                             </select>
                                         </div>
@@ -227,8 +227,8 @@
                                                 class="mb-2 fw-semibold">{{ __('address.Pincode') }}:</label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <input type="text" class="form-control" id="pincode" name="pincode"
-                                                placeholder="{{ __('Enter Pincode') }}" value="{{ old('pincode') }}">
+                                            <input type="text" class="form-control" id="pincode" name="address.pincode"
+                                                placeholder="{{ __('Enter Pincode') }}" value="{{ old('address.pincode') }}">
                                         </div>
                                     </div>
                                 </div>

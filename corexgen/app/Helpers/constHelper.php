@@ -247,3 +247,10 @@ use App\Helpers\PermissionsHelper;
     'ROLES' => 'ROLES',
     'USERS' => 'USERS',
 ]);
+
+!defined('ADDRESS_TYPES') && define('ADDRESS_TYPES', [
+    'COMPANY' => [
+        'TABLE' => ['HOME', 'OFFICE'],
+        'SHOW' => ['HOME' => 'HOME', 'OFFICE' => 'OFFICE'],
+    ],
+]);

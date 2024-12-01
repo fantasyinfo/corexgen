@@ -10,6 +10,7 @@ use App\Models\Company;
 use App\Models\Country;
 use App\Models\CRM\CRMRole;
 use App\Models\Plans;
+use App\Services\CompanyService;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -83,7 +84,7 @@ class CompaniesController extends Controller
 
         $plans = Plans::with('plans_features')->get();
         $country = Country::with('cities')->get();
-        
+
 
         // Apply dynamic filters based on request input
         $query->when($request->filled('name'), fn($q) => $q->where('name', 'LIKE', "%{$request->name}%"));
@@ -133,7 +134,7 @@ class CompaniesController extends Controller
             'permissions' => PermissionsHelper::getPermissionsArray('COMPANIES'),
             'module' => PANEL_MODULES[$this->getPanelModule()]['companies'],
             'plans' => $plans,
-            'country' => $country 
+            'country' => $country
         ]);
     }
 
@@ -144,39 +145,28 @@ class CompaniesController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(CompaniesRequest $request)
+    public function store(CompaniesRequest $request, CompanyService $companyService)
     {
         $this->tenantRoute = $this->getTenantRoute();
-    
+
         try {
-            DB::beginTransaction();
-    
-            $validated = $request->validated();
-            $company = Company::create($validated);
-    
-            if ($company) {
-                $userData = array_merge($validated, [
-                    'is_tenant' => false,
-                    'company_id' => $company->id,
-                    'status' => CRM_STATUS_TYPES['USERS']['STATUS']['ACTIVE'],
-                    'password' => Hash::make($validated['password']),
-                ]);
-    
-                User::create($userData);
-            }
-    
-            DB::commit();
-    
-            return redirect()->route($this->tenantRoute . 'companies.index')
+            $company = $companyService->createCompany($request->validated());
+
+            return redirect()
+                ->route($this->getTenantRoute() . 'companies.index')
                 ->with('success', 'Company created successfully.');
         } catch (\Exception $e) {
-            DB::rollBack();
-    
-            return redirect()->back()
-                ->with('error', 'An error occurred while creating the company & user: ' . $e->getMessage());
+            \Log::error('Company creation failed', [
+                'error' => $e->getMessage(),
+                'data' => $request->validated()
+            ]);
+
+            return redirect()
+                ->back()
+                ->with('error', 'An error occurred while creating the company.');
         }
     }
-    
+
 
 
 
@@ -190,7 +180,7 @@ class CompaniesController extends Controller
 
         $plans = Plans::with('plans_features')->get();
         $country = Country::all();
-        
+
 
         return view($this->getViewFilePath('create'), [
             'title' => 'Create Company',

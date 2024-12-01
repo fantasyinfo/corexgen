@@ -29,6 +29,11 @@ class CompaniesRequest extends FormRequest
             'email' => ['required','email','unique:companies',], 
             'phone' => ['required','min:10'], 
             'password' => ['required','min:8'], 
+            'plan_id' => ['required','exists:plans,id'], 
+            'address_street_address' => 'nullable|string|max:255',
+            'address_country_id' => 'nullable',
+            'address_city_id' => 'nullable',
+            'address_pincode' => 'nullable|string|max:10',
         ];
     }
 }

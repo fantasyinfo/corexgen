@@ -16,7 +16,13 @@ class Country extends Model
     protected $fillable = ['name', 'code'];
 
 
-   public function cities(){
-    return $this->hasMany(City::class,'country_id');
-   }
+    public function cities()
+    {
+        return $this->hasMany(City::class, 'country_id');
+    }
+
+    public function addresses()
+    {
+        return $this->hasMany(Address::class,'country_id');
+    }
 }

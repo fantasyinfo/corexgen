@@ -116,6 +116,8 @@ Route::get('/get-cities/{countryId}', function ($countryId) {
 
 
 
+    // add country, city tables in bg
+    Route::get('/add-default-countries-cities', [CountryCitySeederController::class, 'runSeeder']);
 
 
 
@@ -216,8 +218,7 @@ Route::middleware([
 
 
 
-    // add country, city tables in bg
-    Route::get('/add-default-countries-cities', [CountryCitySeederController::class, 'runSeeder']);
+
 
 
 });
