@@ -144,7 +144,7 @@
                                             <div class="input-group">
 
                                                 <select
-                                                    class="form-control searchSelectBox select2-hidden-accessible @error('billing_cycle') is-invalid @enderror"
+                                                    class="form-control searchSelectBox  @error('billing_cycle') is-invalid @enderror"
                                                     name="billing_cycle" id="billing_cycle">
                                                     @if (PLANS_BILLING_CYCLES['BILLINGS'])
                                                         @foreach (PLANS_BILLING_CYCLES['BILLINGS'] as $billingcycle)

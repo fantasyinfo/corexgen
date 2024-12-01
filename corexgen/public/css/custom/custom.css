@@ -105,21 +105,6 @@ table tr {
     /* Align with text */
 }
 
-.dropdown-menu .dropdown-item:hover {
-    background-color: var(--body-bg) !important;
-
-    transition: all 0.3s ease;
-
-}
-.dselect-wrapper .dropdown-menu .dropdown-item.active{
-    background-color: var(--primary-color);
-}
-
-
-.dselect-wrapper .dropdown-menu {
-    box-shadow: 0px 0px 15px rgb(167, 143, 240) !important;
-    border:1px solid #fff;
-}
      /* Custom styling for filter sidebar */
      .filter-sidebar {
         width: 350px;
@@ -227,4 +212,105 @@ table tr {
     .dark-mode .nav-tabs .nav-link.active {
         color: var(--primary-color);
     }
+}
+
+
+
+.select2 ,
+.select2-container--open, 
+.select2-container--focus ,
+.select2-container, 
+.select2-container--default, 
+.select2-container--above
+{
+    width: 100% !important;
+}
+
+
+
+/* Select2 Styling Integrated with Custom Dark Theme */
+.select2-container .select2-selection {
+    background-color: var(--input-bg);
+    color: var(--body-color);
+    border-color: var(--input-border);
+    transition: border-color 0.2s ease;
+}
+
+.select2-container.select2-container--focus .select2-selection {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(103, 61, 230, 0.25);
+}
+
+.select2-selection__rendered{
+    color: var(--body-color) !important;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected]{
+    background-color: var(--primary-color);
+}
+.select2-dropdown {
+    background-color: var(--card-bg);
+    color: var(--body-color);
+    border-color: var(--border-color);
+}
+
+.select2-container .select2-search__field {
+    background-color: var(--input-bg);
+    color: var(--body-color);
+    border-color: var(--input-border);
+}
+
+.select2-container .select2-results__option {
+    background-color: var(--card-bg);
+    color: var(--body-color);
+    transition: all 0.2s ease;
+}
+
+.select2-container .select2-results__option--highlighted {
+    background-color: var(--primary-color);
+    color: var(--light-color);
+}
+
+.select2-container .select2-results__option:hover {
+    background-color: var(--primary-color);
+    color: var(--light-color);
+}
+
+.select2-container .select2-results__option--selected {
+    background-color: var(--secondary-color);
+    color: var(--light-color);
+}
+
+/* Placeholder styling */
+.select2-container .select2-selection__placeholder {
+    color: var(--neutral-gray);
+}
+
+/* Dropdown arrow */
+.select2-container .select2-selection__arrow {
+    color: var(--body-color);
+}
+
+/* Improved focus and hover states */
+.select2-container.select2-container--open .select2-selection {
+    border-color: var(--primary-color);
+}
+
+/* Responsive and clean scrollbar */
+.select2-results__options {
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-color) var(--input-bg);
+}
+
+.select2-results__options::-webkit-scrollbar {
+    width: 8px;
+}
+
+.select2-results__options::-webkit-scrollbar-track {
+    background: var(--input-bg);
+}
+
+.select2-results__options::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color);
+    border-radius: 4px;
 }

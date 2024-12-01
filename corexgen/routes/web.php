@@ -12,6 +12,7 @@ use App\Http\Controllers\PlansController;
 use App\Http\Controllers\SystemInstallerController;
 use App\Http\Controllers\TaxController;
 use App\Http\Controllers\UserController;
+use App\Models\City;
 use App\Models\CRM\CRMRole;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\App;
@@ -103,6 +104,24 @@ Route::get('/setlang/{locale}', function (string $locale) {
     return redirect()->back()->with('success', 'Language Changed Successfully!');
 });
 
+
+// In your routes file, add a print statement to debug
+Route::get('/get-cities/{countryId}', function ($countryId) {
+ 
+    $cities = City::where('country_id', $countryId)->get(['id', 'name']);
+
+
+    return response()->json($cities);
+});
+
+
+
+
+
+
+
+
+
 // crm routes
 Route::middleware([
     'auth:sanctum',
@@ -112,7 +131,8 @@ Route::middleware([
 ])->prefix(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']))->as(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']) . '.')->group(function () {
 
     Route::get('/', function () {
-        dd('Company Panel Home'); })->name('home');
+        dd('Company Panel Home');
+    })->name('home');
 
     // role routes
     Route::prefix(PANEL_MODULES['COMPANY_PANEL']['role'])->as(PANEL_MODULES['COMPANY_PANEL']['role'] . '.')->group(function () {
@@ -213,7 +233,8 @@ Route::middleware([
 ])->prefix(getPanelUrl(PANEL_TYPES['SUPER_PANEL']))->as(getPanelUrl(PANEL_TYPES['SUPER_PANEL']) . '.')->group(function () {
 
     Route::get('/', function () {
-        dd('Super Panel Home'); })->name('home');
+        dd('Super Panel Home');
+    })->name('home');
     // role routes
     Route::prefix('role')->as('role.')->group(function () {
         // role for fetch, store, update
@@ -295,11 +316,11 @@ Route::middleware([
     });
 
 
-    
 
 
-      // plans routes
-      Route::prefix('plans')->as('plans.')->group(function () {
+
+    // plans routes
+    Route::prefix('plans')->as('plans.')->group(function () {
         // role for fetch, store, update
         Route::get('/', [PlansController::class, 'index'])->name('index')->middleware('check.permission:PLANS.READ_ALL');
         Route::post('/', [PlansController::class, 'store'])->name('store')->middleware('check.permission:PLANS.CREATE');

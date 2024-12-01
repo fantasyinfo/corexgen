@@ -14,7 +14,7 @@
 
             <div class="card-body">
 
-                @include('dashboard.crm.companies.components.companies-filters')
+                {{-- @include('dashboard.crm.companies.components.companies-filters') --}}
                 @include('layout.components.bulk-import-modal')
 
 

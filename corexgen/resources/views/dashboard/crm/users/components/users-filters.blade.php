@@ -33,7 +33,7 @@
                 <div class="form-group">
                     <label for="roleFilter" class="mb-2 font-12">{{ __('users.Role') }}</label>
                     <select id="roleFilter"
-                        class="form-control searchSelectBox select2-hidden-accessible @error('role_id') is-invalid @enderror"
+                        class="form-control searchSelectBox  @error('role_id') is-invalid @enderror"
                         name="role_id" id="role_id">
                         <option selected value="0">Select Role</option>
                         @if ($roles && $roles->isNotEmpty())

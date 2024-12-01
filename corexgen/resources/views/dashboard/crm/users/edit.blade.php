@@ -80,7 +80,7 @@
                             <div class="col-lg-8">
                                 <div class="input-group">
                           
-                                    <select class="form-control searchSelectBox select2-hidden-accessible @error('role_id') is-invalid @enderror" name="role_id" id="role_id">
+                                    <select class="form-control searchSelectBox @error('role_id') is-invalid @enderror" name="role_id" id="role_id">
                                         @if($roles && $roles->isNotEmpty())
                                             @foreach($roles as $role)
                                                 <option value="{{ $role->id }}" {{ $user->role_id == $role->id ? 'selected' : '' }}>

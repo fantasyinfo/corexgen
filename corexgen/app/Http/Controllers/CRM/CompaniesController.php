@@ -195,7 +195,8 @@ class CompaniesController extends Controller
         return view($this->getViewFilePath('create'), [
             'title' => 'Create Company',
             'plans' => $plans,
-            'country' => $country
+            'country' => $country,
+            'module' => PANEL_MODULES[$this->getPanelModule()]['companies'],
 
         ]);
     }

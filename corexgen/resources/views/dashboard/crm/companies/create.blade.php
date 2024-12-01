@@ -138,7 +138,7 @@
                                             <div class="input-group">
 
                                                 <select
-                                                    class="form-control searchSelectBox select2-hidden-accessible @error('plan_id') is-invalid @enderror"
+                                                    class="form-control searchSelectBox  @error('plan_id') is-invalid @enderror"
                                                     name="plan_id" id="plan_id">
                                                     @if ($plans)
                                                         @foreach ($plans as $plan)
@@ -184,8 +184,9 @@
                                             <div class="input-group">
 
                                                 <select
-                                                    class="form-control searchSelectBox select2-hidden-accessible @error('country_id') is-invalid @enderror"
+                                                    class="form-control searchSelectBox  @error('country_id') is-invalid @enderror"
                                                     name="country_id" id="country_id">
+                                                    <option value="0" selected> ----- Select Country ---------- </option>
                                                     @if ($country)
                                                         @foreach ($country as $country)
                                                             <option value="{{ $country->id }}"
@@ -214,9 +215,9 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <select
-                                                class="form-control searchSelectBox select2-hidden-accessible @error('city_id') is-invalid @enderror"
+                                                class="form-control searchSelectBox @error('city_id') is-invalid @enderror"
                                                 name="city_id" id="city_id">
-                                                <option value="0">----- Select City ----------</option>
+                                                <option value="0" selected> ----- Select City ----------</option>
                                             </select>
                                         </div>
                                     </div>
@@ -258,35 +259,64 @@
 
 
 
-        
+
 
         });
 
-            // country and cities
-            document.getElementById('country_id').addEventListener('change', function() {
-                const countryId = this.value;
-                const cityDropdown = document.getElementById('city_id');
+        console.log(document.getElementById('country_id'))
+        // country and cities
+        // Use Select2's event instead of native change
+        $('#country_id').on('change', function() {
+            const countryId = $(this).val();
+            const cityDropdown = $('#city_id');
 
-                console.log('alert')
+            // Debug logs
+            console.log('Selected Country ID:', countryId);
 
-                // Clear the city dropdown
-                cityDropdown.innerHTML = '<option value="">Select City</option>';
+            // If no country is selected, reset and exit
+            if (!countryId || countryId === "0") {
+                cityDropdown.empty().append('<option value="">Select City</option>');
+                cityDropdown.trigger('change'); // Trigger Select2 update
+                return;
+            }
 
-                if (countryId) {
-                    // Make an AJAX request to fetch cities
-                    fetch(`/get-cities/${countryId}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            // Populate the city dropdown with the fetched data
-                            for (const [id, name] of Object.entries(data)) {
-                                const option = document.createElement('option');
-                                option.value = id;
-                                option.textContent = name;
-                                cityDropdown.appendChild(option);
-                            }
-                        })
-                        .catch(error => console.error('Error fetching cities:', error));
+            // Clear and show loading
+            cityDropdown.empty().append('<option value="">Loading cities...</option>');
+            cityDropdown.trigger('change'); // Trigger Select2 update
+
+            // AJAX request
+            $.ajax({
+                url: `/get-cities/${countryId}`,
+                method: "GET",
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // More reliable CSRF token
+                },
+                success: function(response) {
+                    console.log('Received cities:', response);
+
+                    // Clear dropdown
+                    cityDropdown.empty().append('<option value="">Select City</option>');
+
+                    // Populate dropdown
+                    response.forEach(city => {
+                        const option = new Option(city.name, city.id);
+                        cityDropdown.append(option);
+                    });
+
+                    // Reinitialize Select2 and trigger change
+                    cityDropdown.trigger('change');
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error details:', xhr.responseText);
+                    console.error('Status:', status);
+                    console.error('Error:', error);
+
+                    cityDropdown.empty().append('<option value="">Error loading cities</option>');
+                    cityDropdown.trigger('change');
+
+                    alert('Failed to load cities. Please try again.');
                 }
             });
+        });
     </script>
 @endpush
