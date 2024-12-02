@@ -26,7 +26,7 @@ class CompaniesRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string',], 
-            'email' => ['required','email','unique:companies',], 
+            'email' => ['required','email','unique:companies','unique:users'], 
             'phone' => ['required','min:10'], 
             'password' => ['required','min:8'], 
             'plan_id' => ['required','exists:plans,id'], 

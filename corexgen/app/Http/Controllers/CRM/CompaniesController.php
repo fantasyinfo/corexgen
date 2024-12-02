@@ -163,7 +163,7 @@ class CompaniesController extends Controller
 
             return redirect()
                 ->back()
-                ->with('error', 'An error occurred while creating the company.');
+                ->with('error', 'An error occurred while creating the company. ' . $e->getMessage());
         }
     }
 

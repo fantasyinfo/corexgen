@@ -169,11 +169,18 @@ function getCRMMenus()
 {
     $user = Auth::user();
 
+    $menus = [];
+
     if ($user->is_tenant && session('panelAccess') === PANEL_TYPES['SUPER_PANEL']) {
 
-        return CRMMenu::where('panel_type', PANEL_TYPES['SUPER_PANEL'])->get();
+        $menus = CRMMenu::where('panel_type', PANEL_TYPES['SUPER_PANEL'])->get();
+        return $menus;
     }
-    return CRMMenu::where('panel_type', PANEL_TYPES['COMPANY_PANEL'])->get();
+
+    // echo PANEL_TYPES['COMPANY_PANEL'];
+    $menus = CRMMenu::where('panel_type', PANEL_TYPES['COMPANY_PANEL'])->get();
+
+    return $menus;
 }
 
 /**
@@ -273,8 +280,21 @@ function hasMenuPermission($permissionId = null)
     if ($permissionId == null)
         return false;
 
-    if (!$userRoleId)
+
+    if (!$userRoleId && $user->comapany_id == null) {
+
         return false;
+    } else if (!$userRoleId && $user->comapany_id != null) {
+        // its a company admin user
+
+        $permissionExists = DB::table('crm_role_permissions')
+            ->where('permission_id', $permissionId)
+            ->where('role_id', null)
+            ->where('company_id', $user->comapany_id)
+            ->exists();
+
+        return true;
+    }
 
     $permissionExists = DB::table('crm_role_permissions')
         ->where('permission_id', $permissionId)

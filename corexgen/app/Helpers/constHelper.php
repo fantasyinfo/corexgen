@@ -6,55 +6,64 @@ use App\Helpers\PermissionsHelper;
 /**
  * Constant Helpers Inside the APP
  */
+
+
+
+
+// initilize the permissions with matching keys for plans and permissions of menus
+PermissionsHelper::initializePermissions();
+
+
 !defined('CRMPERMISSIONS') && define('CRMPERMISSIONS', [
-    'DASHBOARD' => [
-        'name' => 'CRM_DASHBOARD',
+    PermissionsHelper::$plansPermissionsKeys['DASHBOARD'] => [
+        'name' => 'DASHBOARD',
         'id' => PermissionsHelper::getParentPermissionId('1'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['DASHBOARD']
     ],
-    'ROLE' => [
-        'name' => 'CRM_ROLE',
+    PermissionsHelper::$plansPermissionsKeys['ROLE'] => [
+        'name' => 'ROLE',
         'id' => PermissionsHelper::getParentPermissionId('2'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['ROLE']
     ],
-    'USERS' => [
-        'name' => 'CRM_USERS',
+    PermissionsHelper::$plansPermissionsKeys['USERS'] => [
+        'name' => 'USERS',
         'id' => PermissionsHelper::getParentPermissionId('3'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['USERS']
     ],
-    'PERMISSIONS' => [
-        'name' => 'CRM_PERMISSIONS',
+    PermissionsHelper::$plansPermissionsKeys['PERMISSIONS'] => [
+        'name' => 'PERMISSIONS',
         'id' => PermissionsHelper::getParentPermissionId('4'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['PERMISSIONS']
     ],
-    'SETTINGS' => [
-        'name' => 'CRM_SETTINGS',
+    PermissionsHelper::$plansPermissionsKeys['SETTINGS'] => [
+        'name' => 'SETTINGS',
         'id' => PermissionsHelper::getParentPermissionId('5'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['SETTINGS']
     ],
-    'PLANS' => [
-        'name' => 'CRM_PLANS',
-        'id' => PermissionsHelper::getParentPermissionId('5'),
+    PermissionsHelper::$plansPermissionsKeys['PLANS'] => [
+        'name' => 'PLANS',
+        'id' => PermissionsHelper::getParentPermissionId('6'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['PLANS']
     ],
-    'MODULES' => [
-        'name' => 'CRM_MODULES',
-        'id' => PermissionsHelper::getParentPermissionId('6'),
+    PermissionsHelper::$plansPermissionsKeys['MODULES'] => [
+        'name' => 'MODULES',
+        'id' => PermissionsHelper::getParentPermissionId('7'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['MODULES']
     ],
-    'APPUPDATES' => [
-        'name' => 'CRM_APPUPDATES',
-        'id' => PermissionsHelper::getParentPermissionId('7'),
+    PermissionsHelper::$plansPermissionsKeys['APPUPDATES'] => [
+        'name' => 'APPUPDATES',
+        'id' => PermissionsHelper::getParentPermissionId('8'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['APPUPDATES']
     ],
-    'COMPANIES' => [
-        'name' => 'CRM_COMPANIES',
-        'id' => PermissionsHelper::getParentPermissionId('8'),
+    PermissionsHelper::$plansPermissionsKeys['COMPANIES'] => [
+        'name' => 'COMPANIES',
+        'id' => PermissionsHelper::getParentPermissionId('9'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['COMPANIES']
     ],
 ]);
 
-!defined('CRM_MENU_ITEMS') && define('CRM_MENU_ITEMS', [
+// super panel menus
+!defined('CRM_MENU_ITEMS_TENANT') && define('CRM_MENU_ITEMS_TENANT', [
     'Dashboard' => [
         'menu_icon' => 'fa-tachometer-alt',
         'permission_id' => PermissionsHelper::getParentPermissionId('1'),
@@ -62,7 +71,7 @@ use App\Helpers\PermissionsHelper;
             'CRM' => [
                 'menu_url' => 'home',
                 'menu_icon' => 'fa-tachometer-alt',
-                'permission_id' => PermissionsHelper::findPermissionKey('DASHBOARD', 'READ_ALL')
+                'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['DASHBOARD'], 'READ_ALL')
             ]
         ]
     ],
@@ -70,47 +79,89 @@ use App\Helpers\PermissionsHelper;
         'menu_icon' => 'fa-users',
         'permission_id' => PermissionsHelper::getParentPermissionId('2'),
         'children' => [
-            'Role' => ['menu_url' => 'role.index', 'menu_icon' => 'fa-users', 'permission_id' => PermissionsHelper::findPermissionKey('ROLE', 'READ_ALL')],
-            'Permissions' => ['menu_url' => 'permissions.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey('PERMISSIONS', 'READ_ALL')],
+            'Role' => ['menu_url' => 'role.index', 'menu_icon' => 'fa-users', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['ROLE'], 'READ_ALL')],
+            'Permissions' => ['menu_url' => 'permissions.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PERMISSIONS'], 'READ_ALL')],
         ]
     ],
     'Users & Employees' => [
         'menu_icon' => 'fa-user',
         'permission_id' => PermissionsHelper::getParentPermissionId('3'),
         'children' => [
-            'Users' => ['menu_url' => 'users.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey('USERS', 'READ_ALL')],
+            'Users' => ['menu_url' => 'users.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['USERS'], 'READ_ALL')],
         ]
     ],
     'Compaines' => [
         'menu_icon' => 'fa-building',
         'permission_id' => PermissionsHelper::getParentPermissionId('4'),
         'children' => [
-            'Compaines' => ['menu_url' => 'companies.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey('COMPANIES', 'READ_ALL')],
+            'Compaines' => ['menu_url' => 'companies.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['COMPANIES'], 'READ_ALL')],
         ]
     ],
     'Plans' => [
         'menu_icon' => 'fa-clipboard-list',
         'permission_id' => PermissionsHelper::getParentPermissionId('5'),
         'children' => [
-            'Plans' => ['menu_url' => 'plans.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey('PLANS', 'READ_ALL')],
-   
+            'Plans' => ['menu_url' => 'plans.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PLANS'], 'READ_ALL')],
+
         ]
     ],
     'Settings' => [
         'menu_icon' => 'fa-cog',
         'permission_id' => PermissionsHelper::getParentPermissionId('6'),
         'children' => [
-            'Settings' => ['menu_url' => 'settings.index', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey('SETTINGS', 'READ')],
+            'Settings' => ['menu_url' => 'settings.index', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS'], 'READ')],
         ]
     ],
     'Modules' => [
         'menu_icon' => 'fa-box',
         'permission_id' => PermissionsHelper::getParentPermissionId('7'),
         'children' => [
-            'Modules' => ['menu_url' => 'modules.index', 'menu_icon' => 'fa-box', 'permission_id' => PermissionsHelper::findPermissionKey('MODULES', 'READ_ALL')],
-            'AppUpdates' => ['menu_url' => 'appupdates.index', 'menu_icon' => 'fa-box', 'permission_id' => PermissionsHelper::findPermissionKey('APPUPDATES', 'READ_ALL')],
+            'Modules' => ['menu_url' => 'modules.index', 'menu_icon' => 'fa-box', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['MODULES'], 'READ_ALL')],
+            'AppUpdates' => ['menu_url' => 'appupdates.index', 'menu_icon' => 'fa-box', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['APPUPDATES'], 'READ_ALL')],
         ]
     ],
+]);
+
+// company panel menus
+!defined('CRM_MENU_ITEMS_COMPANY') && define('CRM_MENU_ITEMS_COMPANY', [
+    'Dashboard' => [
+        'menu_icon' => 'fa-tachometer-alt',
+        'permission_id' => PermissionsHelper::getParentPermissionId('1'),
+        'is_default' => true,
+        'children' => [
+            'CRM' => [
+                'menu_url' => 'home',
+                'menu_icon' => 'fa-tachometer-alt',
+                'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['DASHBOARD'], 'READ_ALL')
+            ]
+        ]
+    ],
+    'Settings' => [
+        'menu_icon' => 'fa-cog',
+        'is_default' => true,
+        'permission_id' => PermissionsHelper::getParentPermissionId('6'),
+        'children' => [
+            'Settings' => ['menu_url' => 'settings.index', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS'], 'READ')],
+        ]
+    ],
+    'Roles & Permissions' => [
+        'menu_icon' => 'fa-users',
+        'permission_plan' => PermissionsHelper::$plansPermissionsKeys['ROLE'],
+        'permission_id' => PermissionsHelper::getParentPermissionId('2'),
+        'children' => [
+            'Role' => ['menu_url' => 'role.index', 'menu_icon' => 'fa-users', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['ROLE'], 'READ_ALL')],
+            'Permissions' => ['menu_url' => 'permissions.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PERMISSIONS'], 'READ_ALL')],
+        ]
+    ],
+    'Users & Employees' => [
+        'menu_icon' => 'fa-user',
+        'permission_plan' => PermissionsHelper::$plansPermissionsKeys['USERS'],
+        'permission_id' => PermissionsHelper::getParentPermissionId('3'),
+        'children' => [
+            'Users' => ['menu_url' => 'users.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['USERS'], 'READ_ALL')],
+        ]
+    ],
+
 ]);
 
 !defined('CRM_SETTINGS') && define('CRM_SETTINGS', [
@@ -244,9 +295,9 @@ use App\Helpers\PermissionsHelper;
 
 
 // these values must match with permissionHelper::PERMISSIONS_IDS keys otherwise permission not working properly
-!defined('PLANS_FEATURES') && define('PLANS_FEATURES',[
-    'ROLE' => 'ROLE',
-    'USERS' => 'USERS',
+!defined('PLANS_FEATURES') && define('PLANS_FEATURES', [
+    PermissionsHelper::$plansPermissionsKeys['USERS'] => PermissionsHelper::$plansPermissionsKeys['USERS'],
+    PermissionsHelper::$plansPermissionsKeys['ROLE'] => PermissionsHelper::$plansPermissionsKeys['ROLE'],
 ]);
 
 !defined('ADDRESS_TYPES') && define('ADDRESS_TYPES', [
