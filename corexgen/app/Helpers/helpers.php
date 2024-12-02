@@ -181,6 +181,7 @@ function getCRMMenus()
     $menus = CRMMenu::where('panel_type', PANEL_TYPES['COMPANY_PANEL'])->get();
 
     return $menus;
+
 }
 
 /**
@@ -195,22 +196,32 @@ function hasPermission($permissionKey)
     // Get the current user's role ID
     $user = Auth::user();
 
+
     $userRoleId = $user->role_id;
 
 
-    // return true for superadmin or role id 1
+    // return true for superadmin where role id null
     if ($user->is_tenant && $userRoleId === null) {
+        return true;
+    }
+
+    // return true for comoany admins where role is null
+
+    if (!$user->is_tenant && $userRoleId === null && $user->is_company) {
         return true;
     }
 
     // Split the permission key into module and permission type
     $parts = explode('.', $permissionKey);
 
+
+
     // Validate the permission key format
     if (count($parts) !== 2) {
-        \Log::warning("Invalid permission key format: {$permissionKey}. Use 'MODULE.PERMISSION'.");
+        \Log::warning("Invalid permission key format: {  $permissionKey}. Use 'MODULE.PERMISSION'.");
         return false;
     }
+
 
     // Extract module and permission type
     list($module, $permissionType) = $parts;
@@ -228,6 +239,8 @@ function hasPermission($permissionKey)
     $childPermissions = CRMPERMISSIONS[$module]['children'];
     $childPermissionId = null;
 
+
+
     // Find the child permission ID
     foreach ($childPermissions as $id => $name) {
         if (strtoupper($name) === strtoupper($permissionType)) {
@@ -236,11 +249,13 @@ function hasPermission($permissionKey)
         }
     }
 
+
     // If no matching child permission found, return false
     if ($childPermissionId === null) {
         \Log::warning("Permission type not found for module {$module}: {$permissionType}");
         return false;
     }
+
 
 
 
@@ -269,6 +284,7 @@ function hasMenuPermission($permissionId = null)
     // Get the current user's role ID
     $user = Auth::user();
 
+
     $userRoleId = $user->role_id;
 
 
@@ -281,18 +297,17 @@ function hasMenuPermission($permissionId = null)
         return false;
 
 
-    if (!$userRoleId && $user->comapany_id == null) {
-
+    if ($userRoleId == null && $user->company_id == null) {
+        \Log::error('Role & Compnay Id Not Found.', [$user, $userRoleId, $user->company_id]);
         return false;
-    } else if (!$userRoleId && $user->comapany_id != null) {
+    } else if ($userRoleId == null && $user->company_id != null) {
         // its a company admin user
-
         $permissionExists = DB::table('crm_role_permissions')
             ->where('permission_id', $permissionId)
             ->where('role_id', null)
-            ->where('company_id', $user->comapany_id)
+            ->where('company_id', $user->company_id)
             ->exists();
-
+        \Log::info('Compnay Id Found but not role id.', [$user, $userRoleId, $user->comapany_id]);
         return true;
     }
 
