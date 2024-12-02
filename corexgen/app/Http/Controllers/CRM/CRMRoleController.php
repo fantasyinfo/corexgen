@@ -135,8 +135,13 @@ class CRMRoleController extends Controller
     {
         $this->tenantRoute = $this->getTenantRoute();
         try {
+            
+
             // Validate and create role
             $validated = $request->validated();
+            $validated['company_id'] = Auth::user()->company_id;
+
+
             CRMRole::create($validated);
 
             // Redirect with success message

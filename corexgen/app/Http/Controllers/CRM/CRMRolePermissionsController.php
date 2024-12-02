@@ -132,7 +132,7 @@ class CRMRolePermissionsController extends Controller
 
         // permissions
         $crm_p_query = CRMPermissions::query();
-        $crm_p_query = $this->applyTenantFilter($crm_p_query);
+        // $crm_p_query = $this->applyTenantFilter($crm_p_query);
         $crm_permissions = $crm_p_query->get();
 
 

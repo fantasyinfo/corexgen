@@ -207,7 +207,7 @@ function hasPermission($permissionKey)
 
     // return true for comoany admins where role is null
 
-    if (!$user->is_tenant && $userRoleId === null && $user->is_company) {
+    if (!$user->is_tenant && $userRoleId == null && $user->company_id != null) {
         return true;
     }
 
