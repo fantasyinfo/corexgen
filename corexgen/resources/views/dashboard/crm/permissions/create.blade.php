@@ -1,6 +1,10 @@
 @extends('layout.app')
 
 @section('content')
+@php
+    // prePrintR($crm_permissions);
+    // die();
+@endphp
 <div class="container">
     <div class="row">
         <div class="col-lg-12">

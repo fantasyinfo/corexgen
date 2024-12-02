@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Helpers\PermissionsHelper;
+use App\Models\CRM\CRMPermissions;
 use App\Models\CRM\CRMRolePermissions;
 
 class CompanyService
@@ -34,7 +35,10 @@ class CompanyService
             // add subscription
 
 
-            $this->givePermissionsToCompany($company,$companyAdminUser);
+            $this->givePermissionsToCompany($company, $companyAdminUser);
+
+            // $this->createMenuItemsForCompanyPanel($validatedData['plan_id']);
+
 
             // todo:: add permissions to this user
 
@@ -89,10 +93,10 @@ class CompanyService
         if (!$planid || !$companyid) {
             throw new \InvalidArgumentException('Plan ID and Company ID are required');
         }
-    
+
         // Get plan details from plan id with error handling
         $plansDetails = Plans::findOrFail($planid);
-    
+
         // Prepare payment transaction data with improved default handling
         $paymentTransactionData = [
             'plan_id' => $planid,
@@ -104,22 +108,22 @@ class CompanyService
             'transaction_reference' => $paymentDetails['transaction_reference'] ?? null,
             'transaction_date' => now()
         ];
-    
+
         // Get previous plan details if it's an upgrade
         $previousPlan = PaymentTransaction::where('company_id', $companyid)
             ->latest('created_at')
             ->first();
         $previousPlanId = $previousPlan ? $previousPlan->plan_id : null;
-    
+
         // Create payment transaction
         $paymentTransaction = PaymentTransaction::create($paymentTransactionData);
-    
+
         // Calculate end date and next billing date based on billing cycle
         $startDate = now();
         $billingCycle = $plansDetails->billing_cycle;
-        
+
         // Use Carbon for more robust date calculations
-        $endDate = match($billingCycle) {
+        $endDate = match ($billingCycle) {
             PLANS_BILLING_CYCLES['BILLINGS']['1 MONTH'] => $startDate->addMonth(),
             PLANS_BILLING_CYCLES['BILLINGS']['3 MONTHS'] => $startDate->addMonths(3),
             PLANS_BILLING_CYCLES['BILLINGS']['6 MONTHS'] => $startDate->addMonths(6),
@@ -127,7 +131,7 @@ class CompanyService
             PLANS_BILLING_CYCLES['BILLINGS']['UNLIMITED'] => null, // No end date
             default => $startDate->addMonth()
         };
-    
+
         // Prepare subscription data
         $subscriptionData = [
             'plan_id' => $planid,
@@ -140,10 +144,10 @@ class CompanyService
             'previous_plan_id' => $previousPlanId,
             'upgrade_date' => $previousPlanId ? $startDate : null,
         ];
-    
+
         // Create subscription
         $subscription = Subscription::create($subscriptionData);
-    
+
         return [
             'payment_transaction' => $paymentTransaction,
             'subscription' => $subscription
@@ -161,9 +165,9 @@ class CompanyService
             ]);
             return false;
         }
-    
+
         $plan = Plans::where('id', $company->plan_id)->with('planFeatures')->first();
-    
+
         // Check if plan exists
         if (!$plan) {
             \Log::warning('No plan found for company', [
@@ -172,7 +176,7 @@ class CompanyService
             ]);
             return false;
         }
-    
+
         // Check if plan has features
         if (!$plan->planFeatures->isNotEmpty()) {
             \Log::info('No plan features found', [
@@ -181,17 +185,17 @@ class CompanyService
             ]);
             return false;
         }
-    
+
         $permissionToPush = [];
         try {
             foreach ($plan->planFeatures as $pf) {
                 $featureName = strtoupper($pf->module_name);
-    
+
                 // Skip if feature is disabled
                 if ($pf->value == 0) {
                     continue;
                 }
-    
+
                 // Check if feature exists in permissions
                 if (!isset(PermissionsHelper::$PERMISSIONS_IDS[$featureName])) {
                     \Log::warning('Unknown feature in plan', [
@@ -200,11 +204,29 @@ class CompanyService
                     ]);
                     continue;
                 }
-    
+
                 // Get permissions for this feature
                 $permissionOFModule = PermissionsHelper::$PERMISSIONS_IDS[$featureName];
+
                 $permissionKeys = array_keys($permissionOFModule);
-    
+
+
+
+                $pmi = CRMPermissions::where('permission_id', $permissionKeys[0])->get()->toArray();
+
+
+                $pmItem = CRMPermissions::find($pmi[0]['parent_menu_id']);
+
+                $permissionToPush[] = [
+                    'company_id' => $company->id, // Note: changed from plan_id to company->id
+                    'role_id' => null,
+                    'permission_id' => $pmItem->permission_id,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ];
+
+
+
                 foreach ($permissionKeys as $p) {
                     $permissionToPush[] = [
                         'company_id' => $company->id, // Note: changed from plan_id to company->id
@@ -215,7 +237,7 @@ class CompanyService
                     ];
                 }
             }
-    
+
             // Bulk insert with chunk to handle large datasets
             if (!empty($permissionToPush)) {
                 $chunks = array_chunk($permissionToPush, 100);
@@ -223,7 +245,7 @@ class CompanyService
                     CRMRolePermissions::insert($chunk);
                 }
             }
-    
+
             return true;
         } catch (\Exception $e) {
             \Log::error('Error assigning permissions', [
@@ -231,17 +253,81 @@ class CompanyService
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-    
+
             return false;
         }
     }
 
 
 
+    public function createMenuItemsForCompanyPanel($planId)
+    {
+        $plansFeatures = Plans::with('planFeatures')->findOrFail($planId);
 
+        foreach (CRM_MENU_ITEMS_COMPANY as $category => $menuData) {
+            // Determine if menu should be created
+            $shouldCreateMenu =
+                (isset($menuData['is_default']) && $menuData['is_default']) ||
+                $this->isMenuAllowedByPlanFeatures($plansFeatures, $menuData);
 
+            if ($shouldCreateMenu) {
+                $this->insertMenuWithChildren($category, $menuData);
+            }
+        }
+    }
 
+    private function isMenuAllowedByPlanFeatures($plansFeatures, $menuData)
+    {
+        if (!isset($menuData['permission_plan'])) {
+            return false;
+        }
 
+        return $plansFeatures->planFeatures->some(function ($pf) use ($menuData) {
+            return
+                strtoupper($pf->module_name) == $menuData['permission_plan'] &&
+                $pf->value != 0;
+        });
+    }
+
+    private function insertMenuWithChildren($category, $menuData)
+    {
+        DB::beginTransaction();
+        try {
+            $parentMenuId = DB::table('crm_menu')->insertGetId([
+                'menu_name' => $category,
+                'menu_url' => '',
+                'parent_menu' => '1',
+                'parent_menu_id' => null,
+                'menu_icon' => $menuData['menu_icon'],
+                'permission_id' => $menuData['permission_id'],
+                'panel_type' => PANEL_TYPES['COMPANY_PANEL'],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            $childMenus = collect($menuData['children'])->map(function ($childMenuData, $menuName) use ($parentMenuId) {
+                return [
+                    'menu_name' => $menuName,
+                    'menu_url' => $childMenuData['menu_url'],
+                    'parent_menu' => '2',
+                    'parent_menu_id' => $parentMenuId,
+                    'menu_icon' => $childMenuData['menu_icon'],
+                    'permission_id' => $childMenuData['permission_id'],
+                    'panel_type' => PANEL_TYPES['COMPANY_PANEL'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            })->toArray();
+
+            DB::table('crm_menu')->insert($childMenus);
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Menu creation failed: ' . $e->getMessage());
+            throw $e;
+        }
+    }
 
 
 }

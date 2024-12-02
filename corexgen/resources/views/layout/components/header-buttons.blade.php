@@ -1,6 +1,6 @@
 <div class="col-md-8">
     <div class="row g-2 justify-content-end">
-        @if (isset($permissions['CREATE']) && hasPermission($permissions['CREATE']))
+        @if (isset($permissions['CREATE']) && hasPermission(strtoupper($module) . '.' .$permissions['CREATE']['KEY']))
             <div class="col-12 col-md-auto">
                 <a data-toggle="tooltip" data-placement="top" title="Create New"
                     href="{{ route(getPanelRoutes($module . '.create')) }}" class="btn btn-md btn-primary w-100 mb-2 mb-md-0">
@@ -8,7 +8,7 @@
                 </a>
             </div>
         @endif
-        @if (isset($permissions['EXPORT']) && hasPermission($permissions['EXPORT']))
+        @if (isset($permissions['EXPORT']) && hasPermission(strtoupper($module) . '.' .$permissions['EXPORT']['KEY']))
             <div class="col-12 col-md-auto">
                 <a data-toggle="tooltip" data-placement="top" title="Export Data"
                     href="{{ route(getPanelRoutes($module .'.export'), request()->all()) }}"
@@ -17,7 +17,7 @@
                 </a>
             </div>
         @endif
-        @if (isset($permissions['IMPORT']) && hasPermission($permissions['IMPORT']))
+        @if (isset($permissions['IMPORT']) && hasPermission(strtoupper($module) . '.' .$permissions['IMPORT']['KEY']))
             <div class="col-12 col-md-auto">
                 <button data-toggle="tooltip" data-placement="top" title="Import Data" data-bs-toggle="modal"
                     data-bs-target="#bulkImportModal" class="btn btn-md btn-outline-info w-100 mb-2 mb-md-0">
@@ -25,7 +25,7 @@
                 </button>
             </div>
         @endif
-        @if (isset($permissions['FILTER']) && hasPermission($permissions['FILTER']))
+        @if (isset($permissions['FILTER']) && hasPermission(strtoupper($module) . '.' .$permissions['FILTER']['KEY']))
             <div class="col-12 col-md-auto">
                 <button data-toggle="tooltip" data-placement="top" title="Filter Data" id="filterToggle"
                     class="btn btn-md btn-outline-warning w-100">
@@ -34,7 +34,7 @@
                 </button>
             </div>
         @endif
-        @if (isset($permissions['BULK_DELETE']) && hasPermission($permissions['BULK_DELETE']))
+        @if (isset($permissions['BULK_DELETE']) && hasPermission(strtoupper($module) . '.' .$permissions['BULK_DELETE']['KEY']))
             <div class="col-12 col-md-auto">
                 <button data-toggle="tooltip" data-placement="top" title="Bulk Delete Data" id="bulk-delete-btn"
                     class="btn btn-md btn-outline-danger w-100">

@@ -160,6 +160,7 @@ class UserController extends Controller
             $validated = $request->validated();
             $validated['is_tenant'] = Auth::user()->is_tenant;
             $validated['password'] = Hash::make($validated['password']);
+            $validated['company_id'] = Auth::user()->company_id;
 
             User::create($validated);
 

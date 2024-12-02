@@ -2,6 +2,8 @@
     $menus = getCRMMenus();
     $currentRoute = Route::currentRouteName();
 
+ //prePrintR( Auth::user());
+
 
 @endphp
 
@@ -18,6 +20,7 @@
             @foreach ($menus->where('parent_menu', '1') as $parentMenu)
                 @php
                     $childMenus = $menus->where('parent_menu_id', $parentMenu->id);
+          
                     $hasChildPermission = $childMenus->contains(function ($childMenu) {
                         return hasMenuPermission($childMenu->permission_id);
                     });

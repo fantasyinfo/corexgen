@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CRMMenu extends Model
 {
+    
     use HasFactory;
     const table = 'crm_menu';
 
