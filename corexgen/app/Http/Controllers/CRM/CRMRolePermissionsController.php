@@ -130,10 +130,25 @@ class CRMRolePermissionsController extends Controller
         $roleQuery = $this->applyTenantFilter($roleQuery);
         $roles = $roleQuery->get();
 
-        // permissions
-        $crm_p_query = CRMPermissions::query();
-        // $crm_p_query = $this->applyTenantFilter($crm_p_query);
+     // In your controller method
+        if(Auth::user()->is_tenant) {
+            $crm_p_query = CRMPermissions::query();
+        } else if(Auth::user()->company_id != null) {
+            $crm_p_query = CRMPermissions::query()
+            ->leftJoin('crm_role_permissions', 'crm_permissions.permission_id', '=', 'crm_role_permissions.permission_id')
+            ->select('crm_permissions.*')
+            ->where(function($query) {
+                $query->where('crm_permissions.parent_menu', '1')
+                    ->orWhereNotNull('crm_permissions.parent_menu_id');
+            });
+           
+            
+            $crm_p_query = $this->applyTenantFilter($crm_p_query, 'crm_role_permissions');
+        }
+
         $crm_permissions = $crm_p_query->get();
+
+        // dd($crm_permissions);
 
 
         return view($this->getViewFilePath('create'), [

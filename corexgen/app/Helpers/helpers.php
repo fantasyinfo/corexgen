@@ -215,10 +215,10 @@ function hasPermission($permissionKey)
     $parts = explode('.', $permissionKey);
 
 
-
+    // dd($parts);
     // Validate the permission key format
-    if (count($parts) !== 2) {
-        \Log::warning("Invalid permission key format: {  $permissionKey}. Use 'MODULE.PERMISSION'.");
+    if (count($parts) != 2) {
+        \Log::warning("Invalid permission key format: {  $permissionKey} ",[$parts]);
         return false;
     }
 
@@ -251,7 +251,7 @@ function hasPermission($permissionKey)
 
 
     // If no matching child permission found, return false
-    if ($childPermissionId === null) {
+    if ($childPermissionId == null) {
         \Log::warning("Permission type not found for module {$module}: {$permissionType}");
         return false;
     }

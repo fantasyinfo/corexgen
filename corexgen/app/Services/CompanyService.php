@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Helpers\PermissionsHelper;
+use App\Models\CRM\CRMPermissions;
 use App\Models\CRM\CRMRolePermissions;
 
 class CompanyService
@@ -38,7 +39,7 @@ class CompanyService
 
             // $this->createMenuItemsForCompanyPanel($validatedData['plan_id']);
 
-            
+
             // todo:: add permissions to this user
 
             return $company;
@@ -206,7 +207,25 @@ class CompanyService
 
                 // Get permissions for this feature
                 $permissionOFModule = PermissionsHelper::$PERMISSIONS_IDS[$featureName];
+
                 $permissionKeys = array_keys($permissionOFModule);
+
+
+
+                $pmi = CRMPermissions::where('permission_id', $permissionKeys[0])->get()->toArray();
+
+
+                $pmItem = CRMPermissions::find($pmi[0]['parent_menu_id']);
+
+                $permissionToPush[] = [
+                    'company_id' => $company->id, // Note: changed from plan_id to company->id
+                    'role_id' => null,
+                    'permission_id' => $pmItem->permission_id,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ];
+
+
 
                 foreach ($permissionKeys as $p) {
                     $permissionToPush[] = [

@@ -58,8 +58,18 @@ class PermissionsHelper
     public static function getPermissionsArray($type)
     {
         $permissions = self::$PERMISSIONS_IDS[$type]; // Original array
-        return array_fill_keys(array_values($permissions), true);
+        $result = [];
+
+        foreach ($permissions as $permission) {
+            $result[$permission] = [
+                'KEY' => $permission,
+                'VALUE' => true,
+            ];
+        }
+
+        return $result;
     }
+
 
 
 
