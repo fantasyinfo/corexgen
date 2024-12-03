@@ -199,27 +199,27 @@ class CompaniesController extends Controller
     public function edit($id)
     {
 
-       
+
         $query = Company::query()
             ->with([
                 'users' => function ($query) {
                     $query->where('role_id', null)
-                    ->select('id', 'name', 'company_id','role_id');
+                        ->select('id', 'name', 'company_id', 'role_id');
                 }
             ])
             ->with([
                 'addresses' => function ($query) {
                     $query->with('country')
-                    ->with('city')
-                    ->select('id', 'country_id', 'city_id','street_address','postal_code');
+                        ->with('city')
+                        ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
                 }
             ])
             ->where('id', $id)
             ->select('companies.*', 'companies.name as cname');
 
-            // $company = $query->toSql();
-            $company = $query->firstOrFail();
-            // dd($company);
+        // $company = $query->toSql();
+        $company = $query->firstOrFail();
+        // dd($company);
 
 
 
@@ -246,18 +246,29 @@ class CompaniesController extends Controller
      *
      * @return void
      */
-    public function update(CRMUserRequest $request)
+    public function update(CompaniesRequest $request, CompanyService $companyService)
     {
+
 
         $this->tenantRoute = $this->getTenantRoute();
 
+        try {
+            $companyService->updateCompany($request->validated());
 
-        $this->applyTenantFilter(User::query()->where('id', '=', $request->id))->update($request->validated());
+            // If validation fails, it will throw an exception
+            return redirect()
+                ->route($this->getTenantRoute() . 'companies.index')
+                ->with('success', 'Company updated successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Company updation failed', [
+                'error' => $e->getMessage(),
+                'data' => $request->validated()
+            ]);
 
-
-
-        return redirect()->route($this->tenantRoute . 'users.index')
-            ->with('success', 'User updated successfully.');
+            return redirect()
+                ->back()
+                ->with('error', 'An error occurred while updating the company. ' . $e->getMessage());
+        }
     }
 
 

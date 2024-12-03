@@ -2,7 +2,11 @@
 
 namespace App\Http\Requests\CRM;
 
+use App\Models\Company;
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class CompaniesRequest extends FormRequest
 {
@@ -24,16 +28,45 @@ class CompaniesRequest extends FormRequest
      */
     public function rules(): array
     {
+
+        $companyId = $this->input('id') ?? null;
+        $isUpdate = $this->isMethod('put') || $this->isMethod('patch');
+
+
         return [
-            'name' => ['required', 'string',], 
-            'email' => ['required','email','unique:companies','unique:users'], 
-            'phone' => ['required','min:10'], 
-            'password' => ['required','min:8'], 
-            'plan_id' => ['required','exists:plans,id'], 
+            'id' => [$isUpdate ? 'required' : 'nullable'],
+            'name' => ['required', 'string',],
+            'cname' => ['required', 'string',],
+            'email' => [
+                'required',
+                'email',
+                $this->uniqueEmailRule($companyId),
+            ],
+            'phone' => ['required', 'min:10'],
+            'password' => [$isUpdate ? 'nullable' : 'required', 'min:8'],
+            'plan_id' => ['required', 'exists:plans,id'],
             'address_street_address' => 'nullable|string|max:255',
             'address_country_id' => 'nullable',
             'address_city_id' => 'nullable',
             'address_pincode' => 'nullable|string|max:10',
         ];
+    }
+
+
+    protected function uniqueEmailRule($companyId)
+    {
+        return function ($attribute, $value, $fail) use ($companyId) {
+            $userExists = User::where('email', $value)
+                ->where('company_id', '!=', $companyId)
+                ->exists();
+
+            $companyExists = Company::where('email', $value)
+                ->where('id', '!=', $companyId)
+                ->exists();
+
+            if ($userExists || $companyExists) {
+                $fail('The email has already been taken.');
+            }
+        };
     }
 }

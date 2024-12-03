@@ -1,7 +1,15 @@
 @extends('layout.app')
 
 @section('content')
-
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
 
     <div class="container">
         <div class="row">
@@ -11,6 +19,7 @@
                         @csrf
                         @method('PUT')
                         <input type='hidden' name='id' value='{{ $company['id'] }}' />
+                        <input type='hidden' name='email' value='{{ $company['email'] }}' />
                         <div class="card-body">
                             <div class="mb-4 d-flex align-items-center justify-content-between">
                                 <p class="fw-bold mb-0 me-4">
@@ -87,7 +96,7 @@
                                                 <span class="text-danger">*</span></label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <input type="email" class="form-control @error('email') is-invalid @enderror"
+                                            <input type="email" disabled class="form-control @error('email') is-invalid @enderror"
                                                 id="emailName" name="email" placeholder="{{ __('john@doe.com') }}"
                                                 value="{{ $company->email }}" required>
                                             <div class="invalid-feedback">
@@ -313,8 +322,8 @@
                         });
 
                         // Select the existing city in edit mode
-                        @if (isset($company) && $company->addresses->city_id)
-                            cityDropdown.val('{{ $company->addresses->city_id }}');
+                        @if (isset($company) && @$company->addresses->city_id)
+                            cityDropdown.val('{{ @$company->addresses->city_id }}');
                         @endif
 
                         // Reinitialize Select2 and trigger change

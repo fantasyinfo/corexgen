@@ -22,11 +22,13 @@ class CompanyService
         return DB::transaction(function () use ($validatedData) {
             $address = $this->createAddressIfProvided($validatedData);
 
+            $userFullName = $validatedData['name'];
             $company = Company::create(array_merge($validatedData, [
                 'address_id' => $address?->id,
+                'name' => $validatedData['cname']
             ]));
 
-            $companyAdminUser = $this->createCompanyUser($company, $validatedData);
+            $companyAdminUser = $this->createCompanyUser($company, $validatedData, $userFullName);
 
             // todo:: add payment trasation 
             $paymentDetails = [];
@@ -45,6 +47,8 @@ class CompanyService
             return $company;
         });
     }
+
+
 
     private function createAddressIfProvided(array $data): ?Address
     {
@@ -68,10 +72,11 @@ class CompanyService
         ]);
     }
 
-    private function createCompanyUser(Company $company, array $data)
+    private function createCompanyUser(Company $company, array $data, $userFullName)
     {
         return User::create([
             ...$data,
+            'name' => $userFullName,
             'is_tenant' => false,
             'company_id' => $company->id,
             'status' => CRM_STATUS_TYPES['USERS']['STATUS']['ACTIVE'],
@@ -330,5 +335,119 @@ class CompanyService
     }
 
 
+
+    // company update 
+    public function updateCompany(array $validatedData)
+    {
+        // dd($validatedData);
+        // Validate that company ID is provided
+        if (empty($validatedData['id'])) {
+            throw new \InvalidArgumentException('Company ID is required for updating');
+        }
+
+        return DB::transaction(function () use ($validatedData) {
+            // Retrieve the existing company
+            $company = Company::findOrFail($validatedData['id']);
+
+            $userFullName = $validatedData['name'];
+            // Update company basic details
+            $company->fill(collect($validatedData)->except([
+                'id',
+                'address_street_address',
+                'address_country_id',
+                'address_city_id',
+                'address_pincode',
+                'plan_id'
+            ])
+                ->merge(['name' => $validatedData['cname']])
+                ->toArray());
+
+            // Handle address update
+            $address = $this->updateCompanyAddress($company, $validatedData);
+
+            // Update address_id if a new address was created
+            if ($address) {
+                $company->address_id = $address->id;
+            }
+
+            // update user
+
+            $user = User::where('company_id', $company->id)->where('role_id', null)->where('is_tenant', '0')->first();
+
+            if ($user) {
+                $user->name = $userFullName;
+                $user->save();
+            }
+
+            // Handle plan and permission update if plan_id is provided
+            if (!empty($validatedData['plan_id']) && $validatedData['plan_id'] != $company->plan_id) {
+                $this->updateCompanyPlanAndPermissions($company, $validatedData['plan_id']);
+            }
+
+            // Save company updates
+            $company->save();
+
+            return $company;
+        });
+    }
+
+    private function updateCompanyAddress(Company $company, array $data): ?Address
+    {
+        // Check if address fields are provided
+        $requiredAddressFields = [
+            'address_street_address',
+            'address_country_id',
+            'address_city_id',
+            'address_pincode'
+        ];
+
+        if (!$this->hasAllAddressFields($data, $requiredAddressFields)) {
+            return null;
+        }
+
+        // If company already has an address, update it
+        if ($company->address_id) {
+            $address = Address::findOrFail($company->address_id);
+            $address->update([
+                'street_address' => $data['address_street_address'],
+                'postal_code' => $data['address_pincode'],
+                'city_id' => $data['address_city_id'],
+                'country_id' => $data['address_country_id'],
+            ]);
+            return $address;
+        }
+
+        // If no existing address, create a new one
+        return Address::create([
+            'street_address' => $data['address_street_address'],
+            'postal_code' => $data['address_pincode'],
+            'city_id' => $data['address_city_id'],
+            'country_id' => $data['address_country_id'],
+            'address_type' => ADDRESS_TYPES['COMPANY']['SHOW']['HOME'],
+        ]);
+    }
+
+    private function updateCompanyPlanAndPermissions(Company $company, $newPlanId)
+    {
+        // Create a new payment transaction for the new plan
+        $paymentTransactionResult = $this->createPaymentTransaction($newPlanId, $company->id, []);
+
+        // Update company plan
+        $company->plan_id = $newPlanId;
+
+        // Remove existing permissions
+        CRMRolePermissions::where('company_id', $company->id)->delete();
+
+        // Get company admin user (assuming first user)
+        $companyAdminUser = User::where('company_id', $company->id)->first();
+
+        // Reassign permissions based on new plan
+        $this->givePermissionsToCompany($company, $companyAdminUser);
+
+        // Optionally, create new menu items for the company panel
+        $this->createMenuItemsForCompanyPanel($newPlanId);
+
+        return $company;
+    }
 }
 

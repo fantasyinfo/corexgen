@@ -298,7 +298,7 @@ function hasMenuPermission($permissionId = null)
 
 
     if ($userRoleId == null && $user->company_id == null) {
-        \Log::error('Role & Compnay Id Not Found.', [$user, $userRoleId, $user->company_id]);
+       // \Log::error('Role & Compnay Id Not Found.', [$user, $userRoleId, $user->company_id]);
         return false;
     } else if ($userRoleId == null && $user->company_id != null) {
         // its a company admin user
@@ -307,7 +307,7 @@ function hasMenuPermission($permissionId = null)
             ->where('role_id', null)
             ->where('company_id', $user->company_id)
             ->exists();
-        \Log::info('Compnay Id Found but not role id.', [$user, $userRoleId, $user->comapany_id]);
+        //\Log::info('Compnay Id Found but not role id.', [$user, $userRoleId, $user->comapany_id]);
         return true;
     }
 
