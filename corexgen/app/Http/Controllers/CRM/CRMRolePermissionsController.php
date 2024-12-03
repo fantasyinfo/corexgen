@@ -75,8 +75,10 @@ class CRMRolePermissionsController extends Controller
             ->groupBy('crm_roles.id', 'crm_roles.role_name')
             ->select('crm_roles.id', 'crm_roles.role_name');
 
-        $query = $this->applyTenantFilter($query, 'crm_permissions');
+        $query = $this->applyTenantFilter($query, 'crm_role_permissions');
         $this->tenantRoute = $this->getTenantRoute();
+
+        // dd( $query->toSql());
 
 
 
@@ -130,19 +132,19 @@ class CRMRolePermissionsController extends Controller
         $roleQuery = $this->applyTenantFilter($roleQuery);
         $roles = $roleQuery->get();
 
-     // In your controller method
-        if(Auth::user()->is_tenant) {
+        // In your controller method
+        if (Auth::user()->is_tenant) {
             $crm_p_query = CRMPermissions::query();
-        } else if(Auth::user()->company_id != null) {
+        } else if (Auth::user()->company_id != null) {
             $crm_p_query = CRMPermissions::query()
-            ->leftJoin('crm_role_permissions', 'crm_permissions.permission_id', '=', 'crm_role_permissions.permission_id')
-            ->select('crm_permissions.*')
-            ->where(function($query) {
-                $query->where('crm_permissions.parent_menu', '1')
-                    ->orWhereNotNull('crm_permissions.parent_menu_id');
-            });
-           
-            
+                ->leftJoin('crm_role_permissions', 'crm_permissions.permission_id', '=', 'crm_role_permissions.permission_id')
+                ->select('crm_permissions.*')
+                ->where(function ($query) {
+                    $query->where('crm_permissions.parent_menu', '1')
+                        ->orWhereNotNull('crm_permissions.parent_menu_id');
+                });
+
+
             $crm_p_query = $this->applyTenantFilter($crm_p_query, 'crm_role_permissions');
         }
 
@@ -244,7 +246,23 @@ class CRMRolePermissionsController extends Controller
         $roles = $this->applyTenantFilter(CRMRole::query())->get();
 
         // Get all permissions
-        $crm_permissions = $this->applyTenantFilter(CRMPermissions::query())->get();
+        // In your controller method
+        if (Auth::user()->is_tenant) {
+            $crm_p_query = CRMPermissions::query();
+        } else if (Auth::user()->company_id != null) {
+            $crm_p_query = CRMPermissions::query()
+                ->leftJoin('crm_role_permissions', 'crm_permissions.permission_id', '=', 'crm_role_permissions.permission_id')
+                ->select('crm_permissions.*')
+                ->where(function ($query) {
+                    $query->where('crm_permissions.parent_menu', '1')
+                        ->orWhereNotNull('crm_permissions.parent_menu_id');
+                });
+
+
+            $crm_p_query = $this->applyTenantFilter($crm_p_query, 'crm_role_permissions');
+        }
+
+        $crm_permissions = $crm_p_query->get();
 
         return view($this->getViewFilePath('edit'), [
             'title' => 'Edit Permissions',

@@ -325,7 +325,7 @@ function panelAccess()
 {
     $user = Auth::user();
 
-    if ($user->is_tenant) {
+    if (isset($user->is_tenant) && $user->is_tenant) {
         return PANEL_TYPES['SUPER_PANEL'];
     }
     return PANEL_TYPES['COMPANY_PANEL'];

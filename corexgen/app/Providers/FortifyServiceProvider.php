@@ -64,21 +64,44 @@ class FortifyServiceProvider extends ServiceProvider
                 ->first();
 
             if ($user && Hash::check($password, $user->password)) {
-           
+
+
+                // dd($user->toArray());
                 // Super admin / tenant check
-                if ($isTenant && $user->is_tenant && $user->tenant_id !== null && $path === 'super-admin-login') {
-                    $tenant = Tenant::where('id', $user->tenant_id)
-                        ->where('status', CRM_STATUS_TYPES['TENANTS']['STATUS']['ACTIVE'])
-                        ->first();
-                    if ($tenant) {
-                        $user->tenant_id = $tenant->id;
+                if ($isTenant && $user->is_tenant && $path === 'super-admin-login') {
+
+                
+                    if ($user->role_id == null) {
+                        // super admin user
+                        $tenant = Tenant::where('id', $user->tenant_id)
+                            ->where('status', CRM_STATUS_TYPES['TENANTS']['STATUS']['ACTIVE'])
+                            ->first();
+                        if ($tenant) {
+                            $user->tenant_id = $tenant->id;
+                            session(['panelAccess' => PANEL_TYPES['SUPER_PANEL']]);
+                            return $user;
+                        }
+                    } else if ($user->role_id != null) {
+                  
+                        // super admin employee user
                         session(['panelAccess' => PANEL_TYPES['SUPER_PANEL']]);
                         return $user;
                     }
+
                     return null; // Tenant is inactive
                 } else if ($path == '' && !$user->is_tenant && $user->company_id !== null) {
-                    session(['panelAccess' => PANEL_TYPES['COMPANY_PANEL']]);
-                    return $user;
+
+                    if ($user->role_id == null) {
+                        // company admin
+                        session(['panelAccess' => PANEL_TYPES['COMPANY_PANEL']]);
+                        return $user;
+                    } else if ($user->role_id != null) {
+                        // company employee user
+                        session(['panelAccess' => PANEL_TYPES['COMPANY_PANEL']]);
+
+                        return $user;
+                    }
+
                 } else {
                     return null;
                 }
