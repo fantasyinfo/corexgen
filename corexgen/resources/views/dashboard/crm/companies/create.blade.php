@@ -186,7 +186,7 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <textarea class="form-control" id="registeredAddress" name="address.street_address" rows="3"
-                                                placeholder="{{ __('Enter Registered street_address') }}">{{ old('address.address') }}</textarea>
+                                                placeholder="{{ __('Enter Registered street_address') }}">{{ old('address_street_address') }}</textarea>
                                         </div>
                                     </div>
                                     <div class="row mb-4 align-items-center">
@@ -242,7 +242,7 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <input type="text" class="form-control" id="pincode" name="address.pincode"
-                                                placeholder="{{ __('Enter Pincode') }}" value="{{ old('address.pincode') }}">
+                                                placeholder="{{ __('Enter Pincode') }}" value="{{ old('address_pincode') }}">
                                         </div>
                                     </div>
                                 </div>

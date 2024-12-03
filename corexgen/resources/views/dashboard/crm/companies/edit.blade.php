@@ -11,6 +11,7 @@
     </div>
 @endif
 
+
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
@@ -82,7 +83,7 @@
                                         <div class="col-lg-8">
                                             <input type="text" class="form-control @error('name') is-invalid @enderror"
                                                 id="primaryContactName" name="name" placeholder="{{ __('John Doe') }}"
-                                                value="{{ $company->name }}" required>
+                                                value="{{ @$company->users[0]['name'] }}" required>
                                             <div class="invalid-feedback">
                                                 @error('name')
                                                     {{ $message }}

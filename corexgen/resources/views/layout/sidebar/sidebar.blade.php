@@ -11,7 +11,7 @@
 <nav class="sidebar shadow-sm">
     <div class="sidebar-brand">
         <a href="">
-            <img src=""
+            <img src="{{asset('./img/logo.png')}}"
                 alt="logo" class="logo">
         </a>
     </div>

@@ -202,12 +202,11 @@ class CompaniesController extends Controller
 
         $query = Company::query()
             ->with([
-                'users' => function ($query) {
+                'users' => function ($query) use ($id) {
                     $query->where('role_id', null)
+                        ->where('company_id', $id)
                         ->select('id', 'name', 'company_id', 'role_id');
-                }
-            ])
-            ->with([
+                },
                 'addresses' => function ($query) {
                     $query->with('country')
                         ->with('city')
@@ -217,7 +216,6 @@ class CompaniesController extends Controller
             ->where('id', $id)
             ->select('companies.*', 'companies.name as cname');
 
-        // $company = $query->toSql();
         $company = $query->firstOrFail();
         // dd($company);
 

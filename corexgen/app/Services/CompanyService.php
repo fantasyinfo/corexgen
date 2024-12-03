@@ -74,6 +74,7 @@ class CompanyService
 
     private function createCompanyUser(Company $company, array $data, $userFullName)
     {
+        unset($data['name']);
         return User::create([
             ...$data,
             'name' => $userFullName,
@@ -193,6 +194,10 @@ class CompanyService
 
         $permissionToPush = [];
         try {
+
+            // delete exiting permission if any
+            CRMRolePermissions::where('company_id',$company->id)->where('role_id',null)->delete();
+
             foreach ($plan->planFeatures as $pf) {
                 $featureName = strtoupper($pf->module_name);
 
@@ -231,7 +236,7 @@ class CompanyService
                 ];
 
 
-
+               
                 foreach ($permissionKeys as $p) {
                     $permissionToPush[] = [
                         'company_id' => $company->id, // Note: changed from plan_id to company->id
@@ -350,6 +355,7 @@ class CompanyService
             $company = Company::findOrFail($validatedData['id']);
 
             $userFullName = $validatedData['name'];
+      
             // Update company basic details
             $company->fill(collect($validatedData)->except([
                 'id',
@@ -372,13 +378,28 @@ class CompanyService
 
             // update user
 
-            $user = User::where('company_id', $company->id)->where('role_id', null)->where('is_tenant', '0')->first();
+            $userC = User::where('company_id', $company->id)->where('role_id', null)->where('is_tenant', '0')->first();
 
-            if ($user) {
-                $user->name = $userFullName;
-                $user->save();
+           
+
+            if ($userC) {
+                // \Log::info('Updating user', [
+                //     'user_id' => $userC->id,
+                //     'original_name' => $userC->name,
+                //     'new_name' => $userFullName
+                // ]);
+            
+                $userC->name = $userFullName;
+                $userC->save(); // Changed from update() to save()
+            
+                // Verify the update
+                // $updatedUser = User::find($userC->id);
+                // \Log::info('After update', [
+                //     'updated_name' => $updatedUser->name
+                // ]);
             }
 
+       
             // Handle plan and permission update if plan_id is provided
             if (!empty($validatedData['plan_id']) && $validatedData['plan_id'] != $company->plan_id) {
                 $this->updateCompanyPlanAndPermissions($company, $validatedData['plan_id']);
