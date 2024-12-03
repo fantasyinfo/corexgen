@@ -199,18 +199,41 @@ class CompaniesController extends Controller
     public function edit($id)
     {
 
-        $query = User::query()->where('id', $id);
-        $query = $this->applyTenantFilter($query);
-        $user = $query->firstOrFail();
+       
+        $query = Company::query()
+            ->with([
+                'users' => function ($query) {
+                    $query->where('role_id', null)
+                    ->select('id', 'name', 'company_id','role_id');
+                }
+            ])
+            ->with([
+                'addresses' => function ($query) {
+                    $query->with('country')
+                    ->with('city')
+                    ->select('id', 'country_id', 'city_id','street_address','postal_code');
+                }
+            ])
+            ->where('id', $id)
+            ->select('companies.*', 'companies.name as cname');
 
-        $roles = $this->applyTenantFilter(CRMRole::query())->get();
+            // $company = $query->toSql();
+            $company = $query->firstOrFail();
+            // dd($company);
+
+
+
+        $plans = Plans::with('planFeatures')->get();
+        $country = Country::all();
 
 
         return view($this->getViewFilePath('edit'), [
 
-            'title' => 'Edit User',
-            'user' => $user,
-            'roles' => $roles
+            'title' => 'Edit Company',
+            'company' => $company,
+            'plans' => $plans,
+            'country' => $country,
+            'module' => PANEL_MODULES[$this->getPanelModule()]['companies'],
         ]);
     }
 
@@ -417,59 +440,59 @@ class CompaniesController extends Controller
     {
         // Enable query logging for detailed investigation
         \DB::enableQueryLog();
-    
+
         // Fetch the company owner with extensive logging
         $user = User::where('company_id', $companyid)
             ->where('role_id', null)
             ->where('is_tenant', 0)
             ->first();
-    
+
         \Log::info('User Switching Debug', [
             'companyid' => $companyid,
             'query' => \DB::getQueryLog(),
             'user_found' => $user ? true : false,
             'user_details' => $user ? $user->toArray() : null
         ]);
-    
+
         if (!$user) {
             return redirect()->back()->with('error', 'Company account not found.');
         }
-    
+
         try {
             // Explicitly use the 'web' guard
             $guard = Auth::guard('web');
-    
+
             \Log::info('Active Guard Before Logout', ['guard' => get_class($guard)]);
-    
+
             // Logout the current user if authenticated
             if ($guard->check()) {
                 $guard->logout();
             }
-    
+
             // Completely reset the session
             request()->session()->flush();
             request()->session()->invalidate();
             request()->session()->regenerateToken();
-    
+
             // Log in the new user using 'web' guard
             $guard->loginUsingId($user->id);
-    
+
             // Verify login
             if (!$guard->check() || $guard->id() !== $user->id) {
                 throw new \Exception('Login verification failed.');
             }
-    
+
             \Log::info('Successful User Switch', [
                 'new_user_id' => $user->id,
                 'authenticated_user_id' => $guard->id(),
                 'authenticated_user_email' => $user->email,
                 'guard' => Auth::getDefaultDriver()
             ]);
-    
+
             // Redirect to the desired dashboard or view
             return redirect()->route(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']) . '.home')
                 ->with('success', 'Logged in as company owner');
-    
+
         } catch (\Exception $e) {
             \Log::error('User Switching Failed', [
                 'error' => $e->getMessage(),
@@ -477,9 +500,9 @@ class CompaniesController extends Controller
                 'attempted_user_id' => $user->id,
                 'current_user_id' => Auth::id() ?: 'Not authenticated'
             ]);
-    
+
             return redirect()->back()->with('error', 'Failed to switch user account: ' . $e->getMessage());
         }
     }
-    
+
 }
