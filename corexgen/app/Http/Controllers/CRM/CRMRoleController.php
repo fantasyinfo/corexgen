@@ -73,7 +73,7 @@ class CRMRoleController extends Controller
     public function index(Request $request)
     {
 
-    
+
         // Initialize query with tenant filtering
         $query = CRMRole::query();
         $query = $this->applyTenantFilter($query);
@@ -354,6 +354,38 @@ class CRMRoleController extends Controller
         } catch (\Exception $e) {
             // Handle any status change errors
             return redirect()->back()->with('error', 'Failed to change the role status: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Bulk Delete the role
+     * Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function bulkDelete(Request $request)
+    {
+
+        $ids = $request->input('ids');
+
+        try {
+            // Delete the role
+
+            if (is_array($ids) && count($ids) > 0) {
+                // Validate ownership/permissions if necessary
+                $this->applyTenantFilter(CRMRole::query()->whereIn('id', $ids))->delete();
+
+                return response()->json(['message' => 'Selected roles deleted successfully.'], 200);
+            }
+
+            return response()->json(['message' => 'No roles selected for deletion.'], 400);
+
+
+
+
+
+        } catch (\Exception $e) {
+            // Handle any exceptions
+            return redirect()->back()->with('error', 'Failed to delete the role: ' . $e->getMessage());
         }
     }
 }

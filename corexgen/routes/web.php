@@ -156,6 +156,7 @@ Route::middleware([
         // validate, export, import
         Route::get('/export', [CRMRoleController::class, 'export'])->name('export')->middleware('check.permission:ROLE.EXPORT');
         Route::post('/import', [CRMRoleController::class, 'import'])->name('import')->middleware('check.permission:ROLE.IMPORT');
+        Route::post('/bulkDelete', [CRMRoleController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:ROLE.BULK_DELETE');
 
     });
 
@@ -256,6 +257,7 @@ Route::middleware([
         // validate, export, import
         Route::get('/export', [CRMRoleController::class, 'export'])->name('export')->middleware('check.permission:ROLE.EXPORT');
         Route::post('/import', [CRMRoleController::class, 'import'])->name('import')->middleware('check.permission:ROLE.IMPORT');
+        Route::post('/bulkDelete', [CRMRoleController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:ROLE.BULK_DELETE');
 
     });
 
@@ -300,6 +302,7 @@ Route::middleware([
 
         // view compnay login as company
         Route::get('/loginas/{companyid}', [CompaniesController::class, 'loginas'])->name('loginas')->middleware('check.permission:COMPANIES.LOGIN_AS');
+        Route::post('/bulkDelete', [CompaniesController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:COMPANIES.BULK_DELETE');
 
     });
 

@@ -421,6 +421,38 @@ class CompaniesController extends Controller
         }
     }
 
+    /**
+     * Bulk Delete the companies
+     * Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function bulkDelete(Request $request)
+    {
+
+        $ids = $request->input('ids');
+
+        try {
+            // Delete the companies
+
+            if (is_array($ids) && count($ids) > 0) {
+                // Validate ownership/permissions if necessary
+                Company::query()->whereIn('id', $ids)->delete();
+
+                return response()->json(['message' => 'Selected companiess deleted successfully.'], 200);
+            }
+
+            return response()->json(['message' => 'No companiess selected for deletion.'], 400);
+
+
+
+
+
+        } catch (\Exception $e) {
+            // Handle any exceptions
+            return redirect()->back()->with('error', 'Failed to delete the companies: ' . $e->getMessage());
+        }
+    }
+
 
     /**
      * Method changeStatus (change company status)
@@ -434,7 +466,7 @@ class CompaniesController extends Controller
     {
         try {
             // Delete the role
-           Company::query()->where('id', '=', $id)->update(['status' => $status]);
+            Company::query()->where('id', '=', $id)->update(['status' => $status]);
             // Return success response
             return redirect()->back()->with('success', 'Company status changed successfully.');
         } catch (\Exception $e) {

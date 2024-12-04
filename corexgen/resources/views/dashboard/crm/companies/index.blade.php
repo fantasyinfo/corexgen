@@ -24,6 +24,9 @@
                         <table id="userTable" class="table table-striped table-bordered ui celled">
                             <thead>
                                 <tr>
+                                    <th>
+                                        <input type="checkbox" id="select-all" />
+                                    </th>
                                     <th> {{ __('companies.Name') }}</th>
                                     <th>{{ __('companies.Email') }}</th>
                                     <th>{{ __('crud.Status') }}</th>
@@ -89,7 +92,15 @@
                         d.end_date = endDateFilter.val();
                     },
                 },
-                columns: [{
+                columns: [
+                    {
+                        data: null, // Render checkbox for bulk actions
+                        orderable: false,
+                        searchable: false,
+                        render: function(data, type, row) {
+                            return `<input type="checkbox" class="bulk-select" data-id="${row.id}" />`;
+                        },
+                    },{
                         data: 'name',
                         name: 'name',
                         searchable: true, 
@@ -139,6 +150,41 @@
                 dbTableAjax.ajax.reload();
                 const filterSidebar = document.getElementById("filterSidebar");
                 filterSidebar.classList.remove('show');
+            });
+
+                 // "Select All" functionality
+                 $('#select-all').on('click', function() {
+                let isChecked = $(this).is(':checked');
+                $('.bulk-select').prop('checked', isChecked);
+            });
+
+            $('#bulk-delete-btn').on('click', function() {
+                let selectedIds = [];
+                $('.bulk-select:checked').each(function() {
+                    selectedIds.push($(this).data('id'));
+                });
+
+                if (selectedIds.length > 0) {
+                    if (confirm('Are you sure you want to delete the selected companies?')) {
+                        $.ajax({
+                            url: "{{ route(getPanelRoutes($module . '.bulkDelete')) }}",
+                            method: "POST",
+                            data: {
+                                ids: selectedIds,
+                                _token: '{{ csrf_token() }}' // CSRF token for security
+                            },
+                            success: function(response) {
+                                alert(response.message);
+                                dbTableAjax.ajax.reload(); // Reload DataTable
+                            },
+                            error: function(error) {
+                                alert('An error occurred while deleting companies.');
+                            }
+                        });
+                    }
+                } else {
+                    alert('No companies selected for deletion.');
+                }
             });
         });
     </script>
