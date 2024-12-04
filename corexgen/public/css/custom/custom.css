@@ -310,3 +310,7 @@ table tr {
     background-color: var(--primary-color);
     border-radius: 4px;
 }
+
+.select2-container--default.select2-container--disabled .select2-selection--single{
+    background-color: var(--body-bg);
+}

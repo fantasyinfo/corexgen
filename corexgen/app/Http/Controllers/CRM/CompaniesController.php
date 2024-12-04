@@ -70,7 +70,7 @@ class CompaniesController extends Controller
 
 
     /**
-     * Display list of users with filtering and DataTables support
+     * Display list of company with filtering and DataTables support
      * 
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Contracts\View\View|\Illuminate\Http\JsonResponse
@@ -192,7 +192,7 @@ class CompaniesController extends Controller
     }
 
     /**
-     * showing the edit user view
+     * showing the edit company view
      * @param mixed $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
@@ -238,7 +238,7 @@ class CompaniesController extends Controller
 
     /**
      * Method update 
-     * for updating the user
+     * for updating the company
      *
      * @param Request $request [explicite description]
      *
@@ -274,7 +274,7 @@ class CompaniesController extends Controller
     /**
      * Method export 
      *
-     * @param Request $request [exporting the users]
+     * @param Request $request [exporting the company]
      *
      * @return void
      */
@@ -337,9 +337,9 @@ class CompaniesController extends Controller
     }
 
     /**
-     * Method import bulk import users
+     * Method import bulk import company
      *
-     * @param Request $request [bulk import users]
+     * @param Request $request [bulk import company]
      *
      * @return void
      */
@@ -401,7 +401,7 @@ class CompaniesController extends Controller
 
 
     /**
-     * Deleting the user
+     * Deleting the company
      * @param mixed $id
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -411,21 +411,21 @@ class CompaniesController extends Controller
         try {
             // Delete the user
 
-            $this->applyTenantFilter(User::query()->where('id', '=', $id))->delete();
+            Company::query()->where('id', '=', $id)->delete();
 
             // Return success response
-            return redirect()->back()->with('success', 'User deleted successfully.');
+            return redirect()->back()->with('success', 'Company deleted successfully.');
         } catch (\Exception $e) {
             // Handle any exceptions
-            return redirect()->back()->with('error', 'Failed to delete the user: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to delete the company: ' . $e->getMessage());
         }
     }
 
 
     /**
-     * Method changeStatus (change user status)
+     * Method changeStatus (change company status)
      *
-     * @param $id $id [explicite id of user]
+     * @param $id $id [explicite id of company]
      * @param $status $status [explicite status to change]
      *
      * @return void
@@ -434,18 +434,17 @@ class CompaniesController extends Controller
     {
         try {
             // Delete the role
-
-            $this->applyTenantFilter(User::query()->where('id', '=', $id))->update(['status' => $status]);
+           Company::query()->where('id', '=', $id)->update(['status' => $status]);
             // Return success response
-            return redirect()->back()->with('success', 'User status changed successfully.');
+            return redirect()->back()->with('success', 'Company status changed successfully.');
         } catch (\Exception $e) {
             // Handle any exceptions
-            return redirect()->back()->with('error', 'Failed to changed the user status: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to changed the company status: ' . $e->getMessage());
         }
     }
 
 
-    public function view($companyid)
+    public function loginas($companyid)
     {
         // Enable query logging for detailed investigation
         \DB::enableQueryLog();

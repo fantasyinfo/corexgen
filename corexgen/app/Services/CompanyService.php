@@ -193,82 +193,81 @@ class CompanyService
         }
 
         $permissionToPush = [];
+        DB::beginTransaction();
         try {
+            // Use upsert instead of delete and insert
+            $permissionsToUpsert = $this->preparePermissions($company, $plan);
 
-            // delete exiting permission if any
-            CRMRolePermissions::where('company_id',$company->id)->where('role_id',null)->delete();
+            // Atomic upsert with unique constraint
+            CRMRolePermissions::upsert(
+                $permissionsToUpsert,
+                ['company_id', 'permission_id'], // Unique constraint
+                ['created_at', 'updated_at'] // Columns to update
+            );
 
-            foreach ($plan->planFeatures as $pf) {
-                $featureName = strtoupper($pf->module_name);
-
-                // Skip if feature is disabled
-                if ($pf->value == 0) {
-                    continue;
-                }
-
-                // Check if feature exists in permissions
-                if (!isset(PermissionsHelper::$PERMISSIONS_IDS[$featureName])) {
-                    \Log::warning('Unknown feature in plan', [
-                        'feature_name' => $featureName,
-                        'plan_id' => $company->plan_id
-                    ]);
-                    continue;
-                }
-
-                // Get permissions for this feature
-                $permissionOFModule = PermissionsHelper::$PERMISSIONS_IDS[$featureName];
-
-                $permissionKeys = array_keys($permissionOFModule);
-
-
-
-                $pmi = CRMPermissions::where('permission_id', $permissionKeys[0])->get()->toArray();
-
-
-                $pmItem = CRMPermissions::find($pmi[0]['parent_menu_id']);
-
-                $permissionToPush[] = [
-                    'company_id' => $company->id, // Note: changed from plan_id to company->id
-                    'role_id' => null,
-                    'permission_id' => $pmItem->permission_id,
-                    'created_at' => now(),
-                    'updated_at' => now()
-                ];
-
-
-               
-                foreach ($permissionKeys as $p) {
-                    $permissionToPush[] = [
-                        'company_id' => $company->id, // Note: changed from plan_id to company->id
-                        'role_id' => null,
-                        'permission_id' => $p,
-                        'created_at' => now(),
-                        'updated_at' => now()
-                    ];
-                }
-            }
-
-            // Bulk insert with chunk to handle large datasets
-            if (!empty($permissionToPush)) {
-                $chunks = array_chunk($permissionToPush, 100);
-                foreach ($chunks as $chunk) {
-                    CRMRolePermissions::insert($chunk);
-                }
-            }
-
+            DB::commit();
             return true;
         } catch (\Exception $e) {
-            \Log::error('Error assigning permissions', [
+            DB::rollBack();
+            \Log::error('Permission Assignment Error', [
                 'company_id' => $company->id,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'error' => $e->getMessage()
             ]);
-
             return false;
         }
     }
 
 
+    protected function preparePermissions($company, $plan)
+    {
+        $permissionsToUpsert = [];
+
+        foreach ($plan->planFeatures as $pf) {
+            $featureName = strtoupper($pf->module_name);
+
+            // Skip disabled features
+            if ($pf->value == 0) {
+                continue;
+            }
+
+            // Validate feature existence
+            if (!isset(PermissionsHelper::$PERMISSIONS_IDS[$featureName])) {
+                \Log::warning('Unknown feature in plan', [
+                    'feature_name' => $featureName,
+                    'plan_id' => $company->plan_id
+                ]);
+                continue;
+            }
+
+            $permissionOFModule = PermissionsHelper::$PERMISSIONS_IDS[$featureName];
+            $permissionKeys = array_keys($permissionOFModule);
+
+            // Get parent menu permission
+            $parentPermission = CRMPermissions::find($permissionKeys[0]);
+
+            // Prepare permissions with unique identifier
+            $basePermissionData = [
+                'company_id' => $company->id,
+                'role_id' => null,
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+
+            // Add parent menu permission
+            $permissionsToUpsert[] = array_merge($basePermissionData, [
+                'permission_id' => $parentPermission->permission_id
+            ]);
+
+            // Add individual permissions
+            foreach ($permissionKeys as $permissionId) {
+                $permissionsToUpsert[] = array_merge($basePermissionData, [
+                    'permission_id' => $permissionId
+                ]);
+            }
+        }
+
+        return $permissionsToUpsert;
+    }
 
     public function createMenuItemsForCompanyPanel($planId)
     {
@@ -355,7 +354,7 @@ class CompanyService
             $company = Company::findOrFail($validatedData['id']);
 
             $userFullName = $validatedData['name'];
-      
+
             // Update company basic details
             $company->fill(collect($validatedData)->except([
                 'id',
@@ -380,26 +379,16 @@ class CompanyService
 
             $userC = User::where('company_id', $company->id)->where('role_id', null)->where('is_tenant', '0')->first();
 
-           
+
 
             if ($userC) {
-                // \Log::info('Updating user', [
-                //     'user_id' => $userC->id,
-                //     'original_name' => $userC->name,
-                //     'new_name' => $userFullName
-                // ]);
-            
+
                 $userC->name = $userFullName;
                 $userC->save(); // Changed from update() to save()
-            
-                // Verify the update
-                // $updatedUser = User::find($userC->id);
-                // \Log::info('After update', [
-                //     'updated_name' => $updatedUser->name
-                // ]);
+
             }
 
-       
+
             // Handle plan and permission update if plan_id is provided
             if (!empty($validatedData['plan_id']) && $validatedData['plan_id'] != $company->plan_id) {
                 $this->updateCompanyPlanAndPermissions($company, $validatedData['plan_id']);

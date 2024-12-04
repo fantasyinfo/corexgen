@@ -94,6 +94,8 @@ Route::get('/super-admin-login', function () {
 })->name('super.panel.login');
 
 
+
+
 // language set
 Route::get('/setlang/{locale}', function (string $locale) {
 
@@ -107,7 +109,7 @@ Route::get('/setlang/{locale}', function (string $locale) {
 
 // In your routes file, add a print statement to debug
 Route::get('/get-cities/{countryId}', function ($countryId) {
- 
+
     $cities = City::where('country_id', $countryId)->get(['id', 'name']);
 
 
@@ -116,8 +118,8 @@ Route::get('/get-cities/{countryId}', function ($countryId) {
 
 
 
-    // add country, city tables in bg
-    Route::get('/add-default-countries-cities', [CountryCitySeederController::class, 'runSeeder']);
+// add country, city tables in bg
+Route::get('/add-default-countries-cities', [CountryCitySeederController::class, 'runSeeder']);
 
 
 
@@ -297,7 +299,7 @@ Route::middleware([
         Route::post('/import', [CompaniesController::class, 'import'])->name('import')->middleware('check.permission:COMPANIES.IMPORT');
 
         // view compnay login as company
-        Route::get('/view/{companyid}', [CompaniesController::class, 'view'])->name('view')->middleware('check.permission:COMPANIES.VIEW');
+        Route::get('/loginas/{companyid}', [CompaniesController::class, 'loginas'])->name('loginas')->middleware('check.permission:COMPANIES.LOGIN_AS');
 
     });
 

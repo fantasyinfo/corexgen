@@ -180,6 +180,7 @@ function getCRMMenus()
     // echo PANEL_TYPES['COMPANY_PANEL'];
     $menus = CRMMenu::where('panel_type', PANEL_TYPES['COMPANY_PANEL'])->get();
 
+    // dd(session('panelAccess'));
     return $menus;
 
 }
