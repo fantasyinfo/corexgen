@@ -13,27 +13,36 @@ class CompanyRepository
 
     public function getCompanyQuery($request)
     {
+      
         $query = Company::query()
-            ->select('companies.*')
-            ->leftJoin('plans', 'companies.plan_id', '=', 'plans.id')
-            ->leftJoin('subscriptions', function($join) {
+            ->select([
+                'companies.*',
+                'plans.name as plan_name',
+                'plans.billing_cycle',
+                'subscriptions.start_date',
+                'subscriptions.end_date',
+                'subscriptions.next_billing_date',
+            ])
+            ->join('plans', 'companies.plan_id', '=', 'plans.id')
+            ->join('subscriptions', function ($join) {
                 $join->on('companies.id', '=', 'subscriptions.company_id')
-                     ->whereRaw('subscriptions.id = (
-                         SELECT id 
-                         FROM subscriptions as s2 
-                         WHERE s2.company_id = companies.id 
-                         ORDER BY s2.created_at DESC 
-                         LIMIT 1
-                     )');
-            })
-            ->with('plans', 'latestSubscription');
-    
+                    ->whereRaw('subscriptions.id = (
+                 SELECT id 
+                 FROM subscriptions as s2 
+                 WHERE s2.company_id = companies.id 
+                 ORDER BY s2.created_at DESC 
+                 LIMIT 1
+             )');
+            })->with('plans','subscriptions');
+
+
         // Dynamic filters
         return $this->applyFilters($query, $request);
     }
 
     protected function applyFilters($query, $request)
     {
+
         return $query
             ->when(
                 $request->filled('name'),
@@ -60,9 +69,21 @@ class CompanyRepository
                 fn($q) => $q->whereDate('subscriptions.next_billing_date', '=', $request->next_billing_date)
             )
             ->when(
-                $request->filled('plans'),
-                fn($q) => $q->where('plans.name', 'LIKE', "%{$request->plans}%")
+                $request->filled('plan_id'),
+                fn($q) => $q->where('plan_id', '=', $request->plan_id)
+            )
+            ->when(
+                $request->filled('plans') && $request->plans != '0',
+                fn($q) => $q->whereHas('plans', function($subQuery) use ($request) {
+                    $subQuery->where('name', '=', $request->plans);
+                })
+            )
+            ->when(
+                $request->filled('billing_cycle'),
+                fn($q) => $q->whereHas('plans', function($subQuery) use ($request) {
+                    $subQuery->where('billing_cycle', '=', $request->billing_cycle);
+                })
             );
     }
-    
+
 }

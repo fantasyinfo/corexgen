@@ -490,28 +490,9 @@ class CompanyService
 
         $query = $this->companyRepository->getCompanyQuery($request);
 
+        // dd($query->get()->toArray());
+
         return DataTables::of($query)
-        ->filter(function ($query) use ($request) {
-            // Additional filtering logic if needed
-            if ($request->has('name')) {
-                $query->where('companies.name', 'like', "%{$request->name}%");
-            }
-            if ($request->has('email')) {
-                $query->where('companies.email', 'like', "%{$request->email}%");
-            }
-            if ($request->has('plans')) {
-                $query->where('plans.name', 'like', "%{$request->plans}%");
-            }
-            if ($request->has('status')) {
-                $query->where('companies.status', $request->status);
-            }
-            if ($request->has('start_date')) {
-                $query->whereDate('subscriptions.start_date', '>=', $request->start_date);
-            }
-            if ($request->has('end_date')) {
-                $query->whereDate('subscriptions.end_date', '<=', $request->end_date);
-            }
-        })
             ->addColumn('actions', function ($company) {
                 return $this->renderActionsColumn($company);
             })
@@ -521,22 +502,22 @@ class CompanyService
             ->editColumn('status', function ($company) {
                 return $this->renderStatusColumn($company);
             })
-            ->editColumn('plans', function ($company) {
-                return $company->plans->name;
+            ->editColumn('plan_name', function ($company) {
+                return $company->plan_name;
             })
             ->editColumn('billing_cycle', function ($company) {
-                return $company->plans->billing_cycle;
+                return $company->billing_cycle;
             })
             ->editColumn('start_date', function ($company) {
-                return Carbon::parse($company->latestSubscription->start_date)->format('d M Y');
+                return Carbon::parse($company->start_date)->format('d M Y');
             })
             ->editColumn('end_date', function ($company) {
-                return Carbon::parse($company->latestSubscription->end_date)->format('d M Y');
+                return Carbon::parse($company->end_date)->format('d M Y');
             })
             ->editColumn('next_billing_date', function ($company) {
-                return Carbon::parse($company->latestSubscription->next_billing_date)->format('d M Y');
+                return Carbon::parse($company->next_billing_date)->format('d M Y');
             })
-            ->rawColumns(['plans', 'billing_cycle', 'start_date', 'end_date', 'next_billing_date', 'actions', 'status']) // Add 'status' to raw columns
+            ->rawColumns(['plan_name', 'billing_cycle', 'start_date', 'end_date', 'next_billing_date', 'actions', 'status']) // Add 'status' to raw columns
             ->make(true);
     }
 

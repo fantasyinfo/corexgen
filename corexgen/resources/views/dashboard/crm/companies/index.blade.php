@@ -78,6 +78,9 @@
             const statusFilter = $('#statusFilter');
             const startDateFilter = $('#startDateFilter');
             const endDateFilter = $('#endDateFilter');
+            const plansFilter = $('#plansFilter');
+
+        
 
             const dbTableAjax = $("#userTable").DataTable({
                 processing: true,
@@ -95,6 +98,7 @@
                         d.status = statusFilter.val();
                         d.start_date = startDateFilter.val();
                         d.end_date = endDateFilter.val();
+                        d.plans = plansFilter.val();
                     },
                 },
                 columns: [
@@ -118,15 +122,15 @@
                         orderable: true
                     },
                     {
-                        data: 'plans',
-                        name: 'plans',
-                        searchable: true, 
+                        data: 'plan_name',
+                        name: 'plan_name',
+                        // searchable: true, 
                         orderable: true
                     },
                     {
                         data: 'billing_cycle',
                         name: 'billing_cycle',
-                        searchable: true, 
+                        // searchable: true, 
                         orderable: true
                     },
                     {
@@ -176,6 +180,7 @@
                 statusFilter.val('');
                 startDateFilter.val('');
                 endDateFilter.val('');
+                plansFilter.val('');
                 // Reset the DataTable's search and reload
                 dbTableAjax.ajax.reload();
             });
