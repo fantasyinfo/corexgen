@@ -31,20 +31,20 @@
             </div>
             <div class="mb-3">
                 <div class="form-group">
-                    <label for="roleFilter" class="mb-2 font-12">{{ __('users.Role') }}</label>
+                    <label for="roleFilter" class="mb-2 font-12">{{ __('company.Plans') }}</label>
                     <select id="roleFilter"
-                        class="form-control searchSelectBox  @error('role_id') is-invalid @enderror"
-                        name="role_id" id="role_id">
-                        <option selected value="0">Select Role</option>
-                        @if ($roles && $roles->isNotEmpty())
-                            @foreach ($roles as $role)
-                                <option value="{{ $role->id }}"
-                                    {{ request('role_id') == $role->id ? 'selected' : '' }}>
-                                    {{ $role->role_name }}
+                        class="form-control searchSelectBox  @error('plans') is-invalid @enderror"
+                        name="plans" id="plans">
+                        <option selected value="0">Select Plans</option>
+                        @if ($plans && $plans->isNotEmpty())
+                            @foreach ($plans as $plan)
+                                <option value="{{ $plan->id }}"
+                                    {{ request('plans') == $plan->id ? 'selected' : '' }}>
+                                    {{ $plan->name }}
                                 </option>
                             @endforeach
                         @else
-                            <option disabled>No roles available</option>
+                            <option disabled>No plans available</option>
                         @endif
                     </select>
                 </div>

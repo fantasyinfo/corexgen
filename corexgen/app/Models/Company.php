@@ -18,11 +18,12 @@ class Company extends Model
 
     protected $table = self::table;
 
-    protected $fillable = ['name', 'email', 'phone', 'status', 'tenant_id', 'address_id','plan_id','deleted_at'];
+    protected $fillable = ['name', 'email', 'phone', 'status', 'tenant_id', 'address_id', 'plan_id', 'deleted_at'];
 
 
-    public function tenant(){
-       return  $this->belongsTo(Tenant::class);
+    public function tenant()
+    {
+        return $this->belongsTo(Tenant::class);
     }
 
     public function users()
@@ -31,18 +32,30 @@ class Company extends Model
     }
 
 
-    public function addresses(){
-        return $this->belongsTo(Address::class,'address_id');
+    public function addresses()
+    {
+        return $this->belongsTo(Address::class, 'address_id');
     }
 
-    public function plans(){
-        return $this->belongsTo(Plans::class,'plan_id');
+    public function plans()
+    {
+        return $this->belongsTo(Plans::class, 'plan_id');
+    }
+
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    public function latestSubscription()
+    {
+        return $this->hasOne(Subscription::class)->latestOfMany();
     }
 
 
 
-
-    protected static function boot(){
+    protected static function boot()
+    {
         parent::boot();
 
         static::creating(function ($company) {

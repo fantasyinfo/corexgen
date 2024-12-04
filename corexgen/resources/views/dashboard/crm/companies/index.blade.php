@@ -14,7 +14,7 @@
 
             <div class="card-body">
 
-                {{-- @include('dashboard.crm.companies.components.companies-filters') --}}
+                @include('dashboard.crm.companies.components.companies-filters')
                 @include('layout.components.bulk-import-modal')
 
 
@@ -29,6 +29,11 @@
                                     </th>
                                     <th> {{ __('companies.Name') }}</th>
                                     <th>{{ __('companies.Email') }}</th>
+                                    <th>{{ __('companies.Plan') }}</th>
+                                    <th>{{ __('companies.Billing Cycle') }}</th>
+                                    <th>{{ __('companies.Subscription Start') }}</th>
+                                    <th>{{ __('companies.Subscription End') }}</th>
+                                    <th>{{ __('companies.Renew Date') }}</th>
                                     <th>{{ __('crud.Status') }}</th>
                                     <th>{{ __('crud.Created At') }}</th>
 
@@ -109,6 +114,36 @@
                     {
                         data: 'email',
                         name: 'email',
+                        searchable: true, 
+                        orderable: true
+                    },
+                    {
+                        data: 'plans',
+                        name: 'plans',
+                        searchable: true, 
+                        orderable: true
+                    },
+                    {
+                        data: 'billing_cycle',
+                        name: 'billing_cycle',
+                        searchable: true, 
+                        orderable: true
+                    },
+                    {
+                        data: 'start_date',
+                        name: 'start_date',
+                        searchable: true, 
+                        orderable: true
+                    },
+                    {
+                        data: 'end_date',
+                        name: 'end_date',
+                        searchable: true, 
+                        orderable: true
+                    },
+                    {
+                        data: 'next_billing_date',
+                        name: 'next_billing_date',
                         searchable: true, 
                         orderable: true
                     },

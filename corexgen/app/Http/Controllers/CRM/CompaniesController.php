@@ -14,12 +14,14 @@ use App\Services\CompanyService;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Repositories\CompanyRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 /**
  * CompaniesController handles CRUD operations for Compaines
@@ -69,6 +71,18 @@ class CompaniesController extends Controller
     }
 
 
+    protected $companyRepository;
+    protected $companyService;
+
+    public function __construct(
+        CompanyRepository $companyRepository,
+        CompanyService $companyService
+    ) {
+        $this->companyRepository = $companyRepository;
+        $this->companyService = $companyService;
+    }
+
+
     /**
      * Display list of company with filtering and DataTables support
      * 
@@ -79,54 +93,16 @@ class CompaniesController extends Controller
     {
         $this->tenantRoute = $this->getTenantRoute();
 
-
-        $query = Company::query();
-
-        $plans = Plans::with('planFeatures')->get();
-        $country = Country::with('cities')->get();
-
-
-        // Apply dynamic filters based on request input
-        $query->when($request->filled('name'), fn($q) => $q->where('name', 'LIKE', "%{$request->name}%"));
-        $query->when($request->filled('email'), fn($q) => $q->where('email', 'LIKE', "%{$request->status}%"));
-        $query->when($request->filled('status'), fn($q) => $q->where('status', $request->status));
-
-
-
-
+    
 
         // Server-side DataTables response
         if ($request->ajax()) {
-            return DataTables::of($query)
-                ->addColumn('actions', function ($user) {
-                    return View::make(getComponentsDirFilePath('dt-actions-buttons'), [
-                        'tenantRoute' => $this->tenantRoute,
-                        'permissions' => PermissionsHelper::getPermissionsArray('COMPANIES'),
-                        'module' => PANEL_MODULES[$this->getPanelModule()]['companies'],
-                        'id' => $user->id
-                    ])->render();
-                })
-                ->editColumn('created_at', function ($user) {
-                    return $user->created_at->format('d M Y');
-                })
-                ->editColumn('status', function ($user) {
-                    return View::make(getComponentsDirFilePath('dt-status'), [
-                        'tenantRoute' => $this->tenantRoute,
-                        'permissions' => PermissionsHelper::getPermissionsArray('COMPANIES'),
-                        'module' => PANEL_MODULES[$this->getPanelModule()]['companies'],
-                        'id' => $user->id,
-                        'status' => [
-                            'current_status' => $user->status,
-                            'available_status' => CRM_STATUS_TYPES['COMPANIES']['STATUS'],
-                            'bt_class' => CRM_STATUS_TYPES['COMPANIES']['BT_CLASSES'],
-                        ]
-                    ])->render();
-                })
-                ->rawColumns(['actions', 'status']) // Add 'status' to raw columns
-                ->make(true);
+            return $this->companyService->getDatatablesResponse($request);
         }
 
-        $roles = $this->applyTenantFilter(CRMRole::query())->get();
+
+        $plans = Plans::with('planFeatures')->get();
+        $country = Country::with('cities')->get();
 
         return view($this->getViewFilePath('index'), [
             'filters' => $request->all(),

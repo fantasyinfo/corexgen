@@ -6,6 +6,7 @@ return [
     'Companies Management' => 'Companies Management',
     'Create Company' => 'Create Company',
     'Full Name' => 'Full Name',
+    'Name' => 'Name',
     'Email' => 'Email',
     'Phone' => 'Phone',
     'Role' => 'Role',
@@ -20,7 +21,14 @@ return [
     'General' =>'General',
     'Contact' => 'Contact',
     'Address' => 'Address',
-    'Select Plan' => 'Select Plan'
+    'Select Plan' => 'Select Plan',
+    'Plan' => 'Plan',
+    'Billing Cycle' => 'Billing Cycle',
+    'Subscription Start' => 'Subscription Start',
+    'Subscription End' => 'Subscription End',
+    'Renew Date' => 'Renew Date',
+
+
 
 
 
