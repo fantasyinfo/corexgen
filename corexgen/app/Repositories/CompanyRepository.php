@@ -13,7 +13,7 @@ class CompanyRepository
 
     public function getCompanyQuery($request)
     {
-      
+
         $query = Company::query()
             ->select([
                 'companies.*',
@@ -33,7 +33,7 @@ class CompanyRepository
                  ORDER BY s2.created_at DESC 
                  LIMIT 1
              )');
-            })->with('plans','subscriptions');
+            })->with('plans', 'subscriptions');
 
 
         // Dynamic filters
@@ -74,13 +74,13 @@ class CompanyRepository
             )
             ->when(
                 $request->filled('plans') && $request->plans != '0',
-                fn($q) => $q->whereHas('plans', function($subQuery) use ($request) {
+                fn($q) => $q->whereHas('plans', function ($subQuery) use ($request) {
                     $subQuery->where('name', '=', $request->plans);
                 })
             )
             ->when(
                 $request->filled('billing_cycle'),
-                fn($q) => $q->whereHas('plans', function($subQuery) use ($request) {
+                fn($q) => $q->whereHas('plans', function ($subQuery) use ($request) {
                     $subQuery->where('billing_cycle', '=', $request->billing_cycle);
                 })
             );

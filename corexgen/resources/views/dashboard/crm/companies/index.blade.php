@@ -86,6 +86,7 @@
                 processing: true,
                 serverSide: true,
                 stateSave: true,
+      
                 language: {
                     "lengthMenu": "_MENU_ per page",
                 },
@@ -101,6 +102,7 @@
                         d.plans = plansFilter.val();
                     },
                 },
+                 searching: false,
                 columns: [
                     {
                         data: null, // Render checkbox for bulk actions
@@ -124,13 +126,13 @@
                     {
                         data: 'plan_name',
                         name: 'plan_name',
-                        // searchable: true, 
+                        searchable: false, 
                         orderable: true
                     },
                     {
                         data: 'billing_cycle',
                         name: 'billing_cycle',
-                        // searchable: true, 
+                        searchable: false, 
                         orderable: true
                     },
                     {

@@ -173,14 +173,14 @@ function getCRMMenus()
 
     if ($user->is_tenant && session('panelAccess') === PANEL_TYPES['SUPER_PANEL']) {
 
-        $menus = CRMMenu::where('panel_type', PANEL_TYPES['SUPER_PANEL'])->get();
+        $menus = CRMMenu::where('panel_type', PANEL_TYPES['SUPER_PANEL'])->distinct()->get();
         return $menus;
     }
 
     // echo PANEL_TYPES['COMPANY_PANEL'];
-    $menus = CRMMenu::where('panel_type', PANEL_TYPES['COMPANY_PANEL'])->get();
+    $menus = CRMMenu::where('panel_type', PANEL_TYPES['COMPANY_PANEL'])->distinct()->get();
 
-    // dd(session('panelAccess'));
+    // \dd(session('panelAccess'));
     return $menus;
 
 }
