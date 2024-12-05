@@ -79,7 +79,7 @@ $(function () {
 document.addEventListener("DOMContentLoaded", function () {
     const filterToggle = document.getElementById("filterToggle");
     const filterSidebar = document.getElementById("filterSidebar");
-    const closeFilter = document.getElementById('closeFilter');
+    const closeFilter = document.getElementById("closeFilter");
 
     if (filterToggle) {
         // Toggle filter sidebar
@@ -87,8 +87,7 @@ document.addEventListener("DOMContentLoaded", function () {
             filterSidebar.classList.toggle("show");
         });
 
-        if(closeFilter){
-
+        if (closeFilter) {
             // Close filter sidebar
             closeFilter.addEventListener("click", function () {
                 filterSidebar.classList.remove("show");
@@ -157,4 +156,83 @@ $("#deleteModal").on("show.bs.modal", function (event) {
     // Set the form action to the appropriate route
     var form = $("#deleteForm");
     form.attr("action", route);
+});
+
+// change password
+document.addEventListener("DOMContentLoaded", () => {
+    const changePasswordLink = document.getElementById("changePassword");
+    const changePasswordModal = new bootstrap.Modal(
+        document.getElementById("changePasswordModal")
+    );
+    const savePasswordButton = document.getElementById("savePasswordButton");
+    const errorMessage = document.getElementById("errorMessage");
+
+    let dataUrl = "";
+    let dataId = "";
+
+    if (changePasswordLink) {
+        // Show modal on link click
+        changePasswordLink.addEventListener("click", (event) => {
+            event.preventDefault();
+            dataUrl = changePasswordLink.getAttribute("data-url");
+            dataId = changePasswordLink.getAttribute("data-id");
+            changePasswordModal.show();
+        });
+
+        // Handle save button click
+        savePasswordButton.addEventListener("click", () => {
+            const newPassword = document
+                .getElementById("newPassword")
+                .value.trim();
+            const confirmPassword = document
+                .getElementById("confirmPassword")
+                .value.trim();
+
+            if (newPassword === "" || confirmPassword === "") {
+                errorMessage.textContent = "Both fields are required.";
+                errorMessage.classList.remove("d-none");
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                errorMessage.textContent = "Passwords do not match.";
+                errorMessage.classList.remove("d-none");
+                return;
+            }
+
+            errorMessage.classList.add("d-none");
+
+            // Send data to server
+            fetch(dataUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": document
+                        .querySelector('meta[name="csrf-token"]')
+                        .getAttribute("content"),
+                },
+                body: JSON.stringify({
+                    id: dataId,
+                    password: newPassword,
+                }),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success) {
+                        alert("Password updated successfully!");
+                        changePasswordModal.hide();
+                    } else {
+                        errorMessage.textContent =
+                            data.message || "An error occurred.";
+                        errorMessage.classList.remove("d-none");
+                    }
+                })
+                .catch((error) => {
+                    errorMessage.textContent =
+                        "An error occurred. Please try again.";
+                    errorMessage.classList.remove("d-none");
+                    console.error("Error:", error);
+                });
+        });
+    }
 });

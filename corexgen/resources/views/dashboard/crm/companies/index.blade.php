@@ -31,11 +31,11 @@
                                     <th>{{ __('companies.Email') }}</th>
                                     <th>{{ __('companies.Plan') }}</th>
                                     <th>{{ __('companies.Billing Cycle') }}</th>
-                                    <th>{{ __('companies.Subscription Start') }}</th>
-                                    <th>{{ __('companies.Subscription End') }}</th>
+                                    {{-- <th>{{ __('companies.Subscription Start') }}</th>
+                                    <th>{{ __('companies.Subscription End') }}</th> --}}
                                     <th>{{ __('companies.Renew Date') }}</th>
                                     <th>{{ __('crud.Status') }}</th>
-                                    <th>{{ __('crud.Created At') }}</th>
+                                    {{-- <th>{{ __('crud.Created At') }}</th> --}}
 
                                     <th class="text-end">{{ __('crud.Actions') }}</th>
                                 </tr>
@@ -135,18 +135,18 @@
                         searchable: false, 
                         orderable: true
                     },
-                    {
-                        data: 'start_date',
-                        name: 'start_date',
-                        searchable: true, 
-                        orderable: true
-                    },
-                    {
-                        data: 'end_date',
-                        name: 'end_date',
-                        searchable: true, 
-                        orderable: true
-                    },
+                    // {
+                    //     data: 'start_date',
+                    //     name: 'start_date',
+                    //     searchable: true, 
+                    //     orderable: true
+                    // },
+                    // {
+                    //     data: 'end_date',
+                    //     name: 'end_date',
+                    //     searchable: true, 
+                    //     orderable: true
+                    // },
                     {
                         data: 'next_billing_date',
                         name: 'next_billing_date',
@@ -159,12 +159,12 @@
                         searchable: false, 
                         orderable: true
                     },
-                    {
-                        data: 'created_at',
-                        name: 'created_at',
-                        searchable: true, 
-                        orderable: true
-                    },
+                    // {
+                    //     data: 'created_at',
+                    //     name: 'created_at',
+                    //     searchable: true, 
+                    //     orderable: true
+                    // },
                     {
                         data: 'actions',
                         name: 'actions',

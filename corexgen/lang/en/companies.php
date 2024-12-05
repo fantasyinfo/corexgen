@@ -23,10 +23,10 @@ return [
     'Address' => 'Address',
     'Select Plan' => 'Select Plan',
     'Plan' => 'Plan',
-    'Billing Cycle' => 'Billing Cycle',
-    'Subscription Start' => 'Subscription Start',
-    'Subscription End' => 'Subscription End',
-    'Renew Date' => 'Renew Date',
+    'Billing Cycle' => 'Type',
+    'Subscription Start' => 'Sub Start',
+    'Subscription End' => 'Sub End',
+    'Renew Date' => 'Renew',
     'Plans' => 'Plans',
 
 

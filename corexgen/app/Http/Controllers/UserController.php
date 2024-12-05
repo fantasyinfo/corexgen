@@ -398,4 +398,8 @@ class UserController extends Controller
             return redirect()->back()->with('error', 'Failed to delete the user: ' . $e->getMessage());
         }
     }
+
+    public function changePassword(Request $request){
+        dd($request);
+    }
 }

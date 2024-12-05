@@ -521,4 +521,8 @@ class CompaniesController extends Controller
         }
     }
 
+
+    public function changePassword(Request $request){
+        dd($request);
+    }
 }

@@ -26,6 +26,7 @@
 
           @include('layout.components.alert')
           @include('layout.components.delete-confirm')
+          @include('layout.components.change-password')
        
           
          <div class="toast-container" id="toastContainer"></div>
