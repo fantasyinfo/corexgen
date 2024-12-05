@@ -2,25 +2,16 @@
 
 @section('content')
     <div class="container-fluid ">
-        <div class="card shadow-sm rounded p-3">
-            <div class="card-header  border-bottom pb-2">
-                <div class="row ">
-                    <div class="col-md-4">
-                        <h5 class="card-title">{{ __('crm_role.Roles Management') }}</h5>
-                    </div>
-                    @include('layout.components.header-buttons')
-                </div>
+        <div class="p-3">
+            @include('layout.components.header-buttons')
 
-
-            </div>
-
-            <div class="card-body">
+            <div class="shadow-sm rounded ">
                 @include('dashboard.crm.role.components.role-filters')
                 @include('layout.components.bulk-import-modal')
 
 
                 @if (hasPermission('ROLE.READ_ALL') || hasPermission('ROLE.READ'))
-                    <div class="table-responsive ">
+                    <div class="table-responsive table-bg ">
 
                         <table id="roleTable" class="table table-striped table-bordered ui celled">
                             <thead>
@@ -90,8 +81,7 @@
                         d.end_date = $('#endDateFilter').val();
                     },
                 },
-                columns: [
-                    {
+                columns: [{
                         data: null, // Render checkbox for bulk actions
                         orderable: false,
                         searchable: false,

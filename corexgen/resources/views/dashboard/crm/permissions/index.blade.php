@@ -2,20 +2,13 @@
 
 @section('content')
     <div class="container-fluid">
-        <div class="card shadow-sm rounded p-3">
-            <div class="card-header border-bottom pb-2">
-                <div class="row ">
-                    <div class="col-md-4">
-                        <h5 class="card-title">{{ __('crm_permissions.Permissions Management') }}</h5>
-                    </div>
-                    @include('layout.components.header-buttons')
-                </div>
-            </div>
-
-            <div class="card-body">
+        <div class=" p-3">
+          
+            @include('layout.components.header-buttons')
+            <div class="shadow-sm rounded">
 
                 @if (hasPermission('PERMISSIONS.READ_ALL') || hasPermission('PERMISSIONS.READ'))
-                    <div class="table-responsive card">
+                    <div class="table-responsive  table-bg">
 
                         <table id="permissionTable" class="table table-striped table-bordered ui celled">
                             <thead>

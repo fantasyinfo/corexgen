@@ -7,17 +7,16 @@
         @if (isset($permissions['CHANGE_PASSWORD']) &&
                 hasPermission(strtoupper($module) . '.' . $permissions['CHANGE_PASSWORD']['KEY']))
             <li class="m-1 p-1">
-                <a class="dropdown-item" href="#" 
+                <a class="dropdown-item change-password-link" href="#" 
                 data-toggle="tooltip" 
                 title="Change Password" 
                 id='changePassword'
                 data-id="{{ $id }}" 
-                data-url="{{ route($tenantRoute . $module . '.changePassword') }}"
                 data-bs-toggle="modal"
                 data-bs-target="#changePasswordModal"
                 
                 >
-                    <i class="fas fa-unlock-alt"></i> Change Password
+                    <i class="fas fa-unlock-alt me-2"></i> Change Password
                 </a>
             </li>
         @endif

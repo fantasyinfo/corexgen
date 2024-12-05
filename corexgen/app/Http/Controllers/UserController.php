@@ -399,7 +399,45 @@ class UserController extends Controller
         }
     }
 
-    public function changePassword(Request $request){
-        dd($request);
+    public function changePassword(Request $request)
+    {
+        // Validate input
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:users,id',
+            'password' => [
+                'required',
+                'string',
+            ]
+        ], [
+            'id.exists' => 'Invalid user ID.'
+        ]);
+    
+        // Check validation
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first()
+            ], 422);
+        }
+    
+        try {
+            // Find user and update password
+            $user = User::findOrFail($request->input('id'));
+            
+            $user->password = Hash::make($request->input('password'));
+            $user->save();
+    
+            return response()->json([
+                'success' => true,
+                'message' => 'Password updated successfully.'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Password change error: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'An unexpected error occurred. Please try again.'
+            ], 500);
+        }
     }
 }

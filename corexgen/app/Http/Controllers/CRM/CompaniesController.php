@@ -93,7 +93,7 @@ class CompaniesController extends Controller
     {
         $this->tenantRoute = $this->getTenantRoute();
 
-    
+
 
         // Server-side DataTables response
         if ($request->ajax()) {
@@ -522,7 +522,54 @@ class CompaniesController extends Controller
     }
 
 
-    public function changePassword(Request $request){
-        dd($request);
+    public function changePassword(Request $request)
+    {
+        // Validate input
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:companies,id',
+            'password' => [
+                'required',
+                'string',
+            ]
+        ], [
+            'id.exists' => 'Invalid user ID.'
+        ]);
+
+        // Check validation
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first()
+            ], 422);
+        }
+
+        try {
+
+            // Find user and update password
+            $user = User::where('company_id', '=', $request->input('id'))->first();
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Compnay User not found.'
+                ], 404);
+            }
+
+
+            $user->password = Hash::make($request->input('password'));
+            $user->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Password updated successfully.'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Password change error: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'An unexpected error occurred. Please try again.'
+            ], 500);
+        }
     }
 }

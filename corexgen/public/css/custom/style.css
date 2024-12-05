@@ -117,6 +117,9 @@ body {
   background-color: var(--border-color);
 }
 
+.dropdown-menu {
+  box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.5);
+}
 /* User Dropdown */
 .dropdown-toggle {
   color: var(--body-color) !important;
