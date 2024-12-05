@@ -12,16 +12,22 @@
             <!-- Search Input -->
             <div class="mb-3">
                 <div class="form-group">
-                    <label class="mb-2 font-12">Role Name</label>
-                    <input type="text" id="nameFilter" name="name" class="form-control"
-                        placeholder="{{ __('crm_role.Role Name') }}" value="{{ request('name') }}">
+                    <x-form-components.input-label for="roleDesc" class="custom-class">
+                        {{ __('crm_role.Role Name') }}
+                    </x-form-components.input-label>
+
+                    <x-form-components.input-group type="text" name="name" id="nameFilter"
+                        placeholder="{{ __('Admin/Manager') }}" value="{{ old('name') }}" class="custom-class" />
+
                 </div>
             </div>
 
             <!-- Status Dropdown -->
             <div class="mb-3">
                 <div class="form-group">
-                    <label class="mb-2 font-12">Status</label>
+                    <x-form-components.input-label for="roleDesc" class="custom-class">
+                        {{ __('crm_role.All Statuses') }}
+                    </x-form-components.input-label>
                     <select name="status" class="form-select" id="statusFilter">
                         <option value="">{{ __('crm_role.All Statuses') }}</option>
                         <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>

@@ -11,7 +11,7 @@
                     <form id="plansForm" action="{{ route(getPanelRoutes('plans.store')) }}" method="POST">
                         @csrf
                         @method('PUT')
-                        <input type='hidden' name='id' value="{{$plan->id}}" />
+                        <input type='hidden' name='id' value="{{ $plan->id }}" />
                         <div class="card-body general-info">
                             <div class="mb-5 d-flex align-items-center justify-content-between">
                                 <p class="fw-bold mb-0 me-4">
@@ -49,98 +49,70 @@
                                 <div class="tab-pane fade show active" id="general" role="tabpanel">
                                     <div class="row mb-4 align-items-center">
                                         <div class="col-lg-4">
-                                            <label for="nameName" class="mb-2 fw-semibold">{{ __('plans.Plan Name') }}:
-                                                <span class="text-danger">*</span></label>
+                                            <x-form-components.input-label for="planName" class="custom-class" required>
+                                                {{ __('plans.Plan Name') }}
+                                            </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <div class="input-group">
+                                            <x-form-components.input-group type="text" class="custom-class"
+                                                id="planName" name="name" placeholder="{{ __('Premium') }}"
+                                                value="{{ $plan->name }}" required />
 
-                                                <input type="text"
-                                                    class="form-control @error('name') is-invalid @enderror" id="nameName"
-                                                    name="name" placeholder="{{ __('Premium') }}"
-                                                    value="{{ $plan->name }}" required>
-                                                <div class="invalid-feedback" id="nameNameError">
-                                                    @error('name')
-                                                        {{ $message }}
-                                                    @enderror
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
 
                                     <div class="row mb-4 align-items-center">
                                         <div class="col-lg-4">
-                                            <label for="nameName" class="mb-2 fw-semibold">{{ __('plans.Plan Desc') }}:
-                                                <span class="text-danger">*</span></label>
+                                            <x-form-components.input-label for="planDesc" class="custom-class" required>
+                                                {{ __('plans.Plan Desc') }}
+                                            </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <div class="input-group">
+                                            <x-form-components.input-group type="text" class="custom-class"
+                                                id="planDesc" name="desc" placeholder="{{ __('For Startups') }}"
+                                                value="{{ $plan->desc }}" required />
 
-                                                <input type="text"
-                                                    class="form-control @error('desc') is-invalid @enderror" id="nameName"
-                                                    name="desc" placeholder="{{ __('For Startups') }}"
-                                                    value="{{ $plan->desc }}" required>
-                                                <div class="invalid-feedback" id="nameNameError">
-                                                    @error('desc')
-                                                        {{ $message }}
-                                                    @enderror
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
 
 
                                     <div class="row mb-4 align-items-center">
                                         <div class="col-lg-4">
-                                            <label for="nameName" class="mb-2  fw-semibold">{{ __('plans.Plan Price') }}:
-                                                <span class="text-danger">*</span></label>
+                                            <x-form-components.input-label for="planPrice" class="custom-class" required>
+                                                {{ __('plans.Plan Price') }}
+                                            </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <div class="input-group">
+                                            <x-form-components.input-group type="number" step="0.001"
+                                                class="custom-class" id="planPrice" name="price"
+                                                placeholder="{{ __('129.99') }}" value="{{ $plan->price }}" required />
 
-                                                <input type="number"
-                                                step="0.001"
-                                                    class="form-control @error('price') is-invalid @enderror" id="nameName"
-                                                    name="price" placeholder="{{ __('129.99') }}"
-                                                    value="{{ $plan->price }}" required>
-                                                <div class="invalid-feedback" id="nameNameError">
-                                                    @error('price')
-                                                        {{ $message }}
-                                                    @enderror
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
 
                                     <div class="row mb-4 align-items-center">
                                         <div class="col-lg-4">
-                                            <label for="nameName"
-                                                class="mb-2  fw-semibold">{{ __('plans.Plan Offer Price') }}:
-                                                <span class="text-danger">*</span></label>
+                                            <x-form-components.input-label for="planOfferPrice" class="custom-class"
+                                                required>
+                                                {{ __('plans.Plan Offer Price') }}
+                                            </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <div class="input-group">
+                                            <x-form-components.input-group type="number" step="0.001"
+                                                class="custom-class" id="planOfferPrice" name="offer_price"
+                                                placeholder="{{ __('99.99') }}" value="{{ $plan->offer_price }}"
+                                                required />
 
-                                                <input type="number"
-                                                    step="0.001"
-                                                    class="form-control @error('offer_price') is-invalid @enderror"
-                                                    id="nameName" name="offer_price" placeholder="{{ __('99.99') }}"
-                                                    value="{{ $plan->offer_price}}" required>
-                                                <div class="invalid-feedback" id="nameNameError">
-                                                    @error('offer_price')
-                                                        {{ $message }}
-                                                    @enderror
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
 
 
                                     <div class="row mb-4 align-items-center">
                                         <div class="col-lg-4">
-                                            <label for="country_id"
-                                                class="mb-2 fw-semibold">{{ __('plans.Select Billing Cycle') }}: <span
-                                                    class="text-danger">*</span></label>
+                                            <x-form-components.input-label for="planBillingCycle" class="custom-class"
+                                                required>
+                                                {{ __('plans.Select Billing Cycle') }}
+                                            </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
                                             <div class="input-group">
@@ -171,44 +143,40 @@
                                                 class="text-success">one time cost</span>, no billing to this company.</p>
                                     </div>
                                     <hr>
-                                    <p class="alert alert-secondary">Please add <span
-                                        class="text-success">Plans Features</span> on features tabs, default to 10</p>
+                                    <p class="alert alert-secondary">Please add <span class="text-success">Plans
+                                            Features</span> on features tabs, default to 10</p>
                                 </div>
                                 <div class="tab-pane fade" id="features" role="tabpanel">
-                                    @foreach(PLANS_FEATURES as $pf)
-                                    <div class="row mb-4 align-items-center">
-                                        <div class="col-lg-4">
-                                            <label for="{{$pf}}" class="mb-2 fw-semibold">
-                                                {{ ucwords(strtolower(str_replace('_', ' ',$pf ))) }} Create:
-                                                <span class="text-danger">*</span>
-                                            </label>
-                                        </div>
-                                        <div class="col-lg-8">
-                                            <div class="input-group">
-                                                @php 
-                                                    $pfs = strtolower(str_replace(' ', '_', $pf)); 
-                                                    $featureValue = $plan->planFeatures->firstWhere('module_name', strtolower($pfs))->value ?? 0;
-                                                @endphp
-                                                <input type="number"
-                                                    class="form-control @error('features.'.$pfs) is-invalid @enderror"
-                                                    id="{{$pfs}}" name="features.{{$pfs}}" 
-                                                    placeholder="{{ __('10') }}"
-                                                    value="{{ $featureValue }}" required>
-                                                <div class="invalid-feedback" id="{{$pfs}}Error">
-                                                    @error('features.'.$pfs)
-                                                        {{ $message }}
-                                                    @enderror
-                                                </div>
+                                    @foreach (PLANS_FEATURES as $pf)
+                                        <div class="row mb-4 align-items-center">
+                                            <div class="col-lg-4">
+                                                <x-form-components.input-label for="{{ $pf }}"
+                                                    class="custom-class" required>
+                                                    {{ ucwords(strtolower($pf)) }} Create:
+                                                </x-form-components.input-label>
                                             </div>
-                                        </div>
-                                        <p class="offset-lg-4 font-12 my-2 text-secondary">
-                                            <span class="text-success"> -1</span> For Unlimited. || <span class="text-success">0</span> Means this feature is disable 
-                                        </p>
-                                    </div>
-                                @endforeach
-                                  
+                                            <div class="col-lg-8">
+                                                @php
+                                                    $pfs = strtolower($pf);
+                                                    $featureValue =
+                                                        $plan->planFeatures->firstWhere('module_name', strtolower($pfs))
+                                                            ->value ?? 0;
+                                                @endphp
+                                                <x-form-components.input-group type="number" class="custom-class"
+                                                    id="{{ $pfs }}" name="features.{{ $pfs }}"
+                                                    placeholder="{{ __('10') }}" value="{{ $featureValue }}"
+                                                    required />
 
-                                    
+                                            </div>
+                                            <p class="offset-lg-4 font-12 my-2 text-secondary">
+                                                <span class="text-success"> -1</span> For Unlimited. || <span
+                                                    class="text-success">0</span> Means this feature is disable
+                                            </p>
+                                        </div>
+                                    @endforeach
+
+
+
                                 </div>
                             </div>
 
@@ -237,9 +205,5 @@
                 });
             });
         });
-
-
-        
-
     </script>
 @endpush
