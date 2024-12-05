@@ -1,15 +1,15 @@
 @extends('layout.app')
 
 @section('content')
-@if ($errors->any())
-    <div class="alert alert-danger">
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
 
     <div class="container">
@@ -59,76 +59,63 @@
                                 <div class="tab-pane fade show active" id="general" role="tabpanel">
                                     <div class="row mb-4 align-items-center">
                                         <div class="col-lg-4">
-                                            <label for="companyName"
-                                                class="mb-2  fw-semibold">{{ __('companies.Company Name') }}: <span
-                                                    class="text-danger">*</span></label>
+                                            <x-form-components.input-label for="companyName" class="custom-class" required>
+                                                {{ __('companies.Company Name') }}
+                                            </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <input type="text" class="form-control @error('cname') is-invalid @enderror"
-                                                id="companyName" name="cname" placeholder="{{ __('Enter Company Name') }}"
-                                                value="{{ $company->cname }}" required>
-                                            <div class="invalid-feedback">
-                                                @error('cname')
-                                                    {{ $message }}
-                                                @enderror
-                                            </div>
+                                            <x-form-components.input-group type="text" name="cname" id="companyName"
+                                                placeholder="{{ __('Enter Company Name') }}" value="{{ $company->cname }}"
+                                                required class="custom-class" />
+
                                         </div>
                                     </div>
                                     <div class="row mb-4 align-items-center">
                                         <div class="col-lg-4">
-                                            <label for="primaryContactName"
-                                                class="mb-2  fw-semibold">{{ __('companies.Full Name') }}: <span
-                                                    class="text-danger">*</span></label>
+                                            <x-form-components.input-label for="compnayUserName" class="custom-class"
+                                                required>
+                                                {{ __('companies.Full Name') }}
+                                            </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <input type="text" class="form-control @error('name') is-invalid @enderror"
-                                                id="primaryContactName" name="name" placeholder="{{ __('John Doe') }}"
-                                                value="{{ @$company->users[0]['name'] }}" required>
-                                            <div class="invalid-feedback">
-                                                @error('name')
-                                                    {{ $message }}
-                                                @enderror
-                                            </div>
+                                            <x-form-components.input-group type="text" name="name"
+                                                id="compnayUserName" placeholder="{{ __('John Doe') }}"
+                                                value="{{ @$company->users[0]['name'] }}" required class="custom-class" />
+
                                         </div>
                                     </div>
                                     <div class="row mb-4 align-items-center">
                                         <div class="col-lg-4">
-                                            <label for="emailName" class="mb-2  fw-semibold">{{ __('companies.Email') }}:
-                                                <span class="text-danger">*</span></label>
+                                            <x-form-components.input-label for="compnayEmail" class="custom-class" required>
+                                                {{ __('companies.Email') }}
+                                            </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <input type="email" disabled class="form-control @error('email') is-invalid @enderror"
-                                                id="emailName" name="email" placeholder="{{ __('john@doe.com') }}"
-                                                value="{{ $company->email }}" required>
-                                            <div class="invalid-feedback">
-                                                @error('email')
-                                                    {{ $message }}
-                                                @enderror
-                                            </div>
+                                            <x-form-components.input-group type="email" name="email" id="compnayEmail"
+                                                placeholder="{{ __('john@email.com') }}" value="{{ $company->email }}"
+                                                required class="custom-class" />
+
                                         </div>
                                     </div>
                                     <div class="row mb-4 align-items-center">
                                         <div class="col-lg-4">
-                                            <label for="phone" class="mb-2  fw-semibold">{{ __('companies.Phone') }}:
-                                                <span class="text-danger">*</span></label>
+                                            <x-form-components.input-label for="compnayPhone" class="custom-class" required>
+                                                {{ __('companies.Phone') }}
+                                            </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <input type="tel" class="form-control @error('phone') is-invalid @enderror"
-                                                id="phone" name="phone" placeholder="{{ __('9876543210') }}"
-                                                value="{{ $company->phone }}" required>
-                                            <div class="invalid-feedback">
-                                                @error('phone')
-                                                    {{ $message }}
-                                                @enderror
-                                            </div>
+                                            <x-form-components.input-group type="tel" name="phone" id="compnayPhone"
+                                                placeholder="{{ __('9876543210') }}" value="{{ $company->phone }}"
+                                                required class="custom-class" />
+
                                         </div>
                                     </div>
 
                                     <div class="row mb-4 align-items-center">
                                         <div class="col-lg-4">
-                                            <label for="password"
-                                                class="mb-2 fw-semibold">{{ __('companies.Select Plan') }}: <span
-                                                    class="text-danger">*</span></label>
+                                            <x-form-components.input-label for="compnayPlan" class="custom-class" required>
+                                                {{ __('companies.Select Plan') }}
+                                            </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
                                             <div class="input-group">
@@ -171,18 +158,25 @@
                                 <div class="tab-pane fade" id="address" role="tabpanel">
                                     <div class="row mb-4 align-items-center">
                                         <div class="col-lg-4">
-                                            <label for="registeredAddress"
-                                                class="mb-2 fw-semibold">{{ __('address.Address') }}:</label>
+                                            <x-form-components.input-label for="compnayAddressStreet"
+                                                class="custom-class">
+                                                {{ __('address.Address') }}
+                                            </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <textarea class="form-control" id="registeredAddress" name="address.street_address" rows="3"
-                                                placeholder="{{ __('Enter Registered street_address') }}">{{ @$company->addresses->street_address }}</textarea>
+                                            <x-form-components.textarea-group name="address.street_address"
+                                                id="compnayAddressStreet" placeholder="Enter Registered Street Address"
+                                                value="{{ @$company->addresses->street_address }}" class="custom-class" />
+                                             
+
                                         </div>
                                     </div>
                                     <div class="row mb-4 align-items-center">
                                         <div class="col-lg-4">
-                                            <label for="country"
-                                                class="mb-2 fw-semibold">{{ __('address.Country') }}:</label>
+                                            <x-form-components.input-label for="compnayAddressCountry"
+                                                class="custom-class">
+                                                {{ __('address.Country') }}
+                                            </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
                                             <div class="input-group">
@@ -214,8 +208,9 @@
 
                                     <div class="row mb-4 align-items-center">
                                         <div class="col-lg-4">
-                                            <label for="city"
-                                                class="mb-2 fw-semibold">{{ __('address.City') }}:</label>
+                                            <x-form-components.input-label for="compnayAddressCity" class="custom-class">
+                                                {{ __('address.City') }}
+                                            </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
                                             <select
@@ -227,13 +222,16 @@
                                     </div>
                                     <div class="row mb-4 align-items-center">
                                         <div class="col-lg-4">
-                                            <label for="pincode"
-                                                class="mb-2 fw-semibold">{{ __('address.Pincode') }}:</label>
+                                            <x-form-components.input-label for="compnayAddressPincode"
+                                                class="custom-class">
+                                                {{ __('address.Pincode') }}
+                                            </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <input type="text" class="form-control" id="pincode"
-                                                name="address.pincode" placeholder="{{ __('Enter Pincode') }}"
-                                                value="{{ @$company->addresses->postal_code }}">
+                                            <x-form-components.input-group type="text" name="address.pincode"
+                                                id="compnayAddressPincode" placeholder="{{ __('Enter Pincode') }}"
+                                                value="{{ @$company->addresses->postal_code }}" class="custom-class" />
+
                                         </div>
                                     </div>
                                 </div>

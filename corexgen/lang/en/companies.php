@@ -27,6 +27,7 @@ return [
     'Subscription Start' => 'Subscription Start',
     'Subscription End' => 'Subscription End',
     'Renew Date' => 'Renew Date',
+    'Plans' => 'Plans',
 
 
 
