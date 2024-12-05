@@ -24,8 +24,8 @@
                         <table id="userTable" class="table table-striped table-bordered ui celled">
                             <thead>
                                 <tr>
-                                    <th>
-                                        <input type="checkbox" id="select-all" />
+                                    <th >
+                                        <input type="checkbox" id="select-all" /> 
                                     </th>
                                     <th> {{ __('companies.Name') }}</th>
                                     <th>{{ __('companies.Email') }}</th>

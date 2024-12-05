@@ -314,3 +314,30 @@ table tr {
 .select2-container--default.select2-container--disabled .select2-selection--single{
     background-color: var(--body-bg);
 }
+
+
+/* Increase row height */
+.table > tbody > tr > td,
+.table > tbody > tr > th,
+.table > tfoot > tr > td,
+.table > tfoot > tr > th,
+.table > thead > tr > td,
+.table > thead > tr > th {
+  padding-top: 1.25rem;
+  padding-bottom: 1.25rem;
+}
+
+/* Apply minimum column widths */
+.table th,
+.table td {
+  min-width: 100px;
+}
+
+/* Odd/even row hover effect */
+.table tbody tr:nth-child(odd):hover {
+  background-color: var(--body-bg);
+}
+
+.table tbody tr:nth-child(even):hover {
+  background-color: var(--body-bg);
+}
