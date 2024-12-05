@@ -6,7 +6,7 @@
 
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h5 class="mb-0">Advanced {{ __('crud.Filter') }}</h5>
-             
+
                 <button type="button" class="btn btn-light" id="closeFilter" aria-label="Close">
                     <i class="fas fa-times me-2"></i>Close
                 </button>
@@ -17,23 +17,27 @@
             <!-- Search Input -->
             <div class="mb-3">
                 <div class="form-group">
-                    <label for="nameFilter" class="mb-2 font-12">{{ __('users.Name') }}</label>
-                    <input type="text" id="nameFilter" name="name" class="form-control"
-                        placeholder="{{ __('users.Name') }}" value="{{ request('name') }}">
+                    <x-form-components.input-label for="nameFilter" class="custom-class" required>
+                        {{ __('users.Full Name') }}
+                    </x-form-components.input-label>
+
+                    <x-form-components.input-group type="text" class="custom-class" id="nameFilter" name="name"
+                        placeholder="{{ __('John Doe') }}" value="{{ request('name') }}" />
                 </div>
             </div>
             <div class="mb-3">
                 <div class="form-group">
-                    <label for="emailFilter" class="mb-2 font-12">{{ __('users.Email') }}</label>
-                    <input type="text" id="emailFilter" name="email" class="form-control"
-                        placeholder="{{ __('users.Email') }}" value="{{ request('email') }}">
+                    <x-form-components.input-label for="emailFilter" class="custom-class" required>
+                        {{ __('users.Email') }}
+                    </x-form-components.input-label>
+                    <x-form-components.input-group type="email" class="custom-class" id="emailFilter" name="email"
+                        placeholder="{{ __('john@email.com') }}" value="{{ request('email') }}" />
                 </div>
             </div>
             <div class="mb-3">
                 <div class="form-group">
                     <label for="roleFilter" class="mb-2 font-12">{{ __('users.Role') }}</label>
-                    <select id="roleFilter"
-                        class="form-control searchSelectBox  @error('role_id') is-invalid @enderror"
+                    <select id="roleFilter" class="form-control searchSelectBox  @error('role_id') is-invalid @enderror"
                         name="role_id" id="role_id">
                         <option selected value="0">Select Role</option>
                         @if ($roles && $roles->isNotEmpty())

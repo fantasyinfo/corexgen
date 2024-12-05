@@ -36,6 +36,7 @@ body {
   transition: transform 0.3s;
   z-index: 1030;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  overflow-y: scroll;
 }
 
 .sidebar-collapsed .sidebar {

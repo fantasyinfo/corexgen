@@ -17,7 +17,7 @@ class CRMMenuSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('crm_menu')->delete();
+        DB::table('crm_menu')->truncate();
 
         // create menus for super panel
         foreach (CRM_MENU_ITEMS_TENANT as $category => $menuData) {

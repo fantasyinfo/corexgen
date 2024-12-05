@@ -17,34 +17,49 @@
             <!-- Search Input -->
             <div class="mb-3">
                 <div class="form-group">
-                    <label for="nameFilter" class="mb-2 font-12">{{ __('users.Name') }}</label>
-                    <input type="text" id="nameFilter" name="name" class="form-control"
-                        placeholder="{{ __('users.Name') }}" value="{{ request('name') }}">
+                    <x-form-components.input-label for="nameFilter" class="custom-class" required>
+                        {{ __('companies.Company Name') }}
+                    </x-form-components.input-label>
+
+                    <x-form-components.input-group type="text" name="cname" id="nameFilter"
+                    placeholder="{{ __('Enter Company Name') }}" value="{{ request('name') }}"
+                    required class="custom-class" />
+                  
+                 
                 </div>
             </div>
             <div class="mb-3">
                 <div class="form-group">
-                    <label for="emailFilter" class="mb-2 font-12">{{ __('users.Email') }}</label>
-                    <input type="text" id="emailFilter" name="email" class="form-control"
-                        placeholder="{{ __('users.Email') }}" value="{{ request('email') }}">
+                    <x-form-components.input-label for="emailFilter" class="custom-class" required>
+                        {{ __('companies.Email') }}
+                    </x-form-components.input-label>
+              
+                    <x-form-components.input-group type="email" name="email" id="emailFilter"
+                    placeholder="{{ __('Enter Company Email') }}" value="{{ request('email') }}"
+                    required class="custom-class" />
+
+        
                 </div>
             </div>
             <div class="mb-3">
                 <div class="form-group">
-                    <label for="roleFilter" class="mb-2 font-12">{{ __('users.Role') }}</label>
-                    <select id="roleFilter"
-                        class="form-control searchSelectBox  @error('role_id') is-invalid @enderror"
-                        name="role_id" id="role_id">
-                        <option selected value="0">Select Role</option>
-                        @if ($roles && $roles->isNotEmpty())
-                            @foreach ($roles as $role)
-                                <option value="{{ $role->id }}"
-                                    {{ request('role_id') == $role->id ? 'selected' : '' }}>
-                                    {{ $role->role_name }}
+                    <x-form-components.input-label for="plansFilter" class="custom-class" required>
+                        {{ __('companies.Plans') }}
+                    </x-form-components.input-label>
+                  
+                    <select id="plansFilter"
+                        class="form-control searchSelectBox  @error('plans') is-invalid @enderror"
+                        name="plans" id="plans">
+                        <option selected value="0">Select Plans</option>
+                        @if ($plans && $plans->isNotEmpty())
+                            @foreach ($plans as $plan)
+                                <option value="{{ $plan->name }}"
+                                    {{ request('plans') == $plan->name ? 'selected' : '' }}>
+                                    {{ $plan->name }}
                                 </option>
                             @endforeach
                         @else
-                            <option disabled>No roles available</option>
+                            <option disabled>No plans available</option>
                         @endif
                     </select>
                 </div>
@@ -52,9 +67,11 @@
             <!-- Status Dropdown -->
             <div class="mb-3">
                 <div class="form-group">
-                    <label for="statusFilter" class="mb-2 font-12">{{ __('users.All Statuses') }}</label>
+                    <x-form-components.input-label for="statusFilter" class="custom-class" required>
+                        {{ __('companies.All Statuses') }}
+                    </x-form-components.input-label>
+                 
                     <select name="status" class="form-select" id="statusFilter">
-                        <option value="">{{ __('users.All Statuses') }}</option>
                         <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>
                             {{ __('Active') }}
                         </option>

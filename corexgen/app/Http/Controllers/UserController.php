@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Helpers\PermissionsHelper;
 use App\Http\Requests\CRM\CRMUserRequest;
 use App\Models\CRM\CRMRole;
+use App\Repositories\UserRepository;
+use App\Services\UserService;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -62,6 +64,17 @@ class UserController extends Controller
     }
 
 
+    protected $userRepository;
+    protected $userService;
+
+    public function __construct(
+        UserRepository $userRepository,
+        UserService $userService
+    ) {
+        $this->userRepository = $userRepository;
+        $this->userService = $userService;
+    }
+
     /**
      * Display list of users with filtering and DataTables support
      * 
@@ -70,69 +83,12 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $this->tenantRoute = $this->getTenantRoute();
-
-
-        $query = User::query()->with('role')->where('id', '!=', Auth::user()->id);
-
-        if (panelAccess() == PANEL_TYPES['SUPER_PANEL']) {
-            $query->where('is_tenant', '=', '1');
-        }
-
-        // Apply tenant filter (if necessary)
-        $query = $this->applyTenantFilter($query);
-
-        // Apply dynamic filters based on request input
-        $query->when($request->filled('name'), fn($q) => $q->where('name', 'LIKE', "%{$request->name}%"));
-        $query->when($request->filled('email'), fn($q) => $q->where('email', 'LIKE', "%{$request->status}%"));
-
-        if ($request->filled('role_id') && $request->role_id != '0') {
-
-            $query->when($request->filled('role_id'), fn($q) => $q->where('role_id', $request->role_id));
-        }
-
-        $query->when($request->filled('status'), fn($q) => $q->where('status', $request->status));
-        $query->when($request->filled('start_date'), fn($q) => $q->whereDate('created_at', '>=', $request->start_date));
-        $query->when($request->filled('end_date'), fn($q) => $q->whereDate('created_at', '<=', $request->end_date));
-
-        // For debugging: dd the SQL and bindings
-
-
-
-        // Server-side DataTables response
+        // Ajax DataTables request
         if ($request->ajax()) {
-            return DataTables::of($query)
-                ->addColumn('actions', function ($user) {
-                    return View::make(getComponentsDirFilePath('dt-actions-buttons'), [
-                        'tenantRoute' => $this->tenantRoute,
-                        'permissions' => PermissionsHelper::getPermissionsArray('USERS'),
-                        'module' => PANEL_MODULES[$this->getPanelModule()]['users'],
-                        'id' => $user->id
-                    ])->render();
-                })
-                ->editColumn('created_at', function ($user) {
-                    return $user->created_at->format('d M Y');
-                })
-                ->editColumn('role_name', function ($user) {
-                    return $user->role ? $user->role->role_name : '';
-                })
-                ->editColumn('status', function ($user) {
-                    return View::make(getComponentsDirFilePath('dt-status'), [
-                        'tenantRoute' => $this->tenantRoute,
-                        'permissions' => PermissionsHelper::getPermissionsArray('USERS'),
-                        'module' => PANEL_MODULES[$this->getPanelModule()]['users'],
-                        'id' => $user->id,
-                        'status' => [
-                            'current_status' => $user->status,
-                            'available_status' => CRM_STATUS_TYPES['USERS']['STATUS'],
-                            'bt_class' => CRM_STATUS_TYPES['USERS']['BT_CLASSES'],
-                        ]
-                    ])->render();
-                })
-                ->rawColumns(['actions', 'status', 'role_name']) // Add 'status' to raw columns
-                ->make(true);
+            return $this->userService->getDatatablesResponse($request);
         }
 
+        // Regular view rendering
         $roles = $this->applyTenantFilter(CRMRole::query())->get();
 
         return view($this->getViewFilePath('index'), [

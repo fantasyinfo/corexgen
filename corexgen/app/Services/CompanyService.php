@@ -13,20 +13,42 @@ use Illuminate\Support\Facades\Hash;
 use App\Helpers\PermissionsHelper;
 use App\Models\CRM\CRMPermissions;
 use App\Models\CRM\CRMRolePermissions;
+use App\Repositories\CompanyRepository;
+use App\Traits\TenantFilter;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\View;
+use Yajra\DataTables\Facades\DataTables;
 
 class CompanyService
 {
+    use TenantFilter;
+
+    protected $companyRepository;
+
+    private $tenantRoute;
+
+
+    public function __construct(CompanyRepository $companyRepository)
+    {
+        $this->companyRepository = $companyRepository;
+        $this->tenantRoute = $this->getTenantRoute();
+    }
+
+
+
     public function createCompany(array $validatedData)
     {
 
         return DB::transaction(function () use ($validatedData) {
             $address = $this->createAddressIfProvided($validatedData);
 
+            $userFullName = $validatedData['name'];
             $company = Company::create(array_merge($validatedData, [
                 'address_id' => $address?->id,
+                'name' => $validatedData['cname']
             ]));
 
-            $companyAdminUser = $this->createCompanyUser($company, $validatedData);
+            $companyAdminUser = $this->createCompanyUser($company, $validatedData, $userFullName);
 
             // todo:: add payment trasation 
             $paymentDetails = [];
@@ -45,6 +67,8 @@ class CompanyService
             return $company;
         });
     }
+
+
 
     private function createAddressIfProvided(array $data): ?Address
     {
@@ -68,10 +92,12 @@ class CompanyService
         ]);
     }
 
-    private function createCompanyUser(Company $company, array $data)
+    private function createCompanyUser(Company $company, array $data, $userFullName)
     {
+        unset($data['name']);
         return User::create([
             ...$data,
+            'name' => $userFullName,
             'is_tenant' => false,
             'company_id' => $company->id,
             'status' => CRM_STATUS_TYPES['USERS']['STATUS']['ACTIVE'],
@@ -188,6 +214,11 @@ class CompanyService
 
         $permissionToPush = [];
         try {
+
+            // first delete all existing
+            CRMRolePermissions::where('company_id',$company->id)->where('role_id',null)->delete();
+
+
             foreach ($plan->planFeatures as $pf) {
                 $featureName = strtoupper($pf->module_name);
 
@@ -225,7 +256,7 @@ class CompanyService
                     'updated_at' => now()
                 ];
 
-
+              
 
                 foreach ($permissionKeys as $p) {
                     $permissionToPush[] = [
@@ -259,6 +290,7 @@ class CompanyService
     }
 
 
+  
 
     public function createMenuItemsForCompanyPanel($planId)
     {
@@ -330,5 +362,196 @@ class CompanyService
     }
 
 
+
+    // company update 
+    public function updateCompany(array $validatedData)
+    {
+        // dd($validatedData);
+        // Validate that company ID is provided
+        if (empty($validatedData['id'])) {
+            throw new \InvalidArgumentException('Company ID is required for updating');
+        }
+
+        return DB::transaction(function () use ($validatedData) {
+            // Retrieve the existing company
+            $company = Company::findOrFail($validatedData['id']);
+
+            $userFullName = $validatedData['name'];
+
+            // Update company basic details
+            $company->fill(collect($validatedData)->except([
+                'id',
+                'address_street_address',
+                'address_country_id',
+                'address_city_id',
+                'address_pincode',
+                'plan_id'
+            ])
+                ->merge(['name' => $validatedData['cname']])
+                ->toArray());
+
+            // Handle address update
+            $address = $this->updateCompanyAddress($company, $validatedData);
+
+            // Update address_id if a new address was created
+            if ($address) {
+                $company->address_id = $address->id;
+            }
+
+            // update user
+
+            $userC = User::where('company_id', $company->id)->where('role_id', null)->where('is_tenant', '0')->first();
+
+
+
+            if ($userC) {
+
+                $userC->name = $userFullName;
+                $userC->save(); // Changed from update() to save()
+
+            }
+
+
+            // Handle plan and permission update if plan_id is provided
+            if (!empty($validatedData['plan_id']) && $validatedData['plan_id'] != $company->plan_id) {
+                $this->updateCompanyPlanAndPermissions($company, $validatedData['plan_id']);
+            }
+
+            // Save company updates
+            $company->save();
+
+            return $company;
+        });
+    }
+
+    private function updateCompanyAddress(Company $company, array $data): ?Address
+    {
+        // Check if address fields are provided
+        $requiredAddressFields = [
+            'address_street_address',
+            'address_country_id',
+            'address_city_id',
+            'address_pincode'
+        ];
+
+        if (!$this->hasAllAddressFields($data, $requiredAddressFields)) {
+            return null;
+        }
+
+        // If company already has an address, update it
+        if ($company->address_id) {
+            $address = Address::findOrFail($company->address_id);
+            $address->update([
+                'street_address' => $data['address_street_address'],
+                'postal_code' => $data['address_pincode'],
+                'city_id' => $data['address_city_id'],
+                'country_id' => $data['address_country_id'],
+            ]);
+            return $address;
+        }
+
+        // If no existing address, create a new one
+        return Address::create([
+            'street_address' => $data['address_street_address'],
+            'postal_code' => $data['address_pincode'],
+            'city_id' => $data['address_city_id'],
+            'country_id' => $data['address_country_id'],
+            'address_type' => ADDRESS_TYPES['COMPANY']['SHOW']['HOME'],
+        ]);
+    }
+
+    private function updateCompanyPlanAndPermissions(Company $company, $newPlanId)
+    {
+        // Create a new payment transaction for the new plan
+        $paymentTransactionResult = $this->createPaymentTransaction($newPlanId, $company->id, []);
+
+        // Update company plan
+        $company->plan_id = $newPlanId;
+
+        // Remove existing permissions
+        CRMRolePermissions::where('company_id', $company->id)->delete();
+
+        // Get company admin user (assuming first user)
+        $companyAdminUser = User::where('company_id', $company->id)->first();
+
+        // Reassign permissions based on new plan
+        $this->givePermissionsToCompany($company, $companyAdminUser);
+
+        // Optionally, create new menu items for the company panel
+        $this->createMenuItemsForCompanyPanel($newPlanId);
+
+        return $company;
+    }
+
+
+    /// index 
+
+    public function getDatatablesResponse($request)
+    {
+
+        $this->tenantRoute = $this->getTenantRoute();
+
+        $query = $this->companyRepository->getCompanyQuery($request);
+
+        // dd($query->get()->toArray());
+
+        return DataTables::of($query)
+            ->addColumn('actions', function ($company) {
+                return $this->renderActionsColumn($company);
+            })
+            ->editColumn('created_at', function ($company) {
+                return Carbon::parse($company->created_at)->format('d M Y');
+            })
+            ->editColumn('status', function ($company) {
+                return $this->renderStatusColumn($company);
+            })
+            ->editColumn('plan_name', function ($company) {
+                return $company->plan_name;
+            })
+            ->editColumn('billing_cycle', function ($company) {
+                return $company->billing_cycle;
+            })
+            ->editColumn('start_date', function ($company) {
+                return Carbon::parse($company->start_date)->format('d M Y');
+            })
+            ->editColumn('end_date', function ($company) {
+                return Carbon::parse($company->end_date)->format('d M Y');
+            })
+            ->editColumn('next_billing_date', function ($company) {
+                return Carbon::parse($company->next_billing_date)->format('d M Y');
+            })
+            ->rawColumns(['plan_name', 'billing_cycle', 'start_date', 'end_date', 'next_billing_date', 'actions', 'status']) // Add 'status' to raw columns
+            ->make(true);
+    }
+
+
+    protected function renderActionsColumn($company)
+    {
+  
+
+        return View::make(getComponentsDirFilePath('dt-actions-buttons'), [
+            'tenantRoute' => $this->tenantRoute,
+            'permissions' => PermissionsHelper::getPermissionsArray('COMPANIES'),
+            'module' => PANEL_MODULES[$this->getPanelModule()]['companies'],
+            'id' => $company->id
+        ])->render();
+    }
+
+    protected function renderStatusColumn($company)
+    {
+        
+
+        return View::make(getComponentsDirFilePath('dt-status'), [
+            'tenantRoute' => $this->tenantRoute,
+            'permissions' => PermissionsHelper::getPermissionsArray('COMPANIES'),
+            'module' => PANEL_MODULES[$this->getPanelModule()]['companies'],
+            'id' => $company->id,
+            'status' => [
+                'current_status' => $company->status,
+                'available_status' => CRM_STATUS_TYPES['COMPANIES']['STATUS'],
+                'bt_class' => CRM_STATUS_TYPES['COMPANIES']['BT_CLASSES'],
+            ]
+        ])->render();
+    }
 }
 

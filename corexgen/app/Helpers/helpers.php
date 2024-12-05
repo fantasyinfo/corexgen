@@ -173,13 +173,14 @@ function getCRMMenus()
 
     if ($user->is_tenant && session('panelAccess') === PANEL_TYPES['SUPER_PANEL']) {
 
-        $menus = CRMMenu::where('panel_type', PANEL_TYPES['SUPER_PANEL'])->get();
+        $menus = CRMMenu::where('panel_type', PANEL_TYPES['SUPER_PANEL'])->distinct()->get();
         return $menus;
     }
 
     // echo PANEL_TYPES['COMPANY_PANEL'];
-    $menus = CRMMenu::where('panel_type', PANEL_TYPES['COMPANY_PANEL'])->get();
+    $menus = CRMMenu::where('panel_type', PANEL_TYPES['COMPANY_PANEL'])->distinct()->get();
 
+    // \dd(session('panelAccess'));
     return $menus;
 
 }
@@ -298,7 +299,7 @@ function hasMenuPermission($permissionId = null)
 
 
     if ($userRoleId == null && $user->company_id == null) {
-        \Log::error('Role & Compnay Id Not Found.', [$user, $userRoleId, $user->company_id]);
+       // \Log::error('Role & Compnay Id Not Found.', [$user, $userRoleId, $user->company_id]);
         return false;
     } else if ($userRoleId == null && $user->company_id != null) {
         // its a company admin user
@@ -307,7 +308,7 @@ function hasMenuPermission($permissionId = null)
             ->where('role_id', null)
             ->where('company_id', $user->company_id)
             ->exists();
-        \Log::info('Compnay Id Found but not role id.', [$user, $userRoleId, $user->comapany_id]);
+        //\Log::info('Compnay Id Found but not role id.', [$user, $userRoleId, $user->comapany_id]);
         return true;
     }
 
@@ -325,7 +326,7 @@ function panelAccess()
 {
     $user = Auth::user();
 
-    if ($user->is_tenant) {
+    if (isset($user->is_tenant) && $user->is_tenant) {
         return PANEL_TYPES['SUPER_PANEL'];
     }
     return PANEL_TYPES['COMPANY_PANEL'];

@@ -6,6 +6,7 @@ use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
 use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
+use App\Models\Company;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -50,45 +51,70 @@ class FortifyServiceProvider extends ServiceProvider
         });
 
 
-        // Custom Authentication Logic
+        // Instead of silently returning null, provide more informative error handling
         Fortify::authenticateUsing(function (Request $request) {
-            $path = '';
+            $path = $request->input('path', '');
             $isTenant = filter_var($request->input('is_tenant'), FILTER_VALIDATE_BOOLEAN);
             $email = $request->input('email');
             $password = $request->input('password');
-            $path = $request->input('path');
 
             // Fetch active user by email
             $user = User::where('email', $email)
                 ->where('status', CRM_STATUS_TYPES['USERS']['STATUS']['ACTIVE'])
                 ->first();
 
-            if ($user && Hash::check($password, $user->password)) {
-           
-                // Super admin / tenant check
-                if ($isTenant && $user->is_tenant && $user->tenant_id !== null && $path === 'super-admin-login') {
-                    $tenant = Tenant::where('id', $user->tenant_id)
-                        ->where('status', CRM_STATUS_TYPES['TENANTS']['STATUS']['ACTIVE'])
-                        ->first();
-                    if ($tenant) {
-                        $user->tenant_id = $tenant->id;
-                        session(['panelAccess' => PANEL_TYPES['SUPER_PANEL']]);
-                        return $user;
-                    }
-                    return null; // Tenant is inactive
-                } else if ($path == '' && !$user->is_tenant && $user->company_id !== null) {
-                    session(['panelAccess' => PANEL_TYPES['COMPANY_PANEL']]);
-                    return $user;
-                } else {
-                    return null;
-                }
-
-                // Normal user
-
-
+            if (!$user) {
+                throw \ValidationException::withMessages([
+                    'email' => [trans('auth.failed')],
+                ]);
             }
 
-            return null; // Invalid credentials or inactive user
+            // Password check
+            if (!Hash::check($password, $user->password)) {
+                throw \ValidationException::withMessages([
+                    'email' => [trans('auth.failed')],
+                ]);
+            }
+
+            // Company status check
+            if (!$isTenant && $user->company_id !== null) {
+                $company = Company::find($user->company_id);
+
+                if (!$company || $company->status !== CRM_STATUS_TYPES['COMPANIES']['STATUS']['ACTIVE']) {
+                    throw \ValidationException::withMessages([
+                        'company' => ['Your company account is currently inactive.'],
+                    ]);
+                }
+            }
+
+            // Tenant status check
+            if ($isTenant && $path === 'super-admin-login') {
+                $tenant = Tenant::find($user->tenant_id);
+
+                if (!$tenant || $tenant->status !== CRM_STATUS_TYPES['TENANTS']['STATUS']['ACTIVE']) {
+                    throw \ValidationException::withMessages([
+                        'tenant' => ['Your tenant account is currently inactive.'],
+                    ]);
+                }
+            }
+
+            // Set panel access based on user type
+            $panelAccess = match (true) {
+                $isTenant && $user->role_id === null => PANEL_TYPES['SUPER_PANEL'],
+                $isTenant && $user->role_id !== null => PANEL_TYPES['SUPER_PANEL'],
+                !$isTenant && $user->role_id === null => PANEL_TYPES['COMPANY_PANEL'],
+                !$isTenant && $user->role_id !== null => PANEL_TYPES['COMPANY_PANEL'],
+                default => null
+            };
+
+            if (!$panelAccess) {
+                throw \ValidationException::withMessages([
+                    'authorization' => ['You are not authorized to access this panel.'],
+                ]);
+            }
+
+            session(['panelAccess' => $panelAccess]);
+            return $user;
         });
 
 

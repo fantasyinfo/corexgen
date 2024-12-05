@@ -14,12 +14,14 @@ use App\Services\CompanyService;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Repositories\CompanyRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 /**
  * CompaniesController handles CRUD operations for Compaines
@@ -69,8 +71,20 @@ class CompaniesController extends Controller
     }
 
 
+    protected $companyRepository;
+    protected $companyService;
+
+    public function __construct(
+        CompanyRepository $companyRepository,
+        CompanyService $companyService
+    ) {
+        $this->companyRepository = $companyRepository;
+        $this->companyService = $companyService;
+    }
+
+
     /**
-     * Display list of users with filtering and DataTables support
+     * Display list of company with filtering and DataTables support
      * 
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Contracts\View\View|\Illuminate\Http\JsonResponse
@@ -79,54 +93,16 @@ class CompaniesController extends Controller
     {
         $this->tenantRoute = $this->getTenantRoute();
 
-
-        $query = Company::query();
-
-        $plans = Plans::with('planFeatures')->get();
-        $country = Country::with('cities')->get();
-
-
-        // Apply dynamic filters based on request input
-        $query->when($request->filled('name'), fn($q) => $q->where('name', 'LIKE', "%{$request->name}%"));
-        $query->when($request->filled('email'), fn($q) => $q->where('email', 'LIKE', "%{$request->status}%"));
-        $query->when($request->filled('status'), fn($q) => $q->where('status', $request->status));
-
-
-
-
+    
 
         // Server-side DataTables response
         if ($request->ajax()) {
-            return DataTables::of($query)
-                ->addColumn('actions', function ($user) {
-                    return View::make(getComponentsDirFilePath('dt-actions-buttons'), [
-                        'tenantRoute' => $this->tenantRoute,
-                        'permissions' => PermissionsHelper::getPermissionsArray('COMPANIES'),
-                        'module' => PANEL_MODULES[$this->getPanelModule()]['companies'],
-                        'id' => $user->id
-                    ])->render();
-                })
-                ->editColumn('created_at', function ($user) {
-                    return $user->created_at->format('d M Y');
-                })
-                ->editColumn('status', function ($user) {
-                    return View::make(getComponentsDirFilePath('dt-status'), [
-                        'tenantRoute' => $this->tenantRoute,
-                        'permissions' => PermissionsHelper::getPermissionsArray('COMPANIES'),
-                        'module' => PANEL_MODULES[$this->getPanelModule()]['companies'],
-                        'id' => $user->id,
-                        'status' => [
-                            'current_status' => $user->status,
-                            'available_status' => CRM_STATUS_TYPES['COMPANIES']['STATUS'],
-                            'bt_class' => CRM_STATUS_TYPES['COMPANIES']['BT_CLASSES'],
-                        ]
-                    ])->render();
-                })
-                ->rawColumns(['actions', 'status']) // Add 'status' to raw columns
-                ->make(true);
+            return $this->companyService->getDatatablesResponse($request);
         }
 
-        $roles = $this->applyTenantFilter(CRMRole::query())->get();
+
+        $plans = Plans::with('planFeatures')->get();
+        $country = Country::with('cities')->get();
 
         return view($this->getViewFilePath('index'), [
             'filters' => $request->all(),
@@ -192,49 +168,81 @@ class CompaniesController extends Controller
     }
 
     /**
-     * showing the edit user view
+     * showing the edit company view
      * @param mixed $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function edit($id)
     {
 
-        $query = User::query()->where('id', $id);
-        $query = $this->applyTenantFilter($query);
-        $user = $query->firstOrFail();
 
-        $roles = $this->applyTenantFilter(CRMRole::query())->get();
+        $query = Company::query()
+            ->with([
+                'users' => function ($query) use ($id) {
+                    $query->where('role_id', null)
+                        ->where('company_id', $id)
+                        ->select('id', 'name', 'company_id', 'role_id');
+                },
+                'addresses' => function ($query) {
+                    $query->with('country')
+                        ->with('city')
+                        ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
+                }
+            ])
+            ->where('id', $id)
+            ->select('companies.*', 'companies.name as cname');
+
+        $company = $query->firstOrFail();
+        // dd($company);
+
+
+
+        $plans = Plans::with('planFeatures')->get();
+        $country = Country::all();
 
 
         return view($this->getViewFilePath('edit'), [
 
-            'title' => 'Edit User',
-            'user' => $user,
-            'roles' => $roles
+            'title' => 'Edit Company',
+            'company' => $company,
+            'plans' => $plans,
+            'country' => $country,
+            'module' => PANEL_MODULES[$this->getPanelModule()]['companies'],
         ]);
     }
 
 
     /**
      * Method update 
-     * for updating the user
+     * for updating the company
      *
      * @param Request $request [explicite description]
      *
      * @return void
      */
-    public function update(CRMUserRequest $request)
+    public function update(CompaniesRequest $request, CompanyService $companyService)
     {
+
 
         $this->tenantRoute = $this->getTenantRoute();
 
+        try {
+            $companyService->updateCompany($request->validated());
 
-        $this->applyTenantFilter(User::query()->where('id', '=', $request->id))->update($request->validated());
+            // If validation fails, it will throw an exception
+            return redirect()
+                ->route($this->getTenantRoute() . 'companies.index')
+                ->with('success', 'Company updated successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Company updation failed', [
+                'error' => $e->getMessage(),
+                'data' => $request->validated()
+            ]);
 
-
-
-        return redirect()->route($this->tenantRoute . 'users.index')
-            ->with('success', 'User updated successfully.');
+            return redirect()
+                ->back()
+                ->with('error', 'An error occurred while updating the company. ' . $e->getMessage());
+        }
     }
 
 
@@ -242,7 +250,7 @@ class CompaniesController extends Controller
     /**
      * Method export 
      *
-     * @param Request $request [exporting the users]
+     * @param Request $request [exporting the company]
      *
      * @return void
      */
@@ -305,9 +313,9 @@ class CompaniesController extends Controller
     }
 
     /**
-     * Method import bulk import users
+     * Method import bulk import company
      *
-     * @param Request $request [bulk import users]
+     * @param Request $request [bulk import company]
      *
      * @return void
      */
@@ -369,7 +377,7 @@ class CompaniesController extends Controller
 
 
     /**
-     * Deleting the user
+     * Deleting the company
      * @param mixed $id
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -379,21 +387,53 @@ class CompaniesController extends Controller
         try {
             // Delete the user
 
-            $this->applyTenantFilter(User::query()->where('id', '=', $id))->delete();
+            Company::query()->where('id', '=', $id)->delete();
 
             // Return success response
-            return redirect()->back()->with('success', 'User deleted successfully.');
+            return redirect()->back()->with('success', 'Company deleted successfully.');
         } catch (\Exception $e) {
             // Handle any exceptions
-            return redirect()->back()->with('error', 'Failed to delete the user: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to delete the company: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Bulk Delete the companies
+     * Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function bulkDelete(Request $request)
+    {
+
+        $ids = $request->input('ids');
+
+        try {
+            // Delete the companies
+
+            if (is_array($ids) && count($ids) > 0) {
+                // Validate ownership/permissions if necessary
+                Company::query()->whereIn('id', $ids)->delete();
+
+                return response()->json(['message' => 'Selected companiess deleted successfully.'], 200);
+            }
+
+            return response()->json(['message' => 'No companiess selected for deletion.'], 400);
+
+
+
+
+
+        } catch (\Exception $e) {
+            // Handle any exceptions
+            return redirect()->back()->with('error', 'Failed to delete the companies: ' . $e->getMessage());
         }
     }
 
 
     /**
-     * Method changeStatus (change user status)
+     * Method changeStatus (change company status)
      *
-     * @param $id $id [explicite id of user]
+     * @param $id $id [explicite id of company]
      * @param $status $status [explicite status to change]
      *
      * @return void
@@ -402,74 +442,73 @@ class CompaniesController extends Controller
     {
         try {
             // Delete the role
-
-            $this->applyTenantFilter(User::query()->where('id', '=', $id))->update(['status' => $status]);
+            Company::query()->where('id', '=', $id)->update(['status' => $status]);
             // Return success response
-            return redirect()->back()->with('success', 'User status changed successfully.');
+            return redirect()->back()->with('success', 'Company status changed successfully.');
         } catch (\Exception $e) {
             // Handle any exceptions
-            return redirect()->back()->with('error', 'Failed to changed the user status: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to changed the company status: ' . $e->getMessage());
         }
     }
 
 
-    public function view($companyid)
+    public function loginas($companyid)
     {
         // Enable query logging for detailed investigation
         \DB::enableQueryLog();
-    
+
         // Fetch the company owner with extensive logging
         $user = User::where('company_id', $companyid)
             ->where('role_id', null)
             ->where('is_tenant', 0)
             ->first();
-    
+
         \Log::info('User Switching Debug', [
             'companyid' => $companyid,
             'query' => \DB::getQueryLog(),
             'user_found' => $user ? true : false,
             'user_details' => $user ? $user->toArray() : null
         ]);
-    
+
         if (!$user) {
             return redirect()->back()->with('error', 'Company account not found.');
         }
-    
+
         try {
             // Explicitly use the 'web' guard
             $guard = Auth::guard('web');
-    
+
             \Log::info('Active Guard Before Logout', ['guard' => get_class($guard)]);
-    
+
             // Logout the current user if authenticated
             if ($guard->check()) {
                 $guard->logout();
             }
-    
+
             // Completely reset the session
             request()->session()->flush();
             request()->session()->invalidate();
             request()->session()->regenerateToken();
-    
+
             // Log in the new user using 'web' guard
             $guard->loginUsingId($user->id);
-    
+
             // Verify login
             if (!$guard->check() || $guard->id() !== $user->id) {
                 throw new \Exception('Login verification failed.');
             }
-    
+
             \Log::info('Successful User Switch', [
                 'new_user_id' => $user->id,
                 'authenticated_user_id' => $guard->id(),
                 'authenticated_user_email' => $user->email,
                 'guard' => Auth::getDefaultDriver()
             ]);
-    
+
             // Redirect to the desired dashboard or view
             return redirect()->route(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']) . '.home')
                 ->with('success', 'Logged in as company owner');
-    
+
         } catch (\Exception $e) {
             \Log::error('User Switching Failed', [
                 'error' => $e->getMessage(),
@@ -477,9 +516,9 @@ class CompaniesController extends Controller
                 'attempted_user_id' => $user->id,
                 'current_user_id' => Auth::id() ?: 'Not authenticated'
             ]);
-    
+
             return redirect()->back()->with('error', 'Failed to switch user account: ' . $e->getMessage());
         }
     }
-    
+
 }
