@@ -291,8 +291,8 @@
                         });
 
                         // Select the existing city in edit mode
-                        @if (isset($company) && @$company->addresses->city_id)
-                            cityDropdown.val('{{ @$company->addresses->city_id }}');
+                        @if (isset($user) && @$user->addresses->city_id)
+                            cityDropdown.val('{{ @$user->addresses->city_id }}');
                         @endif
 
                         // Reinitialize Select2 and trigger change

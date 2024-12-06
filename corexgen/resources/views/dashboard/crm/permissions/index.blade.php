@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="container-fluid">
-        <div class=" p-3">
+        <div class="">
           
             @include('layout.components.header-buttons')
             <div class="shadow-sm rounded">

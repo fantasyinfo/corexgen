@@ -30,6 +30,7 @@ class CRMUserRequest extends FormRequest
         $userId = $this->input('id') ?? null; // Safely retrieve user ID for update validation
     
         return [
+            'id' => [$this->isMethod('put') || $this->isMethod('patch') ? 'required' : 'nullable'],
             'name' => [
                 'required',
                 'max:255',

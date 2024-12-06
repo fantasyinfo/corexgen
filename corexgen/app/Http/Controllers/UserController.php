@@ -114,7 +114,7 @@ class UserController extends Controller
 
         try {
 
-        
+
             $userService->createUser($request->validated());
 
             return redirect()->route($this->tenantRoute . 'users.index')
@@ -151,16 +151,16 @@ class UserController extends Controller
     public function edit($id)
     {
 
-    
+
         $query = User::query()
-        ->with([
-            'addresses' => function ($query) {
-                $query->with('country')
-                    ->with('city')
-                    ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
-            }
-        ])
-        ->where('id', $id);
+            ->with([
+                'addresses' => function ($query) {
+                    $query->with('country')
+                        ->with('city')
+                        ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
+                }
+            ])
+            ->where('id', $id);
         $query = $this->applyTenantFilter($query);
         $user = $query->firstOrFail();
 
@@ -187,18 +187,20 @@ class UserController extends Controller
      *
      * @return void
      */
-    public function update(CRMUserRequest $request)
+    public function update(CRMUserRequest $request, UserService $userService)
     {
 
         $this->tenantRoute = $this->getTenantRoute();
 
+        try {
+            $userService->updateUser($request->validated());
 
-        $this->applyTenantFilter(User::query()->where('id', '=', $request->id))->update($request->validated());
-
-
-
-        return redirect()->route($this->tenantRoute . 'users.index')
-            ->with('success', 'User updated successfully.');
+            return redirect()->route($this->tenantRoute . 'users.index')
+                ->with('success', 'User updated successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'An error occurred while updating the user: ' . $e->getMessage());
+        }
     }
 
 
