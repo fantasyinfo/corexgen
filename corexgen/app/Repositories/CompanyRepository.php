@@ -53,7 +53,7 @@ class CompanyRepository
                 fn($q) => $q->where('companies.email', 'LIKE', "%{$request->email}%")
             )
             ->when(
-                $request->filled('status'),
+                $request->filled('status')  && $request->status != '0',
                 fn($q) => $q->where('companies.status', $request->status)
             )
             ->when(

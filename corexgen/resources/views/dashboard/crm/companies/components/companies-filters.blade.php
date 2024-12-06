@@ -72,6 +72,7 @@
                     </x-form-components.input-label>
                  
                     <select name="status" class="form-select" id="statusFilter">
+                        <option selected value="0">Select Status</option>
                         <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>
                             {{ __('Active') }}
                         </option>

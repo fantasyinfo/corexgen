@@ -367,5 +367,22 @@ table tr {
 .dt-link {
     text-decoration: none;
     cursor: pointer;
-    
+    color: var(--body-color);
+    transition: all 0.3s ease;
+    -webkit-transition: all 0.3s ease;
+    -moz-transition: all 0.3s ease;
+    -ms-transition: all 0.3s ease;
+    -o-transition: all 0.3s ease;
+}
+.dt-link::after {
+    content: '\f35d'; /* Unicode for link icon in Font Awesome */
+    font-weight: 900; /* For solid icons */
+    font-family: 'Font Awesome 5 Free';
+    margin-left: 5px;
+    display: inline-block;
+    color: var(--primary-color);
+}
+
+.dt-link:hover{
+    color: var(--secondary-color);
 }
