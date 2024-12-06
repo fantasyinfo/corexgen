@@ -168,7 +168,7 @@
                     </div>
                 </div>
 
-                <div class="contact-item">
+                {{-- <div class="contact-item">
                     <div class="contact-icon">
                         <i class="fas fa-phone"></i>
                     </div>
@@ -176,7 +176,7 @@
                         <div class="contact-label">Phone</div>
                         <div class="contact-value">{{ $user->phone }}</div>
                     </div>
-                </div>
+                </div> --}}
 
                 <div class="contact-item">
                     <div class="contact-icon">
@@ -198,7 +198,7 @@
                     </div>
                     <div class="contact-details">
                         <div class="contact-label">Role</div>
-                        <div class="contact-value">{{ $user->roles->name }}</div>
+                        <div class="contact-value">{{ @$user->role->name }}</div>
                     </div>
                 </div>
             </div>

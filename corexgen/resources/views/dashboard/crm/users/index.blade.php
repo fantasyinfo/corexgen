@@ -100,37 +100,43 @@
                         data: 'name',
                         name: 'name',
                         searchable: true,
-                        orderable: true
+                        orderable: true,
+                        width: '100px',
                     },
                     {
                         data: 'email',
                         name: 'email',
                         searchable: true,
-                        orderable: true
+                        orderable: true,
+                        width: '100px',
                     },
                     {
                         data: 'role_name',
                         name: 'role_name',
                         searchable: false,
-                        orderable: true
+                        orderable: true,
+                        width: '100px',
                     },
                     {
                         data: 'status',
                         name: 'status',
                         searchable: false,
-                        orderable: true
+                        orderable: true,
+                        width: '100px',
                     },
                     {
                         data: 'created_at',
                         name: 'created_at',
                         searchable: true,
-                        orderable: true
+                        orderable: true,
+                        width: '100px',
                     },
                     {
                         data: 'actions',
                         name: 'actions',
                         orderable: false,
-                        searchable: false
+                        searchable: false,
+                        width: '100px',
                     },
                 ],
             });

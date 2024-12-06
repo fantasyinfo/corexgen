@@ -875,7 +875,7 @@
                         if (statusData.status === 'success') {
                             const successMessageContent = `
                         Thank you for purchasing our software. We are thrilled to have you on board!<br>
-                        A welcome email has been sent to your registered email address with your <strong>Buyer Identification Number</strong> to log in to the Buyer Admin Panel.<br>
+                        A welcome email has been sent to your registered email address. <br>
                         Please check your inbox (and spam folder) for the email.
                     `;
 

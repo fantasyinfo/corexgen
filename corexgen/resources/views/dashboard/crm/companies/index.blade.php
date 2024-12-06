@@ -106,31 +106,36 @@
                         name: 'name',
                         searchable: true,
                         orderable: true,
+                        width: '200px',
                   
                     },
                     {
                         data: 'email',
                         name: 'email',
                         searchable: true,
-                        orderable: true
+                        orderable: true,
+                        width: '100px',
                     },
                     {
                         data: 'plan_name',
                         name: 'plan_name',
                         searchable: false,
-                        orderable: true
+                        orderable: true,
+                        width: '100px',
                     },
                     {
                         data: 'billing_cycle',
                         name: 'billing_cycle',
                         searchable: false,
-                        orderable: true
+                        orderable: true,
+                        width: '100px',
                     },
                     // {
                     //     data: 'start_date',
                     //     name: 'start_date',
                     //     searchable: true, 
-                    //     orderable: true
+                    //     orderable: true,
+                    
                     // },
                     // {
                     //     data: 'end_date',
@@ -142,13 +147,15 @@
                         data: 'next_billing_date',
                         name: 'next_billing_date',
                         searchable: true,
-                        orderable: true
+                        orderable: true,
+                        width: '100px',
                     },
                     {
                         data: 'status',
                         name: 'status',
                         searchable: false,
-                        orderable: true
+                        orderable: true,
+                        width: '100px',
                     },
                     // {
                     //     data: 'created_at',
@@ -160,7 +167,8 @@
                         data: 'actions',
                         name: 'actions',
                         orderable: false,
-                        searchable: false
+                        searchable: false,
+                        width: '100px',
                     },
                 ],
             });

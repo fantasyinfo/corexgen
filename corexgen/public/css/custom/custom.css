@@ -323,16 +323,16 @@ table tr {
 .table > tfoot > tr > th,
 .table > thead > tr > td,
 .table > thead > tr > th {
-  padding-top: 1.25rem;
-  padding-bottom: 1.25rem;
+  /* padding-top: 1.25rem; */
+  padding-bottom: .75rem;
   border:0px;
 }
 
 /* Apply minimum column widths */
-.table th,
+/* .table th,
 .table td {
   min-width: 150px;
-}
+} */
 
 /* Odd/even row hover effect */
 .table tbody tr:nth-child(odd):hover {
@@ -354,7 +354,7 @@ table tr {
 }
 
 .table-bg {
-    background-color: var(--body-bg);
+    background-color: var(--card-bg);
     padding:20px 0px;
     border-radius: 10px;
     -webkit-border-radius: 10px;

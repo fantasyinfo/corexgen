@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\PermissionsHelper;
 use App\Http\Requests\CRM\CRMUserRequest;
+use App\Models\Country;
 use App\Models\CRM\CRMRole;
 use App\Repositories\UserRepository;
 use App\Services\UserService;
@@ -107,18 +108,14 @@ class UserController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(CRMUserRequest $request)
+    public function store(CRMUserRequest $request, UserService $userService)
     {
         $this->tenantRoute = $this->getTenantRoute();
 
         try {
 
-            $validated = $request->validated();
-            $validated['is_tenant'] = Auth::user()->is_tenant;
-            $validated['password'] = Hash::make($validated['password']);
-            $validated['company_id'] = Auth::user()->company_id;
-
-            User::create($validated);
+        
+            $userService->createUser($request->validated());
 
             return redirect()->route($this->tenantRoute . 'users.index')
                 ->with('success', 'User created successfully.');
@@ -138,9 +135,11 @@ class UserController extends Controller
     public function create()
     {
         $roles = $this->applyTenantFilter(CRMRole::query())->get();
+        $country = Country::all();
         return view($this->getViewFilePath('create'), [
             'title' => 'Create User',
-            'roles' => $roles
+            'roles' => $roles,
+            'country' => $country,
         ]);
     }
 
@@ -152,18 +151,30 @@ class UserController extends Controller
     public function edit($id)
     {
 
-        $query = User::query()->where('id', $id);
+    
+        $query = User::query()
+        ->with([
+            'addresses' => function ($query) {
+                $query->with('country')
+                    ->with('city')
+                    ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
+            }
+        ])
+        ->where('id', $id);
         $query = $this->applyTenantFilter($query);
         $user = $query->firstOrFail();
 
         $roles = $this->applyTenantFilter(CRMRole::query())->get();
+
+        $country = Country::all();
 
 
         return view($this->getViewFilePath('edit'), [
 
             'title' => 'Edit User',
             'user' => $user,
-            'roles' => $roles
+            'roles' => $roles,
+            'country' => $country,
         ]);
     }
 
@@ -450,7 +461,8 @@ class UserController extends Controller
                     $query->with('country')
                         ->with('city')
                         ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
-                }
+                },
+                'role'
             ])
             ->where('id', $id)->get();
 

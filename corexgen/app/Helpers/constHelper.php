@@ -305,4 +305,8 @@ PermissionsHelper::initializePermissions();
         'TABLE' => ['HOME', 'OFFICE'],
         'SHOW' => ['HOME' => 'HOME', 'OFFICE' => 'OFFICE'],
     ],
+    'USER' => [
+        'TABLE' => ['HOME', 'OFFICE'],
+        'SHOW' => ['HOME' => 'HOME', 'OFFICE' => 'OFFICE'],
+    ],
 ]);

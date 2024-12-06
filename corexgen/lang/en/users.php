@@ -15,7 +15,11 @@ return [
     'Update User' => 'Update User',
     'Password' => 'Password',
     'Full Name' => 'Full Name',
-    'No Users Found' => 'No Users Found'
+    'No Users Found' => 'No Users Found',
+    'General' =>'General',
+    'Contact' => 'Contact',
+    'Address' => 'Address',
+
 
 
 ];

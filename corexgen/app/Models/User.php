@@ -35,6 +35,7 @@ class User extends Authenticatable
         'is_tenant',
         'tenant_id',
         'company_id',
+        'address_id'
     ];
 
     /**
@@ -82,7 +83,10 @@ class User extends Authenticatable
         return $this->belongsTo(Company::class);
     }
 
-
+    public function addresses()
+    {
+        return $this->belongsTo(Address::class, 'address_id');
+    }
     protected static function boot()
     {
         parent::boot();

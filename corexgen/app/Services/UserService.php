@@ -6,13 +6,18 @@ use App\Repositories\UserRepository;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\View;
 use App\Helpers\PermissionsHelper;
+use App\Models\Address;
+use App\Models\User;
 use App\Traits\TenantFilter;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class UserService
 {
 
     use TenantFilter;
-    
+
     protected $userRepository;
 
     private $tenantRoute;
@@ -22,6 +27,67 @@ class UserService
         $this->userRepository = $userRepository;
         $this->tenantRoute = $this->getTenantRoute();
     }
+
+    public function createUser(array $validatedData)
+    {
+        return DB::transaction(function () use ($validatedData) {
+
+            // create address 
+            $address = $this->createAddressIfProvided($validatedData);
+            // create user
+            $user = $this->registerUser($validatedData,$address?->id);
+
+            //
+
+            return $user;
+        });
+    }
+
+    public function registerUser($validatedData,$address_id = null)
+    {
+
+        $validatedData = array_merge($validatedData, [
+            'is_tenant' => Auth::user()->is_tenant,
+            'password' => Hash::make($validatedData['password']),
+            'company_id' => Auth::user()->company_id,
+            'address_id' => $address_id
+        ]);
+
+
+        return User::create($validatedData);
+    }
+
+    private function createAddressIfProvided(array $data): ?Address
+    {
+        $requiredAddressFields = [
+            'address_street_address',
+            'address_country_id',
+            'address_city_id',
+            'address_pincode'
+        ];
+
+        if (!$this->hasAllAddressFields($data, $requiredAddressFields)) {
+            return null;
+        }
+
+        return Address::create([
+            'street_address' => $data['address_street_address'],
+            'postal_code' => $data['address_pincode'],
+            'city_id' => $data['address_city_id'],
+            'country_id' => $data['address_country_id'],
+            'address_type' => ADDRESS_TYPES['USER']['SHOW']['HOME'],
+        ]);
+    }
+
+
+    private function hasAllAddressFields(array $data, array $requiredFields): bool
+    {
+        return collect($requiredFields)->every(
+            fn($field) =>
+            !empty ($data[$field])
+        );
+    }
+
 
     public function getDatatablesResponse($request)
     {
@@ -40,7 +106,7 @@ class UserService
             ->editColumn('status', function ($user) {
                 return $this->renderStatusColumn($user);
             })
-            ->rawColumns(['actions', 'status', 'role_name','name'])
+            ->rawColumns(['actions', 'status', 'role_name', 'name'])
             ->make(true);
     }
 
