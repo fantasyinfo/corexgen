@@ -1,9 +1,31 @@
+*{
+  margin:0;
+  padding:0;
+  box-sizing: border-box;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype');
+  font-weight: 100 900; /* Supports weights from 100 to 900 */
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Italic-VariableFont_opsz,wght.ttf') format('truetype');
+  font-weight: 100 900; /* Supports weights from 100 to 900 */
+  font-style: italic;
+}
+
 /* General Layout */
 body {
   background-color: var(--body-bg);
   color: var(--body-color);
   transition: background-color 0.3s, color 0.3s;
   min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
 }
 
 /* Header Styles */
@@ -115,28 +137,6 @@ body {
 
 .theme-toggle:hover {
   background-color: var(--border-color);
-}
-
-.dropdown-menu {
-  box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.5);
-}
-/* User Dropdown */
-.dropdown-toggle {
-  color: var(--body-color) !important;
-}
-
-.dropdown-menu {
-  background-color: var(--card-bg);
-  border-color: var(--border-color);
-}
-
-.dropdown-item {
-  color: var(--body-color);
-}
-
-.dropdown-item:hover {
-  background-color: var(--border-color);
-  color: var(--body-color);
 }
 
 /* Content Area Styles */

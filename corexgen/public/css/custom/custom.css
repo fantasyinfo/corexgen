@@ -343,15 +343,6 @@ table tr {
   background-color: var(--body-bg);
 }
 
-.dropdown-item{
-    padding:.6rem 1rem;
-}
-.dropdown-item:hover {
-    background-color: var(--body-bg);
-}
-.dropdown-menu.show {
-    border: 1px solid var(--primary-color);
-}
 
 .table-bg {
     background-color: var(--card-bg);
@@ -395,3 +386,234 @@ table tr {
 .form-control:disabled, .form-control[disabled] {
     background-color: rgba(103, 61, 230, 0.25);
 }
+
+/* Pagination Container */
+ul.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+    gap: 8px;
+  }
+  
+  /* Pagination Items */
+  ul.pagination .page-item {
+    display: inline-block;
+  }
+  
+  ul.pagination .page-link {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--body-color);
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  
+  /* Hover Effect */
+  ul.pagination .page-link:hover {
+    background-color: var(--primary-hover);
+    color: #fff;
+    border-color: var(--primary-hover);
+  }
+  
+  /* Active Page Styling */
+  ul.pagination .page-item.active .page-link {
+    background-color: var(--primary-color);
+    color: #fff;
+    border-color: var(--primary-color);
+    cursor: default;
+  }
+  
+  /* Disabled Buttons */
+  ul.pagination .page-item.disabled .page-link {
+    cursor: not-allowed;
+    color: var(--neutral-gray);
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+  }
+  
+  /* Light Mode Overrides */
+  :root ul.pagination .page-link {
+    color: var(--body-color);
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+  }
+  
+  /* Dark Mode Overrides */
+  [data-bs-theme="dark"] ul.pagination .page-link {
+    color: var(--body-color);
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+  }
+  
+  [data-bs-theme="dark"] ul.pagination .page-link:hover {
+    background-color: var(--primary-hover);
+    color: #fff;
+  }
+  
+  [data-bs-theme="dark"] ul.pagination .page-item.active .page-link {
+    background-color: var(--primary-color);
+    color: #fff;
+  }
+  
+  /* Optional Transitions for Smoothness */
+  ul.pagination {
+    transition: all 0.3s ease;
+  }
+  
+
+  /* General Dropdown Styles */
+.dropdown-menu {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+    padding: 0.5rem 0;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  /* Dropdown Item Styles */
+  .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--body-color);
+    white-space: nowrap;
+    background-color: transparent;
+    border: none;
+    transition: all 0.3s ease;
+  }
+  
+  /* Dropdown Item Hover State */
+  .dropdown-item:hover {
+    background-color: var(--primary-hover);
+    color: #fff;
+  }
+  
+  /* Dropdown Separator */
+  .dropdown-menu .dropdown-divider {
+    height: 1px;
+    margin: 0.5rem 0;
+    background-color: var(--border-color);
+    border: none;
+  }
+  
+  /* Dropdown Toggle Button */
+  .dropdown-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--primary-color) !important;
+    background-color: transparent;
+    /* border: 1px solid var(--border-color); */
+    border-radius: 4px;
+    padding: 0.6rem 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .dropdown-toggle:hover {
+    /* background-color: var(--primary-color); */
+    color: #fff !important;
+    /* border-color: var(--primary-color); */
+  }
+  
+  /* Active Dropdown Item */
+  .dropdown-item.active,
+  .dropdown-item:active {
+    background-color: var(--primary-color);
+    color: #fff;
+  }
+  
+  /* Optional: Additional Hover Animation */
+  .dropdown-menu.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .dropdown-menu {
+    opacity: 0;
+    transform: translateX(-10px);
+    -webkit-transform: translateX(-10px);
+    -moz-transform: translateX(-10px);
+    -ms-transform: translateX(-10px);
+    -o-transform: translateX(-10px);
+}
+  
+  /* Mobile-Friendly Adjustments */
+  @media (max-width: 768px) {
+    .dropdown-menu {
+      min-width: 100%;
+    }
+  }
+  
+/* General Toast Styling */
+.custom-toast {
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background-color: var(--card-bg);
+    color: var(--body-color);
+    border: 1px solid var(--border-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Success Toast */
+.custom-toast.text-bg-success {
+    background-color: var(--success-color);
+    color: var(--light-color);
+}
+
+/* Danger Toast */
+.custom-toast.text-bg-danger {
+    background-color: var(--danger-color);
+    color: var(--light-color);
+}
+
+/* Info Toast */
+.custom-toast.text-bg-info {
+    background-color: var(--info-color);
+    color: var(--light-color);
+}
+
+/* Warning Toast */
+.custom-toast.text-bg-warning {
+    background-color: var(--warning-color);
+    color: var(--dark-color);
+}
+
+/* Toast Close Button */
+.custom-toast .btn-close {
+    filter: invert(1); /* Adjust for better visibility in light/dark themes */
+    opacity: 0.8;
+}
+
+.custom-toast .btn-close:hover {
+    opacity: 1;
+}
+
+/* Toast Container Positioning (Bottom-Right) */
+.toast-container {
+    bottom: 1rem;
+    right: 1rem;
+    position: fixed;
+    z-index: 1055;
+}
+
+
+

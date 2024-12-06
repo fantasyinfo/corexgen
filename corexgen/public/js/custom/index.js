@@ -158,3 +158,9 @@ $("#deleteModal").on("show.bs.modal", function (event) {
     form.attr("action", route);
 });
 
+
+
+document.querySelectorAll('.toast').forEach((toastEl) => {
+    const toast = new bootstrap.Toast(toastEl);
+    toast.show();
+});
