@@ -572,4 +572,34 @@ class CompaniesController extends Controller
             ], 500);
         }
     }
+
+    public function view($id){
+        $query = Company::query()
+            ->with([
+                'plans',
+                'users' => function ($query) use ($id) {
+                    $query->where('role_id', null)
+                        ->where('company_id', $id)
+                        ->select('id', 'name', 'company_id', 'role_id')->first();
+                },
+                'addresses' => function ($query) {
+                    $query->with('country')
+                        ->with('city')
+                        ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
+                }
+            ])
+            ->where('id', $id)
+            ->select('companies.*', 'companies.name as cname');
+
+        $company = $query->firstOrFail();
+
+        // dd($company);
+
+        return view($this->getViewFilePath('view'), [
+
+            'title' => 'View Company',
+            'company' => $company,
+            'module' => PANEL_MODULES[$this->getPanelModule()]['companies'],
+        ]);
+    }
 }

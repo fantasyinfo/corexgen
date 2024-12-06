@@ -411,7 +411,7 @@ class UserController extends Controller
         ], [
             'id.exists' => 'Invalid user ID.'
         ]);
-    
+
         // Check validation
         if ($validator->fails()) {
             return response()->json([
@@ -419,25 +419,53 @@ class UserController extends Controller
                 'message' => $validator->errors()->first()
             ], 422);
         }
-    
+
         try {
             // Find user and update password
             $user = User::findOrFail($request->input('id'));
-            
+
             $user->password = Hash::make($request->input('password'));
             $user->save();
-    
+
             return response()->json([
                 'success' => true,
                 'message' => 'Password updated successfully.'
             ]);
         } catch (\Exception $e) {
             \Log::error('Password change error: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'An unexpected error occurred. Please try again.'
             ], 500);
         }
     }
+
+
+    public function view($id)
+    {
+        $query = User::query()
+            ->with([
+                'addresses' => function ($query) {
+                    $query->with('country')
+                        ->with('city')
+                        ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
+                }
+            ])
+            ->where('id', $id)->get();
+
+        $query = $this->applyTenantFilter($query);
+        $user = $query->firstOrFail();
+
+        // dd($user);
+
+        return view($this->getViewFilePath('view'), [
+
+            'title' => 'View User',
+            'user' => $user,
+            'module' => PANEL_MODULES[$this->getPanelModule()]['companies'],
+        ]);
+    }
+
+
 }
