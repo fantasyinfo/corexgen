@@ -195,6 +195,11 @@ class UserController extends Controller
         try {
             $userService->updateUser($request->validated());
 
+            if ($request->boolean('is_profile')) {
+                return redirect()
+                    ->route($this->tenantRoute . 'users.profile')
+                    ->with('success', __('Profile updated successfully.'));
+            }
             return redirect()->route($this->tenantRoute . 'users.index')
                 ->with('success', 'User updated successfully.');
         } catch (\Exception $e) {
@@ -472,12 +477,42 @@ class UserController extends Controller
         $user = $query->firstOrFail();
 
         // dd($user);
-
+  
         return view($this->getViewFilePath('view'), [
 
             'title' => 'View User',
             'user' => $user,
-            'module' => PANEL_MODULES[$this->getPanelModule()]['companies'],
+            'module' => PANEL_MODULES[$this->getPanelModule()]['users'],
+        
+        ]);
+    }
+
+
+
+
+    public function profile()
+    {
+
+        $query = User::query()
+            ->with([
+                'addresses' => function ($query) {
+                    $query->with('country')
+                        ->with('city')
+                        ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
+                },
+                'role'
+            ])
+            ->where('id', Auth::id())->get();
+
+        $query = $this->applyTenantFilter($query);
+        $user = $query->firstOrFail();
+        $country = Country::all();
+        return view($this->getViewFilePath('profile'), [
+
+            'title' => 'Profile',
+            'user' => $user,
+            'module' => PANEL_MODULES[$this->getPanelModule()]['users'],
+            'country' => $country
         ]);
     }
 

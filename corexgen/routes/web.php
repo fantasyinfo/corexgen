@@ -179,6 +179,7 @@ Route::middleware([
         Route::post('/bulkDelete', [UserController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:USERS.BULK_DELETE');
         Route::post('/changePassword', [UserController::class, 'changePassword'])->name('changePassword')->middleware('check.permission:USERS.CHANGE_PASSWORD');
         Route::get('/view/{id}', [UserController::class, 'view'])->name('view')->middleware('check.permission:USERS.VIEW');
+        Route::get('/profile', [UserController::class, 'profile'])->name('profile');
     });
 
 
@@ -282,6 +283,7 @@ Route::middleware([
         Route::post('/bulkDelete', [UserController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:USERS.BULK_DELETE');
         Route::post('/changePassword', [UserController::class, 'changePassword'])->name('changePassword')->middleware('check.permission:USERS.CHANGE_PASSWORD');
         Route::get('/view/{id}', [UserController::class, 'view'])->name('view')->middleware('check.permission:USERS.VIEW');
+        Route::get('/profile', [UserController::class, 'profile'])->name('profile');
 
     });
 

@@ -7,7 +7,10 @@
 
             <div class="shadow-sm rounded ">
                 @include('dashboard.crm.role.components.role-filters')
+    
                 @include('layout.components.bulk-import-modal')
+
+              
 
 
                 @if (hasPermission('ROLE.READ_ALL') || hasPermission('ROLE.READ'))

@@ -49,7 +49,7 @@
                     <li>
                         <hr class="dropdown-divider">
                     </li>
-                    <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>
+                    <li><a class="dropdown-item" href="{{route(getPanelRoutes('users.profile'))}}"><i class="fas fa-user me-2"></i>
                             {{ __('general.Profile') }}</a></li>
                     <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>
                             {{ __('general.Settings') }}</a></li>

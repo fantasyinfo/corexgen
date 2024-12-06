@@ -386,3 +386,12 @@ table tr {
 .dt-link:hover{
     color: var(--secondary-color);
 }
+
+.form-control:disabled, .form-control[readonly] {
+     background-color: var(--body-bg);
+  
+}
+
+.form-control:disabled, .form-control[disabled] {
+    background-color: rgba(103, 61, 230, 0.25);
+}

@@ -19,6 +19,7 @@ return [
     'General' =>'General',
     'Contact' => 'Contact',
     'Address' => 'Address',
+    'Profile Details' => 'Profile Details'
 
 
 
