@@ -68,13 +68,12 @@ Route::middleware(['check.installation'])->group(function () {
     Route::get('/', function () {
         if (Auth::check()) {
             if (Auth::user()->is_tenant) {
-                return redirect()->route(getPanelUrl(PANEL_TYPES['SUPER_PANEL']) . 'home');
+                return redirect()->route(getPanelUrl(PANEL_TYPES['SUPER_PANEL']) . '.home');
             } else if (Auth::user()->company_id != null) {
-                return redirect()->route(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']) . 'home');
+                return redirect()->route(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']) . '.home');
             }
-            return view('landing.index');
         } else {
-            return redirect()->route('login');
+            return view('landing.index');
         }
     })->name('home');
 
