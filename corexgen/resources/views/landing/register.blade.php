@@ -6,7 +6,15 @@
 <body data-bs-theme="light">
 
     @include('landing.components.nav')
-
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     <!-- Register Section -->
     <section id='register_section' class="auth-section py-5 d-flex align-items-center my-5">
         <div class="container">
@@ -58,6 +66,24 @@
                                                 <option value="{{ $item->id }}"
                                                     {{ request('plan') == $item->id ? 'selected' : '' }}>
                                                     {{ $item->name }}
+                                                </option>
+                                            @endforeach
+                                        @endif
+
+
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="choose_plan" class="form-label">Choose Gateway</label>
+                                    @php
+                                        $gateways = ['paypal','stripe'];
+                                    @endphp
+                                    <select class="form-select" required name='gateway'>
+                                        @if ($gateways)
+                                            @foreach ($gateways as $item)
+                                                <option value="{{ $item }}"
+                                                    {{ request('gateway') == $item ? 'selected' : '' }}>
+                                                    {{ $item }}
                                                 </option>
                                             @endforeach
                                         @endif

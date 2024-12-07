@@ -9,9 +9,10 @@ use App\Http\Controllers\CRM\CRMRoleController;
 use App\Http\Controllers\CRM\CRMRolePermissionsController;
 use App\Http\Controllers\CRM\CRMSettingsController;
 use App\Http\Controllers\ModuleController;
+
+use App\Http\Controllers\Payments\PaymentGatewayController;
 use App\Http\Controllers\PlansController;
 use App\Http\Controllers\SystemInstallerController;
-use App\Http\Controllers\TaxController;
 use App\Http\Controllers\UserController;
 use App\Models\City;
 
@@ -19,7 +20,6 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
-use Laravel\Fortify\Features;
 use Illuminate\Support\Facades\File;
 /*
 |--------------------------------------------------------------------------
@@ -87,6 +87,25 @@ Route::middleware(['check.installation'])->group(function () {
     })->name('login');
 
 });
+
+
+
+Route::prefix('payments')->group(function () {
+    Route::post('/initiate/{gateway?}', 
+        [PaymentGatewayController::class, 'initiate'])
+        ->name('payment.initiate');
+    
+    Route::get('/success/{gateway}', 
+        [PaymentGatewayController::class, 'handleSuccess'])
+        ->name('payment.success')->middleware('payment.debug');
+    
+    Route::get('/cancel/{gateway}', 
+        [PaymentGatewayController::class, 'handleCancel'])
+        ->name('payment.cancel');
+});
+
+
+
 
 
 // register
