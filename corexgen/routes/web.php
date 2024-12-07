@@ -2,6 +2,7 @@
 
 // crm routes
 use App\Http\Controllers\AppUpdateController;
+use App\Http\Controllers\CompanyRegisterController;
 use App\Http\Controllers\CountryCitySeederController;
 use App\Http\Controllers\CRM\CompaniesController;
 use App\Http\Controllers\CRM\CRMRoleController;
@@ -13,7 +14,7 @@ use App\Http\Controllers\SystemInstallerController;
 use App\Http\Controllers\TaxController;
 use App\Http\Controllers\UserController;
 use App\Models\City;
-use App\Models\CRM\CRMRole;
+
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
@@ -66,11 +67,20 @@ Route::middleware(['check.installation'])->group(function () {
     // All routes that require the installation to be completed
     Route::get('/', function () {
         if (Auth::check()) {
-            return view('welcome');
+            if (Auth::user()->is_tenant) {
+                return redirect()->route(getPanelUrl(PANEL_TYPES['SUPER_PANEL']) . 'home');
+            } else if (Auth::user()->company_id != null) {
+                return redirect()->route(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']) . 'home');
+            }
+            return view('landing.index');
         } else {
             return redirect()->route('login');
         }
     })->name('home');
+
+
+    Route::get('/company/register', [CompanyRegisterController::class, 'register']);
+    Route::post('/company/register', [CompanyRegisterController::class, 'registerCompany'])->name('company.register');
 
 
     Route::get('/login', function () {

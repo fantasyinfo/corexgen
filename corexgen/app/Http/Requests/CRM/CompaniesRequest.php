@@ -15,10 +15,10 @@ class CompaniesRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        if (hasPermission('COMPANIES.CREATE')) {
-            return true;
-        }
-        return false;
+        // if (hasPermission('COMPANIES.CREATE')) {
+        //     return true;
+        // }
+        return true;
     }
 
     /**
