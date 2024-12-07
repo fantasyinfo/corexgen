@@ -2,7 +2,7 @@
 
 namespace App\Contracts\Payments;
 
-use App\DTO\Payments\PaymentResultDTO;
+
 use Illuminate\Http\Request;
 
 interface PaymentGatewayInterface
@@ -19,9 +19,9 @@ interface PaymentGatewayInterface
      * Process payment
      * 
      * @param array $paymentData
-     * @return PaymentResultDTO
+     * @return mixed
      */
-    public function processPayment(array $paymentData): PaymentResultDTO;
+    public function processPayment(array $paymentData);
 
     /**
      * Handle payment webhook

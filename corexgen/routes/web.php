@@ -78,8 +78,8 @@ Route::middleware(['check.installation'])->group(function () {
     })->name('home');
 
 
-    Route::get('/company/register', [CompanyRegisterController::class, 'register']);
-    Route::post('/company/register', [CompanyRegisterController::class, 'registerCompany'])->name('company.register');
+    Route::get('/company/register', [CompanyRegisterController::class, 'register'])->name('compnay.landing-register');
+    Route::post('/company/register', [CompanyRegisterController::class, 'initPaymentForCompnayRegistration'])->name('company.register');
 
 
     Route::get('/login', function () {
@@ -90,6 +90,7 @@ Route::middleware(['check.installation'])->group(function () {
 
 
 
+// payment gateway routes
 Route::prefix('payments')->group(function () {
     Route::post('/initiate/{gateway?}', 
         [PaymentGatewayController::class, 'initiate'])

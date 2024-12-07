@@ -51,7 +51,7 @@ class CompanyService
             $companyAdminUser = $this->createCompanyUser($company, $validatedData, $userFullName);
 
             // todo:: add payment trasation 
-            $paymentDetails = [];
+            $paymentDetails = @$validatedData['payment_details'] ?? [];
 
             $this->createPaymentTransaction($validatedData['plan_id'], $company->id, $paymentDetails);
             // add subscription

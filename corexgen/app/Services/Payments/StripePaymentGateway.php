@@ -3,7 +3,8 @@
 namespace App\Services\Payments;
 
 use App\Contracts\Payments\PaymentGatewayInterface;
-use App\DTO\Payments\PaymentResultDTO;
+use App\Http\Controllers\CompanyRegisterController;
+use App\Services\CompanyService;
 use Illuminate\Http\Request;
 use Stripe\Stripe;
 use Stripe\Checkout\Session;
@@ -39,7 +40,7 @@ class StripePaymentGateway implements PaymentGatewayInterface
         return $session->url;
     }
 
-    public function processPayment($paymentData): PaymentResultDTO
+    public function processPayment($paymentData)
     {
 
 
@@ -55,7 +56,7 @@ class StripePaymentGateway implements PaymentGatewayInterface
 
         $session = Session::retrieve($sessionId);
 
-        dd($session);
+        // dd($session);
 
         // Log the full session details
 
@@ -68,11 +69,19 @@ class StripePaymentGateway implements PaymentGatewayInterface
                 ->with('error', 'Payment not completed');
         }
 
-        // Implement Stripe payment processing logic
-        return PaymentResultDTO::create(
-            'success',
-            $paymentData['transaction_id'] ?? null
-        );
+        $paymentDetails = [
+            'payment_gateway' => 'stripe',
+            'payment_type' => 'ONLINE',
+            'transaction_reference' => $session->customer_details->toJSON(),
+            'transaction_id' => $session->payment_intent,
+            'amount' => $session->amount_total / 100,
+            'currency' => $session->currency,
+        ];
+
+   
+        return app(CompanyRegisterController::class)->storeCompanyAfterPayment($paymentDetails);
+
+
     }
 
     public function handleWebhook(Request $request)
