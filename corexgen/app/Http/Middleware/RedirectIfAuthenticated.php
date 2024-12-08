@@ -26,9 +26,9 @@ class RedirectIfAuthenticated
                 $panelAccess = panelAccess();
 
                 if ($panelAccess === PANEL_TYPES['SUPER_PANEL']) {
-                    return redirect(route(getPanelUrl(PANEL_TYPES['SUPER_PANEL']) . '.role.index'));
+                    return redirect(route(getPanelUrl(PANEL_TYPES['SUPER_PANEL']) . '.home'));
                 } else if ($panelAccess === PANEL_TYPES['COMPANY_PANEL']) {
-                    return redirect(route(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']) . '.role.index'));
+                    return redirect(route(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']) . '.home'));
                 }
             }
         }

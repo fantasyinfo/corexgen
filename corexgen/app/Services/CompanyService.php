@@ -36,8 +36,12 @@ class CompanyService
 
 
 
+
     public function createCompany(array $validatedData)
     {
+        // temporary basic
+        // create compnay acc with status of onbording
+        // create user acc 
 
         return DB::transaction(function () use ($validatedData) {
             $address = $this->createAddressIfProvided($validatedData);
@@ -45,28 +49,59 @@ class CompanyService
             $userFullName = $validatedData['name'];
             $company = Company::create(array_merge($validatedData, [
                 'address_id' => $address?->id,
-                'name' => $validatedData['cname']
+                'name' => $validatedData['cname'],
             ]));
 
             $companyAdminUser = $this->createCompanyUser($company, $validatedData, $userFullName);
 
-            // todo:: add payment trasation 
-            $paymentDetails = @$validatedData['payment_details'] ?? [];
-
-            $this->createPaymentTransaction($validatedData['plan_id'], $company->id, $paymentDetails);
-            // add subscription
-
-
-            $this->givePermissionsToCompany($company, $companyAdminUser);
-
-            // $this->createMenuItemsForCompanyPanel($validatedData['plan_id']);
-
-
-            // todo:: add permissions to this user
-
-            return $company;
+            return [
+                'company' => $company,
+                'company_admin' => $companyAdminUser
+            ];
         });
     }
+
+
+
+
+
+
+
+
+    // public function createCompany(array $validatedData)
+    // {
+    //     // temporary basic
+    //     // create compnay acc with status of onbording
+    //     // create user acc 
+
+    //     return DB::transaction(function () use ($validatedData) {
+    //         $address = $this->createAddressIfProvided($validatedData);
+
+    //         $userFullName = $validatedData['name'];
+    //         $company = Company::create(array_merge($validatedData, [
+    //             'address_id' => $address?->id,
+    //             'name' => $validatedData['cname']
+    //         ]));
+
+    //         $companyAdminUser = $this->createCompanyUser($company, $validatedData, $userFullName);
+
+    //         // todo:: add payment trasation 
+    //         $paymentDetails = @$validatedData['payment_details'] ?? [];
+
+    //         $this->createPaymentTransaction($validatedData['plan_id'], $company->id, $paymentDetails);
+    //         // add subscription
+
+
+    //         $this->givePermissionsToCompany($company, $companyAdminUser);
+
+    //         // $this->createMenuItemsForCompanyPanel($validatedData['plan_id']);
+
+
+    //         // todo:: add permissions to this user
+
+    //         return $company;
+    //     });
+    // }
 
 
 
@@ -524,7 +559,7 @@ class CompanyService
             ->editColumn('next_billing_date', function ($company) {
                 return Carbon::parse($company->next_billing_date)->format('d M Y');
             })
-            ->rawColumns(['plan_name', 'billing_cycle', 'start_date', 'end_date', 'next_billing_date', 'actions', 'status','name']) // Add 'status' to raw columns
+            ->rawColumns(['plan_name', 'billing_cycle', 'start_date', 'end_date', 'next_billing_date', 'actions', 'status', 'name']) // Add 'status' to raw columns
             ->make(true);
     }
 

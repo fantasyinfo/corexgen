@@ -2,6 +2,7 @@
 
 // crm routes
 use App\Http\Controllers\AppUpdateController;
+use App\Http\Controllers\CompanyOnboardingController;
 use App\Http\Controllers\CompanyRegisterController;
 use App\Http\Controllers\CountryCitySeederController;
 use App\Http\Controllers\CRM\CompaniesController;
@@ -89,6 +90,23 @@ Route::middleware(['check.installation'])->group(function () {
 });
 
 
+// company onboarding
+Route::middleware(['auth'])->group(function () {
+    Route::get('/onboarding', [CompanyOnboardingController::class, 'showOnboardingForm'])
+         ->name('onboarding.index');
+    
+    Route::post('/onboarding/address', [CompanyOnboardingController::class, 'saveAddress'])
+         ->name('onboarding.address');
+    
+    Route::post('/onboarding/currency', [CompanyOnboardingController::class, 'saveCurrency'])
+         ->name('onboarding.currency');
+    
+    Route::post('/onboarding/timezone', [CompanyOnboardingController::class, 'saveTimezone'])
+         ->name('onboarding.timezone');
+    
+    Route::post('/onboarding/payment', [CompanyOnboardingController::class, 'processPayment'])
+         ->name('onboarding.payment');
+});
 
 // payment gateway routes
 Route::prefix('payments')->group(function () {
@@ -158,6 +176,7 @@ Route::get('/add-default-countries-cities', [CountryCitySeederController::class,
 // crm routes
 Route::middleware([
     'auth:sanctum',
+    'company.onboarding',
     // config('jetstream.auth_session'),
     'check.installation'
 ])->prefix(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']))->as(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']) . '.')->group(function () {

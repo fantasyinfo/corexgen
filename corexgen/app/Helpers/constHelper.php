@@ -249,9 +249,9 @@ PermissionsHelper::initializePermissions();
         'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger'],
     ],
     'COMPANIES' => [
-        'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE', 'BANNED'],
-        'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE', 'BANNED' => 'BANNED'],
-        'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger', 'BANNED' => 'warning'],
+        'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE', 'BANNED','ONBOARDING'],
+        'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE', 'BANNED' => 'BANNED','ONBOARDING' => 'ONBOARDING'],
+        'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger', 'BANNED' => 'warning','ONBOARDING'=>'info'],
     ],
     'USERS' => [
         'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE', 'BANNED'],

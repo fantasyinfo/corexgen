@@ -23,8 +23,8 @@ class CompanyRepository
                 'subscriptions.end_date',
                 'subscriptions.next_billing_date',
             ])
-            ->join('plans', 'companies.plan_id', '=', 'plans.id')
-            ->join('subscriptions', function ($join) {
+            ->leftjoin('plans', 'companies.plan_id', '=', 'plans.id')
+            ->leftjoin('subscriptions', function ($join) {
                 $join->on('companies.id', '=', 'subscriptions.company_id')
                     ->whereRaw('subscriptions.id = (
                  SELECT id 
