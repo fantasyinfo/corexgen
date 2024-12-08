@@ -61,7 +61,7 @@ class Company extends Model
         static::creating(function ($company) {
             // Set default values
             $company->status = $company->status ?? CRM_STATUS_TYPES['COMPANIES']['STATUS']['ACTIVE'];
-            $company->tenant_id = Auth::user()->tenant_id;
+            $company->tenant_id = Auth::user()->tenant_id ?? '1';
         });
     }
 }

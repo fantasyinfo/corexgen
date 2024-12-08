@@ -15,6 +15,7 @@
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
         "livewire/livewire": "^3.0",
+        "stripe/stripe-php": "^16.3",
         "yajra/laravel-datatables": "^10.1"
     },
     "require-dev": {

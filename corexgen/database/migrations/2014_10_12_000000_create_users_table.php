@@ -26,6 +26,7 @@ return new class extends Migration
             $table->unsignedBigInteger('role_id')->nullable();
             $table->unsignedBigInteger('tenant_id')->nullable();
             $table->unsignedBigInteger('company_id')->nullable();
+            $table->unsignedBigInteger('address_id')->nullable();
 
             $table->string('profile_photo_path', 2048)->nullable();
 
@@ -37,6 +38,7 @@ return new class extends Migration
             $table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('set null');
             $table->foreign('role_id')->references('id')->on('crm_roles')->onDelete('set null');
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('set null');
+            $table->foreign('address_id')->references('id')->on('addresses')->onDelete('cascade');
 
 
 

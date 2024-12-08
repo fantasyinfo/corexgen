@@ -51,7 +51,7 @@ class CompanyService
             $companyAdminUser = $this->createCompanyUser($company, $validatedData, $userFullName);
 
             // todo:: add payment trasation 
-            $paymentDetails = [];
+            $paymentDetails = @$validatedData['payment_details'] ?? [];
 
             $this->createPaymentTransaction($validatedData['plan_id'], $company->id, $paymentDetails);
             // add subscription
@@ -128,7 +128,7 @@ class CompanyService
             'plan_id' => $planid,
             'company_id' => $companyid,
             'amount' => $plansDetails->offer_price ?? 0,
-            'currency' => 'USD',
+            'currency' => getSettingValue('Currency Code'),
             'payment_gateway' => $paymentDetails['payment_gateway'] ?? 'COD',
             'payment_type' => $paymentDetails['payment_type'] ?? 'OFFLINE',
             'transaction_reference' => $paymentDetails['transaction_reference'] ?? null,
@@ -216,7 +216,7 @@ class CompanyService
         try {
 
             // first delete all existing
-            CRMRolePermissions::where('company_id',$company->id)->where('role_id',null)->delete();
+            CRMRolePermissions::where('company_id', $company->id)->where('role_id', null)->delete();
 
 
             foreach ($plan->planFeatures as $pf) {
@@ -256,7 +256,7 @@ class CompanyService
                     'updated_at' => now()
                 ];
 
-              
+
 
                 foreach ($permissionKeys as $p) {
                     $permissionToPush[] = [
@@ -290,7 +290,7 @@ class CompanyService
     }
 
 
-  
+
 
     public function createMenuItemsForCompanyPanel($planId)
     {
@@ -494,6 +494,7 @@ class CompanyService
         $query = $this->companyRepository->getCompanyQuery($request);
 
         // dd($query->get()->toArray());
+        $module = PANEL_MODULES[$this->getPanelModule()]['companies'];
 
         return DataTables::of($query)
             ->addColumn('actions', function ($company) {
@@ -501,6 +502,9 @@ class CompanyService
             })
             ->editColumn('created_at', function ($company) {
                 return Carbon::parse($company->created_at)->format('d M Y');
+            })
+            ->editColumn('name', function ($company) use ($module) {
+                return "<a  class='dt-link' href='" . route($this->tenantRoute . $module . '.view', $company->id) . "' target='_blank'>$company->name</a>";
             })
             ->editColumn('status', function ($company) {
                 return $this->renderStatusColumn($company);
@@ -520,14 +524,14 @@ class CompanyService
             ->editColumn('next_billing_date', function ($company) {
                 return Carbon::parse($company->next_billing_date)->format('d M Y');
             })
-            ->rawColumns(['plan_name', 'billing_cycle', 'start_date', 'end_date', 'next_billing_date', 'actions', 'status']) // Add 'status' to raw columns
+            ->rawColumns(['plan_name', 'billing_cycle', 'start_date', 'end_date', 'next_billing_date', 'actions', 'status','name']) // Add 'status' to raw columns
             ->make(true);
     }
 
 
     protected function renderActionsColumn($company)
     {
-  
+
 
         return View::make(getComponentsDirFilePath('dt-actions-buttons'), [
             'tenantRoute' => $this->tenantRoute,
@@ -539,7 +543,7 @@ class CompanyService
 
     protected function renderStatusColumn($company)
     {
-        
+
 
         return View::make(getComponentsDirFilePath('dt-status'), [
             'tenantRoute' => $this->tenantRoute,

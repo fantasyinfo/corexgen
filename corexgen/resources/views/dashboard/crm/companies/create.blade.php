@@ -182,8 +182,8 @@
                                         <div class="col-lg-8">
                                             <x-form-components.textarea-group name="address.street_address"
                                                 id="compnayAddressStreet" placeholder="Enter Registered Street Address"
-                                                class="custom-class" value={{ old('address.street_address')}} />
-                                             
+                                                class="custom-class" value="{{ old('address.street_address')}}" />
+
                                         </div>
                                     </div>
                                     <div class="row mb-4 align-items-center">

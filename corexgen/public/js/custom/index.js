@@ -79,7 +79,7 @@ $(function () {
 document.addEventListener("DOMContentLoaded", function () {
     const filterToggle = document.getElementById("filterToggle");
     const filterSidebar = document.getElementById("filterSidebar");
-    const closeFilter = document.getElementById('closeFilter');
+    const closeFilter = document.getElementById("closeFilter");
 
     if (filterToggle) {
         // Toggle filter sidebar
@@ -87,8 +87,7 @@ document.addEventListener("DOMContentLoaded", function () {
             filterSidebar.classList.toggle("show");
         });
 
-        if(closeFilter){
-
+        if (closeFilter) {
             // Close filter sidebar
             closeFilter.addEventListener("click", function () {
                 filterSidebar.classList.remove("show");
@@ -157,4 +156,11 @@ $("#deleteModal").on("show.bs.modal", function (event) {
     // Set the form action to the appropriate route
     var form = $("#deleteForm");
     form.attr("action", route);
+});
+
+
+
+document.querySelectorAll('.toast').forEach((toastEl) => {
+    const toast = new bootstrap.Toast(toastEl);
+    toast.show();
 });

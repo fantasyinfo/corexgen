@@ -93,7 +93,7 @@ class CompaniesController extends Controller
     {
         $this->tenantRoute = $this->getTenantRoute();
 
-    
+
 
         // Server-side DataTables response
         if ($request->ajax()) {
@@ -254,48 +254,79 @@ class CompaniesController extends Controller
      *
      * @return void
      */
-    public function export(Request $request)
+    public function export(Request $request, CompanyRepository $companyRepository)
     {
-        $query = User::query()->with('role');
+        $companies = $companyRepository->getCompanyQuery($request)->with([
+            'addresses' => function ($query) {
+                $query->with('country')
+                    ->with('city')
+                    ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
+            }
+        ])->get();
 
-        if (panelAccess() == PANEL_TYPES['SUPER_PANEL']) {
-            $query->where('is_tenant', '=', true);
-        }
-
-        // Apply tenant filter (if necessary)
-        $query = $this->applyTenantFilter($query, 'users');
-
-        // Apply dynamic filters based on request input
-        $query->when($request->filled('name'), fn($q) => $q->where('name', 'LIKE', "%{$request->name}%"));
-        $query->when($request->filled('email'), fn($q) => $q->where('email', 'LIKE', "%{$request->status}%"));
-
-        if ($request->filled('role_id') && $request->role_id != '0') {
-
-            $query->when($request->filled('role_id'), fn($q) => $q->where('role_id', $request->role_id));
-        }
-
-        $query->when($request->filled('status'), fn($q) => $q->where('status', $request->status));
-        $query->when($request->filled('start_date'), fn($q) => $q->whereDate('created_at', '>=', $request->start_date));
-        $query->when($request->filled('end_date'), fn($q) => $q->whereDate('created_at', '<=', $request->end_date));
-
-        // For debugging: dd the SQL and bindings
-
-        // Get the filtered data
-        $roles = $query->get();
+        // dd($companies);
 
         // Generate CSV content
         $csvData = [];
-        $csvData[] = ['ID', 'Full Name', 'Email', 'Role', 'Status', 'Created At', 'Updated At']; // CSV headers
+        $csvData[] = [
+            'ID',
+            'Company Name',
+            'Email',
+            'Phone',
+            'Address Id',
+            'Street Address',
+            'City Id',
+            'City Name',
+            'Country Id',
+            'Country Name',
+            'Pincode',
+            'Plan Id',
+            'Plan Name',
+            'Billing Cycle',
+            'Subscription Start Date',
+            'Subscription End Date',
+            'Subscription Renew Date',
+            'Subscription Upgrade Date',
+            'Status',
+            'Created At',
 
-        foreach ($roles as $role) {
+        ]; // CSV headers
+
+        foreach ($companies as $company) {
+            $subscriptionStartDate = optional($company->subscriptions->first())['start_date']
+                ? Carbon::parse($company->subscriptions->first()['start_date'])->format('Y-m-d H:i:s')
+                : null;
+            $subscriptionEndDate = optional($company->subscriptions->first())['end_date']
+                ? Carbon::parse($company->subscriptions->first()['end_date'])->format('Y-m-d H:i:s')
+                : null;
+            $subscriptionRenewDate = optional($company->subscriptions->first())['next_billing_date']
+                ? Carbon::parse($company->subscriptions->first()['next_billing_date'])->format('Y-m-d H:i:s')
+                : null;
+            $subscriptionUpgradeDate = optional($company->subscriptions->first())['upgrade_date']
+                ? Carbon::parse($company->subscriptions->first()['upgrade_date'])->format('Y-m-d H:i:s')
+                : null;
+
             $csvData[] = [
-                $role->id,
-                $role->name,
-                $role->email,
-                $role->role_name,
-                $role->status,
-                $role->created_at->format('Y-m-d H:i:s'),
-                $role->updated_at->format('Y-m-d H:i:s'),
+                $company->id,
+                $company->name,
+                $company->email,
+                $company->phone,
+                optional($company->addresses)->id,
+                optional($company->addresses)->street_address,
+                optional($company->addresses->city)->id,
+                optional($company->addresses->city)->name,
+                optional($company->addresses->country)->id,
+                optional($company->addresses->country)->name,
+                optional($company->addresses)->postal_code,
+                optional($company->plans)->id,
+                optional($company->plans)->name,
+                optional($company->plans)->billing_cycle,
+                $subscriptionStartDate,
+                $subscriptionEndDate,
+                $subscriptionRenewDate,
+                $subscriptionUpgradeDate,
+                $company->status,
+                $company->created_at->format('Y-m-d H:i:s'),
             ];
         }
 
@@ -306,7 +337,7 @@ class CompaniesController extends Controller
         }
 
         // Return the response with the CSV content as a file
-        $fileName = 'users_export_' . now()->format('Y_m_d_H_i_s') . '.csv';
+        $fileName = 'companies_export_' . now()->format('Y_m_d_H_i_s') . '.csv';
         return response($csvContent)
             ->header('Content-Type', 'text/csv')
             ->header('Content-Disposition', "attachment; filename={$fileName}");
@@ -319,53 +350,76 @@ class CompaniesController extends Controller
      *
      * @return void
      */
-    public function import(Request $request)
+    public function import(Request $request, CompanyService $companyService)
     {
         $validator = Validator::make($request->all(), [
             'file' => 'required|mimes:csv,txt|max:2048', // Validate file type and size
         ]);
-
+    
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'errors' => $validator->errors(),
             ]);
         }
-
+    
         try {
             $file = $request->file('file');
             $data = array_map('str_getcsv', file($file->getRealPath()));
-            $header = array_shift($data);
-
-            foreach ($data as $row) {
+            $header = array_map('trim', array_shift($data)); // Extract and trim header row
+    
+            $rules = [
+                'Company Name' => ['required', 'string', 'max:255'],
+                'Owner Full Name' => ['required', 'string', 'max:255'],
+                'Email' => ['required', 'email', 'unique:companies,email', 'unique:users,email'],
+                'Phone' => ['required', 'digits_between:10,15'],
+                'Password' => ['required', 'string', 'min:8'],
+                'Plan ID' => ['required', 'exists:plans,id'],
+                'Street Address' => ['nullable', 'string', 'max:255'],
+                'Country ID' => ['nullable', 'exists:countries,id'],
+                'City ID' => ['nullable', 'exists:cities,id'],
+                'Pincode' => ['nullable', 'string', 'max:10'],
+            ];
+    
+            $skippedRows = [];
+            $successfulImportsCount = 0;
+    
+            foreach ($data as $index => $row) {
                 $row = array_combine($header, $row);
-
-                // Skip if email already exists
-                if (User::where('email', $row['email'])->exists()) {
-                    continue;
+                $rowValidator = Validator::make($row, $rules);
+    
+                if ($rowValidator->fails()) {
+                    // Log or collect skipped rows with errors
+                    $skippedRows[] = [
+                        'row' => $index + 2, // Adding 2 to account for header row and zero-based index
+                        'errors' => $rowValidator->errors()->all(),
+                    ];
+                    continue; // Skip this row
                 }
-
-                // Check if role_id exists in crm_roles table
-                $roleExists = $row['role_id'] && DB::table('crm_roles')->where('id', $row['role_id'])->exists();
-
-                if (!$roleExists) {
-                    // Skip this row if the role doesn't exist
-                    continue;
-                }
-
-                User::create([
-                    'name' => $row['name'] ?? '',
-                    'email' => $row['email'] ?? '',
-                    'password' => Hash::make($row['password']) ?? '',
-                    'role_id' => $row['role_id'] ?? '',
-                    'company_id' => Auth::user()->company_id
-
+    
+                // Pass each validated row to the CompanyService
+                $companyService->createCompany([
+                    'cname' => $row['Company Name'],
+                    'name' => $row['Owner Full Name'],
+                    'email' => $row['Email'],
+                    'phone' => $row['Phone'],
+                    'password' => $row['Password'], // Pass raw password, handle hashing in the service
+                    'plan_id' => $row['Plan ID'],
+                    'address_street_address' => $row['Street Address'] ?? null,
+                    'address_country_id' => $row['Country ID'] ?? null,
+                    'address_city_id' => $row['City ID'] ?? null,
+                    'address_pincode' => $row['Pincode'] ?? null,
                 ]);
+    
+                $successfulImportsCount++;
             }
-
+    
             return response()->json([
                 'success' => true,
-                'message' => 'Users imported successfully!',
+                'message' => 'CSV processed successfully.',
+                'imported_count' => $successfulImportsCount,
+                'skipped_count' => count($skippedRows),
+                'skipped_rows' => $skippedRows, // Optional: Include details about skipped rows
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -374,6 +428,8 @@ class CompaniesController extends Controller
             ]);
         }
     }
+    
+    
 
 
     /**
@@ -521,4 +577,86 @@ class CompaniesController extends Controller
         }
     }
 
+
+    public function changePassword(Request $request)
+    {
+        // Validate input
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:companies,id',
+            'password' => [
+                'required',
+                'string',
+            ]
+        ], [
+            'id.exists' => 'Invalid user ID.'
+        ]);
+
+        // Check validation
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first()
+            ], 422);
+        }
+
+        try {
+
+            // Find user and update password
+            $user = User::where('company_id', '=', $request->input('id'))->first();
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Compnay User not found.'
+                ], 404);
+            }
+
+
+            $user->password = Hash::make($request->input('password'));
+            $user->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Password updated successfully.'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Password change error: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'An unexpected error occurred. Please try again.'
+            ], 500);
+        }
+    }
+
+    public function view($id)
+    {
+        $query = Company::query()
+            ->with([
+                'plans',
+                'users' => function ($query) use ($id) {
+                    $query->where('role_id', null)
+                        ->where('company_id', $id)
+                        ->select('id', 'name', 'company_id', 'role_id')->first();
+                },
+                'addresses' => function ($query) {
+                    $query->with('country')
+                        ->with('city')
+                        ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
+                }
+            ])
+            ->where('id', $id)
+            ->select('companies.*', 'companies.name as cname');
+
+        $company = $query->firstOrFail();
+
+        // dd($company);
+
+        return view($this->getViewFilePath('view'), [
+
+            'title' => 'View Company',
+            'company' => $company,
+            'module' => PANEL_MODULES[$this->getPanelModule()]['companies'],
+        ]);
+    }
 }

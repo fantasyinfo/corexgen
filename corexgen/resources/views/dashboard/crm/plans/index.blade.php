@@ -71,19 +71,7 @@
 @extends('layout.app')
 @section('content')
 
-    <div class="card shadow-sm rounded p-3 mb-3">
-        <div class="card-header  border-bottom pb-2">
-            <div class="row ">
-                <div class="col-md-4">
-                    <h5 class="card-title">{{ __('plans.Plans Management') }}</h5>
-                </div>
-                @include('layout.components.header-buttons')
-            </div>
-
-
-        </div>
-    </div>
-
+@include('layout.components.header-buttons')
     @if (hasPermission('PLANS.READ_ALL') || hasPermission('PLANS.READ'))
         <div class="row justify-content-center">
 
@@ -97,11 +85,11 @@
                             </div>
                             <div class="plan-card-body">
                                 <div class="plan-price-strike">
-                                    $ <span>{{$plan->price}}</span>
+                                    {{ getSettingValue('Currency Symbol') }} <span>{{$plan->price}} ({{ getSettingValue('Currency Code') }})</span>
                                 </div>
                                 <div class="plan-price text-center">
-                                    $ {{ $plan->offer_price }} <span class="text-muted"
-                                        style="font-size: 1rem;">/{{ $plan->billing_cycle }} </span>
+                                    {{ getSettingValue('Currency Symbol') }} {{ $plan->offer_price }} <span class="text-muted"
+                                        style="font-size: 1rem;">/{{ $plan->billing_cycle }} ({{ getSettingValue('Currency Code') }})</span>
                                 </div>
                                 @if ($plan->planFeatures)
                                     <div class="plan-features">

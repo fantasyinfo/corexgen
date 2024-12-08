@@ -1,4 +1,4 @@
-<div class="col-md-8 d-flex justify-content-end">
+<div class="mb-3 d-flex justify-content-end">
     <a href="{{ route(getPanelRoutes($module . '.create')) }}" class="btn btn-primary btn-xl me-2">
         <i class="fas fa-plus"></i> {{ __('crud.Create New') }}
     </a>

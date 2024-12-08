@@ -19,6 +19,7 @@ use Laravel\Fortify\Fortify;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -57,47 +58,47 @@ class FortifyServiceProvider extends ServiceProvider
             $isTenant = filter_var($request->input('is_tenant'), FILTER_VALIDATE_BOOLEAN);
             $email = $request->input('email');
             $password = $request->input('password');
-
+        
             // Fetch active user by email
             $user = User::where('email', $email)
                 ->where('status', CRM_STATUS_TYPES['USERS']['STATUS']['ACTIVE'])
                 ->first();
-
+        
             if (!$user) {
-                throw \ValidationException::withMessages([
-                    'email' => [trans('auth.failed')],
+                throw ValidationException::withMessages([
+                    'email' => ['Login Details Not Matched.'],
                 ]);
             }
-
+        
             // Password check
             if (!Hash::check($password, $user->password)) {
-                throw \ValidationException::withMessages([
-                    'email' => [trans('auth.failed')],
+                throw ValidationException::withMessages([
+                    'email' => ['Login Details Not Matched.'],
                 ]);
             }
-
+        
             // Company status check
             if (!$isTenant && $user->company_id !== null) {
                 $company = Company::find($user->company_id);
-
+        
                 if (!$company || $company->status !== CRM_STATUS_TYPES['COMPANIES']['STATUS']['ACTIVE']) {
-                    throw \ValidationException::withMessages([
-                        'company' => ['Your company account is currently inactive.'],
+                    throw ValidationException::withMessages([
+                        'email' => ['Your company account is currently inactive.'],
                     ]);
                 }
             }
-
+        
             // Tenant status check
             if ($isTenant && $path === 'super-admin-login') {
                 $tenant = Tenant::find($user->tenant_id);
-
+        
                 if (!$tenant || $tenant->status !== CRM_STATUS_TYPES['TENANTS']['STATUS']['ACTIVE']) {
-                    throw \ValidationException::withMessages([
-                        'tenant' => ['Your tenant account is currently inactive.'],
+                    throw ValidationException::withMessages([
+                        'email' => ['Your tenant account is currently inactive.'],
                     ]);
                 }
             }
-
+        
             // Set panel access based on user type
             $panelAccess = match (true) {
                 $isTenant && $user->role_id === null => PANEL_TYPES['SUPER_PANEL'],
@@ -106,13 +107,13 @@ class FortifyServiceProvider extends ServiceProvider
                 !$isTenant && $user->role_id !== null => PANEL_TYPES['COMPANY_PANEL'],
                 default => null
             };
-
+        
             if (!$panelAccess) {
-                throw \ValidationException::withMessages([
-                    'authorization' => ['You are not authorized to access this panel.'],
+                throw ValidationException::withMessages([
+                    'email' => ['You are not authorized to access this panel.'],
                 ]);
             }
-
+        
             session(['panelAccess' => $panelAccess]);
             return $user;
         });

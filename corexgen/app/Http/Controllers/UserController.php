@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\PermissionsHelper;
 use App\Http\Requests\CRM\CRMUserRequest;
+use App\Models\Country;
 use App\Models\CRM\CRMRole;
 use App\Repositories\UserRepository;
 use App\Services\UserService;
@@ -107,18 +108,14 @@ class UserController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(CRMUserRequest $request)
+    public function store(CRMUserRequest $request, UserService $userService)
     {
         $this->tenantRoute = $this->getTenantRoute();
 
         try {
 
-            $validated = $request->validated();
-            $validated['is_tenant'] = Auth::user()->is_tenant;
-            $validated['password'] = Hash::make($validated['password']);
-            $validated['company_id'] = Auth::user()->company_id;
 
-            User::create($validated);
+            $userService->createUser($request->validated());
 
             return redirect()->route($this->tenantRoute . 'users.index')
                 ->with('success', 'User created successfully.');
@@ -138,9 +135,11 @@ class UserController extends Controller
     public function create()
     {
         $roles = $this->applyTenantFilter(CRMRole::query())->get();
+        $country = Country::all();
         return view($this->getViewFilePath('create'), [
             'title' => 'Create User',
-            'roles' => $roles
+            'roles' => $roles,
+            'country' => $country,
         ]);
     }
 
@@ -152,18 +151,30 @@ class UserController extends Controller
     public function edit($id)
     {
 
-        $query = User::query()->where('id', $id);
+
+        $query = User::query()
+            ->with([
+                'addresses' => function ($query) {
+                    $query->with('country')
+                        ->with('city')
+                        ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
+                }
+            ])
+            ->where('id', $id);
         $query = $this->applyTenantFilter($query);
         $user = $query->firstOrFail();
 
         $roles = $this->applyTenantFilter(CRMRole::query())->get();
+
+        $country = Country::all();
 
 
         return view($this->getViewFilePath('edit'), [
 
             'title' => 'Edit User',
             'user' => $user,
-            'roles' => $roles
+            'roles' => $roles,
+            'country' => $country,
         ]);
     }
 
@@ -176,18 +187,25 @@ class UserController extends Controller
      *
      * @return void
      */
-    public function update(CRMUserRequest $request)
+    public function update(CRMUserRequest $request, UserService $userService)
     {
 
         $this->tenantRoute = $this->getTenantRoute();
 
+        try {
+            $userService->updateUser($request->validated());
 
-        $this->applyTenantFilter(User::query()->where('id', '=', $request->id))->update($request->validated());
-
-
-
-        return redirect()->route($this->tenantRoute . 'users.index')
-            ->with('success', 'User updated successfully.');
+            if ($request->boolean('is_profile')) {
+                return redirect()
+                    ->route($this->tenantRoute . 'users.profile')
+                    ->with('success', __('Profile updated successfully.'));
+            }
+            return redirect()->route($this->tenantRoute . 'users.index')
+                ->with('success', 'User updated successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'An error occurred while updating the user: ' . $e->getMessage());
+        }
     }
 
 
@@ -398,4 +416,105 @@ class UserController extends Controller
             return redirect()->back()->with('error', 'Failed to delete the user: ' . $e->getMessage());
         }
     }
+
+    public function changePassword(Request $request)
+    {
+        // Validate input
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:users,id',
+            'password' => [
+                'required',
+                'string',
+            ]
+        ], [
+            'id.exists' => 'Invalid user ID.'
+        ]);
+
+        // Check validation
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first()
+            ], 422);
+        }
+
+        try {
+            // Find user and update password
+            $user = User::findOrFail($request->input('id'));
+
+            $user->password = Hash::make($request->input('password'));
+            $user->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Password updated successfully.'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Password change error: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'An unexpected error occurred. Please try again.'
+            ], 500);
+        }
+    }
+
+
+    public function view($id)
+    {
+        $query = User::query()
+            ->with([
+                'addresses' => function ($query) {
+                    $query->with('country')
+                        ->with('city')
+                        ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
+                },
+                'role'
+            ])
+            ->where('id', $id)->get();
+
+        $query = $this->applyTenantFilter($query);
+        $user = $query->firstOrFail();
+
+        // dd($user);
+  
+        return view($this->getViewFilePath('view'), [
+
+            'title' => 'View User',
+            'user' => $user,
+            'module' => PANEL_MODULES[$this->getPanelModule()]['users'],
+        
+        ]);
+    }
+
+
+
+
+    public function profile()
+    {
+
+        $query = User::query()
+            ->with([
+                'addresses' => function ($query) {
+                    $query->with('country')
+                        ->with('city')
+                        ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
+                },
+                'role'
+            ])
+            ->where('id', Auth::id())->get();
+
+        $query = $this->applyTenantFilter($query);
+        $user = $query->firstOrFail();
+        $country = Country::all();
+        return view($this->getViewFilePath('profile'), [
+
+            'title' => 'Profile',
+            'user' => $user,
+            'module' => PANEL_MODULES[$this->getPanelModule()]['users'],
+            'country' => $country
+        ]);
+    }
+
+
 }

@@ -2,23 +2,24 @@
 
 // crm routes
 use App\Http\Controllers\AppUpdateController;
+use App\Http\Controllers\CompanyRegisterController;
 use App\Http\Controllers\CountryCitySeederController;
 use App\Http\Controllers\CRM\CompaniesController;
 use App\Http\Controllers\CRM\CRMRoleController;
 use App\Http\Controllers\CRM\CRMRolePermissionsController;
 use App\Http\Controllers\CRM\CRMSettingsController;
 use App\Http\Controllers\ModuleController;
+
+use App\Http\Controllers\Payments\PaymentGatewayController;
 use App\Http\Controllers\PlansController;
 use App\Http\Controllers\SystemInstallerController;
-use App\Http\Controllers\TaxController;
 use App\Http\Controllers\UserController;
 use App\Models\City;
-use App\Models\CRM\CRMRole;
+
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
-use Laravel\Fortify\Features;
 use Illuminate\Support\Facades\File;
 /*
 |--------------------------------------------------------------------------
@@ -66,11 +67,19 @@ Route::middleware(['check.installation'])->group(function () {
     // All routes that require the installation to be completed
     Route::get('/', function () {
         if (Auth::check()) {
-            return view('welcome');
+            if (Auth::user()->is_tenant) {
+                return redirect()->route(getPanelUrl(PANEL_TYPES['SUPER_PANEL']) . '.home');
+            } else if (Auth::user()->company_id != null) {
+                return redirect()->route(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']) . '.home');
+            }
         } else {
-            return redirect()->route('login');
+            return view('landing.index');
         }
     })->name('home');
+
+
+    Route::get('/company/register', [CompanyRegisterController::class, 'register'])->name('compnay.landing-register');
+    Route::post('/company/register', [CompanyRegisterController::class, 'initPaymentForCompnayRegistration'])->name('company.register');
 
 
     Route::get('/login', function () {
@@ -78,6 +87,26 @@ Route::middleware(['check.installation'])->group(function () {
     })->name('login');
 
 });
+
+
+
+// payment gateway routes
+Route::prefix('payments')->group(function () {
+    Route::post('/initiate/{gateway?}', 
+        [PaymentGatewayController::class, 'initiate'])
+        ->name('payment.initiate');
+    
+    Route::get('/success/{gateway}', 
+        [PaymentGatewayController::class, 'handleSuccess'])
+        ->name('payment.success')->middleware('payment.debug');
+    
+    Route::get('/cancel/{gateway}', 
+        [PaymentGatewayController::class, 'handleCancel'])
+        ->name('payment.cancel');
+});
+
+
+
 
 
 // register
@@ -177,6 +206,9 @@ Route::middleware([
         Route::get('/export', [UserController::class, 'export'])->name('export')->middleware('check.permission:USERS.EXPORT');
         Route::post('/import', [UserController::class, 'import'])->name('import')->middleware('check.permission:USERS.IMPORT');
         Route::post('/bulkDelete', [UserController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:USERS.BULK_DELETE');
+        Route::post('/changePassword', [UserController::class, 'changePassword'])->name('changePassword')->middleware('check.permission:USERS.CHANGE_PASSWORD');
+        Route::get('/view/{id}', [UserController::class, 'view'])->name('view')->middleware('check.permission:USERS.VIEW');
+        Route::get('/profile', [UserController::class, 'profile'])->name('profile');
     });
 
 
@@ -278,6 +310,9 @@ Route::middleware([
         Route::get('/export', [UserController::class, 'export'])->name('export')->middleware('check.permission:USERS.EXPORT');
         Route::post('/import', [UserController::class, 'import'])->name('import')->middleware('check.permission:USERS.IMPORT');
         Route::post('/bulkDelete', [UserController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:USERS.BULK_DELETE');
+        Route::post('/changePassword', [UserController::class, 'changePassword'])->name('changePassword')->middleware('check.permission:USERS.CHANGE_PASSWORD');
+        Route::get('/view/{id}', [UserController::class, 'view'])->name('view')->middleware('check.permission:USERS.VIEW');
+        Route::get('/profile', [UserController::class, 'profile'])->name('profile');
 
     });
 
@@ -303,6 +338,9 @@ Route::middleware([
         // view compnay login as company
         Route::get('/loginas/{companyid}', [CompaniesController::class, 'loginas'])->name('loginas')->middleware('check.permission:COMPANIES.LOGIN_AS');
         Route::post('/bulkDelete', [CompaniesController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:COMPANIES.BULK_DELETE');
+        Route::post('/changePassword', [CompaniesController::class, 'changePassword'])->name('changePassword')->middleware('check.permission:COMPANIES.CHANGE_PASSWORD');
+        Route::get('/view/{id}', [CompaniesController::class, 'view'])->name('view')->middleware('check.permission:COMPANIES.VIEW');
+
 
     });
 

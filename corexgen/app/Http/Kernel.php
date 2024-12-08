@@ -41,7 +41,7 @@ class Kernel extends HttpKernel
 
         'api' => [
             // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-            \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
+            \Illuminate\Routing\Middleware\ThrottleRequests::class . ':api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];
@@ -72,5 +72,6 @@ class Kernel extends HttpKernel
         'check.user.role' => \App\Http\Middleware\CheckUserRole::class,
         'check.permission' => \App\Http\Middleware\CheckRolePermission::class,
         'check.installation' => \App\Http\Middleware\CheckInstallation::class,
+        'payment.debug' => \App\Http\Middleware\DebugPaymentCallback::class,
     ];
 }

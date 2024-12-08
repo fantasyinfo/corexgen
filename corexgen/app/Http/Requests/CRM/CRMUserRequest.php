@@ -28,8 +28,10 @@ class CRMUserRequest extends FormRequest
     {
         $companyId = Auth::user()->company_id ?? null; // Handle null cases for non-authenticated users
         $userId = $this->input('id') ?? null; // Safely retrieve user ID for update validation
+        $isProfile = $this->input('is_profile') ?? false; // Safely retrieve user ID for update validation
     
         return [
+            'id' => [$this->isMethod('put') || $this->isMethod('patch') ? 'required' : 'nullable'],
             'name' => [
                 'required',
                 'max:255',
@@ -48,7 +50,11 @@ class CRMUserRequest extends FormRequest
             'password' => $this->isMethod('post') // Required for create, nullable for update
                 ? ['required', 'string']
                 : ['nullable', 'string'],
-            'role_id' => 'required|integer',
+            'role_id' => [$isProfile ? 'nullable' : 'required', 'integer'],
+            'address_street_address' => 'nullable|string|max:255',
+            'address_country_id' => 'nullable',
+            'address_city_id' => 'nullable',
+            'address_pincode' => 'nullable|string|max:10',
         ];
     }
     
