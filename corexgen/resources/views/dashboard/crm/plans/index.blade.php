@@ -85,11 +85,11 @@
                             </div>
                             <div class="plan-card-body">
                                 <div class="plan-price-strike">
-                                    $ <span>{{$plan->price}}</span>
+                                    {{ getSettingValue('Currency Symbol') }} <span>{{$plan->price}} ({{ getSettingValue('Currency Code') }})</span>
                                 </div>
                                 <div class="plan-price text-center">
-                                    $ {{ $plan->offer_price }} <span class="text-muted"
-                                        style="font-size: 1rem;">/{{ $plan->billing_cycle }} </span>
+                                    {{ getSettingValue('Currency Symbol') }} {{ $plan->offer_price }} <span class="text-muted"
+                                        style="font-size: 1rem;">/{{ $plan->billing_cycle }} ({{ getSettingValue('Currency Code') }})</span>
                                 </div>
                                 @if ($plan->planFeatures)
                                     <div class="plan-features">

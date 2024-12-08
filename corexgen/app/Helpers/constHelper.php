@@ -164,44 +164,80 @@ PermissionsHelper::initializePermissions();
 
 ]);
 
-!defined('CRM_SETTINGS') && define('CRM_SETTINGS', [
+!defined('CRM_TENANT_SETTINGS') && define('CRM_TENANT_SETTINGS', [
 
     'COMPANY_NAME' => [
         'key' => 'Company Name',
         'value' => 'Core X Gen',
         'is_media_setting' => false,
         'media_id' => null,
-        'input_type' => 'text'
+        'input_type' => 'string',
+        'is_tenant' => true,
+        'company_id' => null
     ],
     'COMPANY_TAGLINE' => [
         'key' => 'Company Tagline',
         'value' => 'Next Generation CRM',
         'is_media_setting' => false,
         'media_id' => null,
-        'input_type' => 'text'
+        'input_type' => 'string',
+        'is_tenant' => true,
+        'company_id' => null
     ],
     'COMPANY_LOGO' => [
         'key' => 'Company Logo',
         'value' => '/',
         'is_media_setting' => true,
         'media_id' => null,
-        'input_type' => 'image'
+        'input_type' => 'image',
+        'is_tenant' => true,
+        'company_id' => null
     ],
     'DATE_FORMAT' => [
         'key' => 'Date Format',
         'value' => 'DD/MM/YYYY',
         'is_media_setting' => false,
         'media_id' => null,
-        'input_type' => 'date'
+        'input_type' => 'string',
+        'is_tenant' => true,
+        'company_id' => null
     ],
-    'TIME_FORMAT' => [
-        'key' => 'Time Format',
-        'value' => '12 Hours',
+    'TIME_ZONE' => [
+        'key' => 'Time Zone',
+        'value' => 'Asia/Kolkata',
         'is_media_setting' => false,
         'media_id' => null,
-        'input_type' => 'time'
+        'input_type' => 'string',
+        'is_tenant' => true,
+        'company_id' => null
     ],
-
+    'CURRENCY_SYMBOL' => [
+        'key' => 'Currency Symbol',
+        'value' => '$',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'input_type' => 'string',
+        'is_tenant' => true,
+        'company_id' => null
+    ],
+    'CURRENCY_CODE' => [
+        'key' => 'Currency Code',
+        'value' => 'USD',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'input_type' => 'string',
+        'is_tenant' => true,
+        'company_id' => null
+    ],
+    'SMTP' => [
+        'key' => 'SMTP',
+        'value' => json_encode([]),
+        'is_media_setting' => false,
+        'media_id' => null,
+        'input_type' => 'json',
+        'is_tenant' => true,
+        'company_id' => null
+    ]
 
 
 ]);

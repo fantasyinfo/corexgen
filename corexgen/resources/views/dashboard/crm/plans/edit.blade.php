@@ -83,8 +83,10 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <x-form-components.input-group type="number" step="0.001"
-                                                class="custom-class" id="planPrice" name="price"
+                                            <x-form-components.input-group-prepend-append
+                                                prepend="{{ getSettingValue('Currency Symbol') }}"
+                                                append="{{ getSettingValue('Currency Code') }}" type="number"
+                                                step="0.001" class="custom-class" id="planPrice" name="price"
                                                 placeholder="{{ __('129.99') }}" value="{{ $plan->price }}" required />
 
                                         </div>
@@ -98,8 +100,10 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <x-form-components.input-group type="number" step="0.001"
-                                                class="custom-class" id="planOfferPrice" name="offer_price"
+                                            <x-form-components.input-group-prepend-append
+                                                prepend="{{ getSettingValue('Currency Symbol') }}"
+                                                append="{{ getSettingValue('Currency Code') }}" type="number"
+                                                step="0.001" class="custom-class" id="planOfferPrice" name="offer_price"
                                                 placeholder="{{ __('99.99') }}" value="{{ $plan->offer_price }}"
                                                 required />
 

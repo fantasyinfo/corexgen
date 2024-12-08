@@ -13,20 +13,28 @@ return new class extends Migration
     {
         Schema::create('crm_settings', function (Blueprint $table) {
             $table->id();
-            $table->string('key');
-            $table->string('value');
-            $table->boolean('is_media_setting')->default(false);
-            $table->bigInteger('media_id')->nullable();
-            $table->bigInteger('buyer_id');
-            $table->boolean('is_super_user')->default(false);
-            $table->string('input_type')->nullable();
-            $table->bigInteger('updated_by')->nullable();
-            $table->bigInteger('created_by')->nullable();
+            $table->string('key')->unique(); // Ensures unique settings keys
+            $table->text('value')->nullable(); // Allows larger values
+            $table->boolean('is_media_setting')->default(false); // Flags for media
+            $table->unsignedBigInteger('media_id')->nullable(); // Foreign key for media
+            $table->boolean('is_tenant')->default(false); // Tenant-specific setting
+            $table->unsignedBigInteger('company_id')->nullable(); // SaaS company association
+            $table->string('input_type')->nullable(); // Input type for rendering UI
+            $table->unsignedBigInteger('updated_by')->nullable(); // Tracking who updated
+            $table->unsignedBigInteger('created_by')->nullable(); // Tracking who created
             $table->timestamps();
-            $table->index('buyer_id');
+    
+            // Foreign key constraints
+            $table->foreign('company_id')->references('id')->on('companies')->onDelete('set null');
+            $table->foreign('media_id')->references('id')->on('media')->onDelete('cascade');
+            $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
+            $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
+
+            // index 
+            $table->index(['key', 'company_id', 'is_tenant']);
         });
     }
-
+    
     /**
      * Reverse the migrations.
      */

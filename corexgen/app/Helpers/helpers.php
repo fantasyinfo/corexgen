@@ -4,12 +4,13 @@ use App\Models\CRM\CRMMenu;
 use App\Models\User;
 use App\Models\CRM\CRMRole;
 use App\Models\CRM\CRMRolePermissions;
+use App\Models\CRM\CRMSettings;
 use Illuminate\Support\Facades\DB;
 use App\Models\Media;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Cache;
 
 
 
@@ -219,7 +220,7 @@ function hasPermission($permissionKey)
     // dd($parts);
     // Validate the permission key format
     if (count($parts) != 2) {
-        \Log::warning("Invalid permission key format: {  $permissionKey} ",[$parts]);
+        \Log::warning("Invalid permission key format: {  $permissionKey} ", [$parts]);
         return false;
     }
 
@@ -299,7 +300,7 @@ function hasMenuPermission($permissionId = null)
 
 
     if ($userRoleId == null && $user->company_id == null) {
-       // \Log::error('Role & Compnay Id Not Found.', [$user, $userRoleId, $user->company_id]);
+        // \Log::error('Role & Compnay Id Not Found.', [$user, $userRoleId, $user->company_id]);
         return false;
     } else if ($userRoleId == null && $user->company_id != null) {
         // its a company admin user
@@ -346,4 +347,33 @@ function getPanelRoutes($route)
 function getComponentsDirFilePath($filename)
 {
     return 'layout.components.' . $filename;
+}
+
+
+
+
+if (!function_exists('getSettingValue')) {
+
+    /**
+     * Retrieve the value of a setting by key.
+     *
+     * @param string $key The key of the setting.
+     * @return mixed|null The value of the setting or null if not found.
+     */
+    function getSettingValue(string $key)
+    {
+
+        $query = CRMSettings::where('key', $key);
+
+        if ($user = Auth::user()) {
+            if ($user->is_tenant) {
+                $query->where('is_tenant', 1);
+            } elseif (!is_null($user->company_id)) {
+                $query->where('company_id', $user->company_id);
+            }
+        }
+
+        return $query->value('value'); // Return the value column directly
+
+    }
 }

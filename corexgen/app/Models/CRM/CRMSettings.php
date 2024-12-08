@@ -16,8 +16,9 @@ class CRMSettings extends Model
         'value',
         'is_media_setting',
         'media_id',
-        'buyer_id',
-        'is_super_user',
+        'is_tenant',
+        'company_id',
+        'input_type',
         'updated_by',
         'created_by',
     ];

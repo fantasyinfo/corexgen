@@ -51,7 +51,7 @@ class CompanyRegisterController extends Controller
             $plan = Plans::find($validatedData['plan_id']);
             $validatedData['plan_name'] = $plan->name;
             $validatedData['plan_price'] = $plan->offer_price;
-            $validatedData['currency'] = 'USD'; //todo:: change currecny as per tenant setting
+            $validatedData['currency'] = getSettingValue('Currency Code'); //todo:: change currecny as per tenant setting
 
             // Initiate payment process
             \Log::info('From REg ' . env('STRIPE_SECRET_KEY'));
@@ -145,7 +145,7 @@ class CompanyRegisterController extends Controller
             $paymentDetails = [
                 'amount' => $validatedData['plan_price'],
                 'description' => "Company Registration - {$validatedData['plan_name']} Plan",
-                'currency' => $validatedData['currency'] ?? 'USD',
+                'currency' => getSettingValue('Currency Code'),
                 'metadata' => [
                     'plan_id' => $validatedData['plan_id'],
                     'company_registration' => true

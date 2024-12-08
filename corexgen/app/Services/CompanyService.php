@@ -128,7 +128,7 @@ class CompanyService
             'plan_id' => $planid,
             'company_id' => $companyid,
             'amount' => $plansDetails->offer_price ?? 0,
-            'currency' => 'USD',
+            'currency' => getSettingValue('Currency Code'),
             'payment_gateway' => $paymentDetails['payment_gateway'] ?? 'COD',
             'payment_type' => $paymentDetails['payment_type'] ?? 'OFFLINE',
             'transaction_reference' => $paymentDetails['transaction_reference'] ?? null,

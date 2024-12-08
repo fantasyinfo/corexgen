@@ -71,6 +71,7 @@
                                             <x-form-components.input-group type="text" class="custom-class"
                                                 id="planDesc" name="desc" placeholder="{{ __('For Startups') }}"
                                                 value="{{ old('desc') }}" required />
+                                        
 
                                         </div>
                                     </div>
@@ -79,15 +80,22 @@
                                     <div class="row mb-4 align-items-center">
                                         <div class="col-lg-4">
                                             <x-form-components.input-label for="planPrice" class="custom-class" required>
-                                                {{ __('plans.Plan Price') }}
+                                                 {{ __('plans.Plan Price') }}
                                             </x-form-components.input-label>
 
                                         </div>
                                         <div class="col-lg-8">
-                                            <x-form-components.input-group type="number" step="0.001"
-                                                class="custom-class" id="planPrice" name="price"
-                                                placeholder="{{ __('129.99') }}" value="{{ old('price') }}" required />
-
+                                            <x-form-components.input-group-prepend-append 
+                                            prepend="{{ getSettingValue('Currency Symbol') }}"
+                                            append="{{ getSettingValue('Currency Code') }}"
+                                            type="number" 
+                                            step="0.001"
+                                            class="custom-class"
+                                            id="planPrice" 
+                                            name="price" 
+                                            placeholder="{{ __('129.99') }}"
+                                            value="{{ old('price') }}" 
+                                            required />
                                         </div>
                                     </div>
 
@@ -95,15 +103,23 @@
                                         <div class="col-lg-4">
                                             <x-form-components.input-label for="planOfferPrice" class="custom-class"
                                                 required>
-                                                {{ __('plans.Plan Offer Price') }}
+                                                 {{ __('plans.Plan Offer Price') }}
                                             </x-form-components.input-label>
 
                                         </div>
                                         <div class="col-lg-8">
-                                            <x-form-components.input-group type="number" step="0.001"
-                                                class="custom-class" id="planOfferPrice" name="offer_price"
-                                                placeholder="{{ __('99.99') }}" value="{{ old('offer_price') }}"
-                                                required />
+                                            <x-form-components.input-group-prepend-append 
+                                            prepend="{{ getSettingValue('Currency Symbol') }}"
+                                            append="{{ getSettingValue('Currency Code') }}"
+                                            type="number" 
+                                            step="0.001"
+                                            class="custom-class"
+                                            id="planOfferPrice" 
+                                            name="offer_price" 
+                                            placeholder="{{ __('99.99') }}"
+                                            value="{{ old('offer_price') }}" 
+                                            required />
+                                          
 
                                         </div>
                                     </div>
