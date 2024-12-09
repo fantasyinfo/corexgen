@@ -18,7 +18,9 @@ class CRMPermissionsSeeder extends Seeder
     public function run(): void
     {
         // Truncate table to remove all entries and reset auto-increment IDs
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         DB::table('crm_permissions')->truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         foreach (CRMPERMISSIONS as $name => $values) {
 

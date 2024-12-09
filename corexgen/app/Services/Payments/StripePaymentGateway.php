@@ -35,6 +35,7 @@ class StripePaymentGateway implements PaymentGatewayInterface
             'mode' => 'payment',
             'success_url' => route('payment.success', ['gateway' => 'stripe']) . '?session_id={CHECKOUT_SESSION_ID}',
             'cancel_url' => route('payment.cancel', ['gateway' => 'stripe']),
+            'metadata' => $paymentDetails['metadata'],
         ]);
 
         return $session->url;
@@ -76,10 +77,13 @@ class StripePaymentGateway implements PaymentGatewayInterface
             'transaction_id' => $session->payment_intent,
             'amount' => $session->amount_total / 100,
             'currency' => $session->currency,
+            'company_id' => $session?->metadata?->company_id,
+            'plan_id' => $session?->metadata?->plan_id,
         ];
 
-   
-        return app(CompanyRegisterController::class)->storeCompanyAfterPayment($paymentDetails);
+
+        // return app(CompanyRegisterController::class)->storeCompanyAfterPayment($paymentDetails);
+        return app(CompanyRegisterController::class)->storeCompnayAfterPaymentOnboading($paymentDetails);
 
 
     }

@@ -146,7 +146,7 @@
                             @endforeach
                         </select>
                     </div>
-               
+
                     <div class="col-12">
                         <button type="button" class="btn btn-primary w-100" id="planNextBtn">Select Plan</button>
                     </div>
@@ -158,15 +158,27 @@
                     <div class="col-12 mb-3">
                         <select class="form-control" name="gateway" required>
                             <option value="">Select Payment</option>
-                  
-                                <option value="stripe">Stripe</option>
-                                <option value="paypal">Paypal</option>
-                         
+
+                            <option value="stripe">Stripe</option>
+                            <option value="paypal">Paypal</option>
+
                         </select>
                     </div>
-               
+
                     <div class="col-12">
-                        <button type="button" class="btn btn-primary w-100" id="paymentNextBtn">Select Payment Type</button>
+                        <button type="button" class="btn btn-primary w-100" id="paymentNextBtn">Select Payment
+                            Type</button>
+                    </div>
+                </div>
+                <div class="step" id="completeStep">
+                    <h2 class="text-center mb-4">Complete</h2>
+                    <div class="row">
+                        <div class="alert alert-info">
+                            <h5>Congradulations Onbording Steps Completed, Click to redirect to dashboard.</h5>
+                        </div>
+                        <div class="col-12">
+                            <button type="button" class="btn btn-primary w-100" id="completeNextBtn">Next</button>
+                        </div>
                     </div>
                 </div>
             </form>
@@ -180,125 +192,160 @@
 
     <script>
         $(document).ready(function() {
-            // Cache DOM elements
-            const $form = $('#onboardingForm');
-            const $progressBar = $('.progress-bar');
+            // Get all the form steps and buttons
             const $steps = $('.step');
+            const $progressBar = $('.progress-bar');
+            const $form = $('#onboardingForm');
 
-            // Step navigation buttons
-            const $addressNextBtn = $('#addressNextBtn');
-            const $currencyNextBtn = $('#currencyNextBtn');
-            const $timezoneNextBtn = $('#timezoneNextBtn');
-            const $planNextBtn = $('#planNextBtn');
-            const $paymentNextBtn = $('#paymentNextBtn');
-            const $paymentBtn = $('#paymentBtn');
-
-            // Define steps
-            const steps = [{
-                    id: 'addressStep',
-                    endpoint: '/onboarding/address',
-                    nextStep: 'currencyStep'
-                },
-                {
-                    id: 'currencyStep',
-                    endpoint: '/onboarding/currency',
-                    nextStep: 'timezoneStep'
-                },
-                {
-                    id: 'timezoneStep',
-                    endpoint: '/onboarding/timezone',
-                    nextStep: 'planStep'
-                },
-                {
-                    id: 'planStep',
-                    endpoint: '/onboarding/plan',
-                    nextStep: 'paymentStep'
-                },
-                {
-                    id: 'paymentStep',
-                    endpoint: '/onboarding/payment',
-                    nextStep: 'dashboard'
-                }
-            ];
-
-         
-            // Step validation and progression
-            function validateAndSubmitStep(stepIndex) {
-                const currentStep = steps[stepIndex];
-                const $currentStepElement = $(`#${currentStep.id}`);
-
-                // Validate inputs within the current step
-                const stepInputs = $currentStepElement.find('input, select');
+            // Function to validate the current step
+            function validateStep($currentStep) {
+                // Check all required inputs in the current step
+                const $inputs = $currentStep.find('input, select');
                 let isValid = true;
 
-                stepInputs.each(function() {
+                $inputs.each(function() {
                     if (this.validity && !this.validity.valid) {
-                        isValid = false;
                         $(this).addClass('is-invalid');
+                        isValid = false;
                     }
                 });
 
-                if (!isValid) return false;
+                return isValid;
+            }
 
+            // Function to move to the next step
+            function goToNextStep(currentStepId) {
+                // Hide current step
+                $(`#${currentStepId}`).removeClass('active');
+
+                // Determine next step based on current step
+                let nextStepId;
+                switch (currentStepId) {
+                    case 'addressStep':
+                        nextStepId = 'currencyStep';
+                        break;
+                    case 'currencyStep':
+                        nextStepId = 'timezoneStep';
+                        break;
+                    case 'timezoneStep':
+                        nextStepId = 'planStep';
+                        break;
+                    case 'planStep':
+                        nextStepId = 'paymentStep';
+                        break;
+                    case 'paymentStep':
+                        nextStepId = 'completeStep';
+                        break;
+                    case 'completeStep':
+                        nextStepId = 'dashboard';
+                        break;
+                }
+
+                // Show next step
+                $(`#${nextStepId}`).addClass('active');
+
+                // Update progress bar
+                const stepIndex = ['addressStep', 'currencyStep', 'timezoneStep', 'planStep', 'paymentStep',
+                        'completeStep'
+                    ]
+                    .indexOf(currentStepId);
+                const progress = ((stepIndex + 1) / 6) * 100;
+                $progressBar
+                    .css('width', `${progress}%`)
+                    .attr('aria-valuenow', progress);
+
+                return nextStepId;
+            }
+
+            // Function to submit step data
+            function submitStepData($currentStep) {
                 // Collect form data for the current step
-                const formData = $currentStepElement.find('input, select')
-                    .serializeArray()
-                    .reduce((obj, item) => {
-                        obj[item.name] = item.value;
-                        return obj;
-                    }, {});
+                const formData = $currentStep.find('input, select').serializeArray();
+                const stepId = $currentStep.attr('id');
 
-                // AJAX submission
-                formData['_token'] = '{{ csrf_token() }}';
-                $.ajax({
-                    url: currentStep.endpoint,
+                // Map step to endpoint
+                const endpoints = {
+                    'addressStep': '/onboarding/address',
+                    'currencyStep': '/onboarding/currency',
+                    'timezoneStep': '/onboarding/timezone',
+                    'planStep': '/onboarding/plan',
+                    'paymentStep': '/onboarding/payment',
+                    'completeStep': '/onboarding/complete',
+                };
+
+                // Add CSRF token
+                formData.push({
+                    name: '_token',
+                    value: '{{ csrf_token() }}'
+                });
+
+                // Send AJAX request
+                return $.ajax({
+                    url: endpoints[stepId],
                     method: 'POST',
-                    data: formData,
-                    success: function(response) {
-                        if (response.success) {
-                            // Move to next step
-                            $currentStepElement.removeClass('active');
-                            $(`#${currentStep.nextStep}`).addClass('active');
+                    data: formData
+                });
+            }
 
-                            // Update progress bar
-                            const progress = ((stepIndex + 1) / steps.length) * 100;
-                            $progressBar
-                                .css('width', `${progress}%`)
-                                .attr('aria-valuenow', progress);
+            // Event listener for all 'Next' buttons
+            $('.step .btn-primary').on('click', function() {
+                const $currentStep = $(this).closest('.step');
+                const currentStepId = $currentStep.attr('id');
 
-                            // Special handling for timezone step (check payment requirement)
-                            if (currentStep.id === 'planStep' && response.nextStep ===
-                                'dashboard') {
-                                window.location.href = '/dashboard';
+                // Validate current step
+                if (!validateStep($currentStep)) {
+                    return;
+                }
+
+                // Submit step data
+                submitStepData($currentStep)
+                    .done(function(response) {
+                        // Handle special cases for plan step
+                        if (currentStepId === 'planStep') {
+                            if (response.nextStep === 'complete') {
+                                // Free plan - go to complete step or redirect to company panel
+                                if (response.redirectUrl) {
+                                    // Directly redirect to the company panel
+                                    window.location.href = response.redirectUrl;
+                                    return;
+                                }
+
+                                $('#planStep').removeClass('active');
+                                $('#completeStep').addClass('active');
+                                return;
                             }
-                        } else {
-                            alert(response.message || 'An error occurred');
                         }
-                    },
-                    error: function(xhr) {
+
+                        // New modification for payment step
+                        if (currentStepId === 'paymentStep' && response.paymentUrl) {
+                            // Redirect to payment gateway
+                            window.location.href = response.paymentUrl;
+                            return;
+                        }
+
+                        // Go to next step
+                        const nextStepId = goToNextStep(currentStepId);
+                    })
+                    .fail(function(xhr) {
+                        // Handle errors
                         const errors = xhr.responseJSON?.errors || {};
                         Object.keys(errors).forEach(field => {
                             $(`[name="${field}"]`).addClass('is-invalid');
                         });
                         alert('Please correct the errors in the form.');
-                    }
-                });
-            }
+                    });
+            });
 
-            // Event Listeners for Next buttons
-            $addressNextBtn.on('click', () => validateAndSubmitStep(0));
-            $currencyNextBtn.on('click', () => validateAndSubmitStep(1));
-            $timezoneNextBtn.on('click', () => validateAndSubmitStep(2));
-            $planNextBtn.on('click', () => validateAndSubmitStep(3));
-            $paymentNextBtn.on('click', () => validateAndSubmitStep(4));
-            //$paymentBtn.on('click', () => validateAndSubmitStep(3));
+            // Event listener for complete step button
+            // $('#completeStepBtn').on('click', function() {
+            //     // Redirect to dashboard when complete step button is clicked
+            //     window.location.href = '/dashboard';
+            // });
 
-            // Remove invalid class on input
+            // Remove 'invalid' class when user starts typing
             $form.on('input', 'input, select', function() {
                 $(this).removeClass('is-invalid');
             });
-
-      
         });
 
         $('#country_id').on('change', function() {

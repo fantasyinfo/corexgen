@@ -109,6 +109,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/onboarding/payment', [CompanyOnboardingController::class, 'processPayment'])
          ->name('onboarding.payment');
+
+    Route::post('/onboarding/complete', [CompanyOnboardingController::class, 'completeOnboarding'])
+         ->name('onboarding.complete');
 });
 
 // payment gateway routes

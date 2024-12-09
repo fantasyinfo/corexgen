@@ -8,8 +8,10 @@ use App\Models\Company;
 use App\Models\CompanyOnboarding;
 use App\Models\Country;
 use App\Models\Plans;
+use App\Services\Payments\PaymentGatewayFactory;
 use DateTimeZone;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class CompanyOnboardingController extends Controller
@@ -26,7 +28,7 @@ class CompanyOnboardingController extends Controller
         $plans = Plans::all();
         // Get timezones from PHP
         $timezones = DateTimeZone::listIdentifiers();
-        return view('companyonbording.index', compact('company', 'onboarding', 'countries', 'timezones','plans'));
+        return view('companyonbording.index', compact('company', 'onboarding', 'countries', 'timezones', 'plans'));
     }
 
     public function saveAddress(Request $request)
@@ -155,7 +157,7 @@ class CompanyOnboardingController extends Controller
             'status' => CRM_STATUS_TYPES['COMPANIES_ONBORDING']['STATUS']['TIMEZONE_CAPTURED']
         ]);
 
-        
+
         return response()->json([
             'success' => true,
             'message' => 'Onboarding completed successfully',
@@ -163,7 +165,8 @@ class CompanyOnboardingController extends Controller
         ]);
     }
 
-    public function savePlan(Request $request){
+    public function savePlan(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'plan_id' => 'required|exists:plans,id'
         ]);
@@ -178,13 +181,45 @@ class CompanyOnboardingController extends Controller
         $company = auth()->user()->company;
         $company->plan_id = $request->plan_id;
         $company->save();
-        
+
         $onboarding = CompanyOnboarding::where('company_id', $company->id)->first();
+
 
         $onboarding->update([
             'plan_id' => $request->plan_id,
             'status' => CRM_STATUS_TYPES['COMPANIES_ONBORDING']['STATUS']['PLAN_CAPTURED']
         ]);
+
+        // if plan is free
+        $planOfferPrice = Plans::find($request->plan_id);
+
+        if ($planOfferPrice->offer_price <= 0) {
+
+            $paymentDetails = [
+                'payment_gateway' => 'COD',
+                'payment_type' => 'OFFLINE',
+                'transaction_reference' => json_encode([]),
+                'transaction_id' => null,
+                'amount' => 00,
+                'currency' => 'USD', // tmp
+                'company_id' => $company->id,
+                'plan_id' => $planOfferPrice->id,
+            ];
+
+
+            // Capture the redirect URL from the method
+            $redirectResponse = app(CompanyRegisterController::class)->storeCompnayAfterPaymentOnboading($paymentDetails);
+            $redirectUrl = $redirectResponse->getTargetUrl(); // Extract the URL from the redirect response
+
+            return response()->json([
+                'success' => true,
+                'nextStep' => 'complete',
+                'redirectUrl' => $redirectUrl
+            ]);
+            // return app(CompanyRegisterController::class)->storeCompanyAfterPayment($paymentDetails);
+            //return app(CompanyRegisterController::class)->storeCompnayAfterPaymentOnboading($paymentDetails);
+
+        }
 
         return response()->json([
             'success' => true,
@@ -194,33 +229,96 @@ class CompanyOnboardingController extends Controller
 
 
     }
-    public function processPayment(Request $request)
+    public function processPayment(Request $request, PaymentGatewayFactory $paymentGatewayFactory)
     {
+
+        $validator = Validator::make($request->all(), [
+            'gateway' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+
         // Integrate with your payment gateway here
         // This is a placeholder implementation
         $company = auth()->user()->company;
         $onboarding = CompanyOnboarding::where('company_id', $company->id)->first();
 
-        // Simulate payment processing
-        $paymentSuccess = $this->simulatePaymentGateway($request);
+        Log::info('Onboarding ', ['onboarding' => $onboarding]);
+        $plan = Plans::find($onboarding->plan_id);
 
-        if ($paymentSuccess) {
-            $onboarding->update([
-                'payment_completed' => true,
-                'status' => 'completed'
-            ]);
+        Log::info('Plan Details fetched ', ['plan' => $plan]);
+        $validatedData = [
+            'plan_id' => $plan->id,
+            'plan_name' => $plan->name,
+            'plan_price' => $plan->offer_price,
+            'gateway' => $request->gateway
+        ];
 
+
+        try {
+            // Validate required payment parameters
+            $this->validatePaymentParameters($validatedData);
+
+            // Get selected payment gateway
+            $gateway = $validatedData['gateway'] ?? 'stripe';
+
+            // Create payment gateway instance
+            $paymentGateway = $paymentGatewayFactory->create($gateway);
+
+            // Prepare payment details
+            $paymentDetails = [
+                'amount' => $validatedData['plan_price'],
+                'description' => "Company Registration - {$validatedData['plan_name']} Plan",
+                'currency' => getSettingValue('Currency Code'),
+                'metadata' => [
+                    'plan_id' => $validatedData['plan_id'],
+                    'company_registration' => true,
+                    'company_id' => $company->id
+                ]
+            ];
+
+            Log::info('Payment Details Passed', ['plan' => $paymentDetails]);
+            // Initialize payment
+            $paymentUrl = $paymentGateway->initialize($paymentDetails);
+
+            // Redirect to payment gateway
             return response()->json([
                 'success' => true,
-                'message' => 'Payment successful',
-                'nextStep' => 'dashboard'
+                'paymentUrl' => $paymentUrl
             ]);
-        }
 
-        return response()->json([
-            'success' => false,
-            'message' => 'Payment failed'
-        ], 400);
+        } catch (\App\Exceptions\PaymentGatewayNotFoundException $e) {
+            Log::error('Payment Gateway Error', ['gateway' => $e->getGateway()]);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Validate payment parameters
+     * 
+     * @param array $validatedData
+     * @throws \Exception
+     */
+    private function validatePaymentParameters(array $validatedData)
+    {
+        $requiredFields = [
+            'plan_id',
+            'plan_name',
+            'plan_price',
+            'gateway'
+        ];
+
+        foreach ($requiredFields as $field) {
+            if (!isset($validatedData[$field])) {
+                throw new \Exception("Missing required payment parameter: {$field}");
+            }
+        }
     }
 
     private function simulatePaymentGateway($request)
@@ -228,5 +326,14 @@ class CompanyOnboardingController extends Controller
         // Implement actual payment gateway integration
         // This is just a simulation
         return true;
+    }
+
+    public function completeOnboarding(Request $request)
+    {
+        // update compnay onbording status
+        // create permission to compnay
+        // redirect to the company dashboard
+        prePrintR($request->all());
+
     }
 }

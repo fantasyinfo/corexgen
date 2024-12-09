@@ -15,6 +15,8 @@ class CompanyOnboarding extends Model
         'currency_symbol', 
         'timezone', 
         'payment_completed', 
+        'plan_id',
+        'payment_id',
         'status'
     ];
 

@@ -10,6 +10,8 @@ use App\Services\CompanyService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Exceptions\Payment;
+use App\Models\Company;
+use App\Models\CompanyOnboarding;
 use App\Repositories\CompanyRepository;
 use App\Services\Payments\PaymentGatewayFactory;
 use Illuminate\Support\Facades\DB;
@@ -38,7 +40,7 @@ class CompanyRegisterController extends Controller
         return view('landing.register', ['plans' => $plans]);
     }
 
-   
+
     public function initPaymentForCompnayRegistration(
         CompaniesRequest $request,
         PaymentGatewayFactory $paymentGatewayFactory
@@ -75,35 +77,35 @@ class CompanyRegisterController extends Controller
     public function storeCompanyAfterPayment(array $paymentData)
     {
         $validatedData = session('pending_company_registration');
-    
+
         $validatedData['payment_details'] = $paymentData;
-    
+
         $companyService = $this->companyService;
-    
+
         try {
             $result = DB::transaction(function () use ($companyService, $validatedData) {
                 // Create company
                 $company = $companyService->createCompany($validatedData);
-    
+
                 // Find and login company owner
                 $user = $this->findCompanyOwner($company);
-    
+
                 // Login user
                 Auth::guard('web')->login($user);
-    
+
                 // Log successful registration
                 Log::info('Company Registered Successfully', [
                     'company_id' => $company->id,
                     'user_id' => $user->id
                 ]);
-    
+
                 // Return company and user instead of redirect
                 return [
                     'company' => $company,
                     'user' => $user
                 ];
             });
-    
+
             // Redirect after successful transaction
             return redirect()->route(
                 getPanelUrl(PANEL_TYPES['COMPANY_PANEL']) . '.home'
@@ -114,7 +116,74 @@ class CompanyRegisterController extends Controller
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-    
+
+            // Redirect back with error
+            return redirect()->back()->with('error', 'Registration failed: ' . $e->getMessage());
+        }
+    }
+
+    public function storeCompnayAfterPaymentOnboading(array $paymentData)
+    {
+        $companyService = $this->companyService;
+        $validatedData = [];
+        $validatedData['payment_details'] = $paymentData;
+        try {
+            $result = DB::transaction(function () use ($companyService, $validatedData) {
+
+
+                $company = Company::find($validatedData['payment_details']['company_id']);
+                // Find and login company owner
+                $user = $this->findCompanyOwner($company);
+
+                // create transaction 
+                $paymentTransaction = $companyService->createPaymentTransaction($company->plan_id, $company->id, $validatedData['payment_details']);
+
+                // create permission to company
+                $companyService->givePermissionsToCompany($company, $user);
+
+                // create menu items for compnay
+                $companyService->createMenuItemsForCompanyPanel($validatedData['payment_details']['plan_id']);
+
+                // update company onboarding status to ACTIVE
+                $onboarding = CompanyOnboarding::where('company_id', $company->id)->first();
+                $onboarding->update([
+                    'payment_completed' => '1',
+                    'payment_id' => $paymentTransaction['payment_transaction']->id,
+                    'status' => CRM_STATUS_TYPES['COMPANIES_ONBORDING']['STATUS']['COMPLETE']
+                ]);
+                // update company status to ACTIVE
+                $company->update([
+                    'payment_id' => $paymentTransaction['payment_transaction']->id,
+                    'status' => CRM_STATUS_TYPES['COMPANIES']['STATUS']['ACTIVE']
+                ]);
+
+                // Login user
+                Auth::guard('web')->login($user);
+
+                // Log successful registration
+                Log::info('Company Onboarding Successfully', [
+                    'company_id' => $company->id,
+                    'user_id' => $user->id
+                ]);
+
+                // Return company and user instead of redirect
+                return [
+                    'company' => $company,
+                    'user' => $user
+                ];
+            });
+
+            // Redirect after successful transaction
+            return redirect()->route(
+                getPanelUrl(PANEL_TYPES['COMPANY_PANEL']) . '.home'
+            );
+        } catch (\Exception $e) {
+            // Log the error
+            Log::error('Company Onboarding Failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
             // Redirect back with error
             return redirect()->back()->with('error', 'Registration failed: ' . $e->getMessage());
         }
@@ -148,7 +217,7 @@ class CompanyRegisterController extends Controller
                 'currency' => getSettingValue('Currency Code'),
                 'metadata' => [
                     'plan_id' => $validatedData['plan_id'],
-                    'company_registration' => true
+                    'company_registration' => true,
                 ]
             ];
 
