@@ -73,6 +73,38 @@ class CompanyRegisterController extends Controller
     }
 
 
+    public function store(CompaniesRequest $request, CompanyService $companyService)
+    {
+        try {
+            $result = $companyService->createCompany($request->validated());
+
+            Log::info('Company Creation Result', ['result' => $result]);
+
+            if (!isset($result['company'], $result['company_admin'])) {
+                throw new \Exception('Invalid company creation result structure');
+            }
+
+            $company = $result['company'];
+            $user = $result['company_admin'];
+
+            Auth::guard('web')->loginUsingId($user->id);
+
+            return redirect()
+                ->route('onboarding.index')
+                ->with('success', 'Company created successfully.');
+
+        } catch (\Exception $e) {
+            Log::error('Company creation failed', [
+                'error' => $e->getMessage(),
+                'input' => $request->validated()
+            ]);
+
+            return redirect()
+                ->back()
+                ->withErrors(['error' => 'Company creation failed: ' . $e->getMessage()]);
+        }
+    }
+
 
     public function storeCompanyAfterPayment(array $paymentData)
     {

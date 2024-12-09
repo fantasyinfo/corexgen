@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -15,11 +14,12 @@ return new class extends Migration
             $table->id();
             $table->string('menu_name');
             $table->string('menu_url');
-            $table->enum('parent_menu',['1','2'])->default('1');
-            $table->bigInteger('parent_menu_id',)->nullable();
-            $table->bigInteger('permission_id',)->nullable();
+            $table->enum('parent_menu', ['1', '2'])->default('1');
+            $table->bigInteger('parent_menu_id', )->nullable();
+            $table->bigInteger('permission_id', )->nullable();
             $table->string('menu_icon')->nullable();
             $table->enum('panel_type', array_keys(PANEL_TYPES));
+            $table->unique(['panel_type', 'permission_id'], 'panel_type_permission_id_unique');
             $table->timestamps();
         });
     }

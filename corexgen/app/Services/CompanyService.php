@@ -360,19 +360,37 @@ class CompanyService
     {
         DB::beginTransaction();
         try {
-            $parentMenuId = DB::table('crm_menu')->insertGetId([
-                'menu_name' => $category,
-                'menu_url' => '',
-                'parent_menu' => '1',
-                'parent_menu_id' => null,
-                'menu_icon' => $menuData['menu_icon'],
-                'permission_id' => $menuData['permission_id'],
-                'panel_type' => PANEL_TYPES['COMPANY_PANEL'],
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            // Check if parent menu already exists
+            $existingParentMenu = DB::table('crm_menu')
+                ->where('menu_name', $category)
+                ->where('panel_type', PANEL_TYPES['COMPANY_PANEL'])
+                ->first();
+
+            $parentMenuId = $existingParentMenu
+                ? $existingParentMenu->id
+                : DB::table('crm_menu')->insertGetId([
+                    'menu_name' => $category,
+                    'menu_url' => '',
+                    'parent_menu' => '1',
+                    'parent_menu_id' => null,
+                    'menu_icon' => $menuData['menu_icon'],
+                    'permission_id' => $menuData['permission_id'],
+                    'panel_type' => PANEL_TYPES['COMPANY_PANEL'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
 
             $childMenus = collect($menuData['children'])->map(function ($childMenuData, $menuName) use ($parentMenuId) {
+                // Check if child menu already exists
+                $existingChildMenu = DB::table('crm_menu')
+                    ->where('menu_name', $menuName)
+                    ->where('parent_menu_id', $parentMenuId)
+                    ->first();
+
+                if ($existingChildMenu) {
+                    return null; // Skip existing child menus
+                }
+
                 return [
                     'menu_name' => $menuName,
                     'menu_url' => $childMenuData['menu_url'],
@@ -384,9 +402,13 @@ class CompanyService
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
-            })->toArray();
+            })
+                ->filter() // Remove null entries
+                ->toArray();
 
-            DB::table('crm_menu')->insert($childMenus);
+            if (!empty($childMenus)) {
+                DB::table('crm_menu')->insert($childMenus);
+            }
 
             DB::commit();
         } catch (\Exception $e) {

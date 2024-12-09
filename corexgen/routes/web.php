@@ -63,7 +63,7 @@ Route::prefix('installer')->group(function () {
 
 
 
-// Example of applying it to a group of routes
+// home route of applying it to a group of routes
 Route::middleware(['check.installation'])->group(function () {
     // All routes that require the installation to be completed
     Route::get('/', function () {
@@ -80,7 +80,7 @@ Route::middleware(['check.installation'])->group(function () {
 
 
     Route::get('/company/register', [CompanyRegisterController::class, 'register'])->name('compnay.landing-register');
-    Route::post('/company/register', [CompanyRegisterController::class, 'initPaymentForCompnayRegistration'])->name('company.register');
+    Route::post('/company/register', [CompanyRegisterController::class, 'store'])->name('company.register');
 
 
     Route::get('/login', function () {
