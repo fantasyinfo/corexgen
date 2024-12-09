@@ -17,16 +17,10 @@ return new class extends Migration {
             $table->string('currency_code')->nullable();
             $table->string('currency_symbol')->nullable();
             $table->string('timezone')->nullable();
+            $table->string('plan_id')->nullable();
+            $table->string('payment_id')->nullable();
             $table->boolean('payment_completed')->default(false);
-            $table->enum('status', [
-                'not_started',
-                'in_progress',
-                'address_captured',
-                'currency_captured',
-                'timezone_captured',
-                'payment_pending',
-                'completed'
-            ])->default('not_started');
+            $table->enum('status', CRM_STATUS_TYPES['COMPANIES_ONBORDING']['TABLE_STATUS'])->default(CRM_STATUS_TYPES['COMPANIES_ONBORDING']['STATUS']['NOT_STARTED']);
 
             $table->foreign('company_id')
                 ->references('id')

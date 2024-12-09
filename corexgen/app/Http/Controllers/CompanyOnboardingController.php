@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Company;
 use App\Models\CompanyOnboarding;
 use App\Models\Country;
+use App\Models\Plans;
 use DateTimeZone;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -18,13 +19,14 @@ class CompanyOnboardingController extends Controller
         $company = auth()->user()->company;
         $onboarding = CompanyOnboarding::firstOrCreate(
             ['company_id' => $company->id],
-            ['status' => 'not_started']
+            ['status' => CRM_STATUS_TYPES['COMPANIES_ONBORDING']['STATUS']['NOT_STARTED']]
         );
 
         $countries = Country::all();
+        $plans = Plans::all();
         // Get timezones from PHP
         $timezones = DateTimeZone::listIdentifiers();
-        return view('companyonbording.index', compact('company', 'onboarding', 'countries', 'timezones'));
+        return view('companyonbording.index', compact('company', 'onboarding', 'countries', 'timezones','plans'));
     }
 
     public function saveAddress(Request $request)
@@ -55,7 +57,7 @@ class CompanyOnboardingController extends Controller
 
         $onboarding->update([
             'address' => $fullAddress,
-            'status' => 'address_captured'
+            'status' => CRM_STATUS_TYPES['COMPANIES_ONBORDING']['STATUS']['ADDRESS_CAPTURED']
         ]);
 
         // create address
@@ -122,7 +124,7 @@ class CompanyOnboardingController extends Controller
         $onboarding->update([
             'currency_code' => $request->currency_code,
             'currency_symbol' => $request->currency_symbol,
-            'status' => 'currency_captured'
+            'status' => CRM_STATUS_TYPES['COMPANIES_ONBORDING']['STATUS']['CURRENCY_CAPTURED']
         ]);
 
         return response()->json([
@@ -150,32 +152,48 @@ class CompanyOnboardingController extends Controller
 
         $onboarding->update([
             'timezone' => $request->timezone,
-            'status' => 'timezone_captured'
+            'status' => CRM_STATUS_TYPES['COMPANIES_ONBORDING']['STATUS']['TIMEZONE_CAPTURED']
         ]);
 
-        // Check if payment is required
-        $company = $company->fresh();
-        if ($company->plan->requires_payment) {
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Onboarding completed successfully',
+            'nextStep' => 'plan'
+        ]);
+    }
+
+    public function savePlan(Request $request){
+        $validator = Validator::make($request->all(), [
+            'plan_id' => 'required|exists:plans,id'
+        ]);
+
+        if ($validator->fails()) {
             return response()->json([
-                'success' => true,
-                'message' => 'Timezone saved successfully',
-                'nextStep' => 'payment'
-            ]);
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
         }
 
-        // If no payment required, complete onboarding
+        $company = auth()->user()->company;
+        $company->plan_id = $request->plan_id;
+        $company->save();
+        
+        $onboarding = CompanyOnboarding::where('company_id', $company->id)->first();
+
         $onboarding->update([
-            'payment_completed' => true,
-            'status' => 'completed'
+            'plan_id' => $request->plan_id,
+            'status' => CRM_STATUS_TYPES['COMPANIES_ONBORDING']['STATUS']['PLAN_CAPTURED']
         ]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Onboarding completed successfully',
-            'nextStep' => 'dashboard'
+            'message' => 'Plan Captured successfully',
+            'nextStep' => 'payment'
         ]);
-    }
 
+
+    }
     public function processPayment(Request $request)
     {
         // Integrate with your payment gateway here

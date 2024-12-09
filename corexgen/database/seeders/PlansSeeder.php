@@ -16,13 +16,13 @@ class PlansSeeder extends Seeder
     public function run(): void
     {
         $plans = [
-            'silver' => [
-                'name' => 'Silver',
-                'desc' => 'For Startups',
-                'price' => 109.99,
-                'offer_price' => 99.99,
+            'free' => [
+                'name' => 'Free',
+                'desc' => 'For Learning',
+                'price' => 00,
+                'offer_price' => 00,
                 'billing_cycle' => PLANS_BILLING_CYCLES['BILLINGS']['1 MONTH'],
-                'value' => 10
+                'value' => 2
             ],
             'gold' => [
                 'name' => 'Gold',
@@ -41,6 +41,11 @@ class PlansSeeder extends Seeder
                 'value' => -1
             ]
         ];
+
+        // delete all exiting first
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        Plans::truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     
         DB::beginTransaction();
         try {

@@ -135,11 +135,38 @@
                 </div>
 
                 <!-- Step 4: Payment (if required) -->
-                <div class="step" id="paymentStep">
-                    <h2 class="text-center mb-4">Complete Payment</h2>
+                <div class="step" id="planStep">
+                    <h2 class="text-center mb-4">Select Plan</h2>
                     <!-- Payment gateway integration goes here -->
+                    <div class="col-12 mb-3">
+                        <select class="form-control" name="plan_id" required>
+                            <option value="">Select Plans</option>
+                            @foreach ($plans as $plan)
+                                <option value="{{ $plan->id }}">{{ $plan->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+               
                     <div class="col-12">
-                        <button type="button" class="btn btn-primary w-100" id="paymentBtn">Complete Payment</button>
+                        <button type="button" class="btn btn-primary w-100" id="planNextBtn">Select Plan</button>
+                    </div>
+                </div>
+
+                <div class="step" id="paymentStep">
+                    <h2 class="text-center mb-4">Select Payment</h2>
+                    <!-- Payment gateway integration goes here -->
+                    <div class="col-12 mb-3">
+                        <select class="form-control" name="gateway" required>
+                            <option value="">Select Payment</option>
+                  
+                                <option value="stripe">Stripe</option>
+                                <option value="paypal">Paypal</option>
+                         
+                        </select>
+                    </div>
+               
+                    <div class="col-12">
+                        <button type="button" class="btn btn-primary w-100" id="paymentNextBtn">Select Payment Type</button>
                     </div>
                 </div>
             </form>
@@ -162,6 +189,8 @@
             const $addressNextBtn = $('#addressNextBtn');
             const $currencyNextBtn = $('#currencyNextBtn');
             const $timezoneNextBtn = $('#timezoneNextBtn');
+            const $planNextBtn = $('#planNextBtn');
+            const $paymentNextBtn = $('#paymentNextBtn');
             const $paymentBtn = $('#paymentBtn');
 
             // Define steps
@@ -178,6 +207,11 @@
                 {
                     id: 'timezoneStep',
                     endpoint: '/onboarding/timezone',
+                    nextStep: 'planStep'
+                },
+                {
+                    id: 'planStep',
+                    endpoint: '/onboarding/plan',
                     nextStep: 'paymentStep'
                 },
                 {
@@ -233,7 +267,7 @@
                                 .attr('aria-valuenow', progress);
 
                             // Special handling for timezone step (check payment requirement)
-                            if (currentStep.id === 'timezoneStep' && response.nextStep ===
+                            if (currentStep.id === 'planStep' && response.nextStep ===
                                 'dashboard') {
                                 window.location.href = '/dashboard';
                             }
@@ -255,7 +289,9 @@
             $addressNextBtn.on('click', () => validateAndSubmitStep(0));
             $currencyNextBtn.on('click', () => validateAndSubmitStep(1));
             $timezoneNextBtn.on('click', () => validateAndSubmitStep(2));
-            $paymentBtn.on('click', () => validateAndSubmitStep(3));
+            $planNextBtn.on('click', () => validateAndSubmitStep(3));
+            $paymentNextBtn.on('click', () => validateAndSubmitStep(4));
+            //$paymentBtn.on('click', () => validateAndSubmitStep(3));
 
             // Remove invalid class on input
             $form.on('input', 'input, select', function() {

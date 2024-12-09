@@ -249,9 +249,24 @@ PermissionsHelper::initializePermissions();
         'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger'],
     ],
     'COMPANIES' => [
-        'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE', 'BANNED','ONBOARDING'],
-        'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE', 'BANNED' => 'BANNED','ONBOARDING' => 'ONBOARDING'],
-        'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger', 'BANNED' => 'warning','ONBOARDING'=>'info'],
+        'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE', 'BANNED', 'ONBOARDING'],
+        'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE', 'BANNED' => 'BANNED', 'ONBOARDING' => 'ONBOARDING'],
+        'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger', 'BANNED' => 'warning', 'ONBOARDING' => 'info'],
+    ],
+
+    'COMPANIES_ONBORDING' => [
+        'TABLE_STATUS' => ['NOT_STARTED', 'IN_PROGRESS', 'ADDRESS_CAPTURED', 'CURRENCY_CAPTURED', 'TIMEZONE_CAPTURED', 'PLAN_CAPTURED', 'PAYMENT_PENDING', 'COMPLETE'],
+        'STATUS' => [
+            'NOT_STARTED' => 'NOT_STARTED',
+            'IN_PROGRESS' => 'IN_PROGRESS',
+            'ADDRESS_CAPTURED' => 'ADDRESS_CAPTURED',
+            'CURRENCY_CAPTURED' => 'CURRENCY_CAPTURED',
+            'TIMEZONE_CAPTURED' => 'TIMEZONE_CAPTURED',
+            'PLAN_CAPTURED' => 'PLAN_CAPTURED',
+            'PAYMENT_PENDING' => 'PAYMENT_PENDING',
+            'COMPLETE' => 'COMPLETE',
+        ],
+        'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger', 'BANNED' => 'warning', 'ONBOARDING' => 'info'],
     ],
     'USERS' => [
         'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE', 'BANNED'],

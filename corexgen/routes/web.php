@@ -104,6 +104,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/onboarding/timezone', [CompanyOnboardingController::class, 'saveTimezone'])
          ->name('onboarding.timezone');
     
+    Route::post('/onboarding/plan', [CompanyOnboardingController::class, 'savePlan'])
+         ->name('onboarding.plan');
+
     Route::post('/onboarding/payment', [CompanyOnboardingController::class, 'processPayment'])
          ->name('onboarding.payment');
 });
