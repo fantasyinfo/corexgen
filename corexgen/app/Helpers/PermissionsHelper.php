@@ -18,7 +18,8 @@ class PermissionsHelper
         'MODULES' => 'MODULES',
         'APPUPDATES' => 'APPUPDATES',
         'COMPANIES' => 'COMPANIES',
-        'PLANS' => 'PLANS'
+        'PLANS' => 'PLANS',
+        'PAYMENTSTRANSACTIONS' => 'PAYMENTSTRANSACTIONS'
     ];
 
 
@@ -53,7 +54,10 @@ class PermissionsHelper
 
             self::$plansPermissionsKeys['COMPANIES'] => [851 => 'CREATE', 852 => 'READ', 853 => 'READ_ALL', 854 => 'UPDATE', 855 => 'DELETE', 856 => 'IMPORT', 857 => 'EXPORT', 858 => 'FILTER', 859 => 'CHANGE_STATUS', 860 => 'VIEW', 861 => 'LOGIN_AS', 862 => 'BULK_DELETE', 863 => 'CHANGE_PASSWORD'],
 
-            self::$plansPermissionsKeys['PLANS'] => [901 => 'CREATE', 902 => 'READ', 903 => 'READ_ALL', 904 => 'UPDATE', 905 => 'DELETE', 906 => 'CHANGE_STATUS']
+            self::$plansPermissionsKeys['PLANS'] => [901 => 'CREATE', 902 => 'READ', 903 => 'READ_ALL', 904 => 'UPDATE', 905 => 'DELETE', 906 => 'CHANGE_STATUS'],
+
+
+            self::$plansPermissionsKeys['PAYMENTSTRANSACTIONS'] => [951 => 'CREATE', 952 => 'READ', 953 => 'READ_ALL', 954 => 'UPDATE', 955 => 'DELETE', 956 => 'CHANGE_STATUS']
         ];
     }
 

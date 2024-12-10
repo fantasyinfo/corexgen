@@ -13,6 +13,7 @@ use App\Http\Controllers\ModuleController;
 
 use App\Http\Controllers\Payments\PaymentGatewayController;
 use App\Http\Controllers\PlansController;
+use App\Http\Controllers\PlansPaymentTransaction;
 use App\Http\Controllers\SystemInstallerController;
 use App\Http\Controllers\UserController;
 use App\Models\City;
@@ -405,6 +406,25 @@ Route::middleware([
             [PlansController::class, 'changeStatus']
         )->name('changeStatus')->middleware('check.permission:PLANS.CHANGE_STATUS');
         Route::delete('/destroy/{id}', [PlansController::class, 'destroy'])->name('destroy')->middleware('check.permission:PLANS.DELETE');
+
+
+    });
+
+    // planPaymentTransaction routes
+    Route::prefix('planPaymentTransaction')->as('planPaymentTransaction.')->group(function () {
+        // role for fetch, store, update
+        Route::get('/', [PlansPaymentTransaction::class, 'index'])->name('index')->middleware('check.permission:PAYMENTSTRANSACTIONS.READ_ALL');
+        Route::post('/', [PlansPaymentTransaction::class, 'store'])->name('store')->middleware('check.permission:PAYMENTSTRANSACTIONS.CREATE');
+        Route::put('/', [PlansPaymentTransaction::class, 'update'])->name('update')->middleware('check.permission:PAYMENTSTRANSACTIONS.UPDATE');
+
+        // create, edit, change status, delete
+        Route::get('/create', [PlansPaymentTransaction::class, 'create'])->name('create')->middleware('check.permission:PAYMENTSTRANSACTIONS.CREATE');
+        Route::get('/edit/{id}', [PlansPaymentTransaction::class, 'edit'])->name('edit')->middleware('check.permission:PAYMENTSTRANSACTIONS.UPDATE');
+        Route::get(
+            '/changeStatus/{id}/{status}',
+            [PlansPaymentTransaction::class, 'changeStatus']
+        )->name('changeStatus')->middleware('check.permission:PAYMENTSTRANSACTIONS.CHANGE_STATUS');
+        Route::delete('/destroy/{id}', [PlansPaymentTransaction::class, 'destroy'])->name('destroy')->middleware('check.permission:PAYMENTSTRANSACTIONS.DELETE');
 
 
     });

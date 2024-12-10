@@ -29,6 +29,16 @@ php artisan migrate:rollback --step=1
 php artisan make:job SeedCountriesCities
 
 
+// steps for making a crud
+create migrations
+create model
+create controller 
+create request
+create repository
+create service
+
+
+
 /usr/local/bin/php /home/your-username/public_html/artisan queue:work --daemon
 
 php artisan queue:work
