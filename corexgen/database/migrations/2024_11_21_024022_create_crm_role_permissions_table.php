@@ -25,7 +25,7 @@ return new class extends Migration
     
 
               // Unique constraint on company_id and permission_id
-            $table->unique(['company_id', 'permission_id'], 'company_permission_unique');
+            $table->unique(['company_id', 'permission_id','role_id'], 'company_permission_role_unique');
 
             $table->timestamps();
         });

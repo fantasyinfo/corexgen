@@ -26,8 +26,8 @@ class CRMSettingsSeeder extends Seeder
                 'input_type' => $setting['input_type'],
                 'is_tenant' => $setting['is_tenant'],
                 'company_id' => $setting['company_id'],
-                'updated_by' => Auth::id() ?? '1',
-                'created_by' => Auth::id() ?? '1',
+                'updated_by' => Auth::id() ?? null,
+                'created_by' => Auth::id() ?? null,
             ]);
         }
     }

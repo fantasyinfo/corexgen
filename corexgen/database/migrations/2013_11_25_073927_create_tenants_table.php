@@ -17,6 +17,9 @@ return new class extends Migration
             $table->string('domain');
             $table->json('settings')->nullable();
             $table->enum('status', CRM_STATUS_TYPES['TENANTS']['TABLE_STATUS']);
+            $table->string('currency_code')->nullable();
+            $table->string('currency_symbol')->nullable();
+            $table->string('timezone')->nullable();
             $table->timestamps();
         });
     }
