@@ -115,7 +115,7 @@ class ModuleController extends Controller
     private function updateComposerJson($filename)
     {
         // Run the updateComposerJson.php script
-        require_once base_path($filename);
+        require_once base_path('composers_task/' . $filename);
         Log::info('COmposer Update file called.');
     }
 

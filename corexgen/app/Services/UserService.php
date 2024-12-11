@@ -150,6 +150,7 @@ class UserService
     {
         $query = $this->userRepository->getUsersQuery($request);
         $module = PANEL_MODULES[$this->getPanelModule()]['users'];
+        $this->tenantRoute = $this->getTenantRoute();
 
         return DataTables::of($query)
             ->addColumn('actions', function ($user) {

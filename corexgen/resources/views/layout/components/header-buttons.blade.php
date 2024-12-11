@@ -1,7 +1,10 @@
 <div class="mb-3 d-flex justify-content-end">
+    @if( (isset($permissions['CREATE']) && hasPermission(strtoupper($module) . '.' . $permissions['CREATE']['KEY'])) )
+
     <a href="{{ route(getPanelRoutes($module . '.create')) }}" class="btn btn-primary btn-xl me-2">
         <i class="fas fa-plus"></i> {{ __('crud.Create New') }}
     </a>
+    @endif
 
     @if (
         (isset($permissions['EXPORT']) && hasPermission(strtoupper($module) . '.' . $permissions['EXPORT']['KEY'])) ||

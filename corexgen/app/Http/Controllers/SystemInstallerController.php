@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Tenant;
 use App\Models\User;
+use DateTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Artisan;
@@ -19,7 +20,7 @@ use Illuminate\Support\Facades\Config;
  * Installer for software SystemInstallerController
  */
 class SystemInstallerController extends Controller
-{    
+{
     /**
      * Method showInstaller
      * showing the view of installer
@@ -31,9 +32,11 @@ class SystemInstallerController extends Controller
         if (File::exists(storage_path('installed.lock'))) {
             return redirect()->route('login');
         }
-        return view('installer.index');
+
+        $timezones = DateTimeZone::listIdentifiers();
+        return view('installer.index', compact('timezones'));
     }
-    
+
     /**
      * requiredExtensions for software to run
      *
@@ -49,7 +52,7 @@ class SystemInstallerController extends Controller
         'json',
         'zip'
     ];
-    
+
     /**
      * Method checkSystemRequirements
      * checking system requirements
@@ -71,7 +74,7 @@ class SystemInstallerController extends Controller
         ]);
     }
 
-        
+
     /**
      * Method verifyPurchaseCodeEndpoint
      *
@@ -96,7 +99,7 @@ class SystemInstallerController extends Controller
             'message' => $isValid ? 'Purchase code verified successfully' : 'Invalid purchase code'
         ]);
     }
-    
+
     /**
      * Method testSmtpConnection
      *
@@ -132,9 +135,9 @@ class SystemInstallerController extends Controller
             ]);
 
             // Try to send a test email
-            Mail::raw('Test email from installer', function($message) use ($request) {
+            Mail::raw('Test email from installer', function ($message) use ($request) {
                 $message->to($request->mail_from_address)
-                        ->subject('SMTP Test Email');
+                    ->subject('SMTP Test Email');
             });
 
             return response()->json(['success' => true]);
@@ -145,7 +148,7 @@ class SystemInstallerController extends Controller
             ], 500);
         }
     }
-    
+
     /**
      * Method testDatabaseConnection
      *
@@ -190,7 +193,7 @@ class SystemInstallerController extends Controller
         }
     }
 
-    
+
     /**
      * Method reConnectDB
      *
@@ -225,7 +228,7 @@ class SystemInstallerController extends Controller
         \Log::info('DB is Reconnected.');
     }
 
-    
+
     /**
      * Method ensureDatabaseExists
      * checking database is exists
@@ -255,7 +258,7 @@ class SystemInstallerController extends Controller
         }
     }
 
-    
+
     /**
      * Method installApplication
      *
@@ -288,7 +291,7 @@ class SystemInstallerController extends Controller
             \Log::info('DB Transaction Begin');
             DB::beginTransaction();
 
-         
+
 
             $validator = Validator::make($request->all(), [
                 'site_name' => 'required|string|max:255',
@@ -318,6 +321,13 @@ class SystemInstallerController extends Controller
                 ], 422);
             }
 
+            // remove old config file if exists
+            \Log::info('Unlinking the old cache file if exists.');
+            if (file_exists(base_path('/bootstrap/cache/config.php'))) {
+                unlink(base_path('/bootstrap/cache/config.php'));
+            }
+
+
 
             \Log::info('Migration Started.');
             // Run migrations
@@ -331,7 +341,7 @@ class SystemInstallerController extends Controller
             // Create super admin
             $user = $this->createSuperAdmin($request);
 
-          
+
 
             // Create installation lock file
             File::put(storage_path('installed.lock'), 'Installation completed on ' . now());
@@ -379,7 +389,7 @@ class SystemInstallerController extends Controller
             ], 500);
         }
     }
-    
+
     /**
      * Method verifyPurchaseCode
      *
@@ -393,7 +403,7 @@ class SystemInstallerController extends Controller
         // This is a placeholder - replace with actual verification
         return true;
     }
-    
+
     /**
      * Method updateEnvironmentFile
      *
@@ -404,7 +414,7 @@ class SystemInstallerController extends Controller
     private function updateEnvironmentFile(Request $request)
     {
         $envPath = base_path('.env');
-        
+
         if (!File::exists($envPath)) {
             throw new \Exception('.env file not found.');
         }
@@ -448,7 +458,7 @@ class SystemInstallerController extends Controller
 
         File::put($envPath, implode("\n", $lines));
     }
-    
+
     /**
      * Method checkExtensions
      * checking extenstions
@@ -459,7 +469,7 @@ class SystemInstallerController extends Controller
         return collect($this->requiredExtensions)
             ->mapWithKeys(fn($ext) => [$ext => extension_loaded($ext)]);
     }
-    
+
     /**
      * Method runSeeders
      * running the seeder to create required data into db
@@ -474,9 +484,9 @@ class SystemInstallerController extends Controller
         Artisan::call('db:seed', ['--class' => 'CRMRoleSeeder']);
         Artisan::call('db:seed', ['--class' => 'CRMSettingsSeeder']);
         Artisan::call('db:seed', ['--class' => 'PlansSeeder']);
-    
+
     }
-    
+
     /**
      * Method createSuperAdmin
      *
@@ -486,10 +496,13 @@ class SystemInstallerController extends Controller
      */
     private function createSuperAdmin(Request $request)
     {
-     
+
         $tenant = Tenant::create([
             'name' => $request->name,
             'domain' => $request->admin_email,
+            'currency_code' => $request->currency_code,
+            'currency_symbol' => $request->currency_symbol,
+            'timezone' => $request->timezone,
             'settings' => json_encode([$request->all()])
         ]);
 

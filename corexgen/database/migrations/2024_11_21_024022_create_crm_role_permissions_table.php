@@ -24,6 +24,9 @@ return new class extends Migration
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
     
 
+              // Unique constraint on company_id and permission_id
+            $table->unique(['company_id', 'permission_id','role_id'], 'company_permission_role_unique');
+
             $table->timestamps();
         });
     }

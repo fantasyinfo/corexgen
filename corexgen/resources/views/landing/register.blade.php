@@ -73,7 +73,7 @@
 
                                     </select>
                                 </div>
-                                <div class="mb-3">
+                                {{-- <div class="mb-3">
                                     <label for="choose_plan" class="form-label">Choose Gateway</label>
                                     @php
                                         $gateways = ['paypal','stripe'];
@@ -90,7 +90,7 @@
 
 
                                     </select>
-                                </div>
+                                </div> --}}
                                 <div class="d-grid">
                                     <button type="submit" class="btn btn-primary">Register</button>
                                 </div>

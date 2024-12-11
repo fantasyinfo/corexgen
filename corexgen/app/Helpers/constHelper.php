@@ -60,6 +60,11 @@ PermissionsHelper::initializePermissions();
         'id' => PermissionsHelper::getParentPermissionId('9'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['COMPANIES']
     ],
+    PermissionsHelper::$plansPermissionsKeys['PAYMENTSTRANSACTIONS'] => [
+        'name' => 'PAYMENTSTRANSACTIONS',
+        'id' => PermissionsHelper::getParentPermissionId('10'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['PAYMENTSTRANSACTIONS']
+    ],
 ]);
 
 // super panel menus
@@ -90,11 +95,11 @@ PermissionsHelper::initializePermissions();
             'Users' => ['menu_url' => 'users.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['USERS'], 'READ_ALL')],
         ]
     ],
-    'Compaines' => [
+    'Companies' => [
         'menu_icon' => 'fa-building',
         'permission_id' => PermissionsHelper::getParentPermissionId('4'),
         'children' => [
-            'Compaines' => ['menu_url' => 'companies.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['COMPANIES'], 'READ_ALL')],
+            'Companies' => ['menu_url' => 'companies.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['COMPANIES'], 'READ_ALL')],
         ]
     ],
     'Plans' => [
@@ -102,6 +107,14 @@ PermissionsHelper::initializePermissions();
         'permission_id' => PermissionsHelper::getParentPermissionId('5'),
         'children' => [
             'Plans' => ['menu_url' => 'plans.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PLANS'], 'READ_ALL')],
+
+        ]
+    ],
+    'Payment Transactions' => [
+        'menu_icon' => 'fas fa-file-invoice-dollar',
+        'permission_id' => PermissionsHelper::getParentPermissionId('10'),
+        'children' => [
+            'Transactions' => ['menu_url' => 'planPaymentTransaction.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PAYMENTSTRANSACTIONS'], 'READ_ALL')],
 
         ]
     ],
@@ -249,9 +262,24 @@ PermissionsHelper::initializePermissions();
         'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger'],
     ],
     'COMPANIES' => [
-        'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE', 'BANNED'],
-        'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE', 'BANNED' => 'BANNED'],
-        'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger', 'BANNED' => 'warning'],
+        'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE', 'BANNED', 'ONBOARDING'],
+        'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE', 'BANNED' => 'BANNED', 'ONBOARDING' => 'ONBOARDING'],
+        'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger', 'BANNED' => 'warning', 'ONBOARDING' => 'info'],
+    ],
+
+    'COMPANIES_ONBORDING' => [
+        'TABLE_STATUS' => ['NOT_STARTED', 'IN_PROGRESS', 'ADDRESS_CAPTURED', 'CURRENCY_CAPTURED', 'TIMEZONE_CAPTURED', 'PLAN_CAPTURED', 'PAYMENT_PENDING', 'COMPLETE'],
+        'STATUS' => [
+            'NOT_STARTED' => 'NOT_STARTED',
+            'IN_PROGRESS' => 'IN_PROGRESS',
+            'ADDRESS_CAPTURED' => 'ADDRESS_CAPTURED',
+            'CURRENCY_CAPTURED' => 'CURRENCY_CAPTURED',
+            'TIMEZONE_CAPTURED' => 'TIMEZONE_CAPTURED',
+            'PLAN_CAPTURED' => 'PLAN_CAPTURED',
+            'PAYMENT_PENDING' => 'PAYMENT_PENDING',
+            'COMPLETE' => 'COMPLETE',
+        ],
+        'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger', 'BANNED' => 'warning', 'ONBOARDING' => 'info'],
     ],
     'USERS' => [
         'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE', 'BANNED'],
@@ -278,7 +306,7 @@ PermissionsHelper::initializePermissions();
         'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE'],
         'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger'],
     ],
-    'TRANSACTIONS' => [
+    'PAYMENTSTRANSACTIONS' => [
         'TABLE_STATUS' => ['SUCCESS', 'FAILED', 'PENDING'],
         'STATUS' => ['SUCCESS' => 'SUCCESS', 'FAILED' => 'FAILED', 'PENDING' => 'PENDING'],
         'BT_CLASSES' => ['SUCCESS' => 'success', 'FAILED' => 'danger', 'PENDING' => 'warning'],
@@ -291,6 +319,7 @@ PermissionsHelper::initializePermissions();
     'COMPANY_PANEL' => 'COMPANY_PANEL'
 ]);
 
+// web.php file prefix for routes
 !defined('PANEL_MODULES') && define('PANEL_MODULES', [
     'SUPER_PANEL' => [
         'dashboard' => 'dashboard',
@@ -302,6 +331,7 @@ PermissionsHelper::initializePermissions();
         'appupdates' => 'appupdates',
         'companies' => 'companies',
         'plans' => 'plans',
+        'planPaymentTransaction' => 'planPaymentTransaction',
 
 
     ],

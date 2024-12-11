@@ -73,5 +73,6 @@ class Kernel extends HttpKernel
         'check.permission' => \App\Http\Middleware\CheckRolePermission::class,
         'check.installation' => \App\Http\Middleware\CheckInstallation::class,
         'payment.debug' => \App\Http\Middleware\DebugPaymentCallback::class,
+        'company.onboarding' => \App\Http\Middleware\CompanyOnboarding::class,
     ];
 }

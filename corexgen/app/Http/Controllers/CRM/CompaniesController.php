@@ -128,6 +128,7 @@ class CompaniesController extends Controller
         try {
             $company = $companyService->createCompany($request->validated());
 
+            
             return redirect()
                 ->route($this->getTenantRoute() . 'companies.index')
                 ->with('success', 'Company created successfully.');

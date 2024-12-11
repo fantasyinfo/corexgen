@@ -2,6 +2,7 @@
 
 // crm routes
 use App\Http\Controllers\AppUpdateController;
+use App\Http\Controllers\CompanyOnboardingController;
 use App\Http\Controllers\CompanyRegisterController;
 use App\Http\Controllers\CountryCitySeederController;
 use App\Http\Controllers\CRM\CompaniesController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\ModuleController;
 
 use App\Http\Controllers\Payments\PaymentGatewayController;
 use App\Http\Controllers\PlansController;
+use App\Http\Controllers\PlansPaymentTransaction;
 use App\Http\Controllers\SystemInstallerController;
 use App\Http\Controllers\UserController;
 use App\Models\City;
@@ -62,7 +64,7 @@ Route::prefix('installer')->group(function () {
 
 
 
-// Example of applying it to a group of routes
+// home route of applying it to a group of routes
 Route::middleware(['check.installation'])->group(function () {
     // All routes that require the installation to be completed
     Route::get('/', function () {
@@ -79,7 +81,7 @@ Route::middleware(['check.installation'])->group(function () {
 
 
     Route::get('/company/register', [CompanyRegisterController::class, 'register'])->name('compnay.landing-register');
-    Route::post('/company/register', [CompanyRegisterController::class, 'initPaymentForCompnayRegistration'])->name('company.register');
+    Route::post('/company/register', [CompanyRegisterController::class, 'store'])->name('company.register');
 
 
     Route::get('/login', function () {
@@ -89,6 +91,29 @@ Route::middleware(['check.installation'])->group(function () {
 });
 
 
+// company onboarding
+Route::middleware(['auth'])->group(function () {
+    Route::get('/onboarding', [CompanyOnboardingController::class, 'showOnboardingForm'])
+         ->name('onboarding.index');
+    
+    Route::post('/onboarding/address', [CompanyOnboardingController::class, 'saveAddress'])
+         ->name('onboarding.address');
+    
+    Route::post('/onboarding/currency', [CompanyOnboardingController::class, 'saveCurrency'])
+         ->name('onboarding.currency');
+    
+    Route::post('/onboarding/timezone', [CompanyOnboardingController::class, 'saveTimezone'])
+         ->name('onboarding.timezone');
+    
+    Route::post('/onboarding/plan', [CompanyOnboardingController::class, 'savePlan'])
+         ->name('onboarding.plan');
+
+    Route::post('/onboarding/payment', [CompanyOnboardingController::class, 'processPayment'])
+         ->name('onboarding.payment');
+
+    Route::post('/onboarding/complete', [CompanyOnboardingController::class, 'completeOnboarding'])
+         ->name('onboarding.complete');
+});
 
 // payment gateway routes
 Route::prefix('payments')->group(function () {
@@ -158,6 +183,7 @@ Route::get('/add-default-countries-cities', [CountryCitySeederController::class,
 // crm routes
 Route::middleware([
     'auth:sanctum',
+    'company.onboarding',
     // config('jetstream.auth_session'),
     'check.installation'
 ])->prefix(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']))->as(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']) . '.')->group(function () {
@@ -380,6 +406,25 @@ Route::middleware([
             [PlansController::class, 'changeStatus']
         )->name('changeStatus')->middleware('check.permission:PLANS.CHANGE_STATUS');
         Route::delete('/destroy/{id}', [PlansController::class, 'destroy'])->name('destroy')->middleware('check.permission:PLANS.DELETE');
+
+
+    });
+
+    // planPaymentTransaction routes
+    Route::prefix('planPaymentTransaction')->as('planPaymentTransaction.')->group(function () {
+        // role for fetch, store, update
+        Route::get('/', [PlansPaymentTransaction::class, 'index'])->name('index')->middleware('check.permission:PAYMENTSTRANSACTIONS.READ_ALL');
+        Route::post('/', [PlansPaymentTransaction::class, 'store'])->name('store')->middleware('check.permission:PAYMENTSTRANSACTIONS.CREATE');
+        Route::put('/', [PlansPaymentTransaction::class, 'update'])->name('update')->middleware('check.permission:PAYMENTSTRANSACTIONS.UPDATE');
+
+        // create, edit, change status, delete
+        Route::get('/create', [PlansPaymentTransaction::class, 'create'])->name('create')->middleware('check.permission:PAYMENTSTRANSACTIONS.CREATE');
+        Route::get('/edit/{id}', [PlansPaymentTransaction::class, 'edit'])->name('edit')->middleware('check.permission:PAYMENTSTRANSACTIONS.UPDATE');
+        Route::get(
+            '/changeStatus/{id}/{status}',
+            [PlansPaymentTransaction::class, 'changeStatus']
+        )->name('changeStatus')->middleware('check.permission:PAYMENTSTRANSACTIONS.CHANGE_STATUS');
+        Route::delete('/destroy/{id}', [PlansPaymentTransaction::class, 'destroy'])->name('destroy')->middleware('check.permission:PAYMENTSTRANSACTIONS.DELETE');
 
 
     });

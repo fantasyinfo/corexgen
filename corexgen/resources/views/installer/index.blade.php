@@ -369,6 +369,27 @@
                                 <input name="admin_password" type="password"
                                     class="w-full px-4 py-2 rounded border dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                             </div>
+
+
+                            <div class="col-span-2">
+                                <label class="block text-sm font-medium mb-2 dark:text-white">Currency Code</label>
+                                <input name="currency_code" type="text" placeholder="USD"
+                                    class="w-full px-4 py-2 rounded border dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-sm font-medium mb-2 dark:text-white">Currency Symbol</label>
+                                <input name="currency_symbol" type="text" placeholder="$"
+                                    class="w-full px-4 py-2 rounded border dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-sm font-medium mb-2 dark:text-white">Select Timezone</label>
+                                <select class="form-control" name="timezone" required>
+                                  
+                                    @foreach ($timezones as $timezone)
+                                        <option value="{{ $timezone }}">{{ $timezone }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
                     </div>
 
@@ -698,7 +719,7 @@
             }
         }
 
-         // Add a global variable to track SMTP skip status
+        // Add a global variable to track SMTP skip status
         let skipSmtp = false;
 
         // Test SMTP Connection
@@ -709,7 +730,7 @@
                 return true;
             }
 
-            
+
             const smtpData = {
                 smtp_host: form.querySelector('[name="smtp_host"]').value,
                 smtp_port: form.querySelector('[name="smtp_port"]').value,
@@ -905,11 +926,11 @@
 
 
 
-          // Add event listener for skipping SMTP configuration
+        // Add event listener for skipping SMTP configuration
         skipSmtpBtn.addEventListener('click', () => {
             // Mark SMTP as skipped
             skipSmtp = true;
-            
+
             document.querySelector(`#step${currentStep}`).classList.add('hidden');
             currentStep++;
             document.querySelector(`#step${currentStep}`).classList.remove('hidden');
