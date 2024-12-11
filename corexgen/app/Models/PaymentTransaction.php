@@ -45,7 +45,7 @@ class PaymentTransaction extends Model
     
             static::creating(function ($paymentTransaction) {
                 // Set default values
-                $paymentTransaction->status = $paymentTransaction->status ?? CRM_STATUS_TYPES['TRANSACTIONS']['STATUS']['SUCCESS'];
+                $paymentTransaction->status = $paymentTransaction->status ?? CRM_STATUS_TYPES['PAYMENTSTRANSACTIONS']['STATUS']['SUCCESS'];
             });
         }
 }

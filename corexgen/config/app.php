@@ -171,6 +171,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\FortifyServiceProvider::class,
         App\Providers\JetstreamServiceProvider::class,
+        Modules\BlogModule\BlogModuleServiceProvider::class,
         Yajra\DataTables\DataTablesServiceProvider::class
     ])->toArray(),
 

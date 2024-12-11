@@ -14,13 +14,17 @@ return new class extends Migration
     {
         Schema::create('subscriptions_usage', function (Blueprint $table) {
             $table->id();
-            $table->integer('subscription_id');
+       
+            $table->unsignedBigInteger('subscription_id');
+            $table->unsignedBigInteger('company_id');
+   
             $table->string('module_name');
-            $table->integer('current_usage')->default(0);
-            $table->integer('max_limit');
+            $table->integer('value')->default(0);
+
             $table->timestamps();
 
-            $table->index('subscription_id');
+            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
+            $table->foreign('subscription_id')->references('id')->on('subscriptions')->onDelete('cascade');
         });
     }
 

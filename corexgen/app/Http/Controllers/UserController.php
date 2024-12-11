@@ -8,6 +8,7 @@ use App\Models\Country;
 use App\Models\CRM\CRMRole;
 use App\Repositories\UserRepository;
 use App\Services\UserService;
+use App\Traits\SubscriptionUsageFilter;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -34,6 +35,7 @@ class UserController extends Controller
 {
 
     use TenantFilter;
+    use SubscriptionUsageFilter;
 
     /**
      * Number of items per page for pagination
@@ -117,6 +119,9 @@ class UserController extends Controller
 
             $userService->createUser($request->validated());
 
+            // update current usage
+            $this->updateUsage(strtolower(PLANS_FEATURES['USERS']));
+
             return redirect()->route($this->tenantRoute . 'users.index')
                 ->with('success', 'User created successfully.');
         } catch (\Exception $e) {
@@ -134,6 +139,9 @@ class UserController extends Controller
      */
     public function create()
     {
+
+        $this->checkCurrentUsage(strtolower(PLANS_FEATURES['USERS']));
+
         $roles = $this->applyTenantFilter(CRMRole::query())->get();
         $country = Country::all();
         return view($this->getViewFilePath('create'), [
@@ -477,13 +485,13 @@ class UserController extends Controller
         $user = $query->firstOrFail();
 
         // dd($user);
-  
+
         return view($this->getViewFilePath('view'), [
 
             'title' => 'View User',
             'user' => $user,
             'module' => PANEL_MODULES[$this->getPanelModule()]['users'],
-        
+
         ]);
     }
 
