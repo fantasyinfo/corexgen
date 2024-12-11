@@ -3,8 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\PermissionsHelper;
+use App\Models\Company;
 use App\Models\Plans;
+use App\Models\Subscription;
+use App\Models\User;
+use App\Services\CompanyService;
+use App\Services\Payments\PaymentGatewayFactory;
 use App\Traits\TenantFilter;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -52,8 +58,12 @@ class PlanUpgrade extends Controller
      */
     public function index(Request $request)
     {
-        $plans = Plans::query()->with('planFeatures')->get();
+        $companyId = Auth::user()->company_id;
 
+        $plans = Plans::query()->with('planFeatures')->get();
+        $subscription = Subscription::where('company_id', $companyId)->latest()->first();
+        $company = Company::find($companyId);
+        // dd($subscription);
         $this->tenantRoute = $this->getTenantRoute();
 
 
@@ -63,7 +73,121 @@ class PlanUpgrade extends Controller
             'permissions' => PermissionsHelper::getPermissionsArray('PLANUPGRADE'),
             'module' => PANEL_MODULES[$this->getPanelModule()]['planupgrade'],
             'plans' => $plans,
-            'current_plan_id' => Auth::user()->company_id
+            'current_plan_id' => $company->plan_id,
+            'renew_at' => Carbon::make($subscription->next_billing_date)->format('d M, Y')
         ]);
+    }
+
+    public function upgrade(Request $request, CompanyService $companyService, PaymentGatewayFactory $paymentGatewayFactory)
+    {
+        $request->validate([
+            'plan_id' => 'required|exists:plans,id'
+        ]);
+
+        $companyId = Auth::user()->company_id;
+        $company = Company::find($companyId);
+
+        $planOfferPrice = Plans::find($request->plan_id);
+        if ($planOfferPrice->offer_price <= 0) {
+
+            $paymentDetails = [
+                'payment_gateway' => 'COD',
+                'payment_type' => 'OFFLINE',
+                'transaction_reference' => json_encode([]),
+                'transaction_id' => null,
+                'amount' => 00,
+                'currency' => 'USD', // tmp
+                'company_id' => $companyId,
+                'plan_id' => $planOfferPrice->id,
+            ];
+
+            $paymentTransaction = $companyService->createPaymentTransaction($planOfferPrice->id, $companyId, $paymentDetails);
+
+            $user = $this->findCompanyOwner($company);
+
+            $companyService->givePermissionsToCompany($company, $user);
+
+            $company->plan_id = $planOfferPrice->id;
+            $company->save();
+
+            return redirect()->back()->with('success', 'Plan has been changed successfully.');
+
+        } else {
+
+            $validatedData = [
+                'plan_id' => $planOfferPrice->id,
+                'plan_name' => $planOfferPrice->name,
+                'plan_price' => $planOfferPrice->offer_price,
+                'gateway' => $request->gateway
+            ];
+
+
+            // Validate required payment parameters
+            $this->validatePaymentParameters($validatedData);
+
+            // Get selected payment gateway
+            $gateway = $validatedData['gateway'] ?? 'stripe';
+
+            // Create payment gateway instance
+            $paymentGateway = $paymentGatewayFactory->create($gateway);
+
+            // Prepare payment details
+            $paymentDetails = [
+                'amount' => $validatedData['plan_price'],
+                'description' => "Changed To - {$validatedData['plan_name']} Plan",
+                'currency' => getSettingValue('Currency Code'),
+                'metadata' => [
+                    'plan_id' => $validatedData['plan_id'],
+                    'company_registration' => true,
+                    'company_id' => $company->id
+                ]
+            ];
+
+            Log::info('Payment Details Passed', ['plan' => $paymentDetails]);
+            // Initialize payment
+            $paymentUrl = $paymentGateway->initialize($paymentDetails);
+            dd($paymentUrl);
+        }
+        // payment gateway
+        // update company plan id
+        // create payment transaction
+        // create new subscrition
+
+    }
+
+    private function findCompanyOwner($company)
+    {
+        $user = User::where('company_id', $company->id)
+            ->where('role_id', null)
+            ->where('is_tenant', 0)
+            ->first();
+
+        if (!$user) {
+            throw new \Exception('Company owner user not found');
+        }
+
+        return $user;
+    }
+
+    /**
+     * Validate payment parameters
+     * 
+     * @param array $validatedData
+     * @throws \Exception
+     */
+    private function validatePaymentParameters(array $validatedData)
+    {
+        $requiredFields = [
+            'plan_id',
+            'plan_name',
+            'plan_price',
+            'gateway'
+        ];
+
+        foreach ($requiredFields as $field) {
+            if (!isset($validatedData[$field])) {
+                throw new \Exception("Missing required payment parameter: {$field}");
+            }
+        }
     }
 }

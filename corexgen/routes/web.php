@@ -274,9 +274,9 @@ Route::middleware([
     // upgrade routes
     Route::prefix(PANEL_MODULES['COMPANY_PANEL']['planupgrade'])->as(PANEL_MODULES['COMPANY_PANEL']['planupgrade'] . '.')->group(function () {
         // role for fetch, store, update
-        Route::get('/', [PlanUpgrade::class, 'index'])->name('index')->middleware('check.permission:SETTINGS.READ_ALL');
+        Route::get('/', [PlanUpgrade::class, 'index'])->name('index')->middleware('check.permission:PLANUPGRADE.READ_ALL');
 
-
+        Route::put('/', [PlanUpgrade::class, 'upgrade'])->name('upgrade')->middleware('check.permission:PLANUPGRADE.UPGRADE');
       
   
     });
