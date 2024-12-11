@@ -9,55 +9,61 @@ trait SubscriptionUsageFilter
 {
 
 
-
-    public int $companyid;
-
     public function checkCurrentUsage($module)
     {
-        if (Auth::user()->is_tenant) {
+        if ($this->isTenantUser()) {
             return true;
         }
-        $this->companyid = Auth::user()->company_id;
 
-        $totalAllow = $this->getTotalAllowed($this->companyid, $module);
+
+        $totalAllow = $this->getTotalAllowed($module);
 
         // fetch current usage
+
+        $currentUsage = $this->getCurrentUsage($this->getCurrentSubscriptionId());
+
+        // check 
+        if ($currentUsage >= $totalAllow) {
+
+            return abort(redirect()->route('company.upgrade'));
+        }
+    
+        return true;
 
     }
 
 
     public function updateUsage($module)
     {
-        if (Auth::user()->is_tenant) {
-            return;
+        if ($this->isTenantUser()) {
+            return true;
         }
- 
-        $this->companyid = Auth::user()->company_id;
-  
+
+
         // Get current subscription ID
-      
+
 
         $subId = $this->getCurrentSubscriptionId();
-  
+
         // Find existing usage
         $subUsageFind = SubscriptionUsage::where('subscription_id', $subId)
-            ->where('company_id', $this->companyid)
+            ->where('company_id', $this->getCompanyId())
             ->first();
-    
-     
-     
+
+
+
 
         if ($subUsageFind) {
             // Update existing record
             $subUsageFind->update([
                 'value' => $subUsageFind->value + 1
             ]);
-         
+
         } else {
             // Create new record
             SubscriptionUsage::create([
                 'subscription_id' => $subId,
-                'company_id' => $this->companyid,
+                'company_id' => $this->getCompanyId(),
                 'module_name' => $module,
                 'value' => 1
             ]);
@@ -65,13 +71,12 @@ trait SubscriptionUsageFilter
         }
     }
 
-    private function getTotalAllowed($companyid, $module)
+    private function getTotalAllowed($module)
     {
-        if (Auth::user()->is_tenant) {
-            return;
+        if ($this->isTenantUser()) {
+            return true;
         }
 
-        $this->companyid = $companyid;
         $currentSubscriptionsAllowed = Subscription::with([
             'plans' => function ($q) use ($module) {
                 $q->with([
@@ -81,15 +86,13 @@ trait SubscriptionUsageFilter
                 ]);
             }
         ])
-            ->where('company_id', $this->companyid)
+            ->where('company_id', $this->getCompanyId())
             ->latest()
             ->first();
 
 
-        return [
-            'id' => $currentSubscriptionsAllowed->id,
-            'value' => $currentSubscriptionsAllowed->plans->planFeatures[0]->value,
-        ];
+        return $currentSubscriptionsAllowed->plans->planFeatures[0]->value;
+
 
     }
 
@@ -99,10 +102,31 @@ trait SubscriptionUsageFilter
             return;
         }
 
-        $this->companyid = Auth::user()->company_id;
+        $subscription = Subscription::where('company_id', $this->getCompanyId())->latest()->first();
 
-        $subscription = Subscription::where('company_id', $this->companyid)->latest()->first();
-     
         return $subscription->id;
+    }
+
+    private function getCurrentUsage(int $subId): int
+    {
+        // Find existing usage
+        $subUsageFind = SubscriptionUsage::where('subscription_id', $subId)
+            ->where('company_id', $this->getCompanyId())
+            ->first();
+
+        if ($subUsageFind) {
+            return $subUsageFind->value;
+
+        }
+        return 0;
+    }
+
+    private function isTenantUser(): bool
+    {
+        return Auth::check() && Auth::user()->is_tenant;
+    }
+    private function getCompanyId(): bool
+    {
+        return Auth::user()->company_id;
     }
 }

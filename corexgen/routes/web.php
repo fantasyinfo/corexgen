@@ -113,6 +113,11 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/onboarding/complete', [CompanyOnboardingController::class, 'completeOnboarding'])
          ->name('onboarding.complete');
+
+
+    Route::get('/upgrade', [CompanyOnboardingController::class, 'upgrade'])
+         ->name('company.upgrade');
+    
 });
 
 // payment gateway routes
@@ -264,6 +269,9 @@ Route::middleware([
         // role for fetch, store, update
         Route::get('/', [CRMSettingsController::class, 'index'])->name('index')->middleware('check.permission:SETTINGS.READ_ALL');
         Route::put('/', [CRMSettingsController::class, 'update'])->name('update')->middleware('check.permission:SETTINGS.UPDATE');
+
+      
+  
     });
 
 
