@@ -336,4 +336,8 @@ class CompanyOnboardingController extends Controller
         prePrintR($request->all());
 
     }
+
+    public function upgrade(){
+        
+    }
 }

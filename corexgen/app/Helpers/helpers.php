@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Company;
 use App\Models\CRM\CRMMenu;
 use App\Models\User;
 use App\Models\CRM\CRMRole;
@@ -7,6 +8,7 @@ use App\Models\CRM\CRMRolePermissions;
 use App\Models\CRM\CRMSettings;
 use Illuminate\Support\Facades\DB;
 use App\Models\Media;
+use App\Models\Plans;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
@@ -55,6 +57,24 @@ function createMedia(UploadedFile $file)
 }
 
 
+
+function isFeatureEnable($module)
+{
+    if (!Auth::user() || Auth::user()->company_id == null) {
+        return true;
+    }
+
+
+    $planFeatuers = Company::with(['plans.planFeatures' => fn($q) => $q->where('module_name', strtolower($module))])
+        ->where('id', Auth::user()->company_id)
+        ->first()->toArray();
+
+    if ($planFeatuers['plans']['plan_features'][0]['value'] == 0) {
+        return false;
+    }
+
+    return true;
+}
 
 
 
@@ -360,7 +380,7 @@ if (!function_exists('getSettingValue')) {
      * @param string $key The key of the setting.
      * @return mixed|null The value of the setting or null if not found.
      */
-    function getSettingValue(string $key)
+    function getSettingValue(string $key, string $isTenantSetting = '0')
     {
 
         $query = CRMSettings::where('key', $key);
@@ -369,7 +389,12 @@ if (!function_exists('getSettingValue')) {
             if ($user->is_tenant) {
                 $query->where('is_tenant', 1);
             } elseif (!is_null($user->company_id)) {
-                $query->where('company_id', $user->company_id);
+                if ($isTenantSetting == '1') {
+                    $query->where('is_tenant', 1);
+                } else {
+
+                    $query->where('company_id', $user->company_id);
+                }
             }
         }
 

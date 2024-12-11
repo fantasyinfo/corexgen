@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('payment_gateway')->nullable();
             $table->enum('payment_type', ['ONLINE', 'OFFLINE'])->default('ONLINE');
             $table->json('transaction_refrence')->nullable();
-            $table->enum('status', CRM_STATUS_TYPES['TRANSACTIONS']['TABLE_STATUS'])->default(CRM_STATUS_TYPES['TRANSACTIONS']['STATUS']['PENDING']);
+            $table->enum('status', CRM_STATUS_TYPES['PAYMENTSTRANSACTIONS']['TABLE_STATUS'])->default(CRM_STATUS_TYPES['PAYMENTSTRANSACTIONS']['STATUS']['PENDING']);
 
             $table->dateTime('transaction_date')->default(now());
 

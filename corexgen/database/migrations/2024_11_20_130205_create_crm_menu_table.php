@@ -19,6 +19,8 @@ return new class extends Migration {
             $table->bigInteger('permission_id', )->nullable();
             $table->string('menu_icon')->nullable();
             $table->enum('panel_type', array_keys(PANEL_TYPES));
+            $table->boolean('is_default')->default(false);
+            $table->string('feature_type')->nullable();
             $table->unique(['panel_type', 'permission_id'], 'panel_type_permission_id_unique');
             $table->timestamps();
         });

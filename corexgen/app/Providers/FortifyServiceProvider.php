@@ -83,7 +83,8 @@ class FortifyServiceProvider extends ServiceProvider
 
                 if (
                     !$company ||
-                    ($company->status !== CRM_STATUS_TYPES['COMPANIES']['STATUS']['ACTIVE'] || $company->status !== CRM_STATUS_TYPES['COMPANIES']['STATUS']['ONBOARDING'])
+                    ($company->status !== CRM_STATUS_TYPES['COMPANIES']['STATUS']['ACTIVE'] &&
+                        $company->status !== CRM_STATUS_TYPES['COMPANIES']['STATUS']['ONBOARDING'])
                 ) {
                     throw ValidationException::withMessages([
                         'email' => ['Your company account is currently inactive.'],

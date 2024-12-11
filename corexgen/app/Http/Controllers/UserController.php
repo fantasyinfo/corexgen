@@ -8,6 +8,7 @@ use App\Models\Country;
 use App\Models\CRM\CRMRole;
 use App\Repositories\UserRepository;
 use App\Services\UserService;
+use App\Traits\SubscriptionUsageFilter;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -34,6 +35,7 @@ class UserController extends Controller
 {
 
     use TenantFilter;
+    use SubscriptionUsageFilter;
 
     /**
      * Number of items per page for pagination
@@ -117,6 +119,9 @@ class UserController extends Controller
 
             $userService->createUser($request->validated());
 
+            // update current usage
+            $this->updateUsage(strtolower(PLANS_FEATURES['USERS']), '+','1');
+
             return redirect()->route($this->tenantRoute . 'users.index')
                 ->with('success', 'User created successfully.');
         } catch (\Exception $e) {
@@ -134,6 +139,9 @@ class UserController extends Controller
      */
     public function create()
     {
+
+        $this->checkCurrentUsage(strtolower(PLANS_FEATURES['USERS']));
+
         $roles = $this->applyTenantFilter(CRMRole::query())->get();
         $country = Country::all();
         return view($this->getViewFilePath('create'), [
@@ -324,6 +332,8 @@ class UserController extends Controller
                     'company_id' => Auth::user()->company_id
 
                 ]);
+
+                $this->updateUsage(strtolower(PLANS_FEATURES['USERS']), '+','1');
             }
 
             return response()->json([
@@ -351,7 +361,8 @@ class UserController extends Controller
             // Delete the user
 
             $this->applyTenantFilter(User::query()->where('id', '=', $id))->delete();
-
+            // update current usage
+            $this->updateUsage(strtolower(PLANS_FEATURES['USERS']), '-','1');
             // Return success response
             return redirect()->back()->with('success', 'User deleted successfully.');
         } catch (\Exception $e) {
@@ -395,13 +406,14 @@ class UserController extends Controller
 
         $ids = $request->input('ids');
 
+
         try {
             // Delete the user
 
             if (is_array($ids) && count($ids) > 0) {
                 // Validate ownership/permissions if necessary
                 $this->applyTenantFilter(User::query()->whereIn('id', $ids))->delete();
-
+                $this->updateUsage(strtolower(PLANS_FEATURES['USERS']), '-',count($ids));
                 return response()->json(['message' => 'Selected users deleted successfully.'], 200);
             }
 
@@ -477,13 +489,13 @@ class UserController extends Controller
         $user = $query->firstOrFail();
 
         // dd($user);
-  
+
         return view($this->getViewFilePath('view'), [
 
             'title' => 'View User',
             'user' => $user,
             'module' => PANEL_MODULES[$this->getPanelModule()]['users'],
-        
+
         ]);
     }
 

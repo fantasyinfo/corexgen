@@ -40,6 +40,11 @@ class Subscription extends Model
         return $this->belongsTo(PaymentTransaction::class,'payment_id');
     }
 
+    public function usages()
+    {
+        return $this->hasMany(SubscriptionUsage::class,'subscription_id');
+    }
+
      // boot method
      protected static function boot()
      {

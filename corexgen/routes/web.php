@@ -14,6 +14,7 @@ use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\Payments\PaymentGatewayController;
 use App\Http\Controllers\PlansController;
 use App\Http\Controllers\PlansPaymentTransaction;
+use App\Http\Controllers\PlanUpgrade;
 use App\Http\Controllers\SystemInstallerController;
 use App\Http\Controllers\UserController;
 use App\Models\City;
@@ -113,6 +114,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/onboarding/complete', [CompanyOnboardingController::class, 'completeOnboarding'])
          ->name('onboarding.complete');
+
+    
 });
 
 // payment gateway routes
@@ -264,6 +267,18 @@ Route::middleware([
         // role for fetch, store, update
         Route::get('/', [CRMSettingsController::class, 'index'])->name('index')->middleware('check.permission:SETTINGS.READ_ALL');
         Route::put('/', [CRMSettingsController::class, 'update'])->name('update')->middleware('check.permission:SETTINGS.UPDATE');
+
+      
+  
+    });
+    // upgrade routes
+    Route::prefix(PANEL_MODULES['COMPANY_PANEL']['planupgrade'])->as(PANEL_MODULES['COMPANY_PANEL']['planupgrade'] . '.')->group(function () {
+        // role for fetch, store, update
+        Route::get('/', [PlanUpgrade::class, 'index'])->name('index')->middleware('check.permission:SETTINGS.READ_ALL');
+
+
+      
+  
     });
 
 

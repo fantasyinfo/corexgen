@@ -57,4 +57,8 @@ class CRMSettingsController extends Controller
             'module' => PANEL_MODULES[$this->getPanelModule()]['settings'],
         ]);
     }
+
+    public function upgrade(){
+        
+    }
 }

@@ -329,6 +329,8 @@ class CompanyService
 
     public function createMenuItemsForCompanyPanel($planId)
     {
+        return;
+        
         $plansFeatures = Plans::with('planFeatures')->findOrFail($planId);
 
         foreach (CRM_MENU_ITEMS_COMPANY as $category => $menuData) {
