@@ -306,7 +306,7 @@ PermissionsHelper::initializePermissions();
         'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE'],
         'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger'],
     ],
-    'TRANSACTIONS' => [
+    'PAYMENTSTRANSACTIONS' => [
         'TABLE_STATUS' => ['SUCCESS', 'FAILED', 'PENDING'],
         'STATUS' => ['SUCCESS' => 'SUCCESS', 'FAILED' => 'FAILED', 'PENDING' => 'PENDING'],
         'BT_CLASSES' => ['SUCCESS' => 'success', 'FAILED' => 'danger', 'PENDING' => 'warning'],

@@ -7,6 +7,7 @@ use App\Repositories\PlansPaymentTransactionsRepository;
 use App\Traits\TenantFilter;
 use Carbon\Carbon;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\View;
 
 class PlansPaymentTransactionsService
 {
@@ -30,67 +31,73 @@ class PlansPaymentTransactionsService
 
         $query = $this->plansPaymentTransactionRepository->getTrnasactionQuery($request);
 
-        // dd($query->get()->toArray());
-        $module = PANEL_MODULES[$this->getPanelModule()]['companies'];
+        //  dd($query->toArray());
+
+        $module = PANEL_MODULES[$this->getPanelModule()]['planPaymentTransaction'];
+        $cmodule = PANEL_MODULES[$this->getPanelModule()]['companies'];
 
         return DataTables::of($query)
-            ->addColumn('actions', function ($company) {
-                return $this->renderActionsColumn($company);
+            // ->addColumn('actions', function ($ppT) {
+            //     return $this->renderActionsColumn($ppT);
+            // })
+            ->editColumn('created_at', function ($ppT) {
+                return Carbon::parse($ppT->created_at)->format('d M Y');
             })
-            ->editColumn('created_at', function ($company) {
-                return Carbon::parse($company->created_at)->format('d M Y');
+            ->editColumn('transaction_date', function ($ppT) {
+                return Carbon::parse($ppT->transaction_date)->format('d M Y');
             })
-            ->editColumn('name', function ($company) use ($module) {
-                return "<a  class='dt-link' href='" . route($this->tenantRoute . $module . '.view', $company->id) . "' target='_blank'>$company->name</a>";
+            ->editColumn('name', function ($ppT) use ($cmodule) {
+                return "<a class='dt-link' href='" . route($this->tenantRoute . $cmodule . '.view', $ppT->company->id) . "' target='_blank'>" 
+                       . $ppT->company->name . "</a>";
             })
-            ->editColumn('status', function ($company) {
-                return $this->renderStatusColumn($company);
+            // ->editColumn('status', function ($ppT) {
+            //     return $this->renderStatusColumn($ppT);
+            // })
+            ->editColumn('plan_name', function ($ppT) {
+                return $ppT->plans->name;
             })
-            ->editColumn('plan_name', function ($company) {
-                return $company->plan_name;
+            ->editColumn('amount', function ($ppT) {
+                return $ppT->amount;
             })
-            ->editColumn('billing_cycle', function ($company) {
-                return $company->billing_cycle;
+            ->editColumn('currecny', function ($ppT) {
+                return $ppT->currency;
             })
-            ->editColumn('start_date', function ($company) {
-                return Carbon::parse($company->start_date)->format('d M Y');
+            ->editColumn('payment_gateway', function ($ppT) {
+                return $ppT->payment_gateway;
             })
-            ->editColumn('end_date', function ($company) {
-                return Carbon::parse($company->end_date)->format('d M Y');
+            ->editColumn('start_date', function ($ppT) {
+                return Carbon::parse($ppT->subscription->start_date)->format('d M Y');
             })
-            ->editColumn('next_billing_date', function ($company) {
-                return Carbon::parse($company->next_billing_date)->format('d M Y');
-            })
-            ->rawColumns(['plan_name', 'billing_cycle', 'start_date', 'end_date', 'next_billing_date', 'actions', 'status', 'name']) // Add 'status' to raw columns
+            ->rawColumns(['plan_name', 'start_date', 'status', 'name']) // Add 'status' to raw columns
             ->make(true);
     }
 
-    protected function renderActionsColumn($company)
-    {
+    // protected function renderActionsColumn($company)
+    // {
 
 
-        return View::make(getComponentsDirFilePath('dt-actions-buttons'), [
-            'tenantRoute' => $this->tenantRoute,
-            'permissions' => PermissionsHelper::getPermissionsArray('COMPANIES'),
-            'module' => PANEL_MODULES[$this->getPanelModule()]['companies'],
-            'id' => $company->id
-        ])->render();
-    }
+    //     return View::make(getComponentsDirFilePath('dt-actions-buttons'), [
+    //         'tenantRoute' => $this->tenantRoute,
+    //         'permissions' => PermissionsHelper::getPermissionsArray('PAYMENTSTRANSACTIONS'),
+    //         'module' => PANEL_MODULES[$this->getPanelModule()]['planPaymentTransaction'],
+    //         'id' => $company->id
+    //     ])->render();
+    // }
 
-    protected function renderStatusColumn($company)
-    {
+    // protected function renderStatusColumn($ppT)
+    // {
 
 
-        return View::make(getComponentsDirFilePath('dt-status'), [
-            'tenantRoute' => $this->tenantRoute,
-            'permissions' => PermissionsHelper::getPermissionsArray('COMPANIES'),
-            'module' => PANEL_MODULES[$this->getPanelModule()]['companies'],
-            'id' => $company->id,
-            'status' => [
-                'current_status' => $company->status,
-                'available_status' => CRM_STATUS_TYPES['COMPANIES']['STATUS'],
-                'bt_class' => CRM_STATUS_TYPES['COMPANIES']['BT_CLASSES'],
-            ]
-        ])->render();
-    }
+    //     return View::make(getComponentsDirFilePath('dt-status'), [
+    //         'tenantRoute' => $this->tenantRoute,
+    //         'permissions' => PermissionsHelper::getPermissionsArray('PAYMENTSTRANSACTIONS'),
+    //         'module' => PANEL_MODULES[$this->getPanelModule()]['planPaymentTransaction'],
+    //         'id' => $ppT->id,
+    //         'status' => [
+    //             'current_status' => $ppT->status,
+    //             'available_status' => CRM_STATUS_TYPES['PAYMENTSTRANSACTIONS']['STATUS'],
+    //             'bt_class' => CRM_STATUS_TYPES['PAYMENTSTRANSACTIONS']['BT_CLASSES'],
+    //         ]
+    //     ])->render();
+    // }
 }
