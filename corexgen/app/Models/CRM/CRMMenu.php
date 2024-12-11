@@ -18,7 +18,9 @@ class CRMMenu extends Model
         'parent_menu_id',
         'menu_icon',
         'permission_id',
-        'panel_type'
+        'panel_type',
+        'is_default',
+        'feature_type'
     ];
 
     protected $table = self::table;

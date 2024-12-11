@@ -65,6 +65,11 @@ PermissionsHelper::initializePermissions();
         'id' => PermissionsHelper::getParentPermissionId('10'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['PAYMENTSTRANSACTIONS']
     ],
+    PermissionsHelper::$plansPermissionsKeys['PLANUPGRADE'] => [
+        'name' => 'PLANUPGRADE',
+        'id' => PermissionsHelper::getParentPermissionId('11'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['PLANUPGRADE']
+    ],
 ]);
 
 // super panel menus
@@ -159,6 +164,7 @@ PermissionsHelper::initializePermissions();
     ],
     'Roles & Permissions' => [
         'menu_icon' => 'fa-users',
+        'feature_type' => PermissionsHelper::$plansPermissionsKeys['ROLE'], // this need to match the PLANS_FEATURES key
         'permission_plan' => PermissionsHelper::$plansPermissionsKeys['ROLE'],
         'permission_id' => PermissionsHelper::getParentPermissionId('2'),
         'children' => [
@@ -168,10 +174,20 @@ PermissionsHelper::initializePermissions();
     ],
     'Users & Employees' => [
         'menu_icon' => 'fa-user',
+        'feature_type' => PermissionsHelper::$plansPermissionsKeys['USERS'], // this need to match the PLANS_FEATURES key
         'permission_plan' => PermissionsHelper::$plansPermissionsKeys['USERS'],
         'permission_id' => PermissionsHelper::getParentPermissionId('3'),
         'children' => [
             'Users' => ['menu_url' => 'users.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['USERS'], 'READ_ALL')],
+        ]
+    ],
+    'Membership' => [
+        'menu_icon' => 'fa-paper-plane',
+        'is_default' => true,
+        'permission_plan' => PermissionsHelper::$plansPermissionsKeys['PLANUPGRADE'],
+        'permission_id' => PermissionsHelper::getParentPermissionId('11'),
+        'children' => [
+            'Membership' => ['menu_url' => 'planupgrade.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PLANUPGRADE'], 'READ_ALL')],
         ]
     ],
 
@@ -343,6 +359,7 @@ PermissionsHelper::initializePermissions();
         'users' => 'users',
         'modules' => 'modules',
         'appupdates' => 'appupdates',
+        'planupgrade' =>'planupgrade'
     ]
 ]);
 

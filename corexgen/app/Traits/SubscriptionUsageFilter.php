@@ -25,7 +25,7 @@ trait SubscriptionUsageFilter
         // check 
         if ($currentUsage >= $totalAllow) {
 
-            return abort(redirect()->route('company.upgrade'));
+            return abort(redirect()->route(getPanelRoutes('planupgrade.index')));
         }
     
         return true;
@@ -33,7 +33,7 @@ trait SubscriptionUsageFilter
     }
 
 
-    public function updateUsage($module)
+    public function updateUsage($module,$sign,$value)
     {
         if ($this->isTenantUser()) {
             return true;
@@ -56,7 +56,7 @@ trait SubscriptionUsageFilter
         if ($subUsageFind) {
             // Update existing record
             $subUsageFind->update([
-                'value' => $subUsageFind->value + 1
+                'value' => $subUsageFind->value .$sign. $value
             ]);
 
         } else {
