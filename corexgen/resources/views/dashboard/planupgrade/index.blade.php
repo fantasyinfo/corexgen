@@ -167,40 +167,41 @@
 
                 // Dynamically create modal based on plan price
                 const modalContent = `
-            <div class="modal fade" id="planChangeModal" tabindex="-1">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Confirm Plan Change</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                            <p>Are you sure you want to change your plan? This action cannot be easily reversed.</p>
-                            
-                            ${planPrice > 0 ? `
-                                <div class="mt-3">
-                                    <label for="paymentGateway" class="form-label">Select Payment Method</label>
-                                    <select class="form-select" id="paymentGateway" required>
-                                        <option value="">Choose Payment Gateway</option>
-                                        <option value="stripe">Stripe</option>
-                                        <option value="paypal">PayPal</option>
-                                    </select>
+                    <div class="modal fade" id="planChangeModal" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Confirm Plan Change</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
-                                ` : ''}
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-primary" id="confirmPlanChange">Confirm</button>
+                                <div class="modal-body">
+                                    <p>Are you sure you want to change your plan? This action cannot be easily reversed.</p>
+                                    ${planPrice > 0 ? `
+                                            <div class="mt-3">
+                                                <label for="paymentGateway" class="form-label">Select Payment Method</label>
+                                                <select class="form-select" id="paymentGateway" required>
+                                                 
+                                                    @foreach ($payment_gateways as $pg)
+                                                        <option value="{{ strtolower($pg->name) }}">{{ $pg->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        ` : ''}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="button" class="btn btn-primary" id="confirmPlanChange">Confirm</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        `;
+                `;
 
-                // Append modal to body if not already exists
-                if ($('#planChangeModal').length === 0) {
-                    $('body').append(modalContent);
-                }
+                // Remove any existing modal first to prevent duplicates
+                $('#planChangeModal').remove();
+
+                // Append modal to body
+                $('body').append(modalContent);
 
                 // Initialize Bootstrap modal
                 const modalInstance = new bootstrap.Modal('#planChangeModal');

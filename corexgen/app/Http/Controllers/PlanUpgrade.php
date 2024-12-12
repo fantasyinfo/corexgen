@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\PermissionsHelper;
 use App\Models\Company;
+use App\Models\PaymentGateway;
 use App\Models\Plans;
 use App\Models\Subscription;
 use App\Models\User;
@@ -60,7 +61,7 @@ class PlanUpgrade extends Controller
     {
         $companyId = Auth::user()->company_id;
 
-        $plans = Plans::query()->with('planFeatures')->get();
+        $plans = Plans::query()->with('planFeatures')->where('status', CRM_STATUS_TYPES['PLANS']['STATUS']['ACTIVE'])->get();
         $subscription = Subscription::where('company_id', $companyId)->latest()->first();
         $company = Company::find($companyId);
         // dd($subscription);
@@ -74,14 +75,15 @@ class PlanUpgrade extends Controller
             'module' => PANEL_MODULES[$this->getPanelModule()]['planupgrade'],
             'plans' => $plans,
             'current_plan_id' => $company->plan_id,
-            'renew_at' => Carbon::make($subscription->next_billing_date)->format('d M, Y')
+            'renew_at' => Carbon::make($subscription->next_billing_date)->format('d M, Y'),
+            'payment_gateways' => PaymentGateway::where('status', 'Active')->get()
         ]);
     }
 
     public function upgrade(Request $request, CompanyService $companyService, PaymentGatewayFactory $paymentGatewayFactory)
     {
 
-             // payment gateway
+        // payment gateway
         // update company plan id
         // create payment transaction
         // create new subscrition
@@ -156,7 +158,7 @@ class PlanUpgrade extends Controller
             $paymentUrl = $paymentGateway->initialize($paymentDetails);
             return redirect()->away($paymentUrl);
         }
-   
+
 
     }
 

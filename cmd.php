@@ -3,6 +3,7 @@ php artisan db:seed --class=CRMPermissionsSeeder
 php artisan db:seed --class=CRMMenuSeeder
 php artisan db:seed --class=CRMSettingsSeeder
 php artisan db:seed --class=PlansSeeder
+php artisan db:seed --class=PaymentGatewaySeeder
 
 
 

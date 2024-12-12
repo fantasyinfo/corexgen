@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CRM\CompaniesRequest;
+use App\Http\Requests\CompaniesRequest;
 use App\Models\PaymentTransaction;
 use App\Models\Plans;
 use App\Models\User;

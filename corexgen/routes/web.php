@@ -450,7 +450,26 @@ Route::middleware([
 
     });
 
+    // payment gateways routes
 
+
+    Route::prefix('paymentGateway')->as('paymentGateway.')->group(function () {
+        // role for fetch, store, update
+        Route::get('/', [PaymentGatewayController::class, 'index'])->name('index')->middleware('check.permission:PAYMENTGATEWAYS.READ_ALL');
+
+        Route::put('/', [PaymentGatewayController::class, 'update'])->name('update')->middleware('check.permission:PAYMENTGATEWAYS.UPDATE');
+
+        //  edit, change status, 
+
+        Route::get('/edit/{id}', [PaymentGatewayController::class, 'edit'])->name('edit')->middleware('check.permission:PAYMENTGATEWAYS.UPDATE');
+        Route::get(
+            '/changeStatus/{id}/{status}',
+            [PaymentGatewayController::class, 'changeStatus']
+        )->name('changeStatus')->middleware('check.permission:PAYMENTGATEWAYS.CHANGE_STATUS');
+
+
+
+    });
     // settings routes
     Route::prefix('settings')->as('settings.')->group(function () {
         // role for fetch, store, update
