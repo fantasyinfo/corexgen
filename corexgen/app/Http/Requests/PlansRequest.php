@@ -24,8 +24,6 @@ class PlansRequest extends FormRequest
      */
     public function rules(): array
     {
-
-
         $baseRules = [
             'name' => ['string', 'required'],
             'desc' => ['string', 'required'],
@@ -38,11 +36,16 @@ class PlansRequest extends FormRequest
         $featureRules = [];
         foreach (PLANS_FEATURES as $featureKey) {
             $featureKey = strtolower(str_replace(' ', '_', $featureKey));
-            $featureRules["features_{$featureKey}"] = ['required', 'numeric']; 
+            $featureRules["features_{$featureKey}"] = [
+                'required', 
+                'integer', 
+                'min:-1' // Ensures the value is at least -1
+            ];
         }
     
         return array_merge($baseRules, $featureRules);
     }
+    
 
     public function messages(): array
 {

@@ -18,14 +18,26 @@ trait SubscriptionUsageFilter
 
         $totalAllow = $this->getTotalAllowed($module);
 
+        // for unlimited
+        if ($totalAllow == '-1') {
+            return true;
+        }
+
         // fetch current usage
 
         $currentUsage = $this->getCurrentUsage($this->getCurrentSubscriptionId());
 
+        \Log::info('Usage', [
+            'currentUsage' => $currentUsage,
+            'totalAllow' => $totalAllow,
+            'companyId' => $this->getCompanyId(),
+            'currentSubID' => $this->getCurrentSubscriptionId()
+        ]);
         // check 
+
         if ($currentUsage >= $totalAllow) {
 
-            return abort(redirect()->route(getPanelRoutes('planupgrade.index')));
+            return abort(redirect()->route(getPanelRoutes('planupgrade.index'))->with('error', 'Please Upgrade the plan, current plan resources exceeds'));
         }
 
         return true;
@@ -49,9 +61,16 @@ trait SubscriptionUsageFilter
 
         if ($subUsageFind) {
             // Perform mathematical calculation based on sign
-            $newValue = $sign === '+'
-                ? $subUsageFind->value + $value
-                : $subUsageFind->value - $value;
+            if ($sign === '+') {
+                $newValue = $subUsageFind->value + $value;
+            } else {
+                // Ensure value does not go negative
+                if ($subUsageFind->value <= 0) {
+                    return false; // Prevent updating to a negative value
+                }
+
+                $newValue = max(0, $subUsageFind->value - $value);
+            }
 
             // Update existing record
             $subUsageFind->update([
@@ -59,15 +78,22 @@ trait SubscriptionUsageFilter
             ]);
 
         } else {
-            // Create new record
-            SubscriptionUsage::create([
-                'subscription_id' => $subId,
-                'company_id' => $this->getCompanyId(),
-                'module_name' => $module,
-                'value' => $value
-            ]);
+            // If creating a new record, only allow if the sign is '+'
+            if ($sign === '+') {
+                SubscriptionUsage::create([
+                    'subscription_id' => $subId,
+                    'company_id' => $this->getCompanyId(),
+                    'module_name' => $module,
+                    'value' => $value
+                ]);
+            } else {
+                return false; // Do not create negative records
+            }
         }
+
+        return true; // Indicate successful operation
     }
+
 
     private function getTotalAllowed($module)
     {
