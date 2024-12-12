@@ -479,11 +479,6 @@ class SystemInstallerController extends Controller
     private function runSeeders()
     {
         Artisan::call('db:seed');
-        Artisan::call('db:seed', ['--class' => 'CRMPermissionsSeeder']);
-        Artisan::call('db:seed', ['--class' => 'CRMMenuSeeder']);
-        Artisan::call('db:seed', ['--class' => 'CRMRoleSeeder']);
-        Artisan::call('db:seed', ['--class' => 'CRMSettingsSeeder']);
-        Artisan::call('db:seed', ['--class' => 'PlansSeeder']);
 
     }
 

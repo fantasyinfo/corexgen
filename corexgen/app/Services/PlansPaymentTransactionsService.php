@@ -47,8 +47,8 @@ class PlansPaymentTransactionsService
                 return Carbon::parse($ppT->transaction_date)->format('d M Y');
             })
             ->editColumn('name', function ($ppT) use ($cmodule) {
-                return "<a class='dt-link' href='" . route($this->tenantRoute . $cmodule . '.view', $ppT->company->id) . "' target='_blank'>" 
-                       . $ppT->company->name . "</a>";
+                return "<a class='dt-link' href='" . route($this->tenantRoute . $cmodule . '.view', $ppT->company->id) . "' target='_blank'>"
+                    . $ppT->company->name . "</a>";
             })
             // ->editColumn('status', function ($ppT) {
             //     return $this->renderStatusColumn($ppT);
@@ -72,32 +72,53 @@ class PlansPaymentTransactionsService
             ->make(true);
     }
 
-    // protected function renderActionsColumn($company)
-    // {
+    public function getDatatablesResponseForSub($request)
+    {
+
+        $this->tenantRoute = $this->getTenantRoute();
+
+        $query = $this->plansPaymentTransactionRepository->getSubscriptionsQuery($request);
+
+        //   dd($query->toArray());
+
+        $module = PANEL_MODULES[$this->getPanelModule()]['subscriptions'];
+        $cmodule = PANEL_MODULES[$this->getPanelModule()]['companies'];
+
+        return DataTables::of($query)
+            ->editColumn('created_at', function ($ppT) {
+                return Carbon::parse($ppT->created_at)->format('d M Y');
+            })
+            ->editColumn('start_date', function ($ppT) {
+                return Carbon::parse($ppT->start_date)->format('d M Y');
+            })
+            ->editColumn('end_date', function ($ppT) {
+                return Carbon::parse($ppT->end_date)->format('d M Y');
+            })
+            ->editColumn('upgrade_date', function ($ppT) {
+                return Carbon::parse($ppT->upgrade_date)->format('d M Y');
+            })
+            ->editColumn('name', function ($ppT) use ($cmodule) {
+                return "<a class='dt-link' href='" . route($this->tenantRoute . $cmodule . '.view', $ppT->company->id) . "' target='_blank'>"
+                    . $ppT->company->name . "</a>";
+            })
+            ->editColumn('plan_name', function ($ppT) {
+                return $ppT->plans->name;
+            })
+            ->editColumn('amount', function ($ppT) {
+                return $ppT->payment_transaction->amount;
+            })
+            ->editColumn('currency', function ($ppT) {
+                return $ppT->payment_transaction->currency;
+            })
+            ->editColumn('payment_type', function ($ppT) {
+                return $ppT->payment_transaction->payment_type;
+            })
+            ->editColumn('payment_gateway', function ($ppT) {
+                return $ppT->payment_transaction->payment_gateway;
+            })
+            ->rawColumns(['plan_name', 'start_date', 'end_date', 'upgrade_date', 'status', 'name'])
+            ->make(true);
+    }
 
 
-    //     return View::make(getComponentsDirFilePath('dt-actions-buttons'), [
-    //         'tenantRoute' => $this->tenantRoute,
-    //         'permissions' => PermissionsHelper::getPermissionsArray('PAYMENTSTRANSACTIONS'),
-    //         'module' => PANEL_MODULES[$this->getPanelModule()]['planPaymentTransaction'],
-    //         'id' => $company->id
-    //     ])->render();
-    // }
-
-    // protected function renderStatusColumn($ppT)
-    // {
-
-
-    //     return View::make(getComponentsDirFilePath('dt-status'), [
-    //         'tenantRoute' => $this->tenantRoute,
-    //         'permissions' => PermissionsHelper::getPermissionsArray('PAYMENTSTRANSACTIONS'),
-    //         'module' => PANEL_MODULES[$this->getPanelModule()]['planPaymentTransaction'],
-    //         'id' => $ppT->id,
-    //         'status' => [
-    //             'current_status' => $ppT->status,
-    //             'available_status' => CRM_STATUS_TYPES['PAYMENTSTRANSACTIONS']['STATUS'],
-    //             'bt_class' => CRM_STATUS_TYPES['PAYMENTSTRANSACTIONS']['BT_CLASSES'],
-    //         ]
-    //     ])->render();
-    // }
 }

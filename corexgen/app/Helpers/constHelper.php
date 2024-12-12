@@ -75,6 +75,11 @@ PermissionsHelper::initializePermissions();
         'id' => PermissionsHelper::getParentPermissionId('12'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['PAYMENTGATEWAYS']
     ],
+    PermissionsHelper::$plansPermissionsKeys['SUBSCRIPTIONS'] => [
+        'name' => 'SUBSCRIPTIONS',
+        'id' => PermissionsHelper::getParentPermissionId('13'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['SUBSCRIPTIONS']
+    ],
 ]);
 
 // super panel menus
@@ -126,6 +131,7 @@ PermissionsHelper::initializePermissions();
         'children' => [
             'Gateways' => ['menu_url' => 'paymentGateway.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PAYMENTGATEWAYS'], 'READ_ALL')],
             'Transactions' => ['menu_url' => 'planPaymentTransaction.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PAYMENTSTRANSACTIONS'], 'READ_ALL')],
+            'Subscriptions' => ['menu_url' => 'subscriptions.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SUBSCRIPTIONS'], 'READ_ALL')],
 
         ]
     ],
@@ -355,6 +361,7 @@ PermissionsHelper::initializePermissions();
         'plans' => 'plans',
         'planPaymentTransaction' => 'planPaymentTransaction',
         'paymentGateway' => 'paymentGateway',
+        'subscriptions' => 'subscriptions',
 
 
     ],
