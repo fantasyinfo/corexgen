@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Helpers\PermissionsHelper;
-use App\Http\Requests\CRM\CompaniesRequest;
+use App\Http\Requests\CompaniesRequest;
 use App\Http\Requests\UserRequest;
 use App\Models\Company;
 use App\Models\Country;

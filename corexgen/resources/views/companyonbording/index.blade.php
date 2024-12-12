@@ -453,10 +453,10 @@
                     <!-- Payment gateway integration goes here -->
                     <div class="col-12 mb-3">
                         <select class="form-control" name="gateway" required>
-                            <option value="">Select Payment</option>
-
-                            <option value="stripe">Stripe</option>
-                            <option value="paypal">Paypal</option>
+                           
+                            @foreach ($payment_gateways as $pg)
+                            <option value="{{ strtolower($pg->name) }}">{{ $pg->name }}</option>
+                            @endforeach
 
                         </select>
                     </div>

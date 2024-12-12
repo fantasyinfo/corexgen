@@ -4,6 +4,7 @@ namespace App\Services\Payments;
 
 use App\Contracts\Payments\PaymentGatewayInterface;
 use App\Http\Controllers\CompanyRegisterController;
+use App\Models\PaymentGateway;
 use App\Services\CompanyService;
 use Illuminate\Http\Request;
 use Stripe\Stripe;
@@ -12,11 +13,19 @@ use Stripe\Checkout\Session;
 class StripePaymentGateway implements PaymentGatewayInterface
 {
 
+    public function getStripeSecretKey()
+    {
+        $stripe = PaymentGateway::where('name', 'Stripe')->first();
+        if ($stripe) {
+            return $stripe->config_value;
+        }
+        return null;
+    }
 
     public function initialize(array $paymentDetails)
     {
-        \Log::info(config('gateway.stripe.secret_key'));
-        Stripe::setApiKey(config('gateway.stripe.secret_key')); // todo:// get these from tenenat payment settings 
+        \Log::info('Stripe API Key from StripePaymentGateway Service: ',[$this->getStripeSecretKey()]);
+        Stripe::setApiKey($this->getStripeSecretKey()); // 
 
         $session = Session::create([
             'payment_method_types' => ['card'],
@@ -45,7 +54,7 @@ class StripePaymentGateway implements PaymentGatewayInterface
     {
 
 
-        Stripe::setApiKey(config('gateway.stripe.secret_key')); // todo:// get these from tenenat payment settings 
+        Stripe::setApiKey($this->getStripeSecretKey()); // todo:// get these from tenenat payment settings 
 
         $sessionId = $paymentData['session_id'];
 
@@ -82,7 +91,7 @@ class StripePaymentGateway implements PaymentGatewayInterface
         ];
 
 
-        if(isset($session?->metadata?->is_plan_upgrade) && $session?->metadata?->is_plan_upgrade ){
+        if (isset($session?->metadata?->is_plan_upgrade) && $session?->metadata?->is_plan_upgrade) {
             // upgrade the plan
             return app(CompanyRegisterController::class)->upgradePlanForCompany($paymentDetails);
         }

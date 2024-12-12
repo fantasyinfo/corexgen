@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Address;
+use App\Models\PaymentGateway;
 use Illuminate\Http\Request;
 use App\Models\Company;
 use App\Models\CompanyOnboarding;
@@ -25,10 +26,11 @@ class CompanyOnboardingController extends Controller
         );
 
         $countries = Country::all();
-        $plans = Plans::all();
+        $plans = Plans::where('status',CRM_STATUS_TYPES['PLANS']['STATUS']['ACTIVE'])->get();
+        $payment_gateways = PaymentGateway::where('status','Active')->get();
         // Get timezones from PHP
         $timezones = DateTimeZone::listIdentifiers();
-        return view('companyonbording.index', compact('company', 'onboarding', 'countries', 'timezones', 'plans'));
+        return view('companyonbording.index', compact('company', 'onboarding', 'countries', 'timezones', 'plans','payment_gateways'));
     }
 
     public function saveAddress(Request $request)
