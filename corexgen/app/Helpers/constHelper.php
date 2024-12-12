@@ -70,6 +70,11 @@ PermissionsHelper::initializePermissions();
         'id' => PermissionsHelper::getParentPermissionId('11'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['PLANUPGRADE']
     ],
+    PermissionsHelper::$plansPermissionsKeys['PAYMENTGATEWAYS'] => [
+        'name' => 'PAYMENTGATEWAYS',
+        'id' => PermissionsHelper::getParentPermissionId('12'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['PAYMENTGATEWAYS']
+    ],
 ]);
 
 // super panel menus
@@ -115,10 +120,11 @@ PermissionsHelper::initializePermissions();
 
         ]
     ],
-    'Payment Transactions' => [
+    'Gateway & Transactions' => [
         'menu_icon' => 'fas fa-file-invoice-dollar',
         'permission_id' => PermissionsHelper::getParentPermissionId('10'),
         'children' => [
+            'Gateways' => ['menu_url' => 'paymentGateway.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PAYMENTGATEWAYS'], 'READ_ALL')],
             'Transactions' => ['menu_url' => 'planPaymentTransaction.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PAYMENTSTRANSACTIONS'], 'READ_ALL')],
 
         ]
@@ -348,6 +354,7 @@ PermissionsHelper::initializePermissions();
         'companies' => 'companies',
         'plans' => 'plans',
         'planPaymentTransaction' => 'planPaymentTransaction',
+        'paymentGateway' => 'paymentGateway',
 
 
     ],
@@ -359,7 +366,7 @@ PermissionsHelper::initializePermissions();
         'users' => 'users',
         'modules' => 'modules',
         'appupdates' => 'appupdates',
-        'planupgrade' =>'planupgrade'
+        'planupgrade' => 'planupgrade'
     ]
 ]);
 
@@ -392,4 +399,27 @@ PermissionsHelper::initializePermissions();
         'TABLE' => ['HOME', 'OFFICE'],
         'SHOW' => ['HOME' => 'HOME', 'OFFICE' => 'OFFICE'],
     ],
+]);
+
+!defined('PAYMENT_GATEWAYS') && define('PAYMENT_GATEWAYS', [
+    'STRIPE' => [
+        'name' => 'Stripe',
+        'official_website' => 'stripe.com',
+        'logo' => 'stripe.png',
+        'type' => 'International',
+        'config_key' => 'pk_test_o6ScAy3rikKa1jKhsNZ9HwLn00HIrNEESf',
+        'config_value' => 'sk_test_ZpiCxEOHseka5xDnfwoRoG0700L2MOuJkS',
+        'mode' => 'LIVE',
+        'status' => 'Active'
+    ],
+    'PAYPAL' => [
+        'name' => 'Paypal',
+        'official_website' => 'paypal.com',
+        'logo' => 'paypal.png',
+        'type' => 'International',
+        'config_key' => 'key___',
+        'config_value' => 'sec___',
+        'mode' => 'TEST',
+        'status' => 'Inactive'
+    ]
 ]);
