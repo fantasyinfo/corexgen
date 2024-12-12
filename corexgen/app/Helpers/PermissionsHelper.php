@@ -21,7 +21,8 @@ class PermissionsHelper
         'PLANS' => 'PLANS',
         'PAYMENTSTRANSACTIONS' => 'PAYMENTSTRANSACTIONS',
         'PLANUPGRADE' => 'PLANUPGRADE',
-        'PAYMENTGATEWAYS' => 'PAYMENTGATEWAYS'
+        'PAYMENTGATEWAYS' => 'PAYMENTGATEWAYS',
+        'SUBSCRIPTIONS' => 'SUBSCRIPTIONS'
     ];
 
 
@@ -64,6 +65,8 @@ class PermissionsHelper
             self::$plansPermissionsKeys['PLANUPGRADE'] => [1000 => 'READ', 1001 => 'READ_ALL', 1002 => 'UPGRADE'],
 
             self::$plansPermissionsKeys['PAYMENTGATEWAYS'] => [1051 => 'READ', 1052 => 'READ_ALL', 1053 => 'UPDATE', 1055 => 'FILTER', 1056 => 'CHANGE_STATUS'],
+
+            self::$plansPermissionsKeys['SUBSCRIPTIONS'] => [1101 => 'READ', 1102 => 'READ_ALL'],
         ];
     }
 

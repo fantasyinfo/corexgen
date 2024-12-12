@@ -298,6 +298,21 @@
                 transform: translateY(0);
             }
         }
+
+        .logout-link {
+            background: none;
+            border: none;
+            color: #ff0000;
+            text-decoration: underline;
+            cursor: pointer;
+            padding: 0;
+            font-size: inherit;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-content: center;
+            width:100%;
+        }
     </style>
 </head>
 
@@ -313,8 +328,8 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"
                             class="me-3">
                             <path fill="#e0f7fa" d="M44,24c0,11-9,20-20,20S4,35,4,24S13,4,24,4S44,13,44,24z"></path>
-                            <polyline fill="none" stroke="var(--primary-color)" stroke-miterlimit="10" stroke-width="4"
-                                points="14,24 21,31 36,16"></polyline>
+                            <polyline fill="none" stroke="var(--primary-color)" stroke-miterlimit="10"
+                                stroke-width="4" points="14,24 21,31 36,16"></polyline>
                         </svg>
                         <h4 class="modal-title">Registration Successful!</h4>
                     </div>
@@ -336,6 +351,12 @@
 
                     <button type="button" class="btn btn-primary btn-lg w-100" onclick="showOnboarding()">Start
                         Onboarding</button>
+
+                    <form method="POST" action="{{ route('logout') }}" style="display: inline;">
+                        @csrf
+                        <input type="submit" value="{{ __('general.Logout') }}" class="mt-3 text-center logout-link" />
+                    </form>
+
                 </div>
             </div>
         </div>
@@ -453,9 +474,9 @@
                     <!-- Payment gateway integration goes here -->
                     <div class="col-12 mb-3">
                         <select class="form-control" name="gateway" required>
-                           
+
                             @foreach ($payment_gateways as $pg)
-                            <option value="{{ strtolower($pg->name) }}">{{ $pg->name }}</option>
+                                <option value="{{ strtolower($pg->name) }}">{{ $pg->name }}</option>
                             @endforeach
 
                         </select>

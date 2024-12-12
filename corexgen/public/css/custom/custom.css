@@ -329,10 +329,10 @@ table tr {
 }
 
 /* Apply minimum column widths */
-/* .table th,
+.table th,
 .table td {
   min-width: 150px;
-} */
+} 
 
 /* Odd/even row hover effect */
 .table tbody tr:nth-child(odd):hover {

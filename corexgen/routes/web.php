@@ -435,23 +435,15 @@ Route::middleware([
     Route::prefix('planPaymentTransaction')->as('planPaymentTransaction.')->group(function () {
         // role for fetch, store, update
         Route::get('/', [PlansPaymentTransaction::class, 'index'])->name('index')->middleware('check.permission:PAYMENTSTRANSACTIONS.READ_ALL');
-        Route::post('/', [PlansPaymentTransaction::class, 'store'])->name('store')->middleware('check.permission:PAYMENTSTRANSACTIONS.CREATE');
-        Route::put('/', [PlansPaymentTransaction::class, 'update'])->name('update')->middleware('check.permission:PAYMENTSTRANSACTIONS.UPDATE');
-
-        // create, edit, change status, delete
-        Route::get('/create', [PlansPaymentTransaction::class, 'create'])->name('create')->middleware('check.permission:PAYMENTSTRANSACTIONS.CREATE');
-        Route::get('/edit/{id}', [PlansPaymentTransaction::class, 'edit'])->name('edit')->middleware('check.permission:PAYMENTSTRANSACTIONS.UPDATE');
-        Route::get(
-            '/changeStatus/{id}/{status}',
-            [PlansPaymentTransaction::class, 'changeStatus']
-        )->name('changeStatus')->middleware('check.permission:PAYMENTSTRANSACTIONS.CHANGE_STATUS');
-        Route::delete('/destroy/{id}', [PlansPaymentTransaction::class, 'destroy'])->name('destroy')->middleware('check.permission:PAYMENTSTRANSACTIONS.DELETE');
+    });
 
 
+    // subscriptions routes
+    Route::prefix('subscriptions')->as('subscriptions.')->group(function () {
+        Route::get('/', [PlansPaymentTransaction::class, 'subscriptions'])->name('index')->middleware('check.permission:SUBSCRIPTIONS.READ_ALL');
     });
 
     // payment gateways routes
-
 
     Route::prefix('paymentGateway')->as('paymentGateway.')->group(function () {
         // role for fetch, store, update
