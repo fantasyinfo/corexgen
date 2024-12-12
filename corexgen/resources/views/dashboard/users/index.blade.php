@@ -7,7 +7,7 @@
 
             <div class="shadow-sm rounded">
 
-                @include('dashboard.crm.users.components.users-filters')
+                @include('dashboard.users.components.users-filters')
                 @include('layout.components.bulk-import-modal')
 
 

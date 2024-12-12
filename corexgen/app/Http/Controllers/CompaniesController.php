@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\CRM;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Helpers\PermissionsHelper;
 use App\Http\Requests\CRM\CompaniesRequest;
-use App\Http\Requests\CRM\CRMUserRequest;
+use App\Http\Requests\UserRequest;
 use App\Models\Company;
 use App\Models\Country;
 use App\Models\CRM\CRMRole;
@@ -57,7 +57,7 @@ class CompaniesController extends Controller
      * Base directory for view files
      * @var string
      */
-    private $viewDir = 'dashboard.crm.companies.';
+    private $viewDir = 'dashboard.companies.';
 
     /**
      * Generate full view file path

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\CRM;
+namespace App\Http\Requests;
 
 use App\Models\Company;
 use App\Models\User;

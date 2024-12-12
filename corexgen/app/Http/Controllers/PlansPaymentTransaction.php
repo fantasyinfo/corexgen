@@ -7,6 +7,7 @@ use App\Repositories\PlansPaymentTransactionsRepository;
 use App\Services\PlansPaymentTransactionsService;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
+use App\Http\Requests\UserRequest;
 
 class PlansPaymentTransaction extends Controller
 {
@@ -29,7 +30,7 @@ class PlansPaymentTransaction extends Controller
      * Base directory for view files
      * @var string
      */
-    private $viewDir = 'dashboard.crm.planspaymenttransaction.';
+    private $viewDir = 'dashboard.planspaymenttransaction.';
 
     /**
      * Generate full view file path
@@ -83,7 +84,7 @@ class PlansPaymentTransaction extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(CRMUserRequest $request, UserService $userService)
+    public function store(UserRequest $request, UserService $userService)
     {
         $this->tenantRoute = $this->getTenantRoute();
 
@@ -162,7 +163,7 @@ class PlansPaymentTransaction extends Controller
      *
      * @return void
      */
-    public function update(CRMUserRequest $request, UserService $userService)
+    public function update(UserRequest $request, UserService $userService)
     {
 
         $this->tenantRoute = $this->getTenantRoute();

@@ -27,22 +27,19 @@ trait SubscriptionUsageFilter
 
             return abort(redirect()->route(getPanelRoutes('planupgrade.index')));
         }
-    
+
         return true;
 
     }
 
 
-    public function updateUsage($module,$sign,$value)
+    public function updateUsage($module, $sign, $value)
     {
         if ($this->isTenantUser()) {
             return true;
         }
 
-
         // Get current subscription ID
-
-
         $subId = $this->getCurrentSubscriptionId();
 
         // Find existing usage
@@ -50,13 +47,15 @@ trait SubscriptionUsageFilter
             ->where('company_id', $this->getCompanyId())
             ->first();
 
-
-
-
         if ($subUsageFind) {
+            // Perform mathematical calculation based on sign
+            $newValue = $sign === '+'
+                ? $subUsageFind->value + $value
+                : $subUsageFind->value - $value;
+
             // Update existing record
             $subUsageFind->update([
-                'value' => $subUsageFind->value .$sign. $value
+                'value' => $newValue
             ]);
 
         } else {
@@ -65,9 +64,8 @@ trait SubscriptionUsageFilter
                 'subscription_id' => $subId,
                 'company_id' => $this->getCompanyId(),
                 'module_name' => $module,
-                'value' => 1
+                'value' => $value
             ]);
-
         }
     }
 

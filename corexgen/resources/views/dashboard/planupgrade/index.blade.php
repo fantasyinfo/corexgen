@@ -91,10 +91,16 @@
                                     ({{ getSettingValue('Currency Code', '1') }})
                                 </span>
                             </div>
-                            <div class="plan-price text-center" >
-                                {{ getSettingValue('Currency Symbol', '1') }} <span id="plan_price">{{ $plan->offer_price }}</span> <span
-                                    class="text-muted" style="font-size: 1rem;">/{{ $plan->billing_cycle }}
-                                    ({{ getSettingValue('Currency Code', '1') }})</span>
+                            <div class="plan-price text-center">
+                                {{ getSettingValue('Currency Symbol', '1') }}
+                                <span id="plan_price_offer" data-price="{{ $plan->offer_price }}"
+                                    data-currency-symbol="{{ getSettingValue('Currency Symbol', '1') }}"
+                                    data-currency-code="{{ getSettingValue('Currency Code', '1') }}">
+                                    {{ $plan->offer_price }}
+                                </span>
+                                <span class="text-muted" style="font-size: 1rem;">
+                                    /{{ $plan->billing_cycle }} ({{ getSettingValue('Currency Code', '1') }})
+                                </span>
                             </div>
                             @if ($current_plan_id === $plan->id)
                                 <div class="text-center mt-3">
@@ -148,16 +154,20 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
-            // Capture all plan selection form submissions
             $('.plan-card form').on('submit', function(e) {
-                e.preventDefault(); // Stop the form from submitting immediately
+                e.preventDefault();
 
                 const $form = $(this);
-                const planPrice = $("#plan_price") || 0;
+                // Look for price in multiple possible locations
+                const planPrice = parseFloat(
+                    $form.find('[data-price]').data('price') ||
+                    $form.closest('.plan-card-body').find('[data-price]').data('price') ||
+                    0
+                );
 
-                // Always show confirmation modal first
-                const confirmModal = `
-            <div class="modal fade" id="confirmPlanChangeModal" tabindex="-1">
+                // Dynamically create modal based on plan price
+                const modalContent = `
+            <div class="modal fade" id="planChangeModal" tabindex="-1">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -165,90 +175,60 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body">
-                            Are you sure you want to change your plan? This action cannot be easily reversed.
+                            <p>Are you sure you want to change your plan? This action cannot be easily reversed.</p>
+                            
+                            ${planPrice > 0 ? `
+                                <div class="mt-3">
+                                    <label for="paymentGateway" class="form-label">Select Payment Method</label>
+                                    <select class="form-select" id="paymentGateway" required>
+                                        <option value="">Choose Payment Gateway</option>
+                                        <option value="stripe">Stripe</option>
+                                        <option value="paypal">PayPal</option>
+                                    </select>
+                                </div>
+                                ` : ''}
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-primary" id="continueChangePlan">Continue</button>
+                            <button type="button" class="btn btn-primary" id="confirmPlanChange">Confirm</button>
                         </div>
                     </div>
                 </div>
             </div>
         `;
 
-                // Payment gateway modal
-                const gatewayModal = `
-            <div class="modal fade" id="selectPaymentGatewayModal" tabindex="-1">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Select Payment Gateway</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="mb-3">
-                                <label for="paymentGateway" class="form-label">Choose Payment Method</label>
-                                <select class="form-select" id="paymentGateway" required>
-                                    <option value="">Select Payment Gateway</option>
-                                    <option value="stripe">Stripe</option>
-                                    <option value="paypal">PayPal</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-primary" id="proceedWithPayment">Proceed</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-                // Append modals to body if not already exist
-                if ($('#confirmPlanChangeModal').length === 0) {
-                    $('body').append(confirmModal);
+                // Append modal to body if not already exists
+                if ($('#planChangeModal').length === 0) {
+                    $('body').append(modalContent);
                 }
 
-                if ($('#selectPaymentGatewayModal').length === 0) {
-                    $('body').append(gatewayModal);
-                }
-
-                // Initialize Bootstrap modals
-                const confirmModalInstance = new bootstrap.Modal('#confirmPlanChangeModal');
-                const gatewayModalInstance = new bootstrap.Modal('#selectPaymentGatewayModal');
-
-                // Show confirmation modal
-                confirmModalInstance.show();
+                // Initialize Bootstrap modal
+                const modalInstance = new bootstrap.Modal('#planChangeModal');
+                modalInstance.show();
 
                 // Confirm plan change
-                $('#continueChangePlan').off('click').on('click', function() {
-                    confirmModalInstance.hide();
-
-                    // If plan has a price, show payment gateway modal
+                $('#confirmPlanChange').off('click').on('click', function() {
+                    // If plan has a price, validate gateway selection
                     if (planPrice > 0) {
-                        gatewayModalInstance.show();
-                    } else {
-                        // If plan is free, directly submit the form
-                        $form[0].submit();
-                    }
-                });
+                        const selectedGateway = $('#paymentGateway').val();
 
-                // Proceed with payment
-                $('#proceedWithPayment').off('click').on('click', function() {
-                    const selectedGateway = $('#paymentGateway').val();
+                        if (!selectedGateway) {
+                            alert('Please select a payment gateway');
+                            return;
+                        }
 
-                    if (!selectedGateway) {
-                        alert('Please select a payment gateway');
-                        return;
-                    }
+                        // Clear any existing hidden gateway inputs
+                        $form.find('input[name="gateway"]').remove();
 
-                    // You would typically handle payment gateway logic here
-                    // For now, we'll just submit the form with a hidden gateway input
-                    $form.append(
-                        `<input type="hidden" name="gateway" value="${selectedGateway}">`
+                        // Add hidden input for gateway
+                        $form.append(
+                            `<input type="hidden" name="gateway" value="${selectedGateway}">`
                         );
-                    gatewayModalInstance.hide();
-                    $form[0].submit();
+                    }
+
+                    // Close modal and submit form
+                    modalInstance.hide();
+                    $form.off('submit').submit();
                 });
             });
         });

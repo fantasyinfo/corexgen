@@ -36,7 +36,7 @@ class PlanUpgrade extends Controller
      * Base directory for view files
      * @var string
      */
-    private $viewDir = 'dashboard.crm.planupgrade.';
+    private $viewDir = 'dashboard.planupgrade.';
 
     /**
      * Generate full view file path
@@ -80,6 +80,13 @@ class PlanUpgrade extends Controller
 
     public function upgrade(Request $request, CompanyService $companyService, PaymentGatewayFactory $paymentGatewayFactory)
     {
+
+             // payment gateway
+        // update company plan id
+        // create payment transaction
+        // create new subscrition
+
+
         $request->validate([
             'plan_id' => 'required|exists:plans,id'
         ]);
@@ -139,19 +146,17 @@ class PlanUpgrade extends Controller
                 'metadata' => [
                     'plan_id' => $validatedData['plan_id'],
                     'company_registration' => true,
-                    'company_id' => $company->id
+                    'company_id' => $company->id,
+                    'is_plan_upgrade' => true
                 ]
             ];
 
-            Log::info('Payment Details Passed', ['plan' => $paymentDetails]);
+            \Log::info('Payment Details Passed', ['plan' => $paymentDetails]);
             // Initialize payment
             $paymentUrl = $paymentGateway->initialize($paymentDetails);
-            dd($paymentUrl);
+            return redirect()->away($paymentUrl);
         }
-        // payment gateway
-        // update company plan id
-        // create payment transaction
-        // create new subscrition
+   
 
     }
 

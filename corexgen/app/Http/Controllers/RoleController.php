@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\CRM;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\CRM\CRMRoleRequest;
+use App\Http\Requests\RoleRequest;
 use Illuminate\Http\Request;
 use App\Models\CRM\CRMRole;
 use Illuminate\Validation\Rule;
@@ -25,7 +25,7 @@ use App\Helpers\PermissionsHelper;
  * - Importing roles from CSV
  * - Changing role status
  */
-class CRMRoleController extends Controller
+class RoleController extends Controller
 {
     use TenantFilter;
 
@@ -45,7 +45,7 @@ class CRMRoleController extends Controller
      * Base directory for view files
      * @var string
      */
-    private $viewDir = 'dashboard.crm.role.';
+    private $viewDir = 'dashboard.role.';
 
     /**
      * Generate full view file path
@@ -131,10 +131,10 @@ class CRMRoleController extends Controller
     /**
      * Store a newly created role
      * 
-     * @param CRMRoleRequest $request
+     * @param RoleRequest $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(CRMRoleRequest $request)
+    public function store(RoleRequest $request)
     {
         $this->tenantRoute = $this->getTenantRoute();
         try {
@@ -191,10 +191,10 @@ class CRMRoleController extends Controller
     /**
      * Update an existing role
      * 
-     * @param CRMRoleRequest $request
+     * @param RoleRequest $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(CRMRoleRequest $request)
+    public function update(RoleRequest $request)
     {
         $this->tenantRoute = $this->getTenantRoute();
 

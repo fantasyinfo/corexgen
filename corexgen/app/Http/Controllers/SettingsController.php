@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\CRM;
+namespace App\Http\Controllers;
 
 use App\Helpers\PermissionsHelper;
 use App\Http\Controllers\Controller;
@@ -8,7 +8,7 @@ use App\Models\CRM\CRMSettings;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
 
-class CRMSettingsController extends Controller
+class SettingsController extends Controller
 {
     //
     use TenantFilter;
@@ -32,7 +32,7 @@ class CRMSettingsController extends Controller
      * Base directory for view files
      * @var string
      */
-    private $viewDir = 'dashboard.crm.settings.';
+    private $viewDir = 'dashboard.settings.';
 
     /**
      * Generate full view file path

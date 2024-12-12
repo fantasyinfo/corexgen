@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\PermissionsHelper;
-use App\Http\Requests\CRM\CRMUserRequest;
+use App\Http\Requests\UserRequest;
 use App\Models\Country;
 use App\Models\CRM\CRMRole;
 use App\Repositories\UserRepository;
@@ -53,7 +53,7 @@ class UserController extends Controller
      * Base directory for view files
      * @var string
      */
-    private $viewDir = 'dashboard.crm.users.';
+    private $viewDir = 'dashboard.users.';
 
     /**
      * Generate full view file path
@@ -110,7 +110,7 @@ class UserController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(CRMUserRequest $request, UserService $userService)
+    public function store(UserRequest $request, UserService $userService)
     {
         $this->tenantRoute = $this->getTenantRoute();
 
@@ -195,7 +195,7 @@ class UserController extends Controller
      *
      * @return void
      */
-    public function update(CRMUserRequest $request, UserService $userService)
+    public function update(UserRequest $request, UserService $userService)
     {
 
         $this->tenantRoute = $this->getTenantRoute();

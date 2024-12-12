@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\CRM;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\CRM\CRMRolePermissionsRequest;
+use App\Http\Requests\RolePermissionsRequest;
 use App\Models\CRM\CRMPermissions;
 use App\Models\CRM\CRMRole;
 use App\Models\CRM\CRMRolePermissions;
@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Auth;
  * - Editing existing permissions
  * - Deleting the existing permissions
  */
-class CRMRolePermissionsController extends Controller
+class RolePermissionsController extends Controller
 {
     use TenantFilter;
     /**
@@ -47,7 +47,7 @@ class CRMRolePermissionsController extends Controller
      * Base directory for view files
      * @var string
      */
-    private $viewDir = 'dashboard.crm.permissions.';
+    private $viewDir = 'dashboard.permissions.';
 
     /**
      * Generate full view file path
@@ -164,7 +164,7 @@ class CRMRolePermissionsController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(CRMRolePermissionsRequest $request)
+    public function store(RolePermissionsRequest $request)
     {
 
         // Start a database transaction
@@ -278,7 +278,7 @@ class CRMRolePermissionsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(CRMRolePermissionsRequest $request)
+    public function update(RolePermissionsRequest $request)
     {
 
         // Start a database transaction
