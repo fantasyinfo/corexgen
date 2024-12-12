@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('company_id');
    
             $table->string('module_name');
-            $table->integer('value')->default(0);
+            $table->unsignedInteger('value')->default(0);
 
             $table->timestamps();
 

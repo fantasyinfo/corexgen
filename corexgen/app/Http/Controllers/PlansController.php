@@ -46,7 +46,7 @@ class PlansController extends Controller
      * Base directory for view files
      * @var string
      */
-    private $viewDir = 'dashboard.crm.plans.';
+    private $viewDir = 'dashboard.plans.';
 
     /**
      * Generate full view file path

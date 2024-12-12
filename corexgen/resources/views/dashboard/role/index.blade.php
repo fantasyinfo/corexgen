@@ -6,7 +6,7 @@
             @include('layout.components.header-buttons')
 
             <div class="shadow-sm rounded ">
-                @include('dashboard.crm.role.components.role-filters')
+                @include('dashboard.role.components.role-filters')
     
                 @include('layout.components.bulk-import-modal')
 

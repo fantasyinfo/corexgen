@@ -169,7 +169,8 @@
                                                 <x-form-components.input-group type="number" class="custom-class"
                                                     id="{{ $pfs }}" name="features.{{ $pfs }}"
                                                     placeholder="{{ __('10') }}" value="{{ $featureValue }}"
-                                                    required />
+                                                    min="-1" required />
+
 
                                             </div>
                                             <p class="offset-lg-4 font-12 my-2 text-secondary">

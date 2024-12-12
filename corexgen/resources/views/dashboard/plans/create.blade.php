@@ -178,7 +178,7 @@
                                             <div class="col-lg-8">
                                                 @php  $pfs = strtolower( $pf); @endphp
                                                 <x-form-components.input-group type="number" class="custom-class"
-                                                    id="{{ $pfs }}" name="features.{{ $pfs }}"
+                                                    id="{{ $pfs }}" name="features.{{ $pfs }}"  min="-1"
                                                     placeholder="{{ __('10') }}" value="10" required />
 
                                             </div>

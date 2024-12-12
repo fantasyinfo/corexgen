@@ -222,6 +222,58 @@ class CompanyRegisterController extends Controller
     }
 
 
+    public function upgradePlanForCompany(array $paymentData)
+    {
+        $companyService = $this->companyService;
+        $validatedData = [];
+        $validatedData['payment_details'] = $paymentData;
+        
+        try {
+            return DB::transaction(function () use ($companyService, $validatedData) {
+                $company = Company::find($validatedData['payment_details']['company_id']);
+                
+                // Find and login company owner
+                $user = $this->findCompanyOwner($company);
+    
+                // create transaction 
+                $paymentTransaction = $companyService->createPaymentTransaction(
+                    $company->plan_id, 
+                    $company->id, 
+                    $validatedData['payment_details']
+                );
+    
+                // create permission to company
+                $companyService->givePermissionsToCompany($company, $user);
+    
+                // create menu items for company
+                $companyService->createMenuItemsForCompanyPanel($validatedData['payment_details']['plan_id']);
+    
+                $company->plan_id = $validatedData['payment_details']['plan_id'];
+                $company->save();
+    
+                // Log successful registration
+                Log::info('Company Plan Upgraded Successfully', [
+                    'company_id' => $company->id,
+                    'new_plan_id' => $validatedData['payment_details']['plan_id']
+                ]);
+    
+                // Directly return the redirect to plan upgrade index
+                return redirect()->route(
+                    getPanelUrl(PANEL_TYPES['COMPANY_PANEL']) . '.planupgrade.index'
+                );
+            });
+        } catch (\Exception $e) {
+            // Log the error
+            Log::error('Company Plan Upgrade Failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+    
+            // Redirect back with error
+            return redirect()->back()->with('error', 'Plan upgrade failed: ' . $e->getMessage());
+        }
+    }
+
 
     /**
      * Initiate payment process

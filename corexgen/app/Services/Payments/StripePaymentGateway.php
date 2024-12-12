@@ -82,7 +82,10 @@ class StripePaymentGateway implements PaymentGatewayInterface
         ];
 
 
-        // return app(CompanyRegisterController::class)->storeCompanyAfterPayment($paymentDetails);
+        if(isset($session?->metadata?->is_plan_upgrade) && $session?->metadata?->is_plan_upgrade ){
+            // upgrade the plan
+            return app(CompanyRegisterController::class)->upgradePlanForCompany($paymentDetails);
+        }
         return app(CompanyRegisterController::class)->storeCompnayAfterPaymentOnboading($paymentDetails);
 
 
