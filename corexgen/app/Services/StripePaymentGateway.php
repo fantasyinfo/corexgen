@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Payments;
+namespace App\Services;
 
 use App\Contracts\Payments\PaymentGatewayInterface;
 use App\Http\Controllers\CompanyRegisterController;

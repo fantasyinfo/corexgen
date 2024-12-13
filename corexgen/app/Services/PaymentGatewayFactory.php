@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Payments;
+namespace App\Services;
 
 use App\Contracts\Payments\PaymentGatewayInterface;
 use App\Exceptions\PaymentGatewayNotFoundException;
@@ -13,9 +13,10 @@ class PaymentGatewayFactory
      * @var array
      */
     private array $gateways = [
-        'stripe' => \App\Services\Payments\StripePaymentGateway::class,
-        'paypal' => \App\Services\Payments\PayPalPaymentGateway::class,
+        'stripe' => \App\Services\StripePaymentGateway::class,
         // Future gateways can be added here
+    
+        'paypal' => \Modules\PaypalGatewayModule\App\Services\PayPalPaymentGateway::class,
     ];
 
     /**
@@ -35,5 +36,21 @@ class PaymentGatewayFactory
 
         $gatewayClass = $this->gateways[$gateway];
         return app($gatewayClass);
+    }
+
+    public function addGateway(string $key, string $class): void
+    {
+        $this->gateways[$key] = $class;
+        \Log::info('Gateway Push',[ $this->gateways[$key] => $class] );
+    }
+
+    /**
+     * Get all registered payment gateways
+     * 
+     * @return array
+     */
+    public function getGateways(): array
+    {
+        return $this->gateways;
     }
 }

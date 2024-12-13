@@ -9,7 +9,7 @@ use App\Models\Plans;
 use App\Models\Subscription;
 use App\Models\User;
 use App\Services\CompanyService;
-use App\Services\Payments\PaymentGatewayFactory;
+use App\Services\PaymentGatewayFactory;
 use App\Traits\TenantFilter;
 use Carbon\Carbon;
 use Illuminate\Http\Request;

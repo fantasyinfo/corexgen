@@ -172,6 +172,7 @@ return [
         App\Providers\FortifyServiceProvider::class,
         App\Providers\JetstreamServiceProvider::class,
         Modules\BlogModule\BlogModuleServiceProvider::class,
+        Modules\PaypalGatewayModule\PaypalGatewayModuleServiceProvider::class,
         Yajra\DataTables\DataTablesServiceProvider::class
     ])->toArray(),
 
