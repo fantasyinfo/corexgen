@@ -21,7 +21,7 @@ class PaymentGatewaySeeder extends Seeder
             'config_key' => 'key___',
             'config_value' => 'sec___',
             'mode' => 'TEST',
-            'status' => 'Inactive'
+            'status' => 'Active'
         ];
 
 

@@ -2,6 +2,7 @@
 
 namespace App\Core;
 
+use App\Services\PaymentGatewayFactoryModifier;
 use ZipArchive;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -81,7 +82,8 @@ class ModuleManager
 
             Log::info("Migrations Ran.");
 
-
+            Log::info("Running Seeders.");
+            $this->runSeeder($moduleData['id']);
 
             $this->loadModules();
 
@@ -300,6 +302,19 @@ class ModuleManager
         // Extract module
         $zip->extractTo($extractPath);
         $zip->close();
+
+
+        // Add the gateway to PaymentGatewayFactory
+        if (isset($moduleJson['payment_gateway'])) {
+            Log::info('*** Yes Found the Payment Gateway ', $moduleJson['payment_gateway']);
+
+            PaymentGatewayFactoryModifier::addGateway(
+                $moduleJson['payment_gateway']['key'],
+                $moduleJson['payment_gateway']['class']
+            );
+
+        }
+
 
         return [
             'id' => $moduleJson['name'],

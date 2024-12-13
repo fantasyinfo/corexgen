@@ -5,6 +5,10 @@
     "description": "Paypal Payment Gateway for Trnasactions.",
     "providers": ["PaypalGatewayModuleServiceProvider"],
     "packages": ["srmklive/paypal"],
+    "payment_gateway": {
+        "key": "paypal",
+        "class": "Modules\\PaypalGatewayModule\\App\\Services\\PayPalPaymentGateway"
+    },
     "dependencies": {
         "core": ">=1.0.0"
     }

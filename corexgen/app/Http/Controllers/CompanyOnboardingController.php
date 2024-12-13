@@ -9,7 +9,7 @@ use App\Models\Company;
 use App\Models\CompanyOnboarding;
 use App\Models\Country;
 use App\Models\Plans;
-use App\Services\Payments\PaymentGatewayFactory;
+use App\Services\PaymentGatewayFactory;
 use DateTimeZone;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;

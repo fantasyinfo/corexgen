@@ -13,7 +13,7 @@ use App\Exceptions\Payment;
 use App\Models\Company;
 use App\Models\CompanyOnboarding;
 use App\Repositories\CompanyRepository;
-use App\Services\Payments\PaymentGatewayFactory;
+use App\Services\PaymentGatewayFactory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
