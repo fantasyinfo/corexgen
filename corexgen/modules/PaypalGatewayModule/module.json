@@ -4,7 +4,7 @@
     "author": "Paypal Payment Gateway Module",
     "description": "Paypal Payment Gateway for Trnasactions.",
     "providers": ["PaypalGatewayModuleServiceProvider"],
-    "packages": ["srmklive/paypal"],
+    "packages": ["guzzlehttp/guzzle"],
     "payment_gateway": {
         "key": "paypal",
         "class": "Modules\\PaypalGatewayModule\\App\\Services\\PayPalPaymentGateway"
