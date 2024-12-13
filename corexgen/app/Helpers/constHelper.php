@@ -418,15 +418,5 @@ PermissionsHelper::initializePermissions();
         'config_value' => 'sk_test_ZpiCxEOHseka5xDnfwoRoG0700L2MOuJkS',
         'mode' => 'LIVE',
         'status' => 'Active'
-    ],
-    'PAYPAL' => [
-        'name' => 'Paypal',
-        'official_website' => 'paypal.com',
-        'logo' => 'paypal.png',
-        'type' => 'International',
-        'config_key' => 'key___',
-        'config_value' => 'sec___',
-        'mode' => 'TEST',
-        'status' => 'Inactive'
     ]
 ]);

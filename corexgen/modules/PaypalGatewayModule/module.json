@@ -1,0 +1,11 @@
+{
+    "name": "PaypalGatewayModule",
+    "version": "1.0.0",
+    "author": "Paypal Payment Gateway Module",
+    "description": "Paypal Payment Gateway for Trnasactions.",
+    "providers": ["PaypalGatewayModuleServiceProvider"],
+    "packages": ["srmklive/paypal"],
+    "dependencies": {
+        "core": ">=1.0.0"
+    }
+}

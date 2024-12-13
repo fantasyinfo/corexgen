@@ -67,6 +67,9 @@ class ModuleManager
             // Extract module
             $moduleData = $this->extractModule($modulePath);
 
+            Log::info('Going to install required package');
+            $this->installModulePackages($moduleData);
+
             Log::info("Module Extracted.");
             // Register module in database
             $this->registerModule($moduleData);
@@ -303,8 +306,38 @@ class ModuleManager
             'version' => $moduleJson['version'],
             'description' => $moduleJson['description'],
             'providers' => $moduleJson['providers'],
+            'packages' => $moduleJson['packages'],
             'path' => $extractPath
         ];
+    }
+
+    protected function installModulePackages(array $moduleData): void
+    {
+        // Ensure the "packages" key exists in the module data
+        if (!isset($moduleData['packages']) || !is_array($moduleData['packages'])) {
+            return;
+        }
+
+        foreach ($moduleData['packages'] as $package) {
+            $this->requirePackage($package);
+        }
+    }
+
+    protected function requirePackage(string $package): void
+    {
+        // Build the composer require command
+        $command = "composer require $package --working-dir=" . base_path();
+
+        // Execute the command
+        exec($command, $output, $resultCode);
+
+        // Check the result
+        if ($resultCode !== 0) {
+            throw new \Exception("Failed to install package: $package. Output: " . implode("\n", $output));
+        }
+
+        // Log the success
+        \Log::info("Package installed successfully: $package\n");
     }
 
     /**
@@ -329,50 +362,6 @@ class ModuleManager
             ]
         );
     }
-
-    // protected function runMigrations(string $moduleId): void
-    // {
-    //     Log::info("Running migrations for module: $moduleId");
-    //     $migrationPath = $this->moduleDirectory . '/' . $moduleId . '/database/migrations';
-
-    //     Log::info("Migration path: $migrationPath");
-
-    //     if (File::exists($migrationPath)) {
-    //         Log::info("Migration directory exists.");
-
-    //         // Make the migration path relative to base_path
-    //         $relativePath = str_replace(base_path() . '/', '', $migrationPath);
-
-    //         Log::info("Relative path for migration: $relativePath");
-
-    //         // Log all files in the directory
-    //         $files = File::files($migrationPath);
-    //         foreach ($files as $file) {
-    //             Log::info("File Name: " . $file->getFilename());
-    //         }
-
-    //         try {
-    //             // Call the Artisan migrate command with the correct relative path
-    //             $exitCode = Artisan::call('migrate', [
-    //                 '--path' => $relativePath,
-    //                 '--force' => true,
-    //             ]);
-
-    //             Log::info("Artisan migrate output: " . Artisan::output());
-    //             Log::info("Artisan migrate exit code: $exitCode");
-
-    //             if ($exitCode !== 0) {
-    //                 Log::error("Migration command failed with exit code: $exitCode");
-    //             } else {
-    //                 Log::info("Migrations executed successfully for module: $moduleId");
-    //             }
-    //         } catch (\Exception $e) {
-    //             Log::error("Error running migration command: " . $e->getMessage());
-    //         }
-    //     } else {
-    //         Log::error('Migration path does not exist: ' . $migrationPath);
-    //     }
-    // }
 
 
 
@@ -426,6 +415,86 @@ class ModuleManager
             Log::error('Migration path does not exist: ' . $migrationPath);
         }
     }
+
+    /**
+     * Method runSeeder
+     *
+     * @param string $moduleId running the migrations of module
+     *
+     * @return void
+     */
+    protected function runSeeder(string $moduleId): void
+    {
+        Log::info("Running seeder for module: $moduleId");
+
+        // Set the relative path for seeders
+        $seederPath = 'modules/' . $moduleId . '/database/seeders'; // Relative path to base directory
+        Log::info("Relative Seeder Path: $seederPath");
+
+        // Check if the seeders directory exists
+        if (File::exists(base_path($seederPath))) {
+            Log::info("Seeders directory exists.");
+
+            // Get all PHP files in the directory
+            $files = File::files(base_path($seederPath));
+            foreach ($files as $file) {
+                if ($file->getExtension() === 'php') {
+                    // Derive the class name from the file
+                    $className = $this->getSeederClassName($file->getPathname());
+                    Log::info("Found seeder class: $className");
+
+                    try {
+                        // Run the seeder
+                        $exitCode = Artisan::call('db:seed', ['--class' => $className]);
+                        Log::info("Artisan seeder output: " . Artisan::output());
+                        Log::info("Artisan seeder exit code: $exitCode");
+
+                        if ($exitCode !== 0) {
+                            Log::error("Seeder command failed with exit code: $exitCode for class: $className");
+                        } else {
+                            Log::info("Seeder executed successfully: $className");
+                        }
+                    } catch (\Exception $e) {
+                        // Handle exceptions during the seeding process
+                        Log::error("Error running seeder: $className, Message: " . $e->getMessage());
+                    }
+                } else {
+                    Log::info("Skipping non-PHP file: " . $file->getFilename());
+                }
+            }
+        } else {
+            // Log an error if the seeder path doesn't exist
+            Log::error('Seeder path does not exist: ' . $seederPath);
+        }
+    }
+
+    /**
+     * Get the fully qualified class name for a seeder file.
+     *
+     * @param string $filePath
+     * @return string|null
+     */
+    protected function getSeederClassName(string $filePath): ?string
+    {
+        // Extract the namespace and class name from the file
+        $namespace = null;
+        $className = null;
+
+        $lines = file($filePath);
+        foreach ($lines as $line) {
+            if (preg_match('/^namespace\s+(.+);$/', trim($line), $matches)) {
+                $namespace = $matches[1];
+            }
+
+            if (preg_match('/^class\s+([a-zA-Z0-9_]+)\s/', trim($line), $matches)) {
+                $className = $matches[1];
+                break;
+            }
+        }
+
+        return $namespace && $className ? $namespace . '\\' . $className : null;
+    }
+
 
     /**
      * Method loadModules
@@ -549,38 +618,6 @@ class ModuleManager
 
 
 
-    // protected function addProviderToConfig(string $providerClass): void
-    // {
-    //     // Path to the config/app.php file
-    //     $configPath = config_path('app.php');
-
-    //     // Get the content of the config file
-    //     $configContent = file_get_contents($configPath);
-
-    //     // Check if the provider is already in the config file
-    //     if (strpos($configContent, $providerClass) === false) {
-    //         // Using a more targeted regex approach to insert the provider within the 'providers' array
-    //         $pattern = '/\'providers\' => \[.*?\]/s'; // This will match the entire providers array
-    //         $replacement = function ($matches) use ($providerClass) {
-    //             // Append the new provider before the closing bracket of the array
-    //             return preg_replace(
-    //                 '/\]$/',
-    //                 "\n        {$providerClass}::class,\n    ]",
-    //                 $matches[0]
-    //             );
-    //         };
-
-    //         // Apply the regex replacement
-    //         $configContent = preg_replace_callback($pattern, $replacement, $configContent);
-
-    //         // Write the updated content back to the config file
-    //         file_put_contents($configPath, $configContent);
-
-    //         Log::info("Provider {$providerClass} added to config/app.php");
-    //     } else {
-    //         Log::info("Provider {$providerClass} already exists in config/app.php");
-    //     }
-    // }
 
 
 
