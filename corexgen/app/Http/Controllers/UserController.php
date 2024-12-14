@@ -308,6 +308,7 @@ class UserController extends Controller
             $data = array_map('str_getcsv', file($file->getRealPath()));
             $header = array_shift($data);
 
+            $totalAdd = 0;
             foreach ($data as $row) {
                 $row = array_combine($header, $row);
 
@@ -333,9 +334,10 @@ class UserController extends Controller
 
                 ]);
 
-                $this->updateUsage(strtolower(PLANS_FEATURES['USERS']), '+','1');
+                $totalAdd++;
+       
             }
-
+            $this->updateUsage(strtolower(PLANS_FEATURES['USERS']), '+', $totalAdd);
             return response()->json([
                 'success' => true,
                 'message' => 'Users imported successfully!',

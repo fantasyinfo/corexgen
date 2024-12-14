@@ -18,10 +18,7 @@ trait SubscriptionUsageFilter
 
         $totalAllow = $this->getTotalAllowed($module);
 
-        // for unlimited
-        if ($totalAllow == '-1') {
-            return true;
-        }
+
 
         // fetch current usage
 
@@ -34,6 +31,11 @@ trait SubscriptionUsageFilter
             'currentSubID' => $this->getCurrentSubscriptionId()
         ]);
         // check 
+
+        // for unlimited
+        if ($totalAllow == '-1') {
+            return true;
+        }
 
         if ($currentUsage >= $totalAllow) {
 
@@ -145,11 +147,11 @@ trait SubscriptionUsageFilter
         return 0;
     }
 
-    private function isTenantUser(): bool
+    private function isTenantUser()
     {
         return Auth::check() && Auth::user()->is_tenant;
     }
-    private function getCompanyId(): bool
+    private function getCompanyId()
     {
         return Auth::user()->company_id;
     }

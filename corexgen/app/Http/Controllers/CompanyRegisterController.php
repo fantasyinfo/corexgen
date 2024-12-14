@@ -237,7 +237,7 @@ class CompanyRegisterController extends Controller
     
                 // create transaction 
                 $paymentTransaction = $companyService->createPaymentTransaction(
-                    $company->plan_id, 
+                    $validatedData['payment_details']['plan_id'],
                     $company->id, 
                     $validatedData['payment_details']
                 );
