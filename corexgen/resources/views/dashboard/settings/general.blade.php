@@ -3,7 +3,9 @@
 
 
 @section('settings_content')
- 
+    {{-- @php
+        prePrintR($general_settings);
+    @endphp  --}}
 
     <div class="container-fluid">
         <h3 class="mb-4">General Settings</h3>
@@ -76,11 +78,16 @@
 
                             </div>
 
-                            @if ($item['value'] && $item['value'] !== '/')
+                            @if ($item['media_id'] == null)
                                 <div class="mt-2">
-                                    <img src="{{ $item['value'] }}" alt="{{ $item['key'] }}" class="img-thumbnail"
+                                    <img src="{{ asset('storage/' . $item['value']) }}" alt="{{ $item['key'] }}" class="img-thumbnail"
                                         style="max-width: 200px;">
                                 </div>
+                            @else 
+                            <div class="mt-2">
+                                <img src="{{ asset('storage/' . $item['media']['file_path']) }}" alt="{{ $item['key'] }}" class="img-thumbnail"
+                                    style="max-width: 200px;">
+                            </div>
                             @endif
                         </div>
                     @break

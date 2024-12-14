@@ -25,4 +25,6 @@ class Media extends Model
         'created_by',
         'status'
     ];
+
+    
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models\CRM;
 
+use App\Models\Media;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -28,4 +29,9 @@ class CRMSettings extends Model
     ];
 
     protected $table = self::table;
+
+
+    public function media(){
+        return $this->belongsTo(Media::class,'media_id');
+    }
 }

@@ -402,3 +402,21 @@ if (!function_exists('getSettingValue')) {
 
     }
 }
+
+
+function getLogoPath()
+{
+
+    $query = CRMSettings::with('media');
+    if ($user = Auth::user()) {
+        if ($user->is_tenant) {
+            $query->where('is_tenant', 1)->where('name', 'tenant_company_logo');
+        } elseif (!is_null($user->company_id)) {
+            $query->where('company_id', $user->company_id)->where('name', 'c_company_logo');
+        }
+    }
+
+    $data = $query->first();
+    return $data?->media?->file_path;
+
+}

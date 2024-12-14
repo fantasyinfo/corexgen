@@ -6,6 +6,7 @@ use App\Helpers\PermissionsHelper;
 use App\Http\Controllers\Controller;
 use App\Models\CRM\CRMSettings;
 use App\Models\Media;
+use App\Traits\MediaTrait;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +15,7 @@ class SettingsController extends Controller
 {
     //
     use TenantFilter;
+    use MediaTrait;
     /**
      * Display a listing of the resource.
      */
@@ -50,7 +52,7 @@ class SettingsController extends Controller
     {
         $this->tenantRoute = $this->getTenantRoute();
 
-        $general_settings = CRMSettings::where('type', 'General')->get()->toArray();
+        $general_settings = CRMSettings::with('media')->where('type', 'General')->get()->toArray();
 
         return view($this->getViewFilePath('general'), [
             'general_settings' => $general_settings,
@@ -91,34 +93,49 @@ class SettingsController extends Controller
         }
 
         // Handle the logo upload
-        // Handle the logo upload
-        if ($request->hasFile('tenant_company_logo')) {
-            $logo = $request->file('tenant_company_logo');
-            $logoFileName = $logo->getClientOriginalName();
-            $logoPath = $logo->store('logos', 'public');
+        $this->updateCompanyLogo($request);
 
-            $media = Media::create([
-                'file_name' => $logoFileName,
-                'file_path' => $logoPath,
-                'file_type' => $logo->getMimeType(),
-                'file_extension' => $logo->getClientOriginalExtension(),
-                'size' => $logo->getSize(),
-                'company_id' => Auth::user()->company_id ?? null, // Assuming no company ID is required
-                'is_tenant' => Auth::user()->is_tenant,
-                'updated_by' => auth()->id(),
-                'created_by' => auth()->id(),
-            ]);
-
-            $logoSetting = CRMSettings::where('name', 'tenant_company_logo')->first();
-            if ($logoSetting) {
-                $logoSetting->update([
-                    'value' => 'logo',
-                    'is_media_setting' => true,
-                    'media_id' => $media->id,
-                ]);
-            }
-        }
 
         return redirect()->back()->with('success', 'Settings updated successfully');
     }
+
+    public function updateCompanyLogo(Request $request)
+    {
+        if ($request->hasFile('tenant_company_logo')) {
+            // Find or create the CRMSetting
+            $logoSetting = CRMSettings::firstOrCreate(
+                ['name' => 'tenant_company_logo'], // Condition to check
+                ['value' => null, 'is_media_setting' => true] // Default attributes if not found
+            );
+    
+            // Log the retrieved or created setting
+            \Log::info('Logo Settings', $logoSetting->toArray());
+    
+            // Get the old media (if exists)
+            $oldMedia = $logoSetting->media ?? null;
+    
+            // Update media using the trait
+            $media = $this->updateMedia(
+                $request->file('tenant_company_logo'),
+                $oldMedia,
+                [
+                    'folder' => 'logos',
+                    'company_id' => Auth::user()->company_id,
+                    'is_tenant' => Auth::user()->is_tenant,
+                    'updated_by' => Auth::id(),
+                    'created_by' => Auth::id(),
+                ]
+            );
+    
+            // Update the CRMSetting with the new media ID
+            $logoSetting->update([
+                'is_media_setting' => true,
+                'media_id' => $media->id,
+            ]);
+    
+            \Log::info('Company logo updated successfully', ['media_id' => $media->id, 'setting' => $logoSetting]);
+        }
+    }
+    
+
 }

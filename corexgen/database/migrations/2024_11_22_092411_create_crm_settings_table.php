@@ -29,7 +29,7 @@ return new class extends Migration {
 
             // Foreign key constraints
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('set null');
-            $table->foreign('media_id')->references('id')->on('media')->onDelete('cascade');
+            $table->foreign('media_id')->references('id')->on('media')->onDelete('set null');
             $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
             $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
 
