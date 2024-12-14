@@ -17,15 +17,18 @@ class CRMSettingsSeeder extends Seeder
         //
         CRMSettings::truncate();
 
-        foreach (CRM_TENANT_SETTINGS as $setting) {
+        foreach (CRM_TENANT_GENERAL_SETTINGS as $setting) {
             CRMSettings::create([
                 'key' => $setting['key'],
                 'value' => $setting['value'],
                 'is_media_setting' => $setting['is_media_setting'],
                 'media_id' => $setting['media_id'],
                 'input_type' => $setting['input_type'],
+                'value_type' => $setting['value_type'],
+                'name' => $setting['name'],
+                'placeholder' => $setting['placeholder'] ?? '',
                 'is_tenant' => $setting['is_tenant'],
-                'company_id' => $setting['company_id'],
+                'type' => 'General',
                 'updated_by' => Auth::id() ?? null,
                 'created_by' => Auth::id() ?? null,
             ]);

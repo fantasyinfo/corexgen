@@ -19,6 +19,10 @@ class CRMSettings extends Model
         'is_tenant',
         'company_id',
         'input_type',
+        'value_type',
+        'name',
+        'placeholder',
+        'type',
         'updated_by',
         'created_by',
     ];
