@@ -18,13 +18,14 @@ return new class extends Migration
             $table->string('file_type');
             $table->string('file_extension');
             $table->unsignedBigInteger('size');
-            $table->bigInteger('buyer_id');
-            $table->boolean('is_super_user')->default(false);
+            $table->unsignedBigInteger('company_id')->nullable();
+            $table->boolean('is_tenant')->default(false);
             $table->bigInteger('updated_by')->nullable();
             $table->bigInteger('created_by')->nullable();
             $table->enum('status', ['active', 'deactive'])->default('active');
             $table->timestamps();
-            $table->index('buyer_id');
+           
+            $table->foreign('company_id')->references('id')->on('companies')->onDelete('set null');
         });
     }
 

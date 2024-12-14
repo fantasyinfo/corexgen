@@ -19,10 +19,12 @@ class Media extends Model
         'file_type',
         'file_extension',
         'size',
+        'company_id',
+        'is_tenant',
         'updated_by',
         'created_by',
-        'is_super_user',
-        'buyer_id',
         'status'
     ];
+
+    
 }

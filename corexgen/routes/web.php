@@ -465,8 +465,16 @@ Route::middleware([
     // settings routes
     Route::prefix('settings')->as('settings.')->group(function () {
         // role for fetch, store, update
-        Route::get('/', [SettingsController::class, 'index'])->name('index')->middleware('check.permission:SETTINGS.READ_ALL');
-        Route::put('/', [SettingsController::class, 'update'])->name('update')->middleware('check.permission:SETTINGS.UPDATE');
+        Route::get('/general', [SettingsController::class, 'general'])->name('general')->middleware('check.permission:SETTINGS_GENERAL.READ_ALL');
+        Route::put('/general', [SettingsController::class, 'generalUpdate'])->name('generalUpdate')->middleware('check.permission:SETTINGS_GENERAL.UPDATE');
+
+
+
+        Route::get('/mail', [SettingsController::class, 'mail'])->name('mail')->middleware('check.permission:SETTINGS_MAIL.READ_ALL');
+        Route::put('/mail', [SettingsController::class, 'mailUpdate'])->name('mailUpdate')->middleware('check.permission:SETTINGS_MAIL.UPDATE');
+
+
+
     });
 
 

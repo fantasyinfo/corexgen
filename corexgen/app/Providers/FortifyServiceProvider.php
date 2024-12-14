@@ -54,6 +54,15 @@ class FortifyServiceProvider extends ServiceProvider
 
         // Instead of silently returning null, provide more informative error handling
         Fortify::authenticateUsing(function (Request $request) {
+            $guard = Auth::guard('web');
+
+    
+
+            // Logout the current user if authenticated
+            if ($guard->check()) {
+                $guard->logout();
+            }
+
             $path = $request->input('path', '');
             $isTenant = filter_var($request->input('is_tenant'), FILTER_VALIDATE_BOOLEAN);
             $email = $request->input('email');

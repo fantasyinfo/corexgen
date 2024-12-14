@@ -10,7 +10,7 @@
 <nav class="sidebar shadow-sm">
     <div class="sidebar-brand">
         <a href="">
-            <img src="{{ asset('./img/logo.png') }}" alt="logo" class="logo">
+            <img src="{{ asset('storage/' . getLogoPath()) }}" alt="logo" class="logo">
         </a>
     </div>
     <div class="py-2">

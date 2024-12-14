@@ -80,6 +80,16 @@ PermissionsHelper::initializePermissions();
         'id' => PermissionsHelper::getParentPermissionId('13'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['SUBSCRIPTIONS']
     ],
+    PermissionsHelper::$plansPermissionsKeys['SETTINGS_GENERAL'] => [
+        'name' => 'SETTINGS_GENERAL',
+        'id' => PermissionsHelper::getParentPermissionId('14'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['SETTINGS_GENERAL']
+    ],
+    PermissionsHelper::$plansPermissionsKeys['SETTINGS_MAIL'] => [
+        'name' => 'SETTINGS_MAIL',
+        'id' => PermissionsHelper::getParentPermissionId('15'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['SETTINGS_MAIL']
+    ],
 ]);
 
 // super panel menus
@@ -139,7 +149,8 @@ PermissionsHelper::initializePermissions();
         'menu_icon' => 'fa-cog',
         'permission_id' => PermissionsHelper::getParentPermissionId('6'),
         'children' => [
-            'Settings' => ['menu_url' => 'settings.index', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS'], 'READ')],
+            'General' => ['menu_url' => 'settings.general', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_GENERAL'], 'READ')],
+            'Mail' => ['menu_url' => 'settings.mail', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_MAIL'], 'READ')],
         ]
     ],
     'Modules' => [
@@ -171,7 +182,7 @@ PermissionsHelper::initializePermissions();
         'is_default' => true,
         'permission_id' => PermissionsHelper::getParentPermissionId('6'),
         'children' => [
-            'Settings' => ['menu_url' => 'settings.index', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS'], 'READ')],
+            'General' => ['menu_url' => 'settings.general', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS'], 'READ')],
         ]
     ],
     'Roles & Permissions' => [
@@ -205,80 +216,85 @@ PermissionsHelper::initializePermissions();
 
 ]);
 
-!defined('CRM_TENANT_SETTINGS') && define('CRM_TENANT_SETTINGS', [
+!defined('CRM_TENANT_GENERAL_SETTINGS') && define('CRM_TENANT_GENERAL_SETTINGS', [
 
     'COMPANY_NAME' => [
         'key' => 'Company Name',
         'value' => 'Core X Gen',
         'is_media_setting' => false,
         'media_id' => null,
-        'input_type' => 'string',
+        'value_type' => 'string',
+        'input_type' => 'text',
         'is_tenant' => true,
-        'company_id' => null
+        'placeholder' => 'Digital Pvt Ltd',
+        'name' => 'tenant_company_name'
     ],
     'COMPANY_TAGLINE' => [
         'key' => 'Company Tagline',
         'value' => 'Next Generation CRM',
         'is_media_setting' => false,
         'media_id' => null,
-        'input_type' => 'string',
+        'value_type' => 'string',
+        'input_type' => 'text',
         'is_tenant' => true,
-        'company_id' => null
+        'placeholder' => 'Best Company in the country.',
+        'name' => 'tenant_company_tagline'
     ],
     'COMPANY_LOGO' => [
         'key' => 'Company Logo',
-        'value' => '/',
+        'value' => 'logos/logo.png',
         'is_media_setting' => true,
         'media_id' => null,
+        'value_type' => 'image',
         'input_type' => 'image',
         'is_tenant' => true,
-        'company_id' => null
+        'name' => 'tenant_company_logo'
     ],
     'DATE_FORMAT' => [
         'key' => 'Date Format',
-        'value' => 'DD/MM/YYYY',
+        'value' => 'YY-MM-DD',
         'is_media_setting' => false,
         'media_id' => null,
-        'input_type' => 'string',
+        'value_type' => 'string',
+        'input_type' => 'dropdown',
         'is_tenant' => true,
-        'company_id' => null
+        'placeholder' => 'YY-MM-DD',
+        'name' => 'tenant_company_date_format'
     ],
     'TIME_ZONE' => [
         'key' => 'Time Zone',
         'value' => 'Asia/Kolkata',
         'is_media_setting' => false,
         'media_id' => null,
-        'input_type' => 'string',
+        'value_type' => 'string',
+        'input_type' => 'dropdown',
         'is_tenant' => true,
-        'company_id' => null
+        'placeholder' => 'Asia/Kolkata',
+        'name' => 'tenant_company_time_zone',
     ],
     'CURRENCY_SYMBOL' => [
         'key' => 'Currency Symbol',
         'value' => '$',
         'is_media_setting' => false,
         'media_id' => null,
-        'input_type' => 'string',
+        'value_type' => 'string',
+        'input_type' => 'text',
         'is_tenant' => true,
-        'company_id' => null
+        'placeholder' => '$',
+        'name' => 'tenant_company_currency_symbol'
     ],
     'CURRENCY_CODE' => [
         'key' => 'Currency Code',
         'value' => 'USD',
         'is_media_setting' => false,
         'media_id' => null,
-        'input_type' => 'string',
+        'value_type' => 'string',
+        'input_type' => 'text',
         'is_tenant' => true,
-        'company_id' => null
+        'placeholder' => 'USD',
+        'name' => 'tenant_company_currency_code'
     ],
-    'SMTP' => [
-        'key' => 'SMTP',
-        'value' => json_encode([]),
-        'is_media_setting' => false,
-        'media_id' => null,
-        'input_type' => 'json',
-        'is_tenant' => true,
-        'company_id' => null
-    ]
+
 
 
 ]);
@@ -418,15 +434,19 @@ PermissionsHelper::initializePermissions();
         'config_value' => 'sk_test_ZpiCxEOHseka5xDnfwoRoG0700L2MOuJkS',
         'mode' => 'LIVE',
         'status' => 'Active'
+    ]
+]);
+
+
+!defined('SETTINGS_MENU_ITEMS') && define('SETTINGS_MENU_ITEMS', [
+    'General' => [
+        'name' => 'General',
+        'link' => 'general',
+        'icon' => 'fa-cog',
     ],
-    'PAYPAL' => [
-        'name' => 'Paypal',
-        'official_website' => 'paypal.com',
-        'logo' => 'paypal.png',
-        'type' => 'International',
-        'config_key' => 'key___',
-        'config_value' => 'sec___',
-        'mode' => 'TEST',
-        'status' => 'Inactive'
+    'Mail' => [
+        'name' => 'Mail',
+        'link' => 'mail',
+        'icon' => 'fa-envlope',
     ]
 ]);
