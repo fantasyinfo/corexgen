@@ -174,6 +174,8 @@ class CompanyService
         $previousPlan = PaymentTransaction::where('company_id', $companyid)
             ->latest('created_at')
             ->first();
+
+        // \Log::info('Previous Plan ID', $previousPlan->toArray());
         $previousPlanId = $previousPlan ? $previousPlan->plan_id : null;
 
         // Create payment transaction

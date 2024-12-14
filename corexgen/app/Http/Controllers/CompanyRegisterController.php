@@ -13,7 +13,7 @@ use App\Exceptions\Payment;
 use App\Models\Company;
 use App\Models\CompanyOnboarding;
 use App\Repositories\CompanyRepository;
-use App\Services\Payments\PaymentGatewayFactory;
+use App\Services\PaymentGatewayFactory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -237,7 +237,7 @@ class CompanyRegisterController extends Controller
     
                 // create transaction 
                 $paymentTransaction = $companyService->createPaymentTransaction(
-                    $company->plan_id, 
+                    $validatedData['payment_details']['plan_id'],
                     $company->id, 
                     $validatedData['payment_details']
                 );

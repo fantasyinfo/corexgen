@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\PermissionsHelper;
 use App\Http\Controllers\Controller;
 use App\Models\PaymentGateway;
-use App\Services\Payments\PaymentGatewayFactory;
+use App\Services\PaymentGatewayFactory;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;

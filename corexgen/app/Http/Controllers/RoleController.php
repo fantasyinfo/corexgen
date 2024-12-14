@@ -13,6 +13,7 @@ use Yajra\DataTables\Facades\DataTables;
 use App\Traits\TenantFilter;
 use Illuminate\Support\Facades\View;
 use App\Helpers\PermissionsHelper;
+use App\Traits\SubscriptionUsageFilter;
 
 /**
  * CRMRoleController handles CRUD operations for CRM Roles
@@ -28,6 +29,7 @@ use App\Helpers\PermissionsHelper;
 class RoleController extends Controller
 {
     use TenantFilter;
+    use SubscriptionUsageFilter;
 
     /**
      * Number of items per page for pagination
@@ -147,6 +149,9 @@ class RoleController extends Controller
 
             CRMRole::create($validated);
 
+                    // update current usage
+            $this->updateUsage(strtolower(PLANS_FEATURES['ROLE']), '+','1');
+
             // Redirect with success message
             return redirect()->route($this->tenantRoute . 'role.index')
                 ->with('success', 'Role created successfully.');
@@ -164,6 +169,8 @@ class RoleController extends Controller
      */
     public function create()
     {
+        $this->checkCurrentUsage(strtolower(PLANS_FEATURES['ROLE']));
+
         return view($this->getViewFilePath('create'), [
             'title' => 'Create Role'
         ]);
@@ -290,7 +297,7 @@ class RoleController extends Controller
             $data = array_map('str_getcsv', file($file->getRealPath()));
             $header = array_shift($data);
 
-
+            $totalAdd = 0;
             // Import each row from CSV
             foreach ($data as $row) {
                 $row = array_combine($header, $row);
@@ -300,7 +307,10 @@ class RoleController extends Controller
                     'role_desc' => $row['role_desc'] ?? '',
                     'status' => CRM_STATUS_TYPES['CRM_ROLES']['STATUS']['ACTIVE'],
                 ]);
+                $totalAdd++;
             }
+
+            $this->updateUsage(strtolower(PLANS_FEATURES['ROLE']), '+',$totalAdd);
 
             return response()->json([
                 'success' => true,
@@ -328,6 +338,7 @@ class RoleController extends Controller
             $query = $this->applyTenantFilter($query);
             $query->delete();
 
+            $this->updateUsage(strtolower(PLANS_FEATURES['ROLE']), '-','1');
             // Redirect with success message
             return redirect()->back()->with('success', 'Role deleted successfully.');
         } catch (\Exception $e) {
@@ -373,7 +384,7 @@ class RoleController extends Controller
             if (is_array($ids) && count($ids) > 0) {
                 // Validate ownership/permissions if necessary
                 $this->applyTenantFilter(CRMRole::query()->whereIn('id', $ids))->delete();
-
+                $this->updateUsage(strtolower(PLANS_FEATURES['ROLE']), '-',count($ids));
                 return response()->json(['message' => 'Selected roles deleted successfully.'], 200);
             }
 
