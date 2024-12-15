@@ -91,6 +91,7 @@ class CompaniesController extends Controller
      */
     public function index(Request $request)
     {
+    
         $this->tenantRoute = $this->getTenantRoute();
 
 
@@ -102,8 +103,9 @@ class CompaniesController extends Controller
 
 
         $plans = Plans::with('planFeatures')->get();
-        $country = Country::with('cities')->get();
+        $country = Country::all();
 
+    
         return view($this->getViewFilePath('index'), [
             'filters' => $request->all(),
             'title' => 'Companies Management',

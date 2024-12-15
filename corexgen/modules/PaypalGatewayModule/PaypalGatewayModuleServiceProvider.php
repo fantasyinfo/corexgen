@@ -43,9 +43,9 @@ class PaypalGatewayModuleServiceProvider extends ServiceProvider
         
         if (file_exists($routesPath)) {
             $this->loadRoutesFrom($routesPath);
-            Log::info("Loaded routes from: $routesPath");
+           // Log::info("Loaded routes from: $routesPath");
         } else {
-            Log::warning("Routes file not found: $routesPath");
+           // Log::warning("Routes file not found: $routesPath");
         }
     }
 
@@ -55,9 +55,9 @@ class PaypalGatewayModuleServiceProvider extends ServiceProvider
         
         if (is_dir($viewsPath)) {
             $this->loadViewsFrom($viewsPath, $this->moduleName);
-            Log::info("Loaded views from: $viewsPath");
+           // Log::info("Loaded views from: $viewsPath");
         } else {
-            Log::warning("Views directory not found: $viewsPath");
+           // Log::warning("Views directory not found: $viewsPath");
         }
     }
 
@@ -67,9 +67,9 @@ class PaypalGatewayModuleServiceProvider extends ServiceProvider
         
         if (is_dir($translationsPath)) {
             $this->loadTranslationsFrom($translationsPath, $this->moduleName);
-            Log::info("Loaded translations from: $translationsPath");
+           // Log::info("Loaded translations from: $translationsPath");
         } else {
-            Log::warning("Translations directory not found: $translationsPath");
+           // Log::warning("Translations directory not found: $translationsPath");
         }
     }
 
@@ -79,9 +79,9 @@ class PaypalGatewayModuleServiceProvider extends ServiceProvider
         
         if (is_dir($migrationsPath)) {
             $this->loadMigrationsFrom($migrationsPath);
-            Log::info("Loaded migrations from: $migrationsPath");
+           // Log::info("Loaded migrations from: $migrationsPath");
         } else {
-            Log::warning("Migrations directory not found: $migrationsPath");
+          //  Log::warning("Migrations directory not found: $migrationsPath");
         }
     }
 
@@ -147,7 +147,7 @@ class PaypalGatewayModuleServiceProvider extends ServiceProvider
                 // Skip abstract classes and interfaces
                 if (!$reflectionClass->isAbstract() && !$reflectionClass->isInterface()) {
                     $bindingCallback($fullClassName);
-                    Log::info("Registered {$fullClassName}");
+                  //  Log::info("Registered {$fullClassName}");
                 }
             }
         }
