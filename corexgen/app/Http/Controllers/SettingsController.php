@@ -6,6 +6,7 @@ use App\Helpers\PermissionsHelper;
 use App\Http\Controllers\Controller;
 use App\Models\CRM\CRMSettings;
 use App\Models\Media;
+use App\Models\Tenant;
 use App\Traits\MediaTrait;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
@@ -54,14 +55,31 @@ class SettingsController extends Controller
 
         $general_settings = CRMSettings::with('media')->where('type', 'General')->get()->toArray();
 
+        $tenant = Tenant::find(Auth::user()->tenant_id);
+
+
         return view($this->getViewFilePath('general'), [
             'general_settings' => $general_settings,
             'title' => 'General Settings',
             'permissions' => PermissionsHelper::getPermissionsArray('SETTINGS'),
             'module' => PANEL_MODULES[$this->getPanelModule()]['settings'],
+            'tenant' => $tenant,
+            'dateTimeFormats' => $this->defaultDateTimeFormats()
         ]);
     }
 
+    public function defaultDateTimeFormats(): array
+    {
+        return [
+            'Y-m-d H:i:s' => 'Y-m-d H:i:s | 2024-12-14 12:34:56',
+            'd-m-Y H:i' => 'd-m-Y H:i | 14-12-2024 12:34',
+            'm/d/Y g:i A' => 'm/d/Y g:i A | 12/14/2024 12:34 PM',
+            'D, M j, Y' => 'D, M j, Y | Sat, Dec 14, 2024',
+            'l, F j, Y' => 'l, F j, Y | Saturday, December 14, 2024',
+            'c' => 'c | ISO 8601: 2024-12-14T12:34:56+00:00',
+            'r' => 'r | RFC 2822: Sat, 14 Dec 2024 12:34:56 +0000',
+        ];
+    }
 
     public function generalUpdate(Request $request)
     {
@@ -107,13 +125,13 @@ class SettingsController extends Controller
                 ['name' => 'tenant_company_logo'], // Condition to check
                 ['value' => null, 'is_media_setting' => true] // Default attributes if not found
             );
-    
+
             // Log the retrieved or created setting
             \Log::info('Logo Settings', $logoSetting->toArray());
-    
+
             // Get the old media (if exists)
             $oldMedia = $logoSetting->media ?? null;
-    
+
             // Update media using the trait
             $media = $this->updateMedia(
                 $request->file('tenant_company_logo'),
@@ -126,16 +144,16 @@ class SettingsController extends Controller
                     'created_by' => Auth::id(),
                 ]
             );
-    
+
             // Update the CRMSetting with the new media ID
             $logoSetting->update([
                 'is_media_setting' => true,
                 'media_id' => $media->id,
             ]);
-    
+
             \Log::info('Company logo updated successfully', ['media_id' => $media->id, 'setting' => $logoSetting]);
         }
     }
-    
+
 
 }
