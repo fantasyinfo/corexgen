@@ -7,7 +7,7 @@
     <title>Application Installer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/select2/select2.min.css') }}" />
     <style>
         body {
             background-color: #111827;
@@ -143,6 +143,57 @@
 
         #skipSmtpBtn:hover {
             background-color: #6b7280;
+        }
+        .searchSelectBox {
+            width: 100% !important;
+        }
+        .select2.select2-container{
+            width: 100% !important;
+        }
+        /* Style for Select2 container */
+        .select2-container .select2-selection--single {
+            height: 45px;
+            /* Match input box height */
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 8px 12px;
+            outline: none;
+            font-size: 14px;
+            width:100%;
+            transition: box-shadow 0.3s ease, border 0.3s ease;
+        }
+
+        /* Focus effect */
+        .select2-container--default .select2-selection--single:focus,
+        .select2-container--default .select2-selection--single:active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px rgba(106, 17, 203, 0.2);
+        }
+
+        /* Dropdown */
+        .select2-dropdown {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Dropdown Results */
+        .select2-results__option {
+            padding: 10px;
+            font-size: 14px;
+            color: #333;
+            transition: background 0.2s ease;
+        }
+
+        /* Hover and Active Styles */
+        .select2-results__option--highlighted {
+            background-color: var(--primary-color)!important;
+            color: #fff !important;
+        }
+
+        .select2-results__option--selected {
+            background-color: var(--primary-color)!important;
+            color: #fff !important;
         }
     </style>
 </head>
@@ -383,7 +434,7 @@
                             </div>
                             <div class="col-span-2">
                                 <label class="block text-sm font-medium mb-2 dark:text-white">Select Timezone</label>
-                                <select class="form-control" name="timezone" required>
+                                <select class="form-control searchSelectBox" name="timezone" required>
                                   
                                     @foreach ($timezones as $timezone)
                                         <option value="{{ $timezone }}">{{ $timezone }}</option>
@@ -438,8 +489,11 @@
     </div>
 
 
-
+    <script src="{{ asset('js/select2/select2.min.js') }}"></script>
     <script>
+           if ($(".searchSelectBox").length > 0) {
+            $(".searchSelectBox").select2();
+        }
         function showAlertWithHTML(title, htmlContent) {
             // Create the modal overlay
             const modalOverlay = document.createElement('div');
