@@ -5,10 +5,12 @@ namespace App\Models\CRM;
 use App\Models\Media;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class CRMSettings extends Model
+class CRMSettings extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     const table = 'crm_settings';
 

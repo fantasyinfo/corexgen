@@ -5,10 +5,11 @@ namespace App\Models\CRM;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
-class CRMRole extends Model
+use OwenIt\Auditing\Contracts\Auditable;
+class CRMRole extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     const table = 'crm_roles';
 

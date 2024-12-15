@@ -83,7 +83,7 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="email" name="email" id="compnayEmail"
-                                                placeholder="{{ __('john@email.com') }}" value="{{ $company->email }}"
+                                                placeholder="{{ __('john@email.com') }}" disabled value="{{ $company->email }}"
                                                 required class="custom-class" />
 
                                         </div>

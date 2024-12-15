@@ -4,19 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Models\Address;
 use App\Models\PaymentGateway;
+use App\Traits\MediaTrait;
 use Illuminate\Http\Request;
 use App\Models\Company;
 use App\Models\CompanyOnboarding;
 use App\Models\Country;
+use App\Models\CRM\CRMSettings;
 use App\Models\Plans;
 use App\Services\PaymentGatewayFactory;
 use DateTimeZone;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class CompanyOnboardingController extends Controller
 {
+
+    use MediaTrait;
     public function showOnboardingForm()
     {
         $company = auth()->user()->company;
@@ -26,11 +32,11 @@ class CompanyOnboardingController extends Controller
         );
 
         $countries = Country::all();
-        $plans = Plans::where('status',CRM_STATUS_TYPES['PLANS']['STATUS']['ACTIVE'])->get();
-        $payment_gateways = PaymentGateway::where('status','Active')->get();
+        $plans = Plans::where('status', CRM_STATUS_TYPES['PLANS']['STATUS']['ACTIVE'])->get();
+        $payment_gateways = PaymentGateway::where('status', 'Active')->get();
         // Get timezones from PHP
         $timezones = DateTimeZone::listIdentifiers();
-        return view('companyonbording.index', compact('company', 'onboarding', 'countries', 'timezones', 'plans','payment_gateways'));
+        return view('companyonbording.index', compact('company', 'onboarding', 'countries', 'timezones', 'plans', 'payment_gateways'));
     }
 
     public function saveAddress(Request $request)
@@ -192,6 +198,9 @@ class CompanyOnboardingController extends Controller
             'status' => CRM_STATUS_TYPES['COMPANIES_ONBORDING']['STATUS']['PLAN_CAPTURED']
         ]);
 
+        // company settings generate
+        $this->generateGeneralSettingsForCompany($company->id);
+
         // if plan is free
         $planOfferPrice = Plans::find($request->plan_id);
 
@@ -301,6 +310,48 @@ class CompanyOnboardingController extends Controller
         }
     }
 
+    public function generateGeneralSettingsForCompany($companyid)
+    {
+        foreach (CRM_COMPANY_GENERAL_SETTINGS as $setting) {
+            $media = null;
+
+            // Handle image-specific logic
+            if ($setting['input_type'] == 'image') {
+                if ($setting['name'] === 'client_company_logo') {
+                    $relativePath = $setting['value']; // Relative path for Storage
+                    $absolutePath = storage_path('app/public/' . $relativePath); // Absolute path for file operations
+
+                    if (Storage::disk('public')->exists($relativePath)) {
+                        $media = $this->createMedia($relativePath, [
+                            'folder' => 'logos',
+                            'created_by' => Auth::id(), // Fixed admin ID
+                            'updated_by' => Auth::id(),
+                        ]);
+                    } else {
+                        \Log::warning("File not found for media creation: {$absolutePath}");
+                    }
+                }
+            }
+
+            // Create CRM setting
+            CRMSettings::create([
+                'key' => $setting['key'],
+                'value' => $setting['value'],
+                'is_media_setting' => $setting['is_media_setting'],
+                'media_id' => $media->id ?? null,
+                'input_type' => $setting['input_type'],
+                'value_type' => $setting['value_type'],
+                'name' => $setting['name'],
+                'placeholder' => $setting['placeholder'] ?? '',
+                'is_tenant' => $setting['is_tenant'],
+                'company_id' => $companyid,
+                'type' => 'General',
+                'updated_by' => Auth::id(), // Fixed admin ID
+                'created_by' => Auth::id(),
+            ]);
+        }
+    }
+
     /**
      * Validate payment parameters
      * 
@@ -339,7 +390,8 @@ class CompanyOnboardingController extends Controller
 
     }
 
-    public function upgrade(){
-        
+    public function upgrade()
+    {
+
     }
 }

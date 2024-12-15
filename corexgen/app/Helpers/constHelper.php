@@ -90,6 +90,11 @@ PermissionsHelper::initializePermissions();
         'id' => PermissionsHelper::getParentPermissionId('15'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['SETTINGS_MAIL']
     ],
+    PermissionsHelper::$plansPermissionsKeys['EVENTS_AUDIT_LOG'] => [
+        'name' => 'EVENTS_AUDIT_LOG',
+        'id' => PermissionsHelper::getParentPermissionId('16'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['EVENTS_AUDIT_LOG']
+    ],
 ]);
 
 // super panel menus
@@ -161,6 +166,14 @@ PermissionsHelper::initializePermissions();
             'AppUpdates' => ['menu_url' => 'appupdates.index', 'menu_icon' => 'fa-box', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['APPUPDATES'], 'READ_ALL')],
         ]
     ],
+    'Logs & Events' => [
+        'menu_icon' => 'fa-list-ul',
+        'permission_id' => PermissionsHelper::getParentPermissionId('16'),
+        'children' => [
+            'Audit' => ['menu_url' => 'audit.index', 'menu_icon' => 'fa-box', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['EVENTS_AUDIT_LOG'], 'READ_ALL')],
+
+        ]
+    ],
 ]);
 
 // company panel menus
@@ -213,91 +226,18 @@ PermissionsHelper::initializePermissions();
             'Membership' => ['menu_url' => 'planupgrade.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PLANUPGRADE'], 'READ_ALL')],
         ]
     ],
+    'Logs & Events' => [
+        'menu_icon' => 'fa-list-ul',
+        'permission_id' => PermissionsHelper::getParentPermissionId('16'),
+        'children' => [
+            'Audit' => ['menu_url' => 'audit.index', 'menu_icon' => 'fa-box', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['EVENTS_AUDIT_LOG'], 'READ_ALL')],
+
+        ]
+    ],
 
 ]);
 
-!defined('CRM_TENANT_GENERAL_SETTINGS') && define('CRM_TENANT_GENERAL_SETTINGS', [
 
-    'COMPANY_NAME' => [
-        'key' => 'Company Name',
-        'value' => 'Core X Gen',
-        'is_media_setting' => false,
-        'media_id' => null,
-        'value_type' => 'string',
-        'input_type' => 'text',
-        'is_tenant' => true,
-        'placeholder' => 'Digital Pvt Ltd',
-        'name' => 'tenant_company_name'
-    ],
-    'COMPANY_TAGLINE' => [
-        'key' => 'Company Tagline',
-        'value' => 'Next Generation CRM',
-        'is_media_setting' => false,
-        'media_id' => null,
-        'value_type' => 'string',
-        'input_type' => 'text',
-        'is_tenant' => true,
-        'placeholder' => 'Best Company in the country.',
-        'name' => 'tenant_company_tagline'
-    ],
-    'COMPANY_LOGO' => [
-        'key' => 'Company Logo',
-        'value' => 'logos/logo.png',
-        'is_media_setting' => true,
-        'media_id' => null,
-        'value_type' => 'image',
-        'input_type' => 'image',
-        'is_tenant' => true,
-        'name' => 'tenant_company_logo'
-    ],
-    'DATE_FORMAT' => [
-        'key' => 'Date Format',
-        'value' => 'YY-MM-DD',
-        'is_media_setting' => false,
-        'media_id' => null,
-        'value_type' => 'string',
-        'input_type' => 'dropdown',
-        'is_tenant' => true,
-        'placeholder' => 'YY-MM-DD',
-        'name' => 'tenant_company_date_format'
-    ],
-    'TIME_ZONE' => [
-        'key' => 'Time Zone',
-        'value' => 'default',
-        'is_media_setting' => false,
-        'media_id' => null,
-        'value_type' => 'string',
-        'input_type' => 'dropdown',
-        'is_tenant' => true,
-        'placeholder' => 'Asia/Kolkata',
-        'name' => 'tenant_company_time_zone',
-    ],
-    'CURRENCY_SYMBOL' => [
-        'key' => 'Currency Symbol',
-        'value' => 'default',
-        'is_media_setting' => false,
-        'media_id' => null,
-        'value_type' => 'string',
-        'input_type' => 'text',
-        'is_tenant' => true,
-        'placeholder' => '$',
-        'name' => 'tenant_company_currency_symbol'
-    ],
-    'CURRENCY_CODE' => [
-        'key' => 'Currency Code',
-        'value' => 'default',
-        'is_media_setting' => false,
-        'media_id' => null,
-        'value_type' => 'string',
-        'input_type' => 'text',
-        'is_tenant' => true,
-        'placeholder' => 'USD',
-        'name' => 'tenant_company_currency_code'
-    ],
-
-
-
-]);
 
 !defined('CRM_STATUS_TYPES') && define('CRM_STATUS_TYPES', [
     'TENANTS' => [
@@ -378,6 +318,7 @@ PermissionsHelper::initializePermissions();
         'planPaymentTransaction' => 'planPaymentTransaction',
         'paymentGateway' => 'paymentGateway',
         'subscriptions' => 'subscriptions',
+        'audit' => 'audit',
 
 
     ],
@@ -389,7 +330,8 @@ PermissionsHelper::initializePermissions();
         'users' => 'users',
         'modules' => 'modules',
         'appupdates' => 'appupdates',
-        'planupgrade' => 'planupgrade'
+        'planupgrade' => 'planupgrade',
+        'audit' => 'audit',
     ]
 ]);
 
@@ -449,4 +391,171 @@ PermissionsHelper::initializePermissions();
         'link' => 'mail',
         'icon' => 'fa-envlope',
     ]
+]);
+
+// settings 
+!defined('CRM_TENANT_GENERAL_SETTINGS') && define('CRM_TENANT_GENERAL_SETTINGS', [
+
+    'COMPANY_NAME' => [
+        'key' => 'Panel Company Name',
+        'value' => 'Core X Gen',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'text',
+        'is_tenant' => true,
+        'placeholder' => 'Digital Pvt Ltd',
+        'name' => 'tenant_company_name'
+    ],
+    'COMPANY_TAGLINE' => [
+        'key' => 'Panel Company Tagline',
+        'value' => 'Next Generation CRM',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'text',
+        'is_tenant' => true,
+        'placeholder' => 'Best Company in the country.',
+        'name' => 'tenant_company_tagline'
+    ],
+    'COMPANY_LOGO' => [
+        'key' => 'Panel Company Logo',
+        'value' => 'logos/logo.png',
+        'is_media_setting' => true,
+        'media_id' => null,
+        'value_type' => 'image',
+        'input_type' => 'image',
+        'is_tenant' => true,
+        'name' => 'tenant_company_logo'
+    ],
+    'DATE_FORMAT' => [
+        'key' => 'Panel Date Format',
+        'value' => 'YY-MM-DD',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'dropdown',
+        'is_tenant' => true,
+        'placeholder' => 'YY-MM-DD',
+        'name' => 'tenant_company_date_format'
+    ],
+    'TIME_ZONE' => [
+        'key' => 'Panel Time Zone',
+        'value' => 'default',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'dropdown',
+        'is_tenant' => true,
+        'placeholder' => 'Asia/Kolkata',
+        'name' => 'tenant_company_time_zone',
+    ],
+    'CURRENCY_SYMBOL' => [
+        'key' => 'Panel Currency Symbol',
+        'value' => 'default',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'text',
+        'is_tenant' => true,
+        'placeholder' => '$',
+        'name' => 'tenant_company_currency_symbol'
+    ],
+    'CURRENCY_CODE' => [
+        'key' => 'Panel Currency Code',
+        'value' => 'default',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'text',
+        'is_tenant' => true,
+        'placeholder' => 'USD',
+        'name' => 'tenant_company_currency_code'
+    ],
+
+
+
+]);
+
+!defined('CRM_COMPANY_GENERAL_SETTINGS') && define('CRM_COMPANY_GENERAL_SETTINGS', [
+
+    'COMPANY_NAME' => [
+        'key' => 'Company Name',
+        'value' => 'Core X Gen',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'text',
+        'is_tenant' => false,
+        'placeholder' => 'Digital Pvt Ltd',
+        'name' => 'client_company_name'
+    ],
+    'COMPANY_TAGLINE' => [
+        'key' => 'Company Tagline',
+        'value' => 'Next Generation CRM',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'text',
+        'is_tenant' => false,
+        'placeholder' => 'Best Company in the country.',
+        'name' => 'client_company_tagline'
+    ],
+    'COMPANY_LOGO' => [
+        'key' => 'Company Logo',
+        'value' => 'logos/logo.png',
+        'is_media_setting' => true,
+        'media_id' => null,
+        'value_type' => 'image',
+        'input_type' => 'image',
+        'is_tenant' => false,
+        'name' => 'client_company_logo'
+    ],
+    'DATE_FORMAT' => [
+        'key' => 'Date Format',
+        'value' => 'YY-MM-DD',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'dropdown',
+        'is_tenant' => false,
+        'placeholder' => 'YY-MM-DD',
+        'name' => 'client_company_date_format'
+    ],
+    'TIME_ZONE' => [
+        'key' => 'Time Zone',
+        'value' => 'default',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'dropdown',
+        'is_tenant' => false,
+        'placeholder' => 'Asia/Kolkata',
+        'name' => 'client_company_time_zone',
+    ],
+    'CURRENCY_SYMBOL' => [
+        'key' => 'Currency Symbol',
+        'value' => 'default',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'text',
+        'is_tenant' => false,
+        'placeholder' => '$',
+        'name' => 'client_company_currency_symbol'
+    ],
+    'CURRENCY_CODE' => [
+        'key' => 'Currency Code',
+        'value' => 'default',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'text',
+        'is_tenant' => false,
+        'placeholder' => 'USD',
+        'name' => 'client_company_currency_code'
+    ],
+
+
+
 ]);
