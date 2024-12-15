@@ -51,3 +51,11 @@ php artisan migrate --path=/database/migrations/2013_11_25_150421_create_crm_rol
 
 u804660301_corexgen
 Corexgen!123
+
+@extends('layout.app')
+@push('style')
+@endpush
+@section('content')
+@endsection
+@push('scripts')
+@endpush

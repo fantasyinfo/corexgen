@@ -192,7 +192,7 @@ function getCRMMenus()
 
     $menus = [];
 
-    if ($user->is_tenant && session('panelAccess') === PANEL_TYPES['SUPER_PANEL']) {
+    if ($user->is_tenant && panelAccess() === PANEL_TYPES['SUPER_PANEL']) {
 
         $menus = CRMMenu::where('panel_type', PANEL_TYPES['SUPER_PANEL'])->distinct()->get();
         return $menus;
@@ -201,7 +201,7 @@ function getCRMMenus()
     // echo PANEL_TYPES['COMPANY_PANEL'];
     $menus = CRMMenu::where('panel_type', PANEL_TYPES['COMPANY_PANEL'])->distinct()->get();
 
-    // \dd(session('panelAccess'));
+    // dd($menus->toArray());
     return $menus;
 
 }
@@ -412,7 +412,7 @@ function getLogoPath()
         if ($user->is_tenant) {
             $query->where('is_tenant', 1)->where('name', 'tenant_company_logo');
         } elseif (!is_null($user->company_id)) {
-            $query->where('company_id', $user->company_id)->where('name', 'c_company_logo');
+            $query->where('company_id', $user->company_id)->where('name', 'client_company_logo');
         }
     }
 

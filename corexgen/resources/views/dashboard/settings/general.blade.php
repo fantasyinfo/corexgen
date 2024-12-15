@@ -13,22 +13,47 @@
         <form action="{{ route(getPanelRoutes('settings.general')) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
+            <input type="hidden" name="is_tenant" value="{{$is_tenant}}" />
+  
             @foreach ($general_settings as $key => $item)
-                @if ($item['value'] === 'default')
+                @if ($item['value'] === 'default' && $is_tenant)
                     @switch($item['name'])
                         @case('tenant_company_time_zone')
                             @php
-                                $item['value'] =  $tenant->timezone
+                                $item['value'] =  $defaultSettings->timezone
                             @endphp 
                         @break
                         @case('tenant_company_currency_symbol')
                             @php
-                                $item['value'] =  $tenant->currency_symbol
+                                $item['value'] =  $defaultSettings->currency_symbol
                             @endphp 
                         @break
                         @case('tenant_company_currency_code')
                             @php
-                                $item['value'] =  $tenant->currency_code
+                                $item['value'] =  $defaultSettings->currency_code
+                            @endphp 
+                        @break
+                    @endswitch
+                @elseif($item['value'] === 'default' && $is_tenant == false)
+                    @switch($item['name'])
+                        @case('client_company_time_zone')
+                            @php
+                                $item['value'] =  $defaultSettings->timezone
+                            @endphp 
+                        @break
+                        @case('client_company_currency_symbol')
+                            @php
+                                $item['value'] =  $defaultSettings->currency_symbol
+                            @endphp 
+                        @break
+                        @case('client_company_currency_code')
+                            @php
+                                $item['value'] =  $defaultSettings->currency_code
+                            @endphp 
+                        @break
+                        @case('client_company_name')
+                            @php
+                                $item['value'] =  $company->name
                             @endphp 
                         @break
                     @endswitch
@@ -54,25 +79,49 @@
 
                             <select name="{{ $item['name'] }}" id="{{ $item['key'] }}"
                                 class="searchSelectBox form-control custom-class" required>
-                                @switch($item['name'])
-                                    @case('tenant_company_date_format')
-                                       
+                                @if($is_tenant)
+                                    @switch($item['name'])
+                                        
+                                        @case('tenant_company_date_format')
+                                        
+                                            @foreach ($dateTimeFormats as $key => $option)
+                                                <option value="{{ $key }}" {{ $key == $item['value'] ? 'selected' : '' }}>
+                                                    {{ $option }}
+                                                </option>
+                                            @endforeach
+                                        @break
+                                    
+
+                                        @case('tenant_company_time_zone')
+                                            @foreach (DateTimeZone::listIdentifiers() as $option)
+                                                <option value="{{ $option }}" {{ $option == $item['value'] ? 'selected' : '' }}>
+                                                    {{ $option }}
+                                                </option>
+                                            @endforeach
+                                        @break
+                                    @endswitch
+                                @else
+                                    @switch($item['name'])
+                                        
+                                    @case('client_company_date_format')
+                                    
                                         @foreach ($dateTimeFormats as $key => $option)
                                             <option value="{{ $key }}" {{ $key == $item['value'] ? 'selected' : '' }}>
                                                 {{ $option }}
                                             </option>
                                         @endforeach
                                     @break
+                                
 
-                                    @case('tenant_company_time_zone')
+                                    @case('client_company_time_zone')
                                         @foreach (DateTimeZone::listIdentifiers() as $option)
                                             <option value="{{ $option }}" {{ $option == $item['value'] ? 'selected' : '' }}>
                                                 {{ $option }}
                                             </option>
                                         @endforeach
                                     @break
-                                @endswitch
-
+                                    @endswitch
+                                @endif
                             </select>
                         </div>
                     @break

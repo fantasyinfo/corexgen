@@ -2,6 +2,7 @@
 
 // crm routes
 use App\Http\Controllers\AppUpdateController;
+use App\Http\Controllers\AuditController;
 use App\Http\Controllers\CompanyOnboardingController;
 use App\Http\Controllers\CompanyRegisterController;
 use App\Http\Controllers\CountryCitySeederController;
@@ -271,8 +272,13 @@ Route::middleware([
     // settings routes
     Route::prefix(PANEL_MODULES['COMPANY_PANEL']['settings'])->as(PANEL_MODULES['COMPANY_PANEL']['settings'] . '.')->group(function () {
         // role for fetch, store, update
-        Route::get('/', [SettingsController::class, 'index'])->name('index')->middleware('check.permission:SETTINGS.READ_ALL');
-        Route::put('/', [SettingsController::class, 'update'])->name('update')->middleware('check.permission:SETTINGS.UPDATE');
+        Route::get('/general', [SettingsController::class, 'general'])->name('general')->middleware('check.permission:SETTINGS_GENERAL.READ_ALL');
+        Route::put('/general', [SettingsController::class, 'generalUpdate'])->name('generalUpdate')->middleware('check.permission:SETTINGS_GENERAL.UPDATE');
+
+
+
+        Route::get('/mail', [SettingsController::class, 'mail'])->name('mail')->middleware('check.permission:SETTINGS_MAIL.READ_ALL');
+        Route::put('/mail', [SettingsController::class, 'mailUpdate'])->name('mailUpdate')->middleware('check.permission:SETTINGS_MAIL.UPDATE');
 
 
 
@@ -298,7 +304,10 @@ Route::middleware([
 
 
 
-
+    // audits routes
+    Route::prefix('audit')->as('audit.')->group(function () {
+        Route::get('/', [AuditController::class, 'index'])->name('index')->middleware('check.permission:EVENTS_AUDIT_LOG.READ_ALL');
+    });
 
 
 
@@ -441,6 +450,10 @@ Route::middleware([
     // subscriptions routes
     Route::prefix('subscriptions')->as('subscriptions.')->group(function () {
         Route::get('/', [PlansPaymentTransaction::class, 'subscriptions'])->name('index')->middleware('check.permission:SUBSCRIPTIONS.READ_ALL');
+    });
+    // audits routes
+    Route::prefix('audit')->as('audit.')->group(function () {
+        Route::get('/', [AuditController::class, 'index'])->name('index')->middleware('check.permission:EVENTS_AUDIT_LOG.READ_ALL');
     });
 
     // payment gateways routes

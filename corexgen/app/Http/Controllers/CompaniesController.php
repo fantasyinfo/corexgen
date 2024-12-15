@@ -130,7 +130,7 @@ class CompaniesController extends Controller
 
             
             return redirect()
-                ->route($this->getTenantRoute() . 'companies.index')
+                ->route($this->getTenantRoute() . 'companies.edit', ['id' => $company->id])
                 ->with('success', 'Company created successfully.');
         } catch (\Exception $e) {
             \Log::error('Company creation failed', [
@@ -232,7 +232,7 @@ class CompaniesController extends Controller
 
             // If validation fails, it will throw an exception
             return redirect()
-                ->route($this->getTenantRoute() . 'companies.index')
+            ->back()
                 ->with('success', 'Company updated successfully.');
         } catch (\Exception $e) {
             \Log::error('Company updation failed', [
