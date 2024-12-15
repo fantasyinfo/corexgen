@@ -263,7 +263,7 @@ PermissionsHelper::initializePermissions();
     ],
     'TIME_ZONE' => [
         'key' => 'Time Zone',
-        'value' => 'Asia/Kolkata',
+        'value' => 'default',
         'is_media_setting' => false,
         'media_id' => null,
         'value_type' => 'string',
@@ -274,7 +274,7 @@ PermissionsHelper::initializePermissions();
     ],
     'CURRENCY_SYMBOL' => [
         'key' => 'Currency Symbol',
-        'value' => '$',
+        'value' => 'default',
         'is_media_setting' => false,
         'media_id' => null,
         'value_type' => 'string',
@@ -285,7 +285,7 @@ PermissionsHelper::initializePermissions();
     ],
     'CURRENCY_CODE' => [
         'key' => 'Currency Code',
-        'value' => 'USD',
+        'value' => 'default',
         'is_media_setting' => false,
         'media_id' => null,
         'value_type' => 'string',
