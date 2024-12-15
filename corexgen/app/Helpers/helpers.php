@@ -414,9 +414,11 @@ function getLogoPath()
         } elseif (!is_null($user->company_id)) {
             $query->where('company_id', $user->company_id)->where('name', 'client_company_logo');
         }
+        $data = $query->first();
+        return $data?->media?->file_path;
     }
 
-    $data = $query->first();
-    return $data?->media?->file_path;
+    return '/img/logo.png';
+
 
 }
