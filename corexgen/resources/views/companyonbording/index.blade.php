@@ -11,6 +11,7 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap/bootstrap.min.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ asset('css/custom/colors.css') }}" />
 
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/select2/select2.min.css') }}" />
     <!-- Custom Styles -->
     <style>
         /* Global Styles */
@@ -311,7 +312,59 @@
             display: flex;
             justify-content: center;
             align-content: center;
+            width: 100%;
+        }
+
+        .searchSelectBox {
+            width: 100% !important;
+        }
+        .select2.select2-container{
+            width: 100% !important;
+        }
+        /* Style for Select2 container */
+        .select2-container .select2-selection--single {
+            height: 45px;
+            /* Match input box height */
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 8px 12px;
+            outline: none;
+            font-size: 14px;
             width:100%;
+            transition: box-shadow 0.3s ease, border 0.3s ease;
+        }
+
+        /* Focus effect */
+        .select2-container--default .select2-selection--single:focus,
+        .select2-container--default .select2-selection--single:active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px rgba(106, 17, 203, 0.2);
+        }
+
+        /* Dropdown */
+        .select2-dropdown {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Dropdown Results */
+        .select2-results__option {
+            padding: 10px;
+            font-size: 14px;
+            color: #333;
+            transition: background 0.2s ease;
+        }
+
+        /* Hover and Active Styles */
+        .select2-results__option--highlighted {
+            background-color: var(--primary-color)!important;
+            color: #fff !important;
+        }
+
+        .select2-results__option--selected {
+            background-color: var(--primary-color)!important;
+            color: #fff !important;
         }
     </style>
 </head>
@@ -392,7 +445,8 @@
                         </div>
 
                         <div class="col-md-6 mb-3">
-                            <select class="form-control" id="country_id" name="address_country_id" required>
+                            <select class="form-control searchSelectBox" id="country_id" name="address_country_id"
+                                required>
                                 <option value="">Select Country</option>
                                 @foreach ($countries as $country)
                                     <option value="{{ $country->id }}">{{ $country->name }}</option>
@@ -400,7 +454,7 @@
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <select class="form-control" id="city_id" name="address_city_id" required>
+                            <select class="form-control searchSelectBox" id="city_id" name="address_city_id" required>
                                 <option value="">Select City</option>
                             </select>
                         </div>
@@ -438,7 +492,7 @@
                     <h2 class="text-center mb-4">Select Timezone</h2>
                     <div class="row">
                         <div class="col-12 mb-3">
-                            <select class="form-control" name="timezone" required>
+                            <select class="form-control searchSelectBox" name="timezone" required>
                                 <option value="">Select Timezone</option>
                                 @foreach ($timezones as $timezone)
                                     <option value="{{ $timezone }}">{{ $timezone }}</option>
@@ -456,7 +510,7 @@
                     <h2 class="text-center mb-4">Select Plan</h2>
                     <!-- Payment gateway integration goes here -->
                     <div class="col-12 mb-3">
-                        <select class="form-control" name="plan_id" required>
+                        <select class="form-control searchSelectBox" name="plan_id" required>
                             <option value="">Select Plans</option>
                             @foreach ($plans as $plan)
                                 <option value="{{ $plan->id }}">{{ $plan->name }}</option>
@@ -473,7 +527,7 @@
                     <h2 class="text-center mb-4">Select Payment</h2>
                     <!-- Payment gateway integration goes here -->
                     <div class="col-12 mb-3">
-                        <select class="form-control" name="gateway" required>
+                        <select class="form-control searchSelectBox" name="gateway" required>
 
                             @foreach ($payment_gateways as $pg)
                                 <option value="{{ strtolower($pg->name) }}">{{ $pg->name }}</option>
@@ -506,8 +560,12 @@
     <script src="{{ asset('js/jquery/jquery.min.js') }}"></script>
     <!-- bootstrap js -->
     <script src="{{ asset('js/boostrap/bootstrap.bundle.min.js') }}"></script>
-
+    <script src="{{ asset('js/select2/select2.min.js') }}"></script>
     <script>
+        if ($(".searchSelectBox").length > 0) {
+            $(".searchSelectBox").select2();
+        }
+
         function showOnboarding() {
             $('#onboarding').show();
             $('#welcome').hide();
