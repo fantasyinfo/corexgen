@@ -163,7 +163,7 @@ class CompanyService
             'plan_id' => $planid,
             'company_id' => $companyid,
             'amount' => $plansDetails->offer_price ?? 0,
-            'currency' => $paymentDetails['currency'] ?? getSettingValue('Currency Code'),
+            'currency' => $paymentDetails['currency'] ?? getSettingValue('Panel Currency Code'),
             'payment_gateway' => $paymentDetails['payment_gateway'] ?? 'COD',
             'payment_type' => $paymentDetails['payment_type'] ?? 'OFFLINE',
             'transaction_reference' => $paymentDetails['transaction_reference'] ?? null,

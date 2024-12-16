@@ -1,7 +1,9 @@
 @extends('layout.app')
 
 @section('content')
-
+{{
+    getSettingValue('Currency Symbol')
+}}
     <div class="container">
         <div class="row">
             <div class="col-lg-9">
@@ -86,8 +88,8 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <x-form-components.input-group-prepend-append 
-                                            prepend="{{ getSettingValue('Currency Symbol') }}"
-                                            append="{{ getSettingValue('Currency Code') }}"
+                                            prepend="{{ getSettingValue('Panel Currency Symbol') }}"
+                                            append="{{ getSettingValue('Panel Currency Code') }}"
                                             type="number" 
                                             step="0.001"
                                             class="custom-class"
@@ -109,8 +111,8 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <x-form-components.input-group-prepend-append 
-                                            prepend="{{ getSettingValue('Currency Symbol') }}"
-                                            append="{{ getSettingValue('Currency Code') }}"
+                                            prepend="{{ getSettingValue('Panel Currency Symbol') }}"
+                                            append="{{ getSettingValue('Panel Currency Code') }}"
                                             type="number" 
                                             step="0.001"
                                             class="custom-class"

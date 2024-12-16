@@ -144,7 +144,7 @@ class PlanUpgrade extends Controller
             $paymentDetails = [
                 'amount' => $validatedData['plan_price'],
                 'description' => "Changed To - {$validatedData['plan_name']} Plan",
-                'currency' => getSettingValue('Currency Code'),
+                'currency' => getSettingValue('Panel Currency Code'),
                 'metadata' => [
                     'plan_id' => $validatedData['plan_id'],
                     'company_registration' => true,
