@@ -84,8 +84,8 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <x-form-components.input-group-prepend-append
-                                                prepend="{{ getSettingValue('Currency Symbol') }}"
-                                                append="{{ getSettingValue('Currency Code') }}" type="number"
+                                                prepend="{{ getSettingValue('Panel Currency Symbol') }}"
+                                                append="{{ getSettingValue('Panel Currency Code') }}" type="number"
                                                 step="0.001" class="custom-class" id="planPrice" name="price"
                                                 placeholder="{{ __('129.99') }}" value="{{ $plan->price }}" required />
 
@@ -101,8 +101,8 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <x-form-components.input-group-prepend-append
-                                                prepend="{{ getSettingValue('Currency Symbol') }}"
-                                                append="{{ getSettingValue('Currency Code') }}" type="number"
+                                                prepend="{{ getSettingValue('Panel Currency Symbol') }}"
+                                                append="{{ getSettingValue('Panel Currency Code') }}" type="number"
                                                 step="0.001" class="custom-class" id="planOfferPrice" name="offer_price"
                                                 placeholder="{{ __('99.99') }}" value="{{ $plan->offer_price }}"
                                                 required />

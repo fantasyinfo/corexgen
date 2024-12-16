@@ -69,7 +69,7 @@ function isFeatureEnable($module)
         ->where('id', Auth::user()->company_id)
         ->first()->toArray();
 
-    if ($planFeatuers['plans']['plan_features'][0]['value'] == 0) {
+    if (@$planFeatuers['plans']['plan_features'][0]['value'] == 0) {
         return false;
     }
 
@@ -387,7 +387,7 @@ if (!function_exists('getSettingValue')) {
 
         if ($user = Auth::user()) {
             if ($user->is_tenant) {
-                $query->where('is_tenant', 1);
+                $query->where('is_tenant', '1');
             } elseif (!is_null($user->company_id)) {
                 if ($isTenantSetting == '1') {
                     $query->where('is_tenant', 1);

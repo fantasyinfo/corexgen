@@ -286,7 +286,7 @@ class CompanyOnboardingController extends Controller
             $paymentDetails = [
                 'amount' => $validatedData['plan_price'],
                 'description' => "Company Registration - {$validatedData['plan_name']} Plan",
-                'currency' => getSettingValue('Currency Code'),
+                'currency' => getSettingValue('Panel Currency Code'),
                 'metadata' => [
                     'plan_id' => $validatedData['plan_id'],
                     'company_registration' => true,

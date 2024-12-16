@@ -87,19 +87,19 @@
 
                         <div class="plan-card-body">
                             <div class="plan-price-strike">
-                                {{ getSettingValue('Currency Symbol', '1') }} <span>{{ $plan->price }}
-                                    ({{ getSettingValue('Currency Code', '1') }})
+                                {{ getSettingValue('Panel Currency Symbol', '1') }} <span>{{ $plan->price }}
+                                    ({{ getSettingValue('Panel Currency Code', '1') }})
                                 </span>
                             </div>
                             <div class="plan-price text-center">
-                                {{ getSettingValue('Currency Symbol', '1') }}
+                                {{ getSettingValue('Panel Currency Symbol', '1') }}
                                 <span id="plan_price_offer" data-price="{{ $plan->offer_price }}"
-                                    data-currency-symbol="{{ getSettingValue('Currency Symbol', '1') }}"
-                                    data-currency-code="{{ getSettingValue('Currency Code', '1') }}">
+                                    data-currency-symbol="{{ getSettingValue('Panel Currency Symbol', '1') }}"
+                                    data-currency-code="{{ getSettingValue('Panel Currency Code', '1') }}">
                                     {{ $plan->offer_price }}
                                 </span>
                                 <span class="text-muted" style="font-size: 1rem;">
-                                    /{{ $plan->billing_cycle }} ({{ getSettingValue('Currency Code', '1') }})
+                                    /{{ $plan->billing_cycle }} ({{ getSettingValue('Panel Currency Code', '1') }})
                                 </span>
                             </div>
                             @if ($current_plan_id === $plan->id)

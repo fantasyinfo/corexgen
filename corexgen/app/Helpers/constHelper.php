@@ -228,6 +228,7 @@ PermissionsHelper::initializePermissions();
     ],
     'Logs & Events' => [
         'menu_icon' => 'fa-list-ul',
+        'is_default' => true,
         'permission_id' => PermissionsHelper::getParentPermissionId('16'),
         'children' => [
             'Audit' => ['menu_url' => 'audit.index', 'menu_icon' => 'fa-box', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['EVENTS_AUDIT_LOG'], 'READ_ALL')],
