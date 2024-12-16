@@ -61,6 +61,13 @@ return [
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
+
+                // Dump configuration
+            'dump' => [
+                'dump_binary_path' => env('MYSQL_DUMP_PATH', exec('which mysqldump')), // Automatically detect the path
+                'use_single_transaction' => true,
+                'timeout' => 60 * 5, // Timeout in seconds
+            ],
         ],
 
         'pgsql' => [
