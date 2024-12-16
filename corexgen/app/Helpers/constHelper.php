@@ -95,6 +95,11 @@ PermissionsHelper::initializePermissions();
         'id' => PermissionsHelper::getParentPermissionId('16'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['EVENTS_AUDIT_LOG']
     ],
+    PermissionsHelper::$plansPermissionsKeys['DOWNLOAD_BACKUP'] => [
+        'name' => 'DOWNLOAD_BACKUP',
+        'id' => PermissionsHelper::getParentPermissionId('17'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['DOWNLOAD_BACKUP']
+    ],
 ]);
 
 // super panel menus
@@ -158,12 +163,13 @@ PermissionsHelper::initializePermissions();
             'Mail' => ['menu_url' => 'settings.mail', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_MAIL'], 'READ')],
         ]
     ],
-    'Modules' => [
+    'System Settings' => [
         'menu_icon' => 'fa-box',
         'permission_id' => PermissionsHelper::getParentPermissionId('7'),
         'children' => [
             'Modules' => ['menu_url' => 'modules.index', 'menu_icon' => 'fa-box', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['MODULES'], 'READ_ALL')],
             'AppUpdates' => ['menu_url' => 'appupdates.index', 'menu_icon' => 'fa-box', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['APPUPDATES'], 'READ_ALL')],
+            'Backups' => ['menu_url' => 'backup.index', 'menu_icon' => 'fa-box', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['DOWNLOAD_BACKUP'], 'READ_ALL')],
         ]
     ],
     'Logs & Events' => [
@@ -320,6 +326,7 @@ PermissionsHelper::initializePermissions();
         'paymentGateway' => 'paymentGateway',
         'subscriptions' => 'subscriptions',
         'audit' => 'audit',
+        'backup' => 'backup',
 
 
     ],

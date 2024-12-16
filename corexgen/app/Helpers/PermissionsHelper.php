@@ -25,7 +25,8 @@ class PermissionsHelper
         'SUBSCRIPTIONS' => 'SUBSCRIPTIONS',
         'SETTINGS_GENERAL' => 'SETTINGS_GENERAL',
         'SETTINGS_MAIL' => 'SETTINGS_MAIL',
-        'EVENTS_AUDIT_LOG' => 'EVENTS_AUDIT_LOG'
+        'EVENTS_AUDIT_LOG' => 'EVENTS_AUDIT_LOG',
+        'DOWNLOAD_BACKUP' => 'DOWNLOAD_BACKUP',
     ];
 
 
@@ -75,6 +76,8 @@ class PermissionsHelper
             self::$plansPermissionsKeys['SETTINGS_MAIL'] => [1201 => 'READ', 1202 => 'UPDATE'],
 
             self::$plansPermissionsKeys['EVENTS_AUDIT_LOG'] => [1251 => 'READ', 1252 => 'READ_ALL'],
+            
+            self::$plansPermissionsKeys['DOWNLOAD_BACKUP'] => [1301 => 'READ', 1302 => 'READ_ALL', 1303 => 'CREATE', 1304 => 'DOWNLOAD'],
 
          
         ];

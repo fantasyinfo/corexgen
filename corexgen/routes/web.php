@@ -3,6 +3,7 @@
 // crm routes
 use App\Http\Controllers\AppUpdateController;
 use App\Http\Controllers\AuditController;
+use App\Http\Controllers\BackupController;
 use App\Http\Controllers\CompanyOnboardingController;
 use App\Http\Controllers\CompanyRegisterController;
 use App\Http\Controllers\CountryCitySeederController;
@@ -454,6 +455,14 @@ Route::middleware([
     // audits routes
     Route::prefix('audit')->as('audit.')->group(function () {
         Route::get('/', [AuditController::class, 'index'])->name('index')->middleware('check.permission:EVENTS_AUDIT_LOG.READ_ALL');
+    });
+    // audits routes
+    Route::prefix('backup')->as('backup.')->group(function () {
+        Route::get('/', [BackupController::class, 'index'])->name('index')->middleware('check.permission:DOWNLOAD_BACKUP.READ_ALL');
+        Route::post('/', [BackupController::class, 'createBackup'])->name('createBackup')->middleware('check.permission:DOWNLOAD_BACKUP.CREATE');
+        Route::get('/download', [BackupController::class, 'downloadBackup'])
+            ->name('download')
+            ->middleware(['throttle:5,1', 'check.permission:DOWNLOAD_BACKUP.DOWNLOAD']);
     });
 
     // payment gateways routes

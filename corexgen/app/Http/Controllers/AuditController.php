@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Audit;
 use App\Traits\TenantFilter;
-use Illuminate\Http\Request;
+
 
 class AuditController extends Controller
 {
@@ -41,4 +41,5 @@ class AuditController extends Controller
             ]
         );
     }
+    
 }
