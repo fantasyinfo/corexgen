@@ -214,6 +214,7 @@ function getCRMMenus()
  */
 function hasPermission($permissionKey)
 {
+  
 
     // Get the current user's role ID
     $user = Auth::user();

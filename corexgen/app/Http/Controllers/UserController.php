@@ -120,7 +120,7 @@ class UserController extends Controller
             $userService->createUser($request->validated());
 
             // update current usage
-            $this->updateUsage(strtolower(PLANS_FEATURES['USERS']), '+','1');
+            $this->updateUsage(strtolower(PLANS_FEATURES['USERS']), '+', '1');
 
             return redirect()->route($this->tenantRoute . 'users.index')
                 ->with('success', 'User created successfully.');
@@ -335,7 +335,7 @@ class UserController extends Controller
                 ]);
 
                 $totalAdd++;
-       
+
             }
             $this->updateUsage(strtolower(PLANS_FEATURES['USERS']), '+', $totalAdd);
             return response()->json([
@@ -364,7 +364,7 @@ class UserController extends Controller
 
             $this->applyTenantFilter(User::query()->where('id', '=', $id))->delete();
             // update current usage
-            $this->updateUsage(strtolower(PLANS_FEATURES['USERS']), '-','1');
+            $this->updateUsage(strtolower(PLANS_FEATURES['USERS']), '-', '1');
             // Return success response
             return redirect()->back()->with('success', 'User deleted successfully.');
         } catch (\Exception $e) {
@@ -415,7 +415,7 @@ class UserController extends Controller
             if (is_array($ids) && count($ids) > 0) {
                 // Validate ownership/permissions if necessary
                 $this->applyTenantFilter(User::query()->whereIn('id', $ids))->delete();
-                $this->updateUsage(strtolower(PLANS_FEATURES['USERS']), '-',count($ids));
+                $this->updateUsage(strtolower(PLANS_FEATURES['USERS']), '-', count($ids));
                 return response()->json(['message' => 'Selected users deleted successfully.'], 200);
             }
 
@@ -480,7 +480,8 @@ class UserController extends Controller
             ->with([
                 'addresses' => function ($query) {
                     $query->with('country')
-                        ->with('city')
+                   
+                        ->with(['city' => fn($q) => $q->select('id', 'name as city_name')])
                         ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
                 },
                 'role'
@@ -490,7 +491,7 @@ class UserController extends Controller
         $query = $this->applyTenantFilter($query);
         $user = $query->firstOrFail();
 
-        // dd($user);
+        dd($user);
 
         return view($this->getViewFilePath('view'), [
 
@@ -510,16 +511,19 @@ class UserController extends Controller
         $query = User::query()
             ->with([
                 'addresses' => function ($query) {
-                    $query->with('country')
-                        ->with('city')
+                    $query->with('country') // Load country relationship
+                        ->with(['city' => fn($q) => $q->select('id', 'name as city_name')]) // Fix for city
                         ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
                 },
-                'role'
+                'role' // Load role relationship
             ])
-            ->where('id', Auth::id())->get();
+            ->where('id', Auth::id());
 
         $query = $this->applyTenantFilter($query);
         $user = $query->firstOrFail();
+
+
+
         $country = Country::all();
         return view($this->getViewFilePath('profile'), [
 

@@ -1,12 +1,16 @@
 @extends('layout.app')
 
 @section('content')
+
     <div class="container-fluid">
         <div class="">
+            
             @include('layout.components.header-buttons')
+
 
             <div class="shadow-sm rounded">
 
+                @include('dashboard.users.components.header-stats')
                 @include('dashboard.users.components.users-filters')
                 @include('layout.components.bulk-import-modal')
 
