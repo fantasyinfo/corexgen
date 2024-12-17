@@ -158,7 +158,13 @@ Route::get('/super-admin-login', function () {
     return view('auth.login', ['is_tenant' => true, 'path' => 'super-admin-login']);
 })->name('super.panel.login');
 
+Route::get('/direct-logout', function () {
+    Auth::guard('web')->logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
 
+    return redirect('/'); // Redirect to home or login page after logout
+})->name('direct.logout');
 
 
 // language set
@@ -172,19 +178,9 @@ Route::get('/setlang/{locale}', function (string $locale) {
 });
 
 
-// In your routes file, add a print statement to debug
-Route::get('/get-cities/{countryId}', function ($countryId) {
-
-    $cities = City::where('country_id', $countryId)->get(['id', 'name']);
-
-
-    return response()->json($cities);
-});
 
 
 
-// add country, city tables in bg
-Route::get('/add-default-countries-cities', [CountryCitySeederController::class, 'runSeeder']);
 
 
 

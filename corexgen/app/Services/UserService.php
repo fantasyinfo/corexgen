@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\City;
 use App\Repositories\UserRepository;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\View;
@@ -80,7 +81,7 @@ class UserService
         $requiredAddressFields = [
             'address_street_address',
             'address_country_id',
-            'address_city_id',
+            'address_city_name',
             'address_pincode'
         ];
 
@@ -88,10 +89,14 @@ class UserService
             return null;
         }
 
+        $city = City::create([
+            'name' => $data['address_city_name'],
+            'country_id' => $data['address_country_id']
+        ]);
         return Address::create([
             'street_address' => $data['address_street_address'],
             'postal_code' => $data['address_pincode'],
-            'city_id' => $data['address_city_id'],
+            'city_id' => $city->id,
             'country_id' => $data['address_country_id'],
             'address_type' => ADDRESS_TYPES['USER']['SHOW']['HOME'],
         ]);
@@ -107,7 +112,7 @@ class UserService
         $requiredAddressFields = [
             'address_street_address',
             'address_country_id',
-            'address_city_id',
+            'address_city_name',
             'address_pincode'
         ];
 
@@ -115,13 +120,21 @@ class UserService
             return null;
         }
 
+        $city = City::where('name',$data['address_city_name'] )->where('country_id', $data['address_country_id'])->first();
+        if(!$city){
+            $city = City::create([
+                'name' => $data['address_city_name'],
+                'country_id' => $data['address_country_id']
+            ]);
+        }
         // If company already has an address, update it
         if ($user->address_id) {
+          
             $address = Address::findOrFail($user->address_id);
             $address->update([
                 'street_address' => $data['address_street_address'],
                 'postal_code' => $data['address_pincode'],
-                'city_id' => $data['address_city_id'],
+                'city_id' => $city->id,
                 'country_id' => $data['address_country_id'],
             ]);
             return $address;
@@ -131,7 +144,7 @@ class UserService
         return Address::create([
             'street_address' => $data['address_street_address'],
             'postal_code' => $data['address_pincode'],
-            'city_id' => $data['address_city_id'],
+            'city_id' => $city->id,
             'country_id' => $data['address_country_id'],
             'address_type' => ADDRESS_TYPES['USER']['SHOW']['HOME'],
         ]);

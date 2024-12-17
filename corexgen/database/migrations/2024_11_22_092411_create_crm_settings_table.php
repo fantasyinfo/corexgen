@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('crm_settings', function (Blueprint $table) {
             $table->id();
-            $table->string('key')->unique();
+            $table->string('key');
             $table->text('value')->nullable();
             $table->boolean('is_media_setting')->default(false);
             $table->unsignedBigInteger('media_id')->nullable();
@@ -22,7 +22,7 @@ return new class extends Migration {
             $table->string('type')->nullable();
             $table->string('value_type');
             $table->string('placeholder')->nullable();
-            $table->string('name')->unique();
+            $table->string('name');
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->unsignedBigInteger('created_by')->nullable();
             $table->timestamps();
@@ -33,8 +33,12 @@ return new class extends Migration {
             $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
             $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
 
-            // index 
+            // Index
             $table->index(['key', 'company_id', 'is_tenant']);
+
+            // Unique constraints for composite columns
+            $table->unique(['key', 'company_id'], 'unique_key_company');   // Unique for key + company_id
+            $table->unique(['name', 'company_id'], 'unique_name_company'); // Unique for name + company_id
         });
     }
 

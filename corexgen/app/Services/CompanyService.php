@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Helpers\PermissionsHelper;
+use App\Models\City;
 use App\Models\CRM\CRMPermissions;
 use App\Models\CRM\CRMRolePermissions;
 use App\Repositories\CompanyRepository;
@@ -110,7 +111,7 @@ class CompanyService
         $requiredAddressFields = [
             'address_street_address',
             'address_country_id',
-            'address_city_id',
+            'address_city_name',
             'address_pincode'
         ];
 
@@ -118,12 +119,16 @@ class CompanyService
             return null;
         }
 
+        $city = City::create([
+            'name' => $data['address_city_name'],
+            'country_id' => $data['address_country_id']
+        ]);
         return Address::create([
             'street_address' => $data['address_street_address'],
             'postal_code' => $data['address_pincode'],
-            'city_id' => $data['address_city_id'],
+            'city_id' => $city->id,
             'country_id' => $data['address_country_id'],
-            'address_type' => ADDRESS_TYPES['COMPANY']['SHOW']['HOME'],
+            'address_type' => ADDRESS_TYPES['USER']['SHOW']['HOME'],
         ]);
     }
 
@@ -491,7 +496,7 @@ class CompanyService
         $requiredAddressFields = [
             'address_street_address',
             'address_country_id',
-            'address_city_id',
+            'address_city_name',
             'address_pincode'
         ];
 
@@ -499,13 +504,21 @@ class CompanyService
             return null;
         }
 
+        $city = City::where('name',$data['address_city_name'] )->where('country_id', $data['address_country_id'])->first();
+        if(!$city){
+            $city = City::create([
+                'name' => $data['address_city_name'],
+                'country_id' => $data['address_country_id']
+            ]);
+        }
         // If company already has an address, update it
         if ($company->address_id) {
+          
             $address = Address::findOrFail($company->address_id);
             $address->update([
                 'street_address' => $data['address_street_address'],
                 'postal_code' => $data['address_pincode'],
-                'city_id' => $data['address_city_id'],
+                'city_id' => $city->id,
                 'country_id' => $data['address_country_id'],
             ]);
             return $address;
@@ -515,9 +528,9 @@ class CompanyService
         return Address::create([
             'street_address' => $data['address_street_address'],
             'postal_code' => $data['address_pincode'],
-            'city_id' => $data['address_city_id'],
+            'city_id' => $city->id,
             'country_id' => $data['address_country_id'],
-            'address_type' => ADDRESS_TYPES['COMPANY']['SHOW']['HOME'],
+            'address_type' => ADDRESS_TYPES['USER']['SHOW']['HOME'],
         ]);
     }
 

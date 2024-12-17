@@ -53,7 +53,7 @@ class UserRequest extends FormRequest
             'role_id' => [$isProfile ? 'nullable' : 'required', 'integer'],
             'address_street_address' => 'nullable|string|max:255',
             'address_country_id' => 'nullable',
-            'address_city_id' => 'nullable',
+            'address_city_name' => 'nullable',
             'address_pincode' => 'nullable|string|max:10',
         ];
     }
