@@ -22,7 +22,7 @@ trait SubscriptionUsageFilter
 
         // fetch current usage
 
-        $currentUsage = $this->getCurrentUsage($this->getCurrentSubscriptionId());
+        $currentUsage = $this->getCurrentUsage($this->getCurrentSubscriptionId(),$module);
 
         \Log::info('Usage', [
             'currentUsage' => $currentUsage,
@@ -59,6 +59,7 @@ trait SubscriptionUsageFilter
         // Find existing usage
         $subUsageFind = SubscriptionUsage::where('subscription_id', $subId)
             ->where('company_id', $this->getCompanyId())
+            ->where('module_name', $module)
             ->first();
 
         if ($subUsageFind) {
@@ -133,11 +134,12 @@ trait SubscriptionUsageFilter
         return $subscription->id;
     }
 
-    private function getCurrentUsage(int $subId): int
+    private function getCurrentUsage(int $subId,$module): int
     {
         // Find existing usage
         $subUsageFind = SubscriptionUsage::where('subscription_id', $subId)
             ->where('company_id', $this->getCompanyId())
+            ->where('module_name', $module)
             ->first();
 
         if ($subUsageFind) {

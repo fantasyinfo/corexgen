@@ -53,7 +53,7 @@ class PermissionsHelper
 
             self::$plansPermissionsKeys['PERMISSIONS'] => [651 => 'CREATE', 652 => 'READ', 653 => 'READ_ALL', 654 => 'UPDATE', 655 => 'DELETE'],
 
-            self::$plansPermissionsKeys['SETTINGS'] => [701 => 'READ', 702 => 'UPDATE'],
+            self::$plansPermissionsKeys['SETTINGS'] => [701 => 'READ', 702 => 'READ_ALL' , 703 => 'UPDATE'],
 
             self::$plansPermissionsKeys['MODULES'] => [751 => 'CREATE', 752 => 'READ', 753 => 'READ_ALL', 754 => 'UPDATE', 755 => 'DELETE', 756 => 'IMPORT', 757 => 'EXPORT', 758 => 'FILTER', 759 => 'CHANGE_STATUS'],
 
@@ -72,8 +72,8 @@ class PermissionsHelper
 
             self::$plansPermissionsKeys['SUBSCRIPTIONS'] => [1101 => 'READ', 1102 => 'READ_ALL'],
 
-            self::$plansPermissionsKeys['SETTINGS_GENERAL'] => [1151 => 'READ', 1152 => 'UPDATE'],
-            self::$plansPermissionsKeys['SETTINGS_MAIL'] => [1201 => 'READ', 1202 => 'UPDATE'],
+            self::$plansPermissionsKeys['SETTINGS_GENERAL'] => [1151 => 'READ', 1152 => 'READ_ALL' , 1153 => 'UPDATE'],
+            self::$plansPermissionsKeys['SETTINGS_MAIL'] => [1201 => 'READ', 1202 => 'READ_ALL', 1203 => 'UPDATE'],
 
             self::$plansPermissionsKeys['EVENTS_AUDIT_LOG'] => [1251 => 'READ', 1252 => 'READ_ALL'],
 
@@ -92,6 +92,7 @@ class PermissionsHelper
             'SETTINGS_GENERAL' => 'SETTINGS_GENERAL',
             'SETTINGS_MAIL' => 'SETTINGS_MAIL',
             'EVENTS_AUDIT_LOG' => 'EVENTS_AUDIT_LOG',
+            'PLANUPGRADE' => 'PLANUPGRADE'
         ];
     }
 
