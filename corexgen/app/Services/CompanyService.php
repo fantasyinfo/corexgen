@@ -319,6 +319,7 @@ class CompanyService
                 }
             }
 
+            $this->addDefaultFeatuersToCompany($company);
             return true;
         } catch (\Exception $e) {
             \Log::error('Error assigning permissions', [
@@ -332,12 +333,58 @@ class CompanyService
     }
 
 
+    public function addDefaultFeatuersToCompany($company)
+    {
+        $permissionToPush = [];
+        foreach (PermissionsHelper::defaultFeatuers() as $featureName) {
+            // Get permissions for this feature
+            $permissionOFModule = PermissionsHelper::$PERMISSIONS_IDS[$featureName];
+
+            $permissionKeys = array_keys($permissionOFModule);
+
+
+
+            $pmi = CRMPermissions::where('permission_id', $permissionKeys[0])->get()->toArray();
+
+
+            $pmItem = CRMPermissions::find($pmi[0]['parent_menu_id']);
+
+            $permissionToPush[] = [
+                'company_id' => $company->id, // Note: changed from plan_id to company->id
+                'role_id' => null,
+                'permission_id' => $pmItem->permission_id,
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+
+
+
+            foreach ($permissionKeys as $p) {
+                $permissionToPush[] = [
+                    'company_id' => $company->id, // Note: changed from plan_id to company->id
+                    'role_id' => null,
+                    'permission_id' => $p,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ];
+            }
+        }
+        // Bulk insert with chunk to handle large datasets
+        if (!empty($permissionToPush)) {
+            $chunks = array_chunk($permissionToPush, 100);
+            foreach ($chunks as $chunk) {
+                CRMRolePermissions::insert($chunk);
+            }
+        }
+        return true;
+    }
+
 
 
     public function createMenuItemsForCompanyPanel($planId)
     {
         return;
-        
+
         $plansFeatures = Plans::with('planFeatures')->findOrFail($planId);
 
         foreach (CRM_MENU_ITEMS_COMPANY as $category => $menuData) {
@@ -504,8 +551,8 @@ class CompanyService
             return null;
         }
 
-        $city = City::where('name',$data['address_city_name'] )->where('country_id', $data['address_country_id'])->first();
-        if(!$city){
+        $city = City::where('name', $data['address_city_name'])->where('country_id', $data['address_country_id'])->first();
+        if (!$city) {
             $city = City::create([
                 'name' => $data['address_city_name'],
                 'country_id' => $data['address_country_id']
@@ -513,7 +560,7 @@ class CompanyService
         }
         // If company already has an address, update it
         if ($company->address_id) {
-          
+
             $address = Address::findOrFail($company->address_id);
             $address->update([
                 'street_address' => $data['address_street_address'],

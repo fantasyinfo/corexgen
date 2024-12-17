@@ -71,18 +71,29 @@ class PermissionsHelper
             self::$plansPermissionsKeys['PAYMENTGATEWAYS'] => [1051 => 'READ', 1052 => 'READ_ALL', 1053 => 'UPDATE', 1055 => 'FILTER', 1056 => 'CHANGE_STATUS'],
 
             self::$plansPermissionsKeys['SUBSCRIPTIONS'] => [1101 => 'READ', 1102 => 'READ_ALL'],
-            
+
             self::$plansPermissionsKeys['SETTINGS_GENERAL'] => [1151 => 'READ', 1152 => 'UPDATE'],
             self::$plansPermissionsKeys['SETTINGS_MAIL'] => [1201 => 'READ', 1202 => 'UPDATE'],
 
             self::$plansPermissionsKeys['EVENTS_AUDIT_LOG'] => [1251 => 'READ', 1252 => 'READ_ALL'],
-            
+
             self::$plansPermissionsKeys['DOWNLOAD_BACKUP'] => [1301 => 'READ', 1302 => 'READ_ALL', 1303 => 'CREATE', 1304 => 'DOWNLOAD'],
 
-         
+
         ];
     }
 
+
+    public static function defaultFeatuers(){
+        return [
+            'DASHBOARD' => 'DASHBOARD',
+            'PERMISSIONS' => 'PERMISSIONS',
+            'SETTINGS' => 'SETTINGS',
+            'SETTINGS_GENERAL' => 'SETTINGS_GENERAL',
+            'SETTINGS_MAIL' => 'SETTINGS_MAIL',
+            'EVENTS_AUDIT_LOG' => 'EVENTS_AUDIT_LOG',
+        ];
+    }
 
     /**
      * Summary of getPermissionsArray getting the permission array values
