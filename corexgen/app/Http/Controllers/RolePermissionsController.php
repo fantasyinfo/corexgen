@@ -150,7 +150,7 @@ class RolePermissionsController extends Controller
 
         $crm_permissions = $crm_p_query->get();
 
-        //  dd($crm_permissions);
+        //   dd($crm_permissions->toArray());
 
 
         return view($this->getViewFilePath('create'), [

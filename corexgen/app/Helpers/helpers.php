@@ -315,8 +315,10 @@ function hasMenuPermission($permissionId = null)
         return true;
     }
 
-    if ($permissionId == null)
+    if ($permissionId == null) {
         return false;
+    }
+
 
 
     if ($userRoleId == null && $user->company_id == null) {
