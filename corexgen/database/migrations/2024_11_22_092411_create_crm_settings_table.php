@@ -37,8 +37,8 @@ return new class extends Migration {
             $table->index(['key', 'company_id', 'is_tenant']);
 
             // Unique constraints for composite columns
-            $table->unique(['key', 'company_id'], 'unique_key_company');   // Unique for key + company_id
-            $table->unique(['name', 'company_id'], 'unique_name_company'); // Unique for name + company_id
+            $table->unique(['key', 'company_id','id'], 'unique_key_company');   // Unique for key + company_id
+            $table->unique(['name', 'company_id','id'], 'unique_name_company'); // Unique for name + company_id
         });
     }
 

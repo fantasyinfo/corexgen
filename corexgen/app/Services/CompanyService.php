@@ -8,22 +8,26 @@ use App\Models\PaymentTransaction;
 use App\Models\Plans;
 use App\Models\Subscription;
 use App\Models\User;
+use App\Traits\MediaTrait;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Helpers\PermissionsHelper;
 use App\Models\City;
 use App\Models\CRM\CRMPermissions;
 use App\Models\CRM\CRMRolePermissions;
+use App\Models\CRM\CRMSettings;
 use App\Repositories\CompanyRepository;
 use App\Traits\TenantFilter;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Yajra\DataTables\Facades\DataTables;
 
 class CompanyService
 {
     use TenantFilter;
-
+    use MediaTrait;
     protected $companyRepository;
 
     private $tenantRoute;
@@ -55,6 +59,12 @@ class CompanyService
 
             $companyAdminUser = $this->createCompanyUser($company, $validatedData, $userFullName);
 
+
+            if($validatedData['from_admin'] == true){
+                $this->updateCompanyPlanAndPermissions($company,$validatedData['plan_id']);
+                $this->generateAllSettings($company->id);
+                $company->update(['status' => CRM_STATUS_TYPES['COMPANIES']['STATUS']['ACTIVE']]);
+            }
             return [
                 'company' => $company,
                 'company_admin' => $companyAdminUser
@@ -66,7 +76,71 @@ class CompanyService
 
 
 
+    public function generateAllSettings($companyid){
+        $this->generateGeneralSettingsForCompany($companyid);
+        $this->generateMailSettingsForCompany($companyid);
+    }
+    public function generateGeneralSettingsForCompany($companyid)
+    {
+        foreach (CRM_COMPANY_GENERAL_SETTINGS as $setting) {
+            $media = null;
 
+            // Handle image-specific logic
+            if ($setting['input_type'] == 'image') {
+                if ($setting['name'] === 'client_company_logo') {
+                    $relativePath = $setting['value']; // Relative path for Storage
+                    $absolutePath = storage_path('app/public/' . $relativePath); // Absolute path for file operations
+
+                    if (Storage::disk('public')->exists($relativePath)) {
+                        $media = $this->createMedia($relativePath, [
+                            'folder' => 'logos',
+                            'created_by' => Auth::id(), // Fixed admin ID
+                            'updated_by' => Auth::id(),
+                        ]);
+                    } else {
+                        \Log::warning("File not found for media creation: {$absolutePath}");
+                    }
+                }
+            }
+
+            // Create CRM setting
+            CRMSettings::create([
+                'key' => $setting['key'],
+                'value' => $setting['value'],
+                'is_media_setting' => $setting['is_media_setting'],
+                'media_id' => $media->id ?? null,
+                'input_type' => $setting['input_type'],
+                'value_type' => $setting['value_type'],
+                'name' => $setting['name'],
+                'placeholder' => $setting['placeholder'] ?? '',
+                'is_tenant' => $setting['is_tenant'],
+                'company_id' => $companyid,
+                'type' => 'General',
+                'updated_by' => Auth::id(), // Fixed admin ID
+                'created_by' => Auth::id(),
+            ]);
+        }
+    }
+    public function generateMailSettingsForCompany($companyid){
+        foreach (CRM_COMPANY_MAIL_SETTINGS as $setting) {
+            // Create CRM setting
+            CRMSettings::create([
+                'key' => $setting['key'],
+                'value' => $setting['value'],
+                'is_media_setting' => $setting['is_media_setting'],
+                'media_id' => null,
+                'input_type' => $setting['input_type'],
+                'value_type' => $setting['value_type'],
+                'name' => $setting['name'],
+                'company_id' => $companyid,
+                'placeholder' => $setting['placeholder'] ?? '',
+                'is_tenant' => @$setting['is_tenant'] ?? false,
+                'type' => 'Mail',
+                'updated_by' => Auth::id(), // Fixed admin ID
+                'created_by' => Auth::id(),
+            ]);
+        }
+    }
 
 
     // public function createCompany(array $validatedData)

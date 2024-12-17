@@ -9,6 +9,7 @@
                 <div class="card stretch stretch-full">
                     <form id="companyForm" action="{{ route(getPanelRoutes('companies.store')) }}" method="POST">
                         @csrf
+                        <input type="hidden" name="from_admin" value="true" />
                         <div class="card-body">
                             <div class="mb-4 d-flex align-items-center justify-content-between">
                                 <p class="fw-bold mb-0 me-4">

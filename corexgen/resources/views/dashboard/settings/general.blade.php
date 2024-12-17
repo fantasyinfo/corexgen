@@ -20,17 +20,17 @@
                     @switch($item['name'])
                         @case('tenant_company_time_zone')
                             @php
-                                $item['value'] =  $defaultSettings->timezone
+                                $item['value'] =  $defaultSettings->timezone ?? 'default'
                             @endphp 
                         @break
                         @case('tenant_company_currency_symbol')
                             @php
-                                $item['value'] =  $defaultSettings->currency_symbol
+                                $item['value'] =  $defaultSettings->currency_symbol ?? '$'
                             @endphp 
                         @break
                         @case('tenant_company_currency_code')
                             @php
-                                $item['value'] =  $defaultSettings->currency_code
+                                $item['value'] =  $defaultSettings->currency_code ?? 'USD'
                             @endphp 
                         @break
                     @endswitch
@@ -38,22 +38,22 @@
                     @switch($item['name'])
                         @case('client_company_time_zone')
                             @php
-                                $item['value'] =  $defaultSettings->timezone
+                                $item['value'] =  $defaultSettings->timezone ?? 'default'
                             @endphp 
                         @break
                         @case('client_company_currency_symbol')
                             @php
-                                $item['value'] =  $defaultSettings->currency_symbol
+                                $item['value'] =  $defaultSettings->currency_symbol ?? '$'
                             @endphp 
                         @break
                         @case('client_company_currency_code')
                             @php
-                                $item['value'] =  $defaultSettings->currency_code
+                                $item['value'] =  $defaultSettings->currency_code ?? 'USD'
                             @endphp 
                         @break
                         @case('client_company_name')
                             @php
-                                $item['value'] =  $company->name
+                                $item['value'] =  $company->name ?? 'default'
                             @endphp 
                         @break
                     @endswitch

@@ -51,7 +51,8 @@ class CompaniesRequest extends FormRequest
             'address_pincode' => 'nullable|string|max:10',
 
             // adding front parametwres
-            'gateway' => 'nullable'
+            'gateway' => 'nullable',
+            'from_admin' => 'nullable',
         ];
     }
 

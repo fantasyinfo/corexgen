@@ -71,7 +71,7 @@ class SettingsController extends Controller
         return view($this->getViewFilePath('general'), [
             'general_settings' => $general_settings,
             'title' => 'General Settings',
-            'permissions' => PermissionsHelper::getPermissionsArray('SETTINGS'),
+            'permissions' => PermissionsHelper::getPermissionsArray('SETTINGS_GENERAL'),
             'module' => PANEL_MODULES[$this->getPanelModule()]['settings'],
             'defaultSettings' => $defaultSettings,
             'is_tenant' => Auth::user()->is_tenant,
@@ -124,7 +124,7 @@ class SettingsController extends Controller
                 }
             }
 
-           
+
         } else {
 
             $validatedData = $request->validate([
@@ -156,7 +156,7 @@ class SettingsController extends Controller
         }
 
         // Handle the logo upload
-        $this->updateCompanyLogo($request,$request->is_tenant);
+        $this->updateCompanyLogo($request, $request->is_tenant);
 
         return redirect()->back()->with('success', 'Settings updated successfully');
     }
@@ -165,26 +165,26 @@ class SettingsController extends Controller
     {
         // Determine the logo setting name based on tenant status
         $logoSettingName = $is_tenant ? 'tenant_company_logo' : 'client_company_logo';
-        
+
         // Check if logo file is present
         $logoFile = $request->file($logoSettingName);
         if (!$logoFile) {
             return;
         }
-    
+
         try {
             // Find or create the CRMSetting
             $logoSetting = CRMSettings::firstOrCreate(
-                ['name' => $logoSettingName],
+                ['name' => $logoSettingName,'company_id' =>Auth::user()->company_id ],
                 ['value' => null, 'is_media_setting' => true]
             );
-    
+
             // Log the retrieved or created setting
             \Log::info('Logo Settings', $logoSetting->toArray());
-    
+
             // Get the old media (if exists)
             $oldMedia = $logoSetting->media ?? null;
-    
+
             // Update media using the trait
             $media = $this->updateMedia(
                 $logoFile,
@@ -197,15 +197,15 @@ class SettingsController extends Controller
                     'created_by' => Auth::id(),
                 ]
             );
-    
+
             // Update the CRMSetting with the new media ID
             $logoSetting->update([
                 'is_media_setting' => true,
                 'media_id' => $media->id,
             ]);
-    
+
             \Log::info('Company logo updated successfully', [
-                'media_id' => $media->id, 
+                'media_id' => $media->id,
                 'setting' => $logoSetting
             ]);
         } catch (\Exception $e) {
@@ -213,11 +213,107 @@ class SettingsController extends Controller
                 'error' => $e->getMessage(),
                 'is_tenant' => $is_tenant
             ]);
-            
+
             // Optionally, you could throw the exception or handle it as needed
             // throw $e;
         }
     }
 
+
+    public function mail()
+    {
+        $this->tenantRoute = $this->getTenantRoute();
+
+
+        $mail_settings = $this->applyTenantFilter(CRMSettings::where('type', 'Mail'))->get()->toArray();
+        $company = null;
+
+        $defaultSettings = [];
+        if (Auth::user()->is_tenant) {
+            $defaultSettings = Tenant::find(Auth::user()->tenant_id);
+        }
+
+
+        return view($this->getViewFilePath('mail'), [
+            'mail_settings' => $mail_settings,
+            'title' => 'Mail Settings',
+            'permissions' => PermissionsHelper::getPermissionsArray('SETTINGS_MAIL'),
+            'module' => PANEL_MODULES[$this->getPanelModule()]['settings'],
+            'defaultSettings' => json_decode(@$defaultSettings->settings, true),
+            'is_tenant' => Auth::user()->is_tenant,
+            'company_id' => Auth::user()->company_id,
+            'company' => $company,
+            'encryption' => ['ssl', 'tls', 'no', 'none']
+        ]);
+    }
+
+    public function mailUpdate(Request $request)
+    {
+        if ($request->is_tenant) {
+            $validatedData = $request->validate([
+                'tenant_mail_provider' => 'required|string|max:255',
+                'tenant_mail_host' => 'required|string|max:255',
+                'tenant_mail_port' => 'required|string',
+                'tenant_mail_username' => 'required|string',
+                'tenant_mail_password' => 'required|string|max:10',
+                'tenant_mail_encryption' => 'required|string|max:10',
+                'tenant_mail_from_address' => 'required|email|max:2048',
+                'tenant_mail_from_name' => 'required|string|max:2048',
+            ]);
+
+            // Update the settings in the database
+            $settings = [
+                'tenant_mail_provider' => $request->input('tenant_mail_provider'),
+                'tenant_mail_host' => $request->input('tenant_mail_host'),
+                'tenant_mail_port' => $request->input('tenant_mail_port'),
+                'tenant_mail_username' => $request->input('tenant_mail_username'),
+                'tenant_mail_password' => $request->input('tenant_mail_password'),
+                'tenant_mail_encryption' => $request->input('tenant_mail_encryption'),
+                'tenant_mail_from_address' => $request->input('tenant_mail_from_address'),
+                'tenant_mail_from_name' => $request->input('tenant_mail_from_name'),
+            ];
+
+            foreach ($settings as $key => $value) {
+                $setting = CRMSettings::where('name', $key)->where('is_tenant', '1')->first();
+                if ($setting) {
+                    $setting->update(['value' => $value]);
+                }
+            }
+
+
+        }else{
+            $validatedData = $request->validate([
+                'client_mail_provider' => 'required|string|max:255',
+                'client_mail_host' => 'required|string|max:255',
+                'client_mail_port' => 'required|string',
+                'client_mail_username' => 'required|string',
+                'client_mail_password' => 'required|string|max:10',
+                'client_mail_encryption' => 'required|string|max:10',
+                'client_mail_from_address' => 'required|email|max:2048',
+                'client_mail_from_name' => 'required|string|max:2048',
+            ]);
+
+            // Update the settings in the database
+            $settings = [
+                'client_mail_provider' => $request->input('client_mail_provider'),
+                'client_mail_host' => $request->input('client_mail_host'),
+                'client_mail_port' => $request->input('client_mail_port'),
+                'client_mail_username' => $request->input('client_mail_username'),
+                'client_mail_password' => $request->input('client_mail_password'),
+                'client_mail_encryption' => $request->input('client_mail_encryption'),
+                'client_mail_from_address' => $request->input('client_mail_from_address'),
+                'client_mail_from_name' => $request->input('client_mail_from_name'),
+            ];
+
+            foreach ($settings as $key => $value) {
+                $setting = CRMSettings::where('name', $key)->where('company_id', Auth::user()->company_id)->first();
+                if ($setting) {
+                    $setting->update(['value' => $value]);
+                }
+            }
+        }
+
+        return redirect()->back()->with('success', 'Settings updated successfully');
+    }
 
 }

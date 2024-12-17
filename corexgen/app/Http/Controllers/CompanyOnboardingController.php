@@ -12,6 +12,7 @@ use App\Models\CompanyOnboarding;
 use App\Models\Country;
 use App\Models\CRM\CRMSettings;
 use App\Models\Plans;
+use App\Services\CompanyService;
 use App\Services\PaymentGatewayFactory;
 use DateTimeZone;
 use Illuminate\Support\Facades\Auth;
@@ -204,7 +205,8 @@ class CompanyOnboardingController extends Controller
         ]);
 
         // company settings generate
-        $this->generateGeneralSettingsForCompany($company->id);
+
+        app(CompanyService::class)->generateAllSettings($company->id);
 
         // if plan is free
         $planOfferPrice = Plans::find($request->plan_id);
@@ -315,47 +317,7 @@ class CompanyOnboardingController extends Controller
         }
     }
 
-    public function generateGeneralSettingsForCompany($companyid)
-    {
-        foreach (CRM_COMPANY_GENERAL_SETTINGS as $setting) {
-            $media = null;
 
-            // Handle image-specific logic
-            if ($setting['input_type'] == 'image') {
-                if ($setting['name'] === 'client_company_logo') {
-                    $relativePath = $setting['value']; // Relative path for Storage
-                    $absolutePath = storage_path('app/public/' . $relativePath); // Absolute path for file operations
-
-                    if (Storage::disk('public')->exists($relativePath)) {
-                        $media = $this->createMedia($relativePath, [
-                            'folder' => 'logos',
-                            'created_by' => Auth::id(), // Fixed admin ID
-                            'updated_by' => Auth::id(),
-                        ]);
-                    } else {
-                        \Log::warning("File not found for media creation: {$absolutePath}");
-                    }
-                }
-            }
-
-            // Create CRM setting
-            CRMSettings::create([
-                'key' => $setting['key'],
-                'value' => $setting['value'],
-                'is_media_setting' => $setting['is_media_setting'],
-                'media_id' => $media->id ?? null,
-                'input_type' => $setting['input_type'],
-                'value_type' => $setting['value_type'],
-                'name' => $setting['name'],
-                'placeholder' => $setting['placeholder'] ?? '',
-                'is_tenant' => $setting['is_tenant'],
-                'company_id' => $companyid,
-                'type' => 'General',
-                'updated_by' => Auth::id(), // Fixed admin ID
-                'created_by' => Auth::id(),
-            ]);
-        }
-    }
 
     /**
      * Validate payment parameters

@@ -8,10 +8,11 @@ use App\Helpers\PermissionsHelper;
  */
 
 
-
+!defined('CACHE_DEFAULT_HOURS') && define('CACHE_DEFAULT_HOURS', 24);
 
 // initilize the permissions with matching keys for plans and permissions of menus
 PermissionsHelper::initializePermissions();
+
 
 
 !defined('CRMPERMISSIONS') && define('CRMPERMISSIONS', [
@@ -202,6 +203,7 @@ PermissionsHelper::initializePermissions();
         'permission_id' => PermissionsHelper::getParentPermissionId('6'),
         'children' => [
             'General' => ['menu_url' => 'settings.general', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS'], 'READ')],
+            'Mail' => ['menu_url' => 'settings.mail', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_MAIL'], 'READ')],
         ]
     ],
     'Roles & Permissions' => [
@@ -397,11 +399,11 @@ PermissionsHelper::initializePermissions();
     'Mail' => [
         'name' => 'Mail',
         'link' => 'mail',
-        'icon' => 'fa-envlope',
+        'icon' => 'fa-envelope',
     ]
 ]);
 
-// settings 
+// general settings 
 !defined('CRM_TENANT_GENERAL_SETTINGS') && define('CRM_TENANT_GENERAL_SETTINGS', [
 
     'COMPANY_NAME' => [
@@ -566,4 +568,189 @@ PermissionsHelper::initializePermissions();
 
 
 
+]);
+
+// mail settings
+!defined('CRM_TENANT_MAIL_SETTINGS') && define('CRM_TENANT_MAIL_SETTINGS', [
+
+    'MAIL_PROVIDER' => [
+        'key' => 'Panel Mail Provider',
+        'value' => 'default',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'text',
+        'is_tenant' => true,
+        'placeholder' => 'smtp',
+        'name' => 'tenant_mail_provider'
+    ],
+    'MAIL_HOST' => [
+        'key' => 'Panel Mail Host',
+        'value' => 'default',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'text',
+        'is_tenant' => true,
+        'placeholder' => 'gmail.smtp.com',
+        'name' => 'tenant_mail_host'
+    ],
+    'MAIL_PORT' => [
+        'key' => 'Panel Mail Port',
+        'value' => 'default',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'number',
+        'is_tenant' => true,
+        'placeholder' => '25,465,587',
+        'name' => 'tenant_mail_port'
+    ],
+    'MAIL_USERNAME' => [
+        'key' => 'Panel Mail Username',
+        'value' => 'default',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'text',
+        'is_tenant' => true,
+        'placeholder' => 'admin / admin@gmail.com',
+        'name' => 'tenant_mail_username'
+    ],
+    'MAIL_PASSWORD' => [
+        'key' => 'Panel Mail Password',
+        'value' => 'default',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'password',
+        'is_tenant' => true,
+        'placeholder' => 'admin / admin@gmail.com',
+        'name' => 'tenant_mail_password'
+    ],
+    'MAIL_ENCRYPTION' => [
+        'key' => 'Panel Mail Encryption',
+        'value' => 'default',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'dropdown',
+        'is_tenant' => true,
+        'placeholder' => 'SSL / TLS / No / None',
+        'name' => 'tenant_mail_encryption'
+    ],
+    'MAIL_FROM_ADDRESS' => [
+        'key' => 'Panel Mail From Address',
+        'value' => 'default',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'email',
+        'is_tenant' => true,
+        'placeholder' => 'sales@gmail.com',
+        'name' => 'tenant_mail_from_address'
+    ],
+    'MAIL_FROM_NAME' => [
+        'key' => 'Panel Mail From Name',
+        'value' => 'default',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'text',
+        'is_tenant' => true,
+        'placeholder' => 'Josh Doe',
+        'name' => 'tenant_mail_from_name'
+    ],
+]);
+
+!defined('CRM_COMPANY_MAIL_SETTINGS') && define('CRM_COMPANY_MAIL_SETTINGS', [
+
+    'MAIL_PROVIDER' => [
+        'key' => 'Mail Provider',
+        'value' => 'default',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'text',
+        'is_tenant' => true,
+        'placeholder' => 'smtp',
+        'name' => 'client_mail_provider'
+    ],
+    'MAIL_HOST' => [
+        'key' => 'Mail Host',
+        'value' => 'default',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'text',
+        'is_tenant' => true,
+        'placeholder' => 'gmail.smtp.com',
+        'name' => 'client_mail_host'
+    ],
+    'MAIL_PORT' => [
+        'key' => 'Mail Port',
+        'value' => 'default',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'number',
+        'is_tenant' => true,
+        'placeholder' => '25,465,587',
+        'name' => 'client_mail_port'
+    ],
+    'MAIL_USERNAME' => [
+        'key' => 'Mail Username',
+        'value' => 'default',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'text',
+        'is_tenant' => true,
+        'placeholder' => 'admin / admin@gmail.com',
+        'name' => 'client_mail_username'
+    ],
+    'MAIL_PASSWORD' => [
+        'key' => 'Mail Password',
+        'value' => 'default',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'password',
+        'is_tenant' => true,
+        'placeholder' => 'admin / admin@gmail.com',
+        'name' => 'client_mail_password'
+    ],
+    'MAIL_ENCRYPTION' => [
+        'key' => 'Mail Encryption',
+        'value' => 'default',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'dropdown',
+        'is_tenant' => true,
+        'placeholder' => 'SSL / TLS / No / None',
+        'name' => 'client_mail_encryption'
+    ],
+    'MAIL_FROM_ADDRESS' => [
+        'key' => 'Mail From Address',
+        'value' => 'default',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'email',
+        'is_tenant' => true,
+        'placeholder' => 'sales@gmail.com',
+        'name' => 'client_mail_from_address'
+    ],
+    'MAIL_FROM_NAME' => [
+        'key' => 'Mail From Name',
+        'value' => 'default',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'text',
+        'is_tenant' => true,
+        'placeholder' => 'Josh Doe',
+        'name' => 'client_mail_from_name'
+    ],
 ]);
