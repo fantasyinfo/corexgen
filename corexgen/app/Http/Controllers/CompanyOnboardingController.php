@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Address;
+use App\Models\City;
 use App\Models\PaymentGateway;
 use App\Traits\MediaTrait;
 use Illuminate\Http\Request;
@@ -43,7 +44,7 @@ class CompanyOnboardingController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'address_street_address' => 'nullable|string|max:255',
-            'address_city_id' => 'nullable',
+            'address_city_name' => 'nullable',
             'address_pincode' => 'nullable|string|max:10',
             'address_country_id' => 'nullable',
         ]);
@@ -60,7 +61,7 @@ class CompanyOnboardingController extends Controller
 
         $fullAddress = implode(', ', [
             $request->address_street_address,
-            $request->address_city_id,
+            $request->address_city_name,
             $request->address_pincode,
             $request->address_country_id
         ]);
@@ -89,7 +90,7 @@ class CompanyOnboardingController extends Controller
         $requiredAddressFields = [
             'address_street_address',
             'address_country_id',
-            'address_city_id',
+            'address_city_name',
             'address_pincode'
         ];
 
@@ -97,12 +98,16 @@ class CompanyOnboardingController extends Controller
             return null;
         }
 
+        $city = City::create([
+            'name' => $data['address_city_name'],
+            'country_id' => $data['address_country_id']
+        ]);
         return Address::create([
             'street_address' => $data['address_street_address'],
             'postal_code' => $data['address_pincode'],
-            'city_id' => $data['address_city_id'],
+            'city_id' => $city->id,
             'country_id' => $data['address_country_id'],
-            'address_type' => ADDRESS_TYPES['COMPANY']['SHOW']['HOME'],
+            'address_type' => ADDRESS_TYPES['USER']['SHOW']['HOME'],
         ]);
     }
     private function hasAllAddressFields(array $data, array $requiredFields): bool

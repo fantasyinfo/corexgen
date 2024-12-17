@@ -488,7 +488,7 @@
         </div>
     </div>
 
-
+    <script src="{{asset('js/jquery/jquery.min.js')}}"></script>
     <script src="{{ asset('js/select2/select2.min.js') }}"></script>
     <script>
            if ($(".searchSelectBox").length > 0) {

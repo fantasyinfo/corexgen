@@ -454,9 +454,8 @@
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <select class="form-control searchSelectBox" id="city_id" name="address_city_id" required>
-                                <option value="">Select City</option>
-                            </select>
+                            <input type="text" class="form-control" name="address_city_name"
+                                placeholder="City Name" required>
                         </div>
 
                         <div class="col-md-6 mb-3">
@@ -728,56 +727,5 @@
             });
         });
 
-        $('#country_id').on('change', function() {
-            const countryId = $(this).val();
-            const cityDropdown = $('#city_id');
-
-            // Debug logs
-            console.log('Selected Country ID:', countryId);
-
-            // If no country is selected, reset and exit
-            if (!countryId || countryId === "0") {
-                cityDropdown.empty().append('<option value="">Select City</option>');
-                cityDropdown.trigger('change'); // Trigger Select2 update
-                return;
-            }
-
-            // Clear and show loading
-            cityDropdown.empty().append('<option value="">Loading cities...</option>');
-            cityDropdown.trigger('change'); // Trigger Select2 update
-
-            // AJAX request
-            $.ajax({
-                url: `/get-cities/${countryId}`,
-                method: "GET",
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // More reliable CSRF token
-                },
-                success: function(response) {
-                    console.log('Received cities:', response);
-
-                    // Clear dropdown
-                    cityDropdown.empty().append('<option value="">Select City</option>');
-
-                    // Populate dropdown
-                    response.forEach(city => {
-                        const option = new Option(city.name, city.id);
-                        cityDropdown.append(option);
-                    });
-
-                    // Reinitialize Select2 and trigger change
-                    cityDropdown.trigger('change');
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error details:', xhr.responseText);
-                    console.error('Status:', status);
-                    console.error('Error:', error);
-
-                    cityDropdown.empty().append('<option value="">Error loading cities</option>');
-                    cityDropdown.trigger('change');
-
-                    alert('Failed to load cities. Please try again.');
-                }
-            });
-        });
+      
     </script>

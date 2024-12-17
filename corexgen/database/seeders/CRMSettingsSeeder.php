@@ -18,7 +18,9 @@ class CRMSettingsSeeder extends Seeder
      */
     public function run(): void
     {
+      
         CRMSettings::truncate(); // Clear previous settings
+
 
         foreach (CRM_TENANT_GENERAL_SETTINGS as $setting) {
             $media = null;
@@ -51,10 +53,10 @@ class CRMSettingsSeeder extends Seeder
                 'value_type' => $setting['value_type'],
                 'name' => $setting['name'],
                 'placeholder' => $setting['placeholder'] ?? '',
-                'is_tenant' => $setting['is_tenant'],
+                'is_tenant' => @$setting['is_tenant'] ?? false,
                 'type' => 'General',
-                'updated_by' => 1, // Fixed admin ID
-                'created_by' => 1,
+                'updated_by' => null, // Fixed admin ID
+                'created_by' => null,
             ]);
         }
     }

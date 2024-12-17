@@ -167,21 +167,21 @@
                                     <div class="input-group">
 
                                         <select
-                                            class="form-control searchSelectBox  @error('address.country_id') is-invalid @enderror"
-                                            name="address.country_id" id="country_id">
-                                            <option value="0" selected> ----- Select Country ----------
-                                            </option>
-                                            @if ($country)
-                                                @foreach ($country as $country)
-                                                    <option value="{{ $country->id }}"
-                                                        {{ old('address.country_id') == $country->id ? 'selected' : '' }}>
-                                                        {{ $country->name }}
-                                                    </option>
-                                                @endforeach
-                                            @else
-                                                <option disabled>No country available</option>
-                                            @endif
-                                        </select>
+                                        class="form-control searchSelectBox  @error('address.country_id') is-invalid @enderror"
+                                        name="address.country_id" id="country_id">
+                                        <option value="0" selected> ----- Select Country ----------
+                                        </option>
+                                        @if ($country)
+                                            @foreach ($country as $country)
+                                                <option value="{{ $country->id }}"
+                                                    {{ old('address.country_id') == $country->id ? 'selected' : '' }}>
+                                                    {{ $country->name }}
+                                                </option>
+                                            @endforeach
+                                        @else
+                                            <option disabled>No country available</option>
+                                        @endif
+                                    </select>
                                         <div class="invalid-feedback" id="country_idError">
                                             @error('address.country_id')
                                                 {{ $message }}
@@ -200,11 +200,9 @@
 
                                 </div>
                                 <div class="col-lg-8">
-                                    <select
-                                        class="form-control searchSelectBox @error('address.city_id') is-invalid @enderror"
-                                        name="address.city_id" id="city_id">
-                                        <option value="0" selected> ----- Select City ----------</option>
-                                    </select>
+                                    <x-form-components.input-group type="text" name="address.city_name"
+                                    id="compnayAddressCity" placeholder="{{ __('Enter City') }}"
+                                    value="{{ old('address.city_name') }}" class="custom-class" />
                                 </div>
                             </div>
                             <div class="row mb-4 align-items-center">
@@ -251,60 +249,5 @@
 
         });
 
-        console.log(document.getElementById('country_id'))
-        // country and cities
-        // Use Select2's event instead of native change
-        $('#country_id').on('change', function() {
-            const countryId = $(this).val();
-            const cityDropdown = $('#city_id');
-
-            // Debug logs
-            console.log('Selected Country ID:', countryId);
-
-            // If no country is selected, reset and exit
-            if (!countryId || countryId === "0") {
-                cityDropdown.empty().append('<option value="">Select City</option>');
-                cityDropdown.trigger('change'); // Trigger Select2 update
-                return;
-            }
-
-            // Clear and show loading
-            cityDropdown.empty().append('<option value="">Loading cities...</option>');
-            cityDropdown.trigger('change'); // Trigger Select2 update
-
-            // AJAX request
-            $.ajax({
-                url: `/get-cities/${countryId}`,
-                method: "GET",
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // More reliable CSRF token
-                },
-                success: function(response) {
-                    console.log('Received cities:', response);
-
-                    // Clear dropdown
-                    cityDropdown.empty().append('<option value="">Select City</option>');
-
-                    // Populate dropdown
-                    response.forEach(city => {
-                        const option = new Option(city.name, city.id);
-                        cityDropdown.append(option);
-                    });
-
-                    // Reinitialize Select2 and trigger change
-                    cityDropdown.trigger('change');
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error details:', xhr.responseText);
-                    console.error('Status:', status);
-                    console.error('Error:', error);
-
-                    cityDropdown.empty().append('<option value="">Error loading cities</option>');
-                    cityDropdown.trigger('change');
-
-                    alert('Failed to load cities. Please try again.');
-                }
-            });
-        });
     </script>
 @endpush

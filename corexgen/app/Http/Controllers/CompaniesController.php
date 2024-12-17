@@ -132,7 +132,7 @@ class CompaniesController extends Controller
 
             
             return redirect()
-                ->route($this->getTenantRoute() . 'companies.edit', ['id' => $company->id])
+                ->route($this->getTenantRoute() . 'companies.index')
                 ->with('success', 'Company created successfully.');
         } catch (\Exception $e) {
             \Log::error('Company creation failed', [

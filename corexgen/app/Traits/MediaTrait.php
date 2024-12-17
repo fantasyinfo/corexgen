@@ -41,7 +41,7 @@ trait MediaTrait
             'file_extension' => $fileExtension,
             'size' => $fileSize,
             'company_id' => $attributes['company_id'] ?? null,
-            'is_tenant' => $attributes['is_tenant'] ?? false,
+            'is_tenant' => @$attributes['is_tenant'] ?? false,
             'updated_by' => $attributes['updated_by'] ?? null,
             'created_by' => $attributes['created_by'] ?? null,
         ]);
