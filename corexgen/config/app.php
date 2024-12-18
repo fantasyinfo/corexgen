@@ -172,10 +172,9 @@ return [
         // App\Providers\TelescopeServiceProvider::class,
         App\Providers\FortifyServiceProvider::class,
         App\Providers\JetstreamServiceProvider::class,
-        Modules\BlogModule\BlogModuleServiceProvider::class,
-        Modules\PaypalGatewayModule\PaypalGatewayModuleServiceProvider::class,
         Yajra\DataTables\DataTablesServiceProvider::class,
         OwenIt\Auditing\AuditingServiceProvider::class,
+        Modules\PaypalGatewayModule\PaypalGatewayModuleServiceProvider::class,
     ])->toArray(),
 
     /*

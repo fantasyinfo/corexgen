@@ -2,6 +2,7 @@
 
 namespace Modules\PaypalGatewayModule\Database\Seeders;
 
+
 use App\Models\PaymentGateway;
 use Illuminate\Database\Seeder;
 
@@ -36,5 +37,10 @@ class PaymentGatewaySeeder extends Seeder
             'status' => $gateway['status']
         ]);
 
+    }
+
+    public function rollback(): void
+    {
+        PaymentGateway::where('name', 'Paypal')->delete();
     }
 }
