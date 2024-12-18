@@ -323,7 +323,8 @@ class ModuleManager
             'description' => $moduleJson['description'],
             'providers' => $moduleJson['providers'],
             'packages' => $moduleJson['packages'],
-            'path' => $extractPath
+            'path' => $extractPath,
+            'settings' => json_encode($moduleJson)
         ];
     }
 
@@ -372,6 +373,7 @@ class ModuleManager
                 'description' => $moduleData['description'],
                 'providers' => json_encode($moduleData['providers']),
                 'path' => $moduleData['path'],
+                'settings' => $moduleData['settings'],
                 'status' => 'active',
                 'panel_type' => panelAccess(),
                 'updated_at' => now()
@@ -731,7 +733,56 @@ class ModuleManager
         }
     }
 
-    public function uninstall(string $moduleId): bool
+    protected function rollbackSeeder(string $moduleId): void
+    {
+        Log::info("Running rollback for module: $moduleId");
+
+        // Set the relative path for seeders
+        $seederPath = 'modules/' . $moduleId . '/database/seeders'; // Relative path to base directory
+        Log::info("Relative Seeder Path: $seederPath");
+
+        // Check if the seeders directory exists
+        if (File::exists(base_path($seederPath))) {
+            Log::info("Seeders directory exists.");
+
+            // Get all PHP files in the directory
+            $files = File::files(base_path($seederPath));
+            foreach ($files as $file) {
+                if ($file->getExtension() === 'php') {
+                    // Derive the class name from the file
+                    $className = $this->getSeederClassName($file->getPathname());
+                    Log::info("Found seeder class: $className");
+
+                    try {
+                        // Check if the class exists
+                        if (class_exists($className)) {
+                            $seederInstance = new $className();
+
+                            // Check if the rollback method exists
+                            if (method_exists($seederInstance, 'rollback')) {
+                                Log::info("Running rollback method for: $className");
+                                $seederInstance->rollback(); // Call the rollback method
+                            } else {
+                                Log::warning("Rollback method does not exist in class: $className");
+                            }
+                        } else {
+                            Log::error("Seeder class does not exist: $className");
+                        }
+                    } catch (\Exception $e) {
+                        // Handle exceptions during the rollback process
+                        Log::error("Error running rollback for seeder: $className, Message: " . $e->getMessage());
+                    }
+                } else {
+                    Log::info("Skipping non-PHP file: " . $file->getFilename());
+                }
+            }
+        } else {
+            // Log an error if the seeder path doesn't exist
+            Log::error('Seeder path does not exist: ' . $seederPath);
+        }
+    }
+
+    public function uninstall(string $moduleId, $moduleSettings): bool
     {
         try {
             // Disable module first
@@ -739,19 +790,26 @@ class ModuleManager
 
             // Run uninstall migrations if they exist
             $this->runUninstallMigrations($moduleId);
+            $this->rollbackSeeder($moduleId);
 
+          
             // Remove module files
             File::deleteDirectory($this->moduleDirectory . '/' . $moduleId);
 
 
-            // create provider class
-            // $moduleId = 'BlogModule';
-            //Modules\BlogModule\BlogModuleServiceProvider
+
 
             $providerClassName = "Modules\\$moduleId\\$moduleId" . "ServiceProvider";
 
 
             $this->removeProviderFromConfig($providerClassName);
+
+            $settingsData = json_decode($moduleSettings->settings, true);
+            \Log::info('Settings', $settingsData );
+            // remove payment gateway class from factory if its a gateway module
+            if (isset($settingsData) && isset($settingsData['payment_gateway']) && isset($settingsData['payment_gateway']['key'])) {
+                PaymentGatewayFactoryModifier::removeGateway($settingsData['payment_gateway']['key']);
+            }
 
             // Remove from database
             DB::table('modules')->where('name', $moduleId)->delete();
@@ -799,11 +857,22 @@ class ModuleManager
     protected function runUninstallMigrations(string $moduleId): void
     {
         $migrationPath = $this->moduleDirectory . '/' . $moduleId . '/database/migrations';
+        \Log::info('Rolling back the module migrations from ' . $migrationPath);
+
         if (File::exists($migrationPath)) {
-            Artisan::call('migrate:rollback', [
+            \Log::info('Rolling back the module migrations from this file exists ' . $migrationPath);
+
+            $exitCode = Artisan::call('migrate:rollback', [
                 '--path' => str_replace(base_path(), '', $migrationPath),
                 '--force' => true
             ]);
+
+            // Log the Artisan output and exit code
+            \Log::info('Artisan command output: ' . Artisan::output());
+            \Log::info('Artisan command exit code: ' . $exitCode);
+        } else {
+            \Log::warning('Migration path does not exist: ' . $migrationPath);
         }
     }
+
 }

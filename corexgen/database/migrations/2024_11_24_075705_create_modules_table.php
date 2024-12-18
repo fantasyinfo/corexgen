@@ -15,13 +15,16 @@ return new class extends Migration
 
         Schema::create('modules', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name')->unique();
             $table->string('version');
             $table->text('description');
             $table->json('providers');
+            $table->json('settings')->nullable();
             $table->string('path');
             $table->enum('panel_type', array_keys(PANEL_TYPES))->default(PANEL_TYPES['SUPER_PANEL']);
             $table->enum('status', ['active', 'inactive']);
+
+            $table->index(['name']);
             $table->timestamps();
         });
     }

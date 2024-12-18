@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Core\ModuleManager;
 use App\Models\Module;
 use App\Traits\TenantFilter;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
@@ -176,7 +177,8 @@ class ModuleController extends Controller
     {
         $this->tenantRoute = $this->getTenantRoute();
         $this->moduleManager = new ModuleManager();
-        if ($this->moduleManager->uninstall($module)) {
+        $moduleSettings = DB::table('modules')->where('name' , $module)->first();
+        if ($this->moduleManager->uninstall($module,$moduleSettings)) {
 
             $this->updateComposerJson('addAutoloadModuleComposerJson.php');
             $this->runComposerDumpAutoload();

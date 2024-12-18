@@ -32,7 +32,7 @@ class AuditController extends Controller
 
     public function index()
     {
-        $audits = Audit::latest()->limit(50)->get();
+        $audits = Audit::with('user')->latest()->limit(50)->get();
         return view(
             $this->getViewFilePath('index'),
             [
