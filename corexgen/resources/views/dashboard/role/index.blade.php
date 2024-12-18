@@ -71,6 +71,8 @@
                 processing: true,
                 serverSide: true,
                 stateSave: true,
+                order: [],
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
                 language: {
                     "lengthMenu": "_MENU_ per page",
                 },
