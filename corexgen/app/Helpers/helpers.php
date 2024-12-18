@@ -191,8 +191,8 @@ function getCRMMenus()
     $user = Auth::user();
 
     // Determine the cache key based on user and panel type
-    $panelType = panelAccess() === PANEL_TYPES['SUPER_PANEL'] && $user->is_tenant 
-        ? PANEL_TYPES['SUPER_PANEL'] 
+    $panelType = panelAccess() === PANEL_TYPES['SUPER_PANEL'] && $user->is_tenant
+        ? PANEL_TYPES['SUPER_PANEL']
         : PANEL_TYPES['COMPANY_PANEL'];
 
     $cacheKey = "crm_menus_{$user->id}_{$panelType}";
@@ -207,7 +207,7 @@ function getCRMMenus()
 function hasPermission($permissionKey)
 {
     $user = Auth::user();
-    
+
     // Quick returns for admin users
     if ($user->is_tenant && $user->role_id === null) {
         return true;
@@ -376,23 +376,26 @@ if (!function_exists('getSettingValue')) {
 
 function getLogoPath()
 {
-
-    $query = CRMSettings::with('media');
-    if ($user = Auth::user()) {
-        if ($user->is_tenant) {
-            $query->where('is_tenant', 1)->where('name', 'tenant_company_logo');
-        } elseif (!is_null($user->company_id)) {
-            $query->where('company_id', $user->company_id)->where('name', 'client_company_logo');
+    return Cache::remember('tenant_company_logo', now()->addHours(CACHE_DEFAULT_HOURS), function () {
+        if ($user = Auth::user()) {
+            $query = CRMSettings::with('media');
+            
+            if ($user->is_tenant) {
+                $data = $query->where('is_tenant', 1)
+                              ->where('name', 'tenant_company_logo')
+                              ->first();
+            } elseif (!is_null($user->company_id)) {
+                $data = $query->where('company_id', $user->company_id)
+                              ->where('name', 'client_company_logo')
+                              ->first();
+            }
+            
+            return $data?->media?->file_path ?? '/img/logo.png';
         }
-        $data = $query->first();
-        return $data?->media?->file_path;
-    }
-
-    return '/img/logo.png';
-
-
+        
+        return '/img/logo.png';
+    });
 }
-
 
 function countriesList()
 {
