@@ -252,13 +252,13 @@ class SettingsController extends Controller
         if ($request->is_tenant) {
             $validatedData = $request->validate([
                 'tenant_mail_provider' => 'required|string|max:255',
-                'tenant_mail_host' => 'required|string|max:255',
-                'tenant_mail_port' => 'required|string',
+                'tenant_mail_host' => 'required|string',
+                'tenant_mail_port' => 'required|numeric',
                 'tenant_mail_username' => 'required|string',
-                'tenant_mail_password' => 'required|string|max:10',
-                'tenant_mail_encryption' => 'required|string|max:10',
-                'tenant_mail_from_address' => 'required|email|max:2048',
-                'tenant_mail_from_name' => 'required|string|max:2048',
+                'tenant_mail_password' => 'required|string',
+                'tenant_mail_encryption' => 'required|string',
+                'tenant_mail_from_address' => 'required|email',
+                'tenant_mail_from_name' => 'required|string',
             ]);
 
             // Update the settings in the database
@@ -284,13 +284,13 @@ class SettingsController extends Controller
         }else{
             $validatedData = $request->validate([
                 'client_mail_provider' => 'required|string|max:255',
-                'client_mail_host' => 'required|string|max:255',
-                'client_mail_port' => 'required|string',
+                'client_mail_host' => 'required|string',
+                'client_mail_port' => 'required|numeric',
                 'client_mail_username' => 'required|string',
-                'client_mail_password' => 'required|string|max:10',
-                'client_mail_encryption' => 'required|string|max:10',
-                'client_mail_from_address' => 'required|email|max:2048',
-                'client_mail_from_name' => 'required|string|max:2048',
+                'client_mail_password' => 'required|string',
+                'client_mail_encryption' => 'required|string',
+                'client_mail_from_address' => 'required|email',
+                'client_mail_from_name' => 'required|string',
             ]);
 
             // Update the settings in the database

@@ -592,7 +592,7 @@ PermissionsHelper::initializePermissions();
         'value_type' => 'string',
         'input_type' => 'text',
         'is_tenant' => true,
-        'placeholder' => 'gmail.smtp.com',
+        'placeholder' => 'smtp.gmail.com',
         'name' => 'tenant_mail_host'
     ],
     'MAIL_PORT' => [
@@ -684,7 +684,7 @@ PermissionsHelper::initializePermissions();
         'value_type' => 'string',
         'input_type' => 'text',
         'is_tenant' => true,
-        'placeholder' => 'gmail.smtp.com',
+        'placeholder' => 'smtp.gmail.com',
         'name' => 'client_mail_host'
     ],
     'MAIL_PORT' => [
