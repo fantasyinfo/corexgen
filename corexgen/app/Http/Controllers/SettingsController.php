@@ -175,7 +175,7 @@ class SettingsController extends Controller
         try {
             // Find or create the CRMSetting
             $logoSetting = CRMSettings::firstOrCreate(
-                ['name' => $logoSettingName,'company_id' =>Auth::user()->company_id ],
+                ['name' => $logoSettingName, 'company_id' => Auth::user()->company_id],
                 ['value' => null, 'is_media_setting' => true]
             );
 
@@ -281,7 +281,7 @@ class SettingsController extends Controller
             }
 
 
-        }else{
+        } else {
             $validatedData = $request->validate([
                 'client_mail_provider' => 'required|string|max:255',
                 'client_mail_host' => 'required|string',
@@ -314,6 +314,16 @@ class SettingsController extends Controller
         }
 
         return redirect()->back()->with('success', 'Settings updated successfully');
+    }
+
+    public function cron()
+    {
+        $this->tenantRoute = $this->getTenantRoute();
+        return view($this->getViewFilePath('cron'), [
+            'title' => 'Cron Settings',
+            'permissions' => PermissionsHelper::getPermissionsArray('SETTINGS_CRON'),
+            'module' => PANEL_MODULES[$this->getPanelModule()]['settings'],
+        ]);
     }
 
 }

@@ -91,6 +91,11 @@ PermissionsHelper::initializePermissions();
         'id' => PermissionsHelper::getParentPermissionId('15'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['SETTINGS_MAIL']
     ],
+    PermissionsHelper::$plansPermissionsKeys['SETTINGS_CRON'] => [
+        'name' => 'SETTINGS_CRON',
+        'id' => PermissionsHelper::getParentPermissionId('19'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['SETTINGS_MAIL']
+    ],
     PermissionsHelper::$plansPermissionsKeys['EVENTS_AUDIT_LOG'] => [
         'name' => 'EVENTS_AUDIT_LOG',
         'id' => PermissionsHelper::getParentPermissionId('16'),
@@ -162,6 +167,7 @@ PermissionsHelper::initializePermissions();
         'children' => [
             'General' => ['menu_url' => 'settings.general', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_GENERAL'], 'READ')],
             'Mail' => ['menu_url' => 'settings.mail', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_MAIL'], 'READ')],
+            'Cron' => ['menu_url' => 'settings.cron', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_CRON'], 'READ')],
         ]
     ],
     'System Settings' => [
@@ -395,11 +401,19 @@ PermissionsHelper::initializePermissions();
         'name' => 'General',
         'link' => 'general',
         'icon' => 'fa-cog',
+        'for'  => 'both',
     ],
     'Mail' => [
         'name' => 'Mail',
         'link' => 'mail',
         'icon' => 'fa-envelope',
+        'for'  => 'both',
+    ],
+    'Cron' => [
+        'name' => 'Cron Job',
+        'link' => 'cron',
+        'icon' => 'fa-hourglass-half',
+        'for'  => 'tenant',
     ]
 ]);
 

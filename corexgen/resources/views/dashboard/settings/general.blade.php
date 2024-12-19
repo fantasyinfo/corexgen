@@ -5,7 +5,7 @@
 @section('settings_content')
     @php
         // prePrintR($general_settings);
-        // prePrintR($tenant);
+        // prePrintR(find_php_paths());
     @endphp
 
     <div class="container-fluid">
