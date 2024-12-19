@@ -21,7 +21,9 @@
                                         <input type="checkbox" id="select-all" />
                                     </th>
                                     <th> {{ __('clients.Name') }}</th>
-                                   
+                                    <th> {{ __('clients.Email') }}</th>
+                                    <th> {{ __('clients.Phone') }}</th>
+                                    <th> {{ __('clients.Address') }}</th>
                                     <th>{{ __('crud.Status') }}</th>
                                     <th>{{ __('crud.Created At') }}</th>
                                     <th class="text-end">{{ __('crud.Actions') }}</th>
@@ -86,7 +88,7 @@
                         d.plans = plansFilter.val();
                     },
                 },
-                searching: false,
+                searching: true,
                 columns: [{
                         data: null, // Render checkbox for bulk actions
                         orderable: false,
@@ -111,39 +113,20 @@
                         width: '100px',
                     },
                     {
-                        data: 'plan_name',
-                        name: 'plan_name',
+                        data: 'phone',
+                        name: 'phone',
                         searchable: false,
                         orderable: true,
                         width: '100px',
                     },
                     {
-                        data: 'billing_cycle',
-                        name: 'billing_cycle',
+                        data: 'address',
+                        name: 'address',
                         searchable: false,
                         orderable: true,
                         width: '100px',
                     },
-                    // {
-                    //     data: 'start_date',
-                    //     name: 'start_date',
-                    //     searchable: true, 
-                    //     orderable: true,
                     
-                    // },
-                    // {
-                    //     data: 'end_date',
-                    //     name: 'end_date',
-                    //     searchable: true, 
-                    //     orderable: true
-                    // },
-                    {
-                        data: 'next_billing_date',
-                        name: 'next_billing_date',
-                        searchable: true,
-                        orderable: true,
-                        width: '100px',
-                    },
                     {
                         data: 'status',
                         name: 'status',
@@ -151,12 +134,12 @@
                         orderable: true,
                         width: '100px',
                     },
-                    // {
-                    //     data: 'created_at',
-                    //     name: 'created_at',
-                    //     searchable: true, 
-                    //     orderable: true
-                    // },
+                    {
+                        data: 'created_at',
+                        name: 'created_at',
+                        searchable: true, 
+                        orderable: true
+                    },
                     {
                         data: 'actions',
                         name: 'actions',

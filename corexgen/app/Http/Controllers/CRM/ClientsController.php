@@ -63,6 +63,12 @@ class ClientsController extends Controller
     {
         $this->tenantRoute = $this->getTenantRoute();
 
+
+        // Server-side DataTables response
+        if ($request->ajax()) {
+            return $this->clientService->getDatatablesResponse($request);
+        }
+
         return view($this->getViewFilePath('index'), [
             'filters' => $request->all(),
             'title' => 'Clients Management',
@@ -109,13 +115,40 @@ class ClientsController extends Controller
     {
 
     }
-    public function edit()
+    public function edit($id)
     {
+        $query = CRMClients::query()->with(['addresses' => function ($query) {
+            $query->select('addresses.id', 'addresses.street_address', 'addresses.postal_code', 'addresses.city_id', 'addresses.country_id')
+                  ->withPivot('type');
+        }])->where('id', $id);
 
+        $query = $this->applyTenantFilter($query, 'clients');
+
+        $client = $query->firstOrFail();
+
+
+        $countries = Country::all();
+
+
+        return view($this->getViewFilePath('edit'), [
+
+            'title' => 'Edit Client',
+            'client' => $client,
+            'countries' => $countries,
+            'module' => PANEL_MODULES[$this->getPanelModule()]['clients'],
+        ]);
     }
-    public function destroy()
+    public function destroy($id)
     {
-
+        try {
+            // Delete the user
+            CRMClients::query()->where('id', '=', $id)->delete();
+            // Return success response
+            return redirect()->back()->with('success', 'Client deleted successfully.');
+        } catch (\Exception $e) {
+            // Handle any exceptions
+            return redirect()->back()->with('error', 'Failed to delete the client: ' . $e->getMessage());
+        }
     }
     public function export()
     {
@@ -138,6 +171,19 @@ class ClientsController extends Controller
 
     }
 
+    public function changeStatus($id, $status)
+    {
+        try {
+            CRMClients::query()->where('id', '=', $id)->update(['status' => $status]);
+            // Return success response
+            return redirect()->back()->with('success', 'Clients status changed successfully.');
+        } catch (\Exception $e) {
+            // Handle any exceptions
+            return redirect()->back()->with('error', 'Failed to changed the clients status: ' . $e->getMessage());
+        }
+    }
+
+    
 
 
 }

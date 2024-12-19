@@ -20,10 +20,10 @@ class CRMClients extends Model
     protected $table = self::table;
 
     protected $fillable = [
-        'type', 
-        'title', 
-        'first_name', 
-        'middle_name', 
+        'type',
+        'title',
+        'first_name',
+        'middle_name',
         'last_name',
         'email',
         'phone',
@@ -48,13 +48,21 @@ class CRMClients extends Model
 
     public function addresses()
     {
-        return $this->belongsToMany(Address::class, 'client_addresses')
-                    ->withPivot('type')
-                    ->withTimestamps();
+        return $this->belongsToMany(
+            Address::class,
+            'client_addresses',
+            'client_id',
+            'address_id',
+            'id',
+            'id'
+        )
+            ->withPivot('type')
+            ->withTimestamps();
     }
 
-    public function company(){
-        return $this->belongsTo(Company::class,'company_id');
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'company_id');
     }
 
 
