@@ -218,52 +218,52 @@ function hasPermission($permissionKey)
     }
 
     // Create a unique cache key
-    $cacheKey = "permission_{$user->id}_{$permissionKey}";
+    $cacheKey = "permission_cache";
 
-    return Cache::remember($cacheKey, now()->addHours(CACHE_DEFAULT_HOURS), function () use ($user, $permissionKey) {
-        // Existing permission check logic remains the same
-        $parts = explode('.', $permissionKey);
 
-        if (count($parts) != 2) {
-            \Log::warning("Invalid permission key format: {$permissionKey}", [$parts]);
-            return false;
+    // Existing permission check logic remains the same
+    $parts = explode('.', $permissionKey);
+
+    if (count($parts) != 2) {
+        \Log::warning("Invalid permission key format: {$permissionKey}", [$parts]);
+        return false;
+    }
+
+    list($module, $permissionType) = $parts;
+
+    if (!isset(CRMPERMISSIONS[$module])) {
+        \Log::warning("Module not found in CRMPERMISSIONS: {$module}");
+        return false;
+    }
+
+    $modulePermissionId = CRMPERMISSIONS[$module]['id'];
+    $childPermissions = CRMPERMISSIONS[$module]['children'];
+    $childPermissionId = null;
+
+    foreach ($childPermissions as $id => $name) {
+        if (strtoupper($name) === strtoupper($permissionType)) {
+            $childPermissionId = $id;
+            break;
         }
+    }
 
-        list($module, $permissionType) = $parts;
+    if ($childPermissionId === null) {
+        \Log::warning("Permission type not found for module {$module}: {$permissionType}");
+        return false;
+    }
 
-        if (!isset(CRMPERMISSIONS[$module])) {
-            \Log::warning("Module not found in CRMPERMISSIONS: {$module}");
-            return false;
-        }
+    $specificPermissionExists = CRMRolePermissions::where('role_id', $user->role_id)
+        ->where('permission_id', $childPermissionId)
+        ->exists();
 
-        $modulePermissionId = CRMPERMISSIONS[$module]['id'];
-        $childPermissions = CRMPERMISSIONS[$module]['children'];
-        $childPermissionId = null;
+    if ($specificPermissionExists) {
+        return true;
+    }
 
-        foreach ($childPermissions as $id => $name) {
-            if (strtoupper($name) === strtoupper($permissionType)) {
-                $childPermissionId = $id;
-                break;
-            }
-        }
+    return CRMRolePermissions::where('role_id', $user->role_id)
+        ->where('permission_id', $modulePermissionId)
+        ->exists();
 
-        if ($childPermissionId === null) {
-            \Log::warning("Permission type not found for module {$module}: {$permissionType}");
-            return false;
-        }
-
-        $specificPermissionExists = CRMRolePermissions::where('role_id', $user->role_id)
-            ->where('permission_id', $childPermissionId)
-            ->exists();
-
-        if ($specificPermissionExists) {
-            return true;
-        }
-
-        return CRMRolePermissions::where('role_id', $user->role_id)
-            ->where('permission_id', $modulePermissionId)
-            ->exists();
-    });
 }
 
 
@@ -275,6 +275,7 @@ function hasPermission($permissionKey)
  */
 function hasMenuPermission($permissionId = null)
 {
+    //return true;
     $user = Auth::user();
 
     // Quick returns for admin users
@@ -286,29 +287,24 @@ function hasMenuPermission($permissionId = null)
         return false;
     }
 
-    if ($user->role_id === null && $user->company_id === null) {
+    if ($user->role_id == null && $user->company_id == null) {
         return false;
     }
 
-    // Create a unique cache key
-    $cacheKey = "menu_permission_{$user->id}_{$permissionId}";
 
-    return Cache::remember($cacheKey, now()->addHours(CACHE_DEFAULT_HOURS), function () use ($user, $permissionId) {
-        // Company admin case
-        if ($user->role_id === null && $user->company_id !== null) {
-            return DB::table('crm_role_permissions')
-                ->where('permission_id', $permissionId)
-                ->where('role_id', null)
-                ->where('company_id', $user->company_id)
-                ->exists();
-        }
 
-        // Regular role-based permission check
-        return DB::table('crm_role_permissions')
-            ->where('permission_id', $permissionId)
-            ->where('role_id', $user->role_id)
-            ->exists();
-    });
+
+    // Company admin case
+    if ($user->role_id === null && $user->company_id !== null) {
+        return true;
+    }
+
+    // Regular role-based permission check
+    return DB::table('crm_role_permissions')
+        ->where('permission_id', $permissionId)
+        ->where('role_id', $user->role_id)
+        ->exists();
+
 }
 
 
@@ -379,20 +375,20 @@ function getLogoPath()
     return Cache::remember('tenant_company_logo', now()->addHours(CACHE_DEFAULT_HOURS), function () {
         if ($user = Auth::user()) {
             $query = CRMSettings::with('media');
-            
+
             if ($user->is_tenant) {
                 $data = $query->where('is_tenant', 1)
-                              ->where('name', 'tenant_company_logo')
-                              ->first();
+                    ->where('name', 'tenant_company_logo')
+                    ->first();
             } elseif (!is_null($user->company_id)) {
                 $data = $query->where('company_id', $user->company_id)
-                              ->where('name', 'client_company_logo')
-                              ->first();
+                    ->where('name', 'client_company_logo')
+                    ->first();
             }
-            
+
             return $data?->media?->file_path ?? '/img/logo.png';
         }
-        
+
         return '/img/logo.png';
     });
 }
@@ -667,7 +663,8 @@ function countriesList()
     ];
 }
 
-function find_php_paths() {
+function find_php_paths()
+{
     $paths = [];
     $isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
 
@@ -712,7 +709,7 @@ function find_php_paths() {
     $serverSoftware = isset($_SERVER['SERVER_SOFTWARE']) ? strtolower($_SERVER['SERVER_SOFTWARE']) : '';
 
     // Function to check if a path is valid and get PHP version
-    $validatePath = function($path) {
+    $validatePath = function ($path) {
         if (!file_exists($path) || !is_file($path)) {
             return false;
         }
@@ -721,7 +718,7 @@ function find_php_paths() {
         try {
             $versionCommand = escapeshellcmd($path) . ' -v';
             $versionOutput = shell_exec($versionCommand);
-            
+
             if (preg_match('/PHP ([0-9]+\.[0-9]+\.[0-9]+)/', $versionOutput, $matches)) {
                 return [
                     'path' => $path,
@@ -817,7 +814,7 @@ function find_php_paths() {
     $paths = array_filter(array_unique($paths, SORT_REGULAR));
 
     // Sort paths by version number (descending)
-    usort($paths, function($a, $b) {
+    usort($paths, function ($a, $b) {
         return version_compare($b['version'], $a['version']);
     });
 
@@ -854,7 +851,8 @@ function find_php_paths() {
  * @param string $minVersion Minimum required PHP version
  * @return string|null Best matching PHP path or null if none found
  */
-function get_best_php_path($paths, $minVersion = '8.1') {
+function get_best_php_path($paths, $minVersion = '8.1')
+{
     if (empty($paths['php_paths'])) {
         return null;
     }
@@ -874,9 +872,10 @@ function get_best_php_path($paths, $minVersion = '8.1') {
  * @param array $paths Result from find_php_paths()
  * @return array Formatted paths for display
  */
-function format_php_paths_for_display($paths) {
+function format_php_paths_for_display($paths)
+{
     $formatted = [];
-    
+
     foreach ($paths['php_paths'] as $path) {
         $formatted[] = [
             'path' => $path['path'],
@@ -894,4 +893,17 @@ function format_php_paths_for_display($paths) {
     }
 
     return $formatted;
+}
+
+
+
+function getActivePlanWithFeatuers($companyId)
+{
+    if ($companyId == null)
+        return;
+
+    return Company::with([
+        'plans.planFeatures' // Load plans and their planFeatures
+    ])->where('id', $companyId) // Use company_id from Auth
+        ->first();
 }

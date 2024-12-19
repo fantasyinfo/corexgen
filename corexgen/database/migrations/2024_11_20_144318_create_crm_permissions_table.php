@@ -16,11 +16,11 @@ return new class extends Migration {
             $table->string('name');
             $table->enum('parent_menu', ['1', '2'])->default('1');
             $table->bigInteger('parent_menu_id', )->nullable();
-            $table->unsignedBigInteger('company_id')->nullable();
-            $table->bigInteger('permission_id');
+            $table->enum('for',['both','tenant','company'])->default('tenant');
+            $table->boolean('is_feature')->default(false);
+            $table->bigInteger('permission_id')->unique();
 
-            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
-          
+            $table->index(['parent_menu','permission_id','for']);
             $table->timestamps();
         });
     }

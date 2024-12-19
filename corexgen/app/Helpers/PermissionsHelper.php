@@ -28,6 +28,7 @@ class PermissionsHelper
         'SETTINGS_CRON' => 'SETTINGS_CRON',
         'EVENTS_AUDIT_LOG' => 'EVENTS_AUDIT_LOG',
         'DOWNLOAD_BACKUP' => 'DOWNLOAD_BACKUP',
+        'CLIENTS' => 'CLIENTS',
     ];
 
 
@@ -52,9 +53,10 @@ class PermissionsHelper
 
             self::$plansPermissionsKeys['USERS'] => [601 => 'CREATE', 602 => 'READ', 603 => 'READ_ALL', 604 => 'UPDATE', 605 => 'DELETE', 606 => 'IMPORT', 607 => 'EXPORT', 608 => 'FILTER', 609 => 'CHANGE_STATUS', 610 => 'BULK_DELETE', 611 => 'CHANGE_PASSWORD', 612 => 'VIEW'],
 
+
             self::$plansPermissionsKeys['PERMISSIONS'] => [651 => 'CREATE', 652 => 'READ', 653 => 'READ_ALL', 654 => 'UPDATE', 655 => 'DELETE'],
 
-            self::$plansPermissionsKeys['SETTINGS'] => [701 => 'READ', 702 => 'READ_ALL' , 703 => 'UPDATE'],
+            self::$plansPermissionsKeys['SETTINGS'] => [701 => 'READ', 702 => 'READ_ALL', 703 => 'UPDATE'],
 
             self::$plansPermissionsKeys['MODULES'] => [751 => 'CREATE', 752 => 'READ', 753 => 'READ_ALL', 754 => 'UPDATE', 755 => 'DELETE', 756 => 'IMPORT', 757 => 'EXPORT', 758 => 'FILTER', 759 => 'CHANGE_STATUS'],
 
@@ -73,20 +75,24 @@ class PermissionsHelper
 
             self::$plansPermissionsKeys['SUBSCRIPTIONS'] => [1101 => 'READ', 1102 => 'READ_ALL'],
 
-            self::$plansPermissionsKeys['SETTINGS_GENERAL'] => [1151 => 'READ', 1152 => 'READ_ALL' , 1153 => 'UPDATE'],
+            self::$plansPermissionsKeys['SETTINGS_GENERAL'] => [1151 => 'READ', 1152 => 'READ_ALL', 1153 => 'UPDATE'],
             self::$plansPermissionsKeys['SETTINGS_MAIL'] => [1201 => 'READ', 1202 => 'READ_ALL', 1203 => 'UPDATE'],
-            
+
             self::$plansPermissionsKeys['EVENTS_AUDIT_LOG'] => [1251 => 'READ', 1252 => 'READ_ALL'],
-            
+
             self::$plansPermissionsKeys['DOWNLOAD_BACKUP'] => [1301 => 'READ', 1302 => 'READ_ALL', 1303 => 'CREATE', 1304 => 'DOWNLOAD'],
-            
+
             self::$plansPermissionsKeys['SETTINGS_CRON'] => [1351 => 'READ', 1352 => 'READ_ALL'],
 
+
+            // starring from 3k
+            self::$plansPermissionsKeys['CLIENTS'] => [3001 => 'CREATE', 3002 => 'READ', 3003 => 'READ_ALL', 3004 => 'UPDATE', 3005 => 'DELETE', 3006 => 'IMPORT', 3007 => 'EXPORT', 3008 => 'FILTER', 3009 => 'CHANGE_STATUS', 3010 => 'BULK_DELETE', 3011 => 'VIEW'],
         ];
     }
 
 
-    public static function defaultFeatuers(){
+    public static function defaultFeatuers()
+    {
         return [
             'DASHBOARD' => 'DASHBOARD',
             'PERMISSIONS' => 'PERMISSIONS',
