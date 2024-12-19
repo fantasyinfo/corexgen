@@ -2,10 +2,19 @@
     $menus = getCRMMenus();
     $currentRoute = Route::currentRouteName();
 
-    // prePrintR( $menus);
+    // prePrintR( $menus->toArray());
+
 
 @endphp
 
+<style>
+    .pro{
+        border:1px dotted red;
+        padding: 3px 10px;
+        color: var(--primary-color);
+        border-radius: 10px;
+    }
+</style>
 <!-- Sidebar -->
 <nav class="sidebar shadow-sm">
     <div class="sidebar-brand">
@@ -22,7 +31,7 @@
                 <li class="nav-item">
                     <a title="Upgrade Your Plan to Use this feature" data-toggle="tooltip"
                         href="{{ route(getPanelRoutes('planupgrade.index')) }}" class="nav-link">
-                        <i class="fas {{ $parentMenu->menu_icon }}"></i> {{ $parentMenu->menu_name }}
+                        <i class="fas {{ $parentMenu->menu_icon }}"></i> {{ $parentMenu->menu_name }} <span class='pro'>PRO</span>
                     </a>
                 </li>
                 @continue

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\CRM\CRMClients;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -39,5 +40,12 @@ class Address extends Model
 
     public function users(){
         return $this->hasMany(User::class,'address_id');
+    }
+
+    public function clients()
+    {
+        return $this->belongsToMany(CRMClients::class, 'client_addresses')
+                    ->withPivot('type')
+                    ->withTimestamps();
     }
 }

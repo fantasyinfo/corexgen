@@ -19,92 +19,137 @@ PermissionsHelper::initializePermissions();
     PermissionsHelper::$plansPermissionsKeys['DASHBOARD'] => [
         'name' => 'DASHBOARD',
         'id' => PermissionsHelper::getParentPermissionId('1'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['DASHBOARD']
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['DASHBOARD'],
+        'for' => 'both',
+        'is_feature' => false
     ],
     PermissionsHelper::$plansPermissionsKeys['ROLE'] => [
         'name' => 'ROLE',
         'id' => PermissionsHelper::getParentPermissionId('2'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['ROLE']
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['ROLE'],
+        'for' => 'both',
+        'is_feature' => true
     ],
     PermissionsHelper::$plansPermissionsKeys['USERS'] => [
         'name' => 'USERS',
         'id' => PermissionsHelper::getParentPermissionId('3'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['USERS']
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['USERS'],
+        'for' => 'both',
+        'is_feature' => true
     ],
     PermissionsHelper::$plansPermissionsKeys['PERMISSIONS'] => [
         'name' => 'PERMISSIONS',
         'id' => PermissionsHelper::getParentPermissionId('4'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['PERMISSIONS']
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['PERMISSIONS'],
+        'for' => 'both',
+        'is_feature' => false
     ],
     PermissionsHelper::$plansPermissionsKeys['SETTINGS'] => [
         'name' => 'SETTINGS',
         'id' => PermissionsHelper::getParentPermissionId('5'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['SETTINGS']
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['SETTINGS'],
+        'for' => 'both',
+        'is_feature' => false
     ],
     PermissionsHelper::$plansPermissionsKeys['PLANS'] => [
         'name' => 'PLANS',
         'id' => PermissionsHelper::getParentPermissionId('6'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['PLANS']
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['PLANS'],
+        'for' => 'tenant',
+        'is_feature' => false
     ],
     PermissionsHelper::$plansPermissionsKeys['MODULES'] => [
         'name' => 'MODULES',
         'id' => PermissionsHelper::getParentPermissionId('7'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['MODULES']
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['MODULES'],
+        'for' => 'tenant',
+        'is_feature' => false
     ],
     PermissionsHelper::$plansPermissionsKeys['APPUPDATES'] => [
         'name' => 'APPUPDATES',
         'id' => PermissionsHelper::getParentPermissionId('8'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['APPUPDATES']
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['APPUPDATES'],
+        'for' => 'tenant',
+        'is_feature' => false
     ],
     PermissionsHelper::$plansPermissionsKeys['COMPANIES'] => [
         'name' => 'COMPANIES',
         'id' => PermissionsHelper::getParentPermissionId('9'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['COMPANIES']
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['COMPANIES'],
+        'for' => 'tenant',
+        'is_feature' => false
     ],
     PermissionsHelper::$plansPermissionsKeys['PAYMENTSTRANSACTIONS'] => [
         'name' => 'PAYMENTSTRANSACTIONS',
         'id' => PermissionsHelper::getParentPermissionId('10'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['PAYMENTSTRANSACTIONS']
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['PAYMENTSTRANSACTIONS'],
+        'for' => 'tenant',
+        'is_feature' => false
     ],
     PermissionsHelper::$plansPermissionsKeys['PLANUPGRADE'] => [
         'name' => 'PLANUPGRADE',
         'id' => PermissionsHelper::getParentPermissionId('11'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['PLANUPGRADE']
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['PLANUPGRADE'],
+        'for' => 'company',
+        'is_feature' => false
     ],
     PermissionsHelper::$plansPermissionsKeys['PAYMENTGATEWAYS'] => [
         'name' => 'PAYMENTGATEWAYS',
         'id' => PermissionsHelper::getParentPermissionId('12'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['PAYMENTGATEWAYS']
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['PAYMENTGATEWAYS'],
+        'for' => 'tenant',
+        'is_feature' => false
     ],
     PermissionsHelper::$plansPermissionsKeys['SUBSCRIPTIONS'] => [
         'name' => 'SUBSCRIPTIONS',
         'id' => PermissionsHelper::getParentPermissionId('13'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['SUBSCRIPTIONS']
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['SUBSCRIPTIONS'],
+        'for' => 'tenant',
+        'is_feature' => false
     ],
     PermissionsHelper::$plansPermissionsKeys['SETTINGS_GENERAL'] => [
         'name' => 'SETTINGS_GENERAL',
         'id' => PermissionsHelper::getParentPermissionId('14'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['SETTINGS_GENERAL']
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['SETTINGS_GENERAL'],
+        'for' => 'both',
+        'is_feature' => false
     ],
     PermissionsHelper::$plansPermissionsKeys['SETTINGS_MAIL'] => [
         'name' => 'SETTINGS_MAIL',
         'id' => PermissionsHelper::getParentPermissionId('15'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['SETTINGS_MAIL']
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['SETTINGS_MAIL'],
+        'for' => 'both',
+        'is_feature' => false
     ],
     PermissionsHelper::$plansPermissionsKeys['SETTINGS_CRON'] => [
         'name' => 'SETTINGS_CRON',
         'id' => PermissionsHelper::getParentPermissionId('19'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['SETTINGS_MAIL']
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['SETTINGS_CRON'],
+        'for' => 'tenant',
+        'is_feature' => false
     ],
     PermissionsHelper::$plansPermissionsKeys['EVENTS_AUDIT_LOG'] => [
         'name' => 'EVENTS_AUDIT_LOG',
         'id' => PermissionsHelper::getParentPermissionId('16'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['EVENTS_AUDIT_LOG']
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['EVENTS_AUDIT_LOG'],
+        'for' => 'both',
+        'is_feature' => false
     ],
     PermissionsHelper::$plansPermissionsKeys['DOWNLOAD_BACKUP'] => [
         'name' => 'DOWNLOAD_BACKUP',
         'id' => PermissionsHelper::getParentPermissionId('17'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['DOWNLOAD_BACKUP']
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['DOWNLOAD_BACKUP'],
+        'for' => 'tenant',
+        'is_feature' => false
+    ],
+
+    // starting from 100
+    PermissionsHelper::$plansPermissionsKeys['CLIENTS'] => [
+        'name' => 'CLIENTS',
+        'id' => PermissionsHelper::getParentPermissionId('100'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['CLIENTS'],
+        'for' => 'company',
+        'is_feature' => true
     ],
 ]);
 
@@ -250,6 +295,15 @@ PermissionsHelper::initializePermissions();
         ]
     ],
 
+    'Clients' => [
+        'menu_icon' => 'fa-users',
+        'feature_type' => PermissionsHelper::$plansPermissionsKeys['CLIENTS'], // this need to match the PLANS_FEATURES key
+        'permission_plan' => PermissionsHelper::$plansPermissionsKeys['CLIENTS'],
+        'permission_id' => PermissionsHelper::getParentPermissionId('100'),
+        'children' => [
+            'Clients' => ['menu_url' => 'clients.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['CLIENTS'], 'READ_ALL')],
+        ]
+    ],
 ]);
 
 
@@ -281,6 +335,11 @@ PermissionsHelper::initializePermissions();
         'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger', 'BANNED' => 'warning', 'ONBOARDING' => 'info'],
     ],
     'USERS' => [
+        'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE', 'BANNED'],
+        'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE', 'BANNED' => 'BANNED'],
+        'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger', 'BANNED' => 'warning'],
+    ],
+    'CLIENTS' => [
         'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE', 'BANNED'],
         'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE', 'BANNED' => 'BANNED'],
         'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger', 'BANNED' => 'warning'],
@@ -348,6 +407,7 @@ PermissionsHelper::initializePermissions();
         'appupdates' => 'appupdates',
         'planupgrade' => 'planupgrade',
         'audit' => 'audit',
+        'clients' => 'clients',
     ]
 ]);
 
@@ -369,6 +429,7 @@ PermissionsHelper::initializePermissions();
 !defined('PLANS_FEATURES') && define('PLANS_FEATURES', [
     PermissionsHelper::$plansPermissionsKeys['USERS'] => PermissionsHelper::$plansPermissionsKeys['USERS'],
     PermissionsHelper::$plansPermissionsKeys['ROLE'] => PermissionsHelper::$plansPermissionsKeys['ROLE'],
+    PermissionsHelper::$plansPermissionsKeys['CLIENTS'] => PermissionsHelper::$plansPermissionsKeys['CLIENTS'],
 ]);
 
 !defined('ADDRESS_TYPES') && define('ADDRESS_TYPES', [
@@ -401,19 +462,19 @@ PermissionsHelper::initializePermissions();
         'name' => 'General',
         'link' => 'general',
         'icon' => 'fa-cog',
-        'for'  => 'both',
+        'for' => 'both',
     ],
     'Mail' => [
         'name' => 'Mail',
         'link' => 'mail',
         'icon' => 'fa-envelope',
-        'for'  => 'both',
+        'for' => 'both',
     ],
     'Cron' => [
         'name' => 'Cron Job',
         'link' => 'cron',
         'icon' => 'fa-hourglass-half',
-        'for'  => 'tenant',
+        'for' => 'tenant',
     ]
 ]);
 
@@ -767,4 +828,10 @@ PermissionsHelper::initializePermissions();
         'placeholder' => 'Josh Doe',
         'name' => 'client_mail_from_name'
     ],
+]);
+
+
+!defined('CLIENTS_CATEGORY_TYPES') && define('CLIENTS_CATEGORY_TYPES', [
+    'TABLE_STATUS' => ['VIP', 'Normal', 'High Budget', 'Low Budget'],
+    'STATUS' => ['VIP' => 'VIP', 'Normal' => 'Normal', 'High Budget' => 'High Budget', 'Low Budget' => 'Low Budget'],
 ]);

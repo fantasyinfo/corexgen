@@ -67,6 +67,7 @@
                                             id='parent_{{$parentMenu->permission_id}}' 
                                             name='permissions[]'
                                             value='{{$parentMenu->permission_id}}'
+                                            checked
                                         />
                                         <label class="form-check-label" for='parent_{{$parentMenu->permission_id}}'>
                                             {{$parentMenu->name}}
@@ -82,6 +83,7 @@
                                                             id='child_{{$childMenu->permission_id}}'
                                                             name='permissions[]'
                                                             value='{{$childMenu->permission_id}}'
+                                                            checked
                                                         />
                                                         <label class="form-check-label" for='child_{{$childMenu->permission_id}}'>
                                                             {{$childMenu->name}}

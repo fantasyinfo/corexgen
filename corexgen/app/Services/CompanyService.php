@@ -300,6 +300,7 @@ class CompanyService
 
     public function givePermissionsToCompany($company, $companyAdminUser)
     {
+        return;
         // Validate input
         if (!$company || !$company->plan_id) {
             \Log::error('Company or plan_id is missing', [
@@ -657,6 +658,7 @@ class CompanyService
 
     private function updateCompanyPlanAndPermissions(Company $company, $newPlanId)
     {
+ 
         // Create a new payment transaction for the new plan
         $paymentTransactionResult = $this->createPaymentTransaction($newPlanId, $company->id, []);
 
@@ -673,7 +675,7 @@ class CompanyService
         $this->givePermissionsToCompany($company, $companyAdminUser);
 
         // Optionally, create new menu items for the company panel
-        $this->createMenuItemsForCompanyPanel($newPlanId);
+       $this->createMenuItemsForCompanyPanel($newPlanId);
 
         return $company;
     }

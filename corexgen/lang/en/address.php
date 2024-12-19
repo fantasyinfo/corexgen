@@ -5,5 +5,6 @@ return  [
     'Address' => 'Address',
     'City' => 'City',
     'Country' => 'Country',
-    'Pincode' => 'Pincode'
+    'Pincode' => 'Pincode',
+    'Street Address' => 'Street Address'
 ];

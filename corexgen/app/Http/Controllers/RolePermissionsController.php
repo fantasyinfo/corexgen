@@ -13,7 +13,10 @@ use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\View;
 use App\Helpers\PermissionsHelper;
+use App\Models\Company;
+use App\Models\Plans;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * CRMRolePermissionsController handles CRUD operations for CRM Roles Permissions
@@ -127,39 +130,48 @@ class RolePermissionsController extends Controller
      */
     public function create()
     {
-        // roles
+        // Fetch roles with tenant filter applied
         $roleQuery = CRMRole::query();
         $roleQuery = $this->applyTenantFilter($roleQuery);
         $roles = $roleQuery->get();
-
-        // In your controller method
+    
+        // Initialize CRM permissions query
         if (Auth::user()->is_tenant) {
-            $crm_p_query = CRMPermissions::query();
+            $crm_p_query = CRMPermissions::query()->whereIn('for', ['both', 'tenant']);
         } else if (Auth::user()->company_id != null) {
-            $crm_p_query = CRMPermissions::query()
-            ->leftJoin('crm_role_permissions', 'crm_permissions.permission_id', '=', 'crm_role_permissions.permission_id')
-            ->select('crm_permissions.*')
-            ->where(function ($query) {
-                $query->where('crm_permissions.parent_menu', '1')
-                    ->orWhereNotNull('crm_permissions.parent_menu_id');
-            })
-            ->distinct(); // 
-
-            $crm_p_query = $this->applyTenantFilter($crm_p_query, 'crm_role_permissions');
+            $crm_p_query = CRMPermissions::query()->whereIn('for', ['both', 'company']);
+    
+            // Fetch active plan features for the user's company
+            $planFeatures = getActivePlanWithFeatuers(Auth::user()->company_id);
+    
+            // Check plan features and exclude certain permissions
+            $excludedModules = [];
+            if ($planFeatures && $planFeatures->plans && $planFeatures->plans->planFeatures) {
+                foreach ($planFeatures->plans->planFeatures as $pf) {
+                    // Match CRM permission names with module_name and check value
+                    if ($pf->value === 0) {
+                        $excludedModules[] = strtolower($pf->module_name);
+                    }
+                }
+    
+                // Exclude permissions where module_name matches excludedModules
+                if (!empty($excludedModules)) {
+                    $crm_p_query->whereNotIn('name', $excludedModules);
+                }
+            }
         }
-
+    
+        // Fetch filtered CRM permissions
         $crm_permissions = $crm_p_query->get();
-
-        //   dd($crm_permissions->toArray());
-
-
+    
+        // Return the view
         return view($this->getViewFilePath('create'), [
-
             'title' => 'Create Permission',
             'roles' => $roles,
             'crm_permissions' => $crm_permissions
         ]);
     }
+    
 
     /**
      * Store a newly created resource in storage.
@@ -210,6 +222,7 @@ class RolePermissionsController extends Controller
 
             $this->tenantRoute = $this->getTenantRoute();
 
+         
             // Redirect with success message
             return redirect()->route($this->tenantRoute . 'permissions.index')
                 ->with('success', 'Permissions created successfully.');
@@ -248,18 +261,28 @@ class RolePermissionsController extends Controller
         // Get all permissions
         // In your controller method
         if (Auth::user()->is_tenant) {
-            $crm_p_query = CRMPermissions::query();
+            $crm_p_query = CRMPermissions::query()->whereIn('for', ['both', 'tenant']);
         } else if (Auth::user()->company_id != null) {
-            $crm_p_query = CRMPermissions::query()
-                ->leftJoin('crm_role_permissions', 'crm_permissions.permission_id', '=', 'crm_role_permissions.permission_id')
-                ->select('crm_permissions.*')
-                ->where(function ($query) {
-                    $query->where('crm_permissions.parent_menu', '1')
-                        ->orWhereNotNull('crm_permissions.parent_menu_id');
-                })->distinct();
-
-
-            $crm_p_query = $this->applyTenantFilter($crm_p_query, 'crm_role_permissions');
+            $crm_p_query = CRMPermissions::query()->whereIn('for', ['both', 'company']);
+    
+            // Fetch active plan features for the user's company
+            $planFeatures = getActivePlanWithFeatuers(Auth::user()->company_id);
+    
+            // Check plan features and exclude certain permissions
+            $excludedModules = [];
+            if ($planFeatures && $planFeatures->plans && $planFeatures->plans->planFeatures) {
+                foreach ($planFeatures->plans->planFeatures as $pf) {
+                    // Match CRM permission names with module_name and check value
+                    if ($pf->value === 0) {
+                        $excludedModules[] = strtolower($pf->module_name);
+                    }
+                }
+    
+                // Exclude permissions where module_name matches excludedModules
+                if (!empty($excludedModules)) {
+                    $crm_p_query->whereNotIn('name', $excludedModules);
+                }
+            }
         }
 
         $crm_permissions = $crm_p_query->get();
@@ -316,7 +339,7 @@ class RolePermissionsController extends Controller
 
             // Commit the transaction
             DB::commit();
-
+        
             // Redirect with success message
             return redirect()->route($this->tenantRoute . 'permissions.index')
                 ->with('success', 'Permissions updated successfully.');

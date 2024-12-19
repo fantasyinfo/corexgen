@@ -8,6 +8,7 @@ use App\Http\Controllers\CompanyOnboardingController;
 use App\Http\Controllers\CompanyRegisterController;
 use App\Http\Controllers\CountryCitySeederController;
 use App\Http\Controllers\CompaniesController;
+use App\Http\Controllers\CRM\ClientsController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RolePermissionsController;
 use App\Http\Controllers\SettingsController;
@@ -306,6 +307,28 @@ Route::middleware([
         Route::get('/', [AuditController::class, 'index'])->name('index')->middleware('check.permission:EVENTS_AUDIT_LOG.READ_ALL');
     });
 
+
+    // clients routes
+    Route::prefix(PANEL_MODULES['COMPANY_PANEL']['clients'])->as(PANEL_MODULES['COMPANY_PANEL']['clients'] . '.')->group(function () {
+        // role for fetch, store, update
+        Route::get('/', [ClientsController::class, 'index'])->name('index')->middleware('check.permission:CLIENTS.READ_ALL');
+        Route::post('/', [ClientsController::class, 'store'])->name('store')->middleware('check.permission:CLIENTS.CREATE');
+        Route::put('/', [ClientsController::class, 'update'])->name('update')->middleware('check.permission:CLIENTS.UPDATE');
+
+        // create, edit, change status, delete
+        Route::get('/create', [ClientsController::class, 'create'])->name('create')->middleware('check.permission:CLIENTS.CREATE');
+        Route::get('/edit/{id}', [ClientsController::class, 'edit'])->name('edit')->middleware('check.permission:CLIENTS.UPDATE');
+        Route::get('/changeStatus/{id}/{status}', [ClientsController::class, 'changeStatus'])->name('changeStatus')->middleware('check.permission:CLIENTS.CHANGE_STATUS');
+        Route::delete('/destroy/{id}', [ClientsController::class, 'destroy'])->name('destroy')->middleware('check.permission:CLIENTS.DELETE');
+
+        // validate, export, import
+        Route::get('/export', [ClientsController::class, 'export'])->name('export')->middleware('check.permission:CLIENTS.EXPORT');
+        Route::post('/import', [ClientsController::class, 'import'])->name('import')->middleware('check.permission:CLIENTS.IMPORT');
+        Route::post('/bulkDelete', [ClientsController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:CLIENTS.BULK_DELETE');
+    
+        Route::get('/view/{id}', [ClientsController::class, 'view'])->name('view')->middleware('check.permission:CLIENTS.VIEW');
+        Route::get('/profile', [ClientsController::class, 'profile'])->name('profile');
+    });
 
 
 });

@@ -59,3 +59,40 @@ Corexgen!123
 @endsection
 @push('scripts')
 @endpush
+
+
+
+public function index(){
+        
+    }
+    public function store(){
+
+    }
+    public function create(){
+
+    }
+
+    public function update(){
+
+    }
+    public function edit(){
+
+    }
+    public function destroy(){
+
+    }
+    public function export(){
+
+    }
+    public function import(){
+
+    }
+    public function bulkDelete(){
+
+    }
+    public function view(){
+
+    }
+    public function profile(){
+
+    }
