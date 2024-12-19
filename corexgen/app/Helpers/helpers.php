@@ -666,3 +666,232 @@ function countriesList()
         "AX" => "Åland Islands",
     ];
 }
+
+function find_php_paths() {
+    $paths = [];
+    $isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+
+    // Common Unix/Linux locations
+    $unixLocations = [
+        '/usr/bin/php*',
+        '/usr/local/bin/php*',
+        '/usr/local/php*/bin/php',
+        '/usr/local/opt/php*/bin/php',
+        '/opt/plesk/php/*/bin/php',
+        '/opt/cpanel/ea-php*/root/usr/bin/php',
+        '/opt/alt/php*/usr/bin/php',
+        '/usr/local/www/php*/bin/php',
+        '/usr/pkg/php*/bin/php',
+        '/opt/homebrew/bin/php*',
+        '/opt/homebrew/opt/php*/bin/php',
+        '/opt/remi/php*/root/usr/bin/php',
+        '/opt/lampp/bin/php*',
+        '/xampp/php/php*',
+        '/usr/local/Cellar/php*/*/bin/php',
+        '/usr/local/php5/bin/php*',
+        '/usr/local/php7/bin/php*',
+        '/usr/local/php8/bin/php*',
+        '/opt/bitnami/php/bin/php*',
+        '/opt/conda/bin/php*'
+    ];
+
+    // Common Windows locations
+    $windowsLocations = [
+        'C:\\xampp\\php\\php.exe',
+        'C:\\wamp\\bin\\php\\php*\\php.exe',
+        'C:\\wamp64\\bin\\php\\php*\\php.exe',
+        'C:\\laragon\\bin\\php\\php*\\php.exe',
+        'C:\\Program Files\\PHP\\php.exe',
+        'C:\\Program Files (x86)\\PHP\\php.exe',
+        'C:\\ProgramData\\chocolatey\\bin\\php.exe',
+        'C:\\tools\\php\\php.exe',
+        'C:\\php\\php.exe'
+    ];
+
+    // Get server software information
+    $serverSoftware = isset($_SERVER['SERVER_SOFTWARE']) ? strtolower($_SERVER['SERVER_SOFTWARE']) : '';
+
+    // Function to check if a path is valid and get PHP version
+    $validatePath = function($path) {
+        if (!file_exists($path) || !is_file($path)) {
+            return false;
+        }
+
+        // Get PHP version using the binary
+        try {
+            $versionCommand = escapeshellcmd($path) . ' -v';
+            $versionOutput = shell_exec($versionCommand);
+            
+            if (preg_match('/PHP ([0-9]+\.[0-9]+\.[0-9]+)/', $versionOutput, $matches)) {
+                return [
+                    'path' => $path,
+                    'version' => $matches[1],
+                    'version_output' => trim($versionOutput),
+                    'cli_available' => true,
+                    'last_modified' => filemtime($path),
+                    'size' => filesize($path),
+                    'permissions' => substr(sprintf('%o', fileperms($path)), -4)
+                ];
+            }
+        } catch (Exception $e) {
+            // If execution fails, still include the path but mark CLI as unavailable
+            return [
+                'path' => $path,
+                'version' => 'Unknown',
+                'version_output' => null,
+                'cli_available' => false,
+                'last_modified' => filemtime($path),
+                'size' => filesize($path),
+                'permissions' => substr(sprintf('%o', fileperms($path)), -4)
+            ];
+        }
+        return false;
+    };
+
+    // Detect control panel environments
+    $controlPanels = [
+        'cpanel' => [
+            'paths' => ['/usr/local/cpanel/version'],
+            'php_paths' => ['/opt/cpanel/ea-php*/root/usr/bin/php']
+        ],
+        'plesk' => [
+            'paths' => ['/usr/local/psa/version'],
+            'php_paths' => ['/opt/plesk/php/*/bin/php']
+        ],
+        'directadmin' => [
+            'paths' => ['/usr/local/directadmin/version'],
+            'php_paths' => ['/usr/local/php*/bin/php']
+        ],
+        'cyberpanel' => [
+            'paths' => ['/usr/local/CyberCP/version'],
+            'php_paths' => ['/usr/local/lsws/lsphp*/bin/php']
+        ],
+        'virtualmin' => [
+            'paths' => ['/etc/virtualmin/version'],
+            'php_paths' => ['/usr/bin/php*', '/usr/local/bin/php*']
+        ]
+    ];
+
+    $detectedPanel = null;
+    foreach ($controlPanels as $panel => $info) {
+        foreach ($info['paths'] as $versionPath) {
+            if (file_exists($versionPath)) {
+                $detectedPanel = $panel;
+                $unixLocations = array_merge($unixLocations, $info['php_paths']);
+                break 2;
+            }
+        }
+    }
+
+    // Search for PHP binaries
+    if ($isWindows) {
+        foreach ($windowsLocations as $location) {
+            $windowsPaths = glob($location);
+            foreach ($windowsPaths as $path) {
+                if ($result = $validatePath($path)) {
+                    $paths[] = $result;
+                }
+            }
+        }
+    } else {
+        foreach ($unixLocations as $location) {
+            $unixPaths = glob($location);
+            foreach ($unixPaths as $path) {
+                if ($result = $validatePath($path)) {
+                    $paths[] = $result;
+                }
+            }
+        }
+    }
+
+    // Check PATH environment
+    $pathDirs = explode(PATH_SEPARATOR, getenv('PATH'));
+    foreach ($pathDirs as $dir) {
+        $phpPath = $isWindows ? $dir . '\\php.exe' : $dir . '/php';
+        if ($result = $validatePath($phpPath)) {
+            $paths[] = $result;
+        }
+    }
+
+    // Additional environment checks
+    $paths = array_filter(array_unique($paths, SORT_REGULAR));
+
+    // Sort paths by version number (descending)
+    usort($paths, function($a, $b) {
+        return version_compare($b['version'], $a['version']);
+    });
+
+    // Add environment information
+    $result = [
+        'php_paths' => $paths,
+        'environment' => [
+            'os' => PHP_OS,
+            'os_family' => PHP_OS_FAMILY,
+            'server_software' => $serverSoftware,
+            'control_panel' => $detectedPanel,
+            'is_windows' => $isWindows,
+            'current_php_version' => PHP_VERSION,
+            'scan_time' => date('Y-m-d H:i:s'),
+            'path_environment' => getenv('PATH'),
+        ]
+    ];
+
+    // Check for restricted environments
+    $result['environment']['restrictions'] = [
+        'safe_mode' => ini_get('safe_mode'),
+        'disable_functions' => ini_get('disable_functions'),
+        'open_basedir' => ini_get('open_basedir'),
+        'can_execute_shell' => function_exists('shell_exec') && !in_array('shell_exec', explode(',', ini_get('disable_functions'))),
+    ];
+
+    return $result;
+}
+
+/**
+ * Helper function to get the best available PHP path
+ * 
+ * @param array $paths Result from find_php_paths()
+ * @param string $minVersion Minimum required PHP version
+ * @return string|null Best matching PHP path or null if none found
+ */
+function get_best_php_path($paths, $minVersion = '8.1') {
+    if (empty($paths['php_paths'])) {
+        return null;
+    }
+
+    foreach ($paths['php_paths'] as $path) {
+        if (version_compare($path['version'], $minVersion, '>=') && $path['cli_available']) {
+            return $path['path'];
+        }
+    }
+
+    return $paths['php_paths'][0]['path']; // Return the first available path if no version matches
+}
+
+/**
+ * Helper function to format PHP paths for display
+ * 
+ * @param array $paths Result from find_php_paths()
+ * @return array Formatted paths for display
+ */
+function format_php_paths_for_display($paths) {
+    $formatted = [];
+    
+    foreach ($paths['php_paths'] as $path) {
+        $formatted[] = [
+            'path' => $path['path'],
+            'version' => $path['version'],
+            'display_name' => sprintf(
+                'PHP %s (%s)',
+                $path['version'],
+                basename(dirname($path['path']))
+            ),
+            'is_cli_available' => $path['cli_available'],
+            'last_modified' => date('Y-m-d H:i:s', $path['last_modified']),
+            'size_formatted' => number_format($path['size'] / 1024, 2) . ' KB',
+            'permissions' => $path['permissions']
+        ];
+    }
+
+    return $formatted;
+}

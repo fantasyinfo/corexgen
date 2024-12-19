@@ -175,7 +175,7 @@ class SettingsController extends Controller
         try {
             // Find or create the CRMSetting
             $logoSetting = CRMSettings::firstOrCreate(
-                ['name' => $logoSettingName,'company_id' =>Auth::user()->company_id ],
+                ['name' => $logoSettingName, 'company_id' => Auth::user()->company_id],
                 ['value' => null, 'is_media_setting' => true]
             );
 
@@ -252,13 +252,13 @@ class SettingsController extends Controller
         if ($request->is_tenant) {
             $validatedData = $request->validate([
                 'tenant_mail_provider' => 'required|string|max:255',
-                'tenant_mail_host' => 'required|string|max:255',
-                'tenant_mail_port' => 'required|string',
+                'tenant_mail_host' => 'required|string',
+                'tenant_mail_port' => 'required|numeric',
                 'tenant_mail_username' => 'required|string',
-                'tenant_mail_password' => 'required|string|max:10',
-                'tenant_mail_encryption' => 'required|string|max:10',
-                'tenant_mail_from_address' => 'required|email|max:2048',
-                'tenant_mail_from_name' => 'required|string|max:2048',
+                'tenant_mail_password' => 'required|string',
+                'tenant_mail_encryption' => 'required|string',
+                'tenant_mail_from_address' => 'required|email',
+                'tenant_mail_from_name' => 'required|string',
             ]);
 
             // Update the settings in the database
@@ -281,16 +281,16 @@ class SettingsController extends Controller
             }
 
 
-        }else{
+        } else {
             $validatedData = $request->validate([
                 'client_mail_provider' => 'required|string|max:255',
-                'client_mail_host' => 'required|string|max:255',
-                'client_mail_port' => 'required|string',
+                'client_mail_host' => 'required|string',
+                'client_mail_port' => 'required|numeric',
                 'client_mail_username' => 'required|string',
-                'client_mail_password' => 'required|string|max:10',
-                'client_mail_encryption' => 'required|string|max:10',
-                'client_mail_from_address' => 'required|email|max:2048',
-                'client_mail_from_name' => 'required|string|max:2048',
+                'client_mail_password' => 'required|string',
+                'client_mail_encryption' => 'required|string',
+                'client_mail_from_address' => 'required|email',
+                'client_mail_from_name' => 'required|string',
             ]);
 
             // Update the settings in the database
@@ -314,6 +314,16 @@ class SettingsController extends Controller
         }
 
         return redirect()->back()->with('success', 'Settings updated successfully');
+    }
+
+    public function cron()
+    {
+        $this->tenantRoute = $this->getTenantRoute();
+        return view($this->getViewFilePath('cron'), [
+            'title' => 'Cron Settings',
+            'permissions' => PermissionsHelper::getPermissionsArray('SETTINGS_CRON'),
+            'module' => PANEL_MODULES[$this->getPanelModule()]['settings'],
+        ]);
     }
 
 }

@@ -2,9 +2,10 @@
 
 @push('style')
     <style>
-        label{
+        label {
             opacity: 0.7;
         }
+
         /* Mobile Sidebar Overlay */
         .settings-sidebar-overlay {
             position: fixed;
@@ -139,10 +140,22 @@
                         <div class="settings-sidebar">
                             <nav class="nav flex-column">
                                 @foreach (SETTINGS_MENU_ITEMS as $key => $item)
-                                    <a class="nav-link {{ request()->routeIs(getPanelRoutes('settings.' . $item['link'])) ? 'active' : '' }}"
-                                        href="{{ route(getPanelRoutes('settings.' . $item['link'])) }}">
-                                        <i class="fas {{ $item['icon'] }}"></i> {{ $item['name'] }}
-                                    </a>
+                                    @if ($item['for'] === 'both')
+                                        <a class="nav-link {{ request()->routeIs(getPanelRoutes('settings.' . $item['link'])) ? 'active' : '' }}"
+                                            href="{{ route(getPanelRoutes('settings.' . $item['link'])) }}">
+                                            <i class="fas {{ $item['icon'] }}"></i> {{ $item['name'] }}
+                                        </a>
+                                    @elseif($item['for'] === 'tenant' && panelAccess() == PANEL_TYPES['SUPER_PANEL'])
+                                        <a class="nav-link {{ request()->routeIs(getPanelRoutes('settings.' . $item['link'])) ? 'active' : '' }}"
+                                            href="{{ route(getPanelRoutes('settings.' . $item['link'])) }}">
+                                            <i class="fas {{ $item['icon'] }}"></i> {{ $item['name'] }}
+                                        </a>
+                                    @elseif ($item['for'] === 'company' && panelAccess() == PANEL_TYPES['COMPANY_PANEL'])
+                                        <a class="nav-link {{ request()->routeIs(getPanelRoutes('settings.' . $item['link'])) ? 'active' : '' }}"
+                                            href="{{ route(getPanelRoutes('settings.' . $item['link'])) }}">
+                                            <i class="fas {{ $item['icon'] }}"></i> {{ $item['name'] }}
+                                        </a>
+                                    @endif
                                 @endforeach
                             </nav>
                         </div>
