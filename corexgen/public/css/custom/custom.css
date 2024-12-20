@@ -331,7 +331,7 @@ table tr {
 /* Apply minimum column widths */
 .table th,
 .table td {
-  min-width: 150px;
+  /* min-width: 150px; */
 } 
 
 /* Odd/even row hover effect */
