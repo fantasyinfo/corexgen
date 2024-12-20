@@ -7,10 +7,10 @@
 
             <div class="shadow-sm rounded ">
                 @include('dashboard.role.components.role-filters')
-    
+
                 @include('layout.components.bulk-import-modal')
 
-              
+
 
 
                 @if (hasPermission('ROLE.READ_ALL') || hasPermission('ROLE.READ'))
@@ -72,7 +72,10 @@
                 serverSide: true,
                 stateSave: true,
                 order: [],
-                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                lengthMenu: [
+                    [10, 25, 50, -1],
+                    [10, 25, 50, "All"]
+                ],
                 language: {
                     "lengthMenu": "_MENU_ per page",
                 },
@@ -142,6 +145,7 @@
                 $('.bulk-select').prop('checked', isChecked);
             });
 
+            // bulk delete btn
             $('#bulk-delete-btn').on('click', function() {
                 let selectedIds = [];
                 $('.bulk-select:checked').each(function() {
@@ -149,7 +153,11 @@
                 });
 
                 if (selectedIds.length > 0) {
-                    if (confirm('Are you sure you want to delete the selected roles?')) {
+                    // Show the custom confirmation modal
+                    $('#bulkDeleteModal').modal('show');
+
+                    // Attach the event to the confirm button in the modal
+                    $('#confirmDeleteBtn').off('click').on('click', function() {
                         $.ajax({
                             url: "{{ route(getPanelRoutes($module . '.bulkDelete')) }}",
                             method: "POST",
@@ -158,16 +166,29 @@
                                 _token: '{{ csrf_token() }}' // CSRF token for security
                             },
                             success: function(response) {
-                                alert(response.message);
-                                dbTableAjax.ajax.reload(); // Reload DataTable
+                                // Hide the confirmation modal
+                                $('#bulkDeleteModal').modal('hide');
+
+                                // Show the success modal with the response message
+                                $('#successModal .modal-body').text(response
+                                    .message);
+                                $('#successModal').modal('show');
+
+                                // Reload the DataTable
+                                dbTableAjax.ajax.reload();
                             },
                             error: function(error) {
-                                alert('An error occurred while deleting roles.');
+                                // Handle errors (optional)
+                                $('#bulkDeleteModal').modal('hide');
+                                alert(
+                                    'An error occurred while deleting items.');
                             }
                         });
-                    }
+                    });
                 } else {
-                    alert('No roles selected for deletion.');
+                    // No items selected
+                    $('#alertModal .modal-body').text('No items selected for deletion.');
+                    $('#alertModal').modal('show');
                 }
             });
 

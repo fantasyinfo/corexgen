@@ -282,7 +282,7 @@ class RoleController extends Controller
     {
         // Validate uploaded file
         $validator = Validator::make($request->all(), [
-            'file' => 'required|mimes:csv,txt|max:2048',
+            'file' => 'required|mimes:csv,txt|max:' . BULK_CSV_UPLOAD_FILE_SIZE . '', // Validate file type and size
         ]);
 
         if ($validator->fails()) {

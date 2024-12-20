@@ -56,8 +56,6 @@
 @include('layout.components.bulk-import-js')
 
 @push('scripts')
-
-
     <script type="text/javascript">
         $(document).ready(function() {
             const nameFilter = $('#nameFilter');
@@ -72,7 +70,10 @@
                 serverSide: true,
                 stateSave: true,
                 responsive: true,
-                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                lengthMenu: [
+                    [10, 25, 50, -1],
+                    [10, 25, 50, "All"]
+                ],
                 language: {
                     "lengthMenu": "_MENU_ per page",
                 },
@@ -159,7 +160,8 @@
                 $('.bulk-select').prop('checked', isChecked);
             });
 
-            // Bulk Delete
+   
+            // bulk delete btn
             $('#bulk-delete-btn').on('click', function() {
                 let selectedIds = [];
                 $('.bulk-select:checked').each(function() {
@@ -167,27 +169,45 @@
                 });
 
                 if (selectedIds.length > 0) {
-                    if (confirm('Are you sure you want to delete the selected users?')) {
+                    // Show the custom confirmation modal
+                    $('#bulkDeleteModal').modal('show');
+
+                    // Attach the event to the confirm button in the modal
+                    $('#confirmDeleteBtn').off('click').on('click', function() {
                         $.ajax({
                             url: "{{ route(getPanelRoutes($module . '.bulkDelete')) }}",
-                            method: 'POST',
+                            method: "POST",
                             data: {
                                 ids: selectedIds,
-                                _token: '{{ csrf_token() }}',
+                                _token: '{{ csrf_token() }}' // CSRF token for security
                             },
                             success: function(response) {
-                                alert(response.message);
+                                // Hide the confirmation modal
+                                $('#bulkDeleteModal').modal('hide');
+
+                                // Show the success modal with the response message
+                                $('#successModal .modal-body').text(response
+                                    .message);
+                                $('#successModal').modal('show');
+
+                                // Reload the DataTable
                                 dbTableAjax.ajax.reload();
                             },
                             error: function(error) {
-                                alert('An error occurred while deleting users.');
-                            },
+                                // Handle errors (optional)
+                                $('#bulkDeleteModal').modal('hide');
+                                alert(
+                                    'An error occurred while deleting items.');
+                            }
                         });
-                    }
+                    });
                 } else {
-                    alert('No users selected for deletion.');
+                    // No items selected
+                    $('#alertModal .modal-body').text('No items selected for deletion.');
+                    $('#alertModal').modal('show');
                 }
             });
+
         });
 
 

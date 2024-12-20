@@ -10,6 +10,8 @@ use App\Helpers\PermissionsHelper;
 
 !defined('CACHE_DEFAULT_HOURS') && define('CACHE_DEFAULT_HOURS', 24);
 
+!defined('BULK_CSV_UPLOAD_FILE_SIZE') && define('BULK_CSV_UPLOAD_FILE_SIZE', 2048);
+
 // initilize the permissions with matching keys for plans and permissions of menus
 PermissionsHelper::initializePermissions();
 
@@ -835,3 +837,6 @@ PermissionsHelper::initializePermissions();
     'TABLE_STATUS' => ['VIP', 'Normal', 'High Budget', 'Low Budget'],
     'STATUS' => ['VIP' => 'VIP', 'Normal' => 'Normal', 'High Budget' => 'High Budget', 'Low Budget' => 'Low Budget'],
 ]);
+
+
+

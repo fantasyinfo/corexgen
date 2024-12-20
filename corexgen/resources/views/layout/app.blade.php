@@ -25,7 +25,10 @@
                 </nav>
 
                 @include('layout.components.alert')
+                @include('layout.components.alert-modal')
                 @include('layout.components.delete-confirm')
+                @include('layout.components.bulk-delete-confirm')
+                @include('layout.components.delete-success')
                 @include('layout.components.change-password')
 
 
