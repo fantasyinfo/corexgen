@@ -1,15 +1,7 @@
 @extends('layout.app')
 
 @section('content')
-@if ($errors->any())
-<div class="alert alert-danger">
-    <ul>
-        @foreach ($errors->all() as $error)
-            <li>{{ $error }}</li>
-        @endforeach
-    </ul>
-</div>
-@endif
+
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
@@ -63,7 +55,7 @@
                                 </div>
                                 <div class="col-lg-8">
                                     <x-form-components.input-group type="text" class="custom-class" id="nameName"
-                                        name="name" placeholder="{{ __('John Doe') }}" value="{{ $user->name }}"
+                                        name="name" placeholder="{{ __('John Doe') }}" value="{{ old('name', $user->name) }}"
                                         required />
 
                                 </div>
@@ -79,7 +71,7 @@
                                 <div class="col-lg-8">
                                     <x-form-components.input-group type="email" class="custom-class" id="emailName"
                                         name="email" placeholder="{{ __('john@email.com') }}"
-                                        value="{{ $user->email }}" required />
+                                        value="{{ old('email', $user->email) }}" required disabled />
 
                                 </div>
                             </div>
@@ -136,7 +128,7 @@
                                 <div class="col-lg-8">
                                     <x-form-components.textarea-group name="address.street_address"
                                         id="compnayAddressStreet" placeholder="Enter Registered Street Address"
-                                        value="{{ @$user->addresses->street_address }}" class="custom-class" />
+                                        value="{{ old('address.street_address', @$user->addresses->street_address) }}" class="custom-class" />
                                      
 
                                 </div>
@@ -186,7 +178,8 @@
                                     <div class="col-lg-8">
                                         <x-form-components.input-group type="text" name="address.city_name"
                                         id="compnayAddressCity" placeholder="{{ __('Enter City') }}"
-                                        value="{{ @$user->addresses->city_name }}" class="custom-class" />
+                                        value="{{ old('address.city_name', @$user->addresses->city->name) }}" 
+                                       class="custom-class" />
                                     </div>
                                 </div>
                             </div>
@@ -200,7 +193,8 @@
                                 <div class="col-lg-8">
                                     <x-form-components.input-group type="text" name="address.pincode"
                                         id="compnayAddressPincode" placeholder="{{ __('Enter Pincode') }}"
-                                        value="{{ @$user->addresses->postal_code }}" class="custom-class" />
+                                        value="{{ old('address.pincode', @$user->addresses->postal_code) }}" 
+                                       class="custom-class" />
 
                                 </div>
                             </div>

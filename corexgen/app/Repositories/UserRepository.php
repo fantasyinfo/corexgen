@@ -21,7 +21,7 @@ class UserRepository
             $query->where('is_tenant', '=', '1');
         }
 
-        $query = $this->applyTenantFilter($query)->get();
+        $query = $this->applyTenantFilter($query);
 
         // Dynamic filters
         return $this->applyFilters($query, $request);

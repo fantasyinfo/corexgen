@@ -103,7 +103,7 @@
                         name: 'plan_name',
                         searchable: true,
                         orderable: true,
-                        width: '100px',
+                        width: '200px',
                     },
                     {
                         data: 'currency',
@@ -145,7 +145,7 @@
                         name: 'start_date',
                         searchable: false,
                         orderable: true,
-                        width: '100px',
+                        width: '200px',
                     },
                     // {
                     //     data: 'status',
@@ -159,7 +159,7 @@
                         name: 'created_at',
                         searchable: true,
                         orderable: true,
-                        width: '100px',
+                        width: '200px',
                     },
                     // {
                     //     data: 'actions',

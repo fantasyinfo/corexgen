@@ -1,10 +1,9 @@
 @extends('layout.app')
 
 @section('content')
-
     <div class="container-fluid">
         <div class="">
-            
+
             @include('layout.components.header-buttons')
 
 
@@ -21,22 +20,19 @@
                         <table id="userTable" class="table table-striped table-bordered ui celled">
                             <thead>
                                 <tr>
-                                    <th>
-                                        <input type="checkbox" id="select-all" />
-                                    </th>
+                                    <th><input type="checkbox" id="select-all" /></th>
                                     <th> {{ __('users.Name') }}</th>
                                     <th>{{ __('users.Email') }}</th>
                                     <th>{{ __('users.Role') }}</th>
                                     <th>{{ __('crud.Status') }}</th>
                                     <th>{{ __('crud.Created At') }}</th>
-
                                     <th class="text-end">{{ __('crud.Actions') }}</th>
                                 </tr>
-                            </thead>
-                            <tbody>
 
-                            </tbody>
+                            </thead>
+                            <tbody></tbody>
                         </table>
+
 
 
                     </div>
@@ -60,9 +56,10 @@
 @include('layout.components.bulk-import-js')
 
 @push('scripts')
+
+
     <script type="text/javascript">
         $(document).ready(function() {
-
             const nameFilter = $('#nameFilter');
             const emailFilter = $('#emailFilter');
             const roleFilter = $('#roleFilter');
@@ -74,14 +71,13 @@
                 processing: true,
                 serverSide: true,
                 stateSave: true,
-
+                responsive: true,
                 language: {
                     "lengthMenu": "_MENU_ per page",
                 },
                 ajax: {
                     url: "{{ route(getPanelRoutes($module . '.index')) }}",
                     data: function(d) {
-                        // Add filters if required
                         d.name = nameFilter.val();
                         d.email = emailFilter.val();
                         d.status = statusFilter.val();
@@ -91,7 +87,7 @@
                     },
                 },
                 columns: [{
-                        data: null, // Render checkbox for bulk actions
+                        data: null,
                         orderable: false,
                         searchable: false,
                         width: '10px',
@@ -99,69 +95,60 @@
                             return `<input type="checkbox" class="bulk-select" data-id="${row.id}" />`;
                         },
                     },
-
                     {
                         data: 'name',
                         name: 'name',
                         searchable: true,
-                        orderable: true,
-                        width: '100px',
+                        orderable: true
                     },
                     {
                         data: 'email',
                         name: 'email',
                         searchable: true,
-                        orderable: true,
-                        width: '100px',
+                        orderable: true
                     },
                     {
                         data: 'role_name',
                         name: 'role_name',
                         searchable: false,
-                        orderable: true,
-                        width: '100px',
+                        orderable: true
                     },
                     {
                         data: 'status',
                         name: 'status',
                         searchable: false,
-                        orderable: true,
-                        width: '100px',
+                        orderable: true
                     },
                     {
                         data: 'created_at',
                         name: 'created_at',
                         searchable: true,
-                        orderable: true,
-                        width: '100px',
+                        orderable: true
                     },
                     {
                         data: 'actions',
                         name: 'actions',
                         orderable: false,
-                        searchable: false,
-                        width: '100px',
+                        searchable: false
                     },
                 ],
             });
 
             // Clear Filter Button
             $('#clearFilter').on('click', function() {
-                // Reset all filter input fields
                 nameFilter.val('');
                 emailFilter.val('');
                 roleFilter.val('');
                 statusFilter.val('');
                 startDateFilter.val('');
                 endDateFilter.val('');
-                // Reset the DataTable's search and reload
                 dbTableAjax.ajax.reload();
             });
 
-
+            // Filter Button
             $('#filterBtn').click(function() {
                 dbTableAjax.ajax.reload();
-                const filterSidebar = document.getElementById("filterSidebar");
+                const filterSidebar = document.getElementById('filterSidebar');
                 filterSidebar.classList.remove('show');
             });
 
@@ -171,8 +158,7 @@
                 $('.bulk-select').prop('checked', isChecked);
             });
 
-            // bulk delete
-
+            // Bulk Delete
             $('#bulk-delete-btn').on('click', function() {
                 let selectedIds = [];
                 $('.bulk-select:checked').each(function() {
@@ -183,26 +169,26 @@
                     if (confirm('Are you sure you want to delete the selected users?')) {
                         $.ajax({
                             url: "{{ route(getPanelRoutes($module . '.bulkDelete')) }}",
-                            method: "POST",
+                            method: 'POST',
                             data: {
                                 ids: selectedIds,
-                                _token: '{{ csrf_token() }}' // CSRF token for security
+                                _token: '{{ csrf_token() }}',
                             },
                             success: function(response) {
                                 alert(response.message);
-                                dbTableAjax.ajax.reload(); // Reload DataTable
+                                dbTableAjax.ajax.reload();
                             },
                             error: function(error) {
                                 alert('An error occurred while deleting users.');
-                            }
+                            },
                         });
                     }
                 } else {
                     alert('No users selected for deletion.');
                 }
             });
-
         });
+
 
         // change password
         $(document).ready(function() {

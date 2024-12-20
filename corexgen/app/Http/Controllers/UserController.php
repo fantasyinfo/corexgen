@@ -491,7 +491,7 @@ class UserController extends Controller
         $query = $this->applyTenantFilter($query);
         $user = $query->firstOrFail();
 
-        dd($user);
+        // dd($user);
 
         return view($this->getViewFilePath('view'), [
 

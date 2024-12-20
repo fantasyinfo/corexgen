@@ -32,7 +32,7 @@
                                 <div class="col-lg-8">
                                     <x-form-components.input-group type="text" class="custom-class" id="roleName"
                                         name="role_name" placeholder="{{ __('Admin/Manager') }}"
-                                        value="{{ $role['role_name'] }}" required />
+                                        value="{{ old('role_name', $role['role_name']) }}"  required />
                                 </div>
                             </div>
 
@@ -45,7 +45,7 @@
                                 </div>
                                 <div class="col-lg-8">
                                     <x-form-components.textarea-group name="role_desc" id="roleDesc"
-                                    placeholder="Describe the role" value="{{ $role['role_desc'] }}" class="custom-class"
+                                    placeholder="Describe the role" value="{{ old('role_desc', $role['role_desc']) }}" class="custom-class"
                                      />
                                   
                                 </div>

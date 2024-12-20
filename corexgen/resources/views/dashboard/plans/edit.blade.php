@@ -56,7 +56,7 @@
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="text" class="custom-class"
                                                 id="planName" name="name" placeholder="{{ __('Premium') }}"
-                                                value="{{ $plan->name }}" required />
+                                                value="{{ old('name',$plan->name) }}" required />
 
                                         </div>
                                     </div>
@@ -70,7 +70,7 @@
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="text" class="custom-class"
                                                 id="planDesc" name="desc" placeholder="{{ __('For Startups') }}"
-                                                value="{{ $plan->desc }}" required />
+                                                value="{{ old('desc',$plan->desc) }}" required />
 
                                         </div>
                                     </div>
@@ -87,7 +87,7 @@
                                                 prepend="{{ getSettingValue('Panel Currency Symbol') }}"
                                                 append="{{ getSettingValue('Panel Currency Code') }}" type="number"
                                                 step="0.001" class="custom-class" id="planPrice" name="price"
-                                                placeholder="{{ __('129.99') }}" value="{{ $plan->price }}" required />
+                                                placeholder="{{ __('129.99') }}" value="{{ old('price',$plan->price) }}" required />
 
                                         </div>
                                     </div>
@@ -104,7 +104,7 @@
                                                 prepend="{{ getSettingValue('Panel Currency Symbol') }}"
                                                 append="{{ getSettingValue('Panel Currency Code') }}" type="number"
                                                 step="0.001" class="custom-class" id="planOfferPrice" name="offer_price"
-                                                placeholder="{{ __('99.99') }}" value="{{ $plan->offer_price }}"
+                                                placeholder="{{ __('99.99') }}" value="{{ old('offer_price',$plan->offer_price) }}"
                                                 required />
 
                                         </div>
@@ -147,7 +147,7 @@
                                                 class="text-success">one time cost</span>, no billing to this company.</p>
                                     </div>
                                     <hr>
-                                    <p class="alert alert-secondary">Please add <span class="text-success">Plans
+                                    <p class="alert alert-secondary">Please add / update <span class="text-success">Plans
                                             Features</span> on features tabs, default to 10</p>
                                 </div>
                                 <div class="tab-pane fade" id="features" role="tabpanel">
@@ -168,7 +168,7 @@
                                                 @endphp
                                                 <x-form-components.input-group type="number" class="custom-class"
                                                     id="{{ $pfs }}" name="features.{{ $pfs }}"
-                                                    placeholder="{{ __('10') }}" value="{{ $featureValue }}"
+                                                    placeholder="{{ __('10') }}" value="{{ old('features.'.$pfs.'',$featureValue) }}"
                                                     min="-1" required />
 
 
