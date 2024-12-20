@@ -44,7 +44,7 @@ return new class extends Migration
 
             // indexes
             $table->index('email');
-        
+            $table->softDeletes();
             $table->timestamps();
 
         });

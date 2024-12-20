@@ -38,7 +38,7 @@ class ClientService
         return DB::transaction(function () use ($validatedData) {
 
             $client = CRMClients::create($validatedData);
-            $client_address = $this->createAddressIfProvided($validatedData, $client);
+            $client_address = $this->createOrUpdateAddresses($validatedData, $client);
 
             return [
                 'client' => $client,
@@ -48,27 +48,60 @@ class ClientService
     }
 
 
-    public function createAddressIfProvided($validatedData, $client)
+    public function updateClient(array $validatedData)
+    {
+        // Validate that company ID is provided
+        if (empty($validatedData['id'])) {
+            throw new \InvalidArgumentException('Client ID is required for updating');
+        }
+
+        return DB::transaction(function () use ($validatedData) {
+            // Retrieve the existing client
+            $client = CRMClients::findOrFail($validatedData['id']);
+
+            unset($validatedData['id']);
+            $client->update($validatedData);
+
+            $client_address = $this->createOrUpdateAddresses($validatedData, $client);
+
+            return [
+                'client' => $client,
+                'client_address' => $client_address
+            ];
+        });
+    }
+
+    public function createOrUpdateAddresses($validatedData, $client)
     {
         if (empty($validatedData['addresses'])) {
             return [];
         }
 
-        $createdAddresses = [];
+        $processedAddresses = [];
         foreach ($validatedData['addresses'] as $address) {
+
+            if (
+                empty($address['city']) ||
+                empty($address['country_id']) ||
+                empty($address['type']) ||
+                empty($address['street_address']) ||
+                empty($address['pincode'])
+            ) {
+                continue; // Skip this address if any required field is missing
+            }
             // Step 1: Create or get the city ID
             $cityId = $this->findOrCreateCity($address['city'], $address['country_id']);
 
-            // Step 2: Create the address
-            $addressId = $this->createAddress($address, $cityId);
+            // Step 2: Create or update the address
+            $addressId = $this->createOrUpdateAddress($address, $cityId);
 
             // Step 3: Link the address to the client
-            $this->linkClientAddress($client->id, $addressId, $address['type']);
+            $this->linkOrUpdateClientAddress($client->id, $addressId, $address['type']);
 
-            $createdAddresses[] = $addressId;
+            $processedAddresses[] = $addressId;
         }
 
-        return $createdAddresses;
+        return $processedAddresses;
     }
 
     private function findOrCreateCity($cityName, $countryId)
@@ -81,26 +114,37 @@ class ClientService
         return $city->id;
     }
 
-    private function createAddress($addressData, $cityId)
+    private function createOrUpdateAddress($addressData, $cityId)
     {
-        $address = Address::create([
-            'street_address' => $addressData['street_address'],
-            'postal_code' => $addressData['pincode'],
-            'city_id' => $cityId,
-            'country_id' => $addressData['country_id'],
-        ]);
+        $address = Address::updateOrCreate(
+            [
+                'street_address' => $addressData['street_address'],
+                'city_id' => $cityId,
+                'country_id' => $addressData['country_id'],
+            ],
+            [
+                'postal_code' => $addressData['pincode'],
+                'country_id' => $addressData['country_id'],
+
+            ]
+        );
 
         return $address->id;
     }
 
-    private function linkClientAddress($clientId, $addressId, $type)
+    private function linkOrUpdateClientAddress($clientId, $addressId, $type)
     {
-        ClientAddress::create([
-            'client_id' => $clientId,
-            'address_id' => $addressId,
-            'type' => $type,
-        ]);
+        ClientAddress::updateOrCreate(
+            [
+                'client_id' => $clientId,
+                'address_id' => $addressId,
+            ],
+            [
+                'type' => $type,
+            ]
+        );
     }
+
 
 
     public function getDatatablesResponse($request)
@@ -119,10 +163,10 @@ class ClientService
             ->editColumn('created_at', function ($client) {
                 return Carbon::parse($client->created_at)->format('d M Y');
             })
-            ->editColumn('name', function ($client) use ($module) {
-                $fullName = trim("{$client->title} {$client->first_name} {$client->middle_name} {$client->last_name}");
-                return "<a class='dt-link' href='" . route($this->tenantRoute . $module . '.view', $client->id) . "' target='_blank'>$fullName</a>";
-            })
+            // ->editColumn('name', function ($client) use ($module) {
+            //     $fullName = trim("{$client->title} {$client->first_name} {$client->middle_name} {$client->last_name}");
+            //     return "<a class='dt-link' href='" . route($this->tenantRoute . $module . '.view', $client->id) . "' target='_blank'>$fullName</a>";
+            // })
             ->editColumn('email', function ($client) {
                 return isset($client->email[0]) ? $client->email[0] : 'N/A';
             })

@@ -20,7 +20,10 @@
                                     <th>
                                         <input type="checkbox" id="select-all" />
                                     </th>
-                                    <th> {{ __('clients.Name') }}</th>
+                                    <th> {{ __('clients.Title') }}</th>
+                                    <th> {{ __('clients.First Name') }}</th>
+                                    <th> {{ __('clients.Middle Name') }}</th>
+                                    <th> {{ __('clients.Last Name') }}</th>
                                     <th> {{ __('clients.Email') }}</th>
                                     <th> {{ __('clients.Phone') }}</th>
                                     <th> {{ __('clients.Address') }}</th>
@@ -61,10 +64,12 @@
 
             const nameFilter = $('#nameFilter');
             const emailFilter = $('#emailFilter');
+            const phoneFilter = $('#phoneFilter');
             const statusFilter = $('#statusFilter');
+
             const startDateFilter = $('#startDateFilter');
             const endDateFilter = $('#endDateFilter');
-            const plansFilter = $('#plansFilter');
+
 
 
 
@@ -72,7 +77,7 @@
                 processing: true,
                 serverSide: true,
                 stateSave: true,
-
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
                 language: {
                     "lengthMenu": "_MENU_ per page",
                 },
@@ -82,10 +87,11 @@
                         // Add filters if required
                         d.name = nameFilter.val();
                         d.email = emailFilter.val();
+                        d.phone = phoneFilter.val();
                         d.status = statusFilter.val();
                         d.start_date = startDateFilter.val();
                         d.end_date = endDateFilter.val();
-                        d.plans = plansFilter.val();
+
                     },
                 },
                 searching: true,
@@ -97,13 +103,38 @@
                         render: function(data, type, row) {
                             return `<input type="checkbox" class="bulk-select" data-id="${row.id}" />`;
                         },
-                    }, {
-                        data: 'name',
-                        name: 'name',
+                    },
+                    {
+                        data: 'title',
+                        name: 'title',
+                        // searchable: true,
+                        // orderable: true,
+                        width: '100px',
+
+                    },
+                    {
+                        data: 'first_name',
+                        name: 'first_name',
                         searchable: true,
                         orderable: true,
                         width: '200px',
-                  
+
+                    },
+                    {
+                        data: 'middle_name',
+                        name: 'middle_name',
+                        searchable: true,
+                        orderable: true,
+                        width: '200px',
+
+                    },
+                    {
+                        data: 'last_name',
+                        name: 'last_name',
+                        searchable: true,
+                        orderable: true,
+                        width: '200px',
+
                     },
                     {
                         data: 'email',
@@ -126,7 +157,7 @@
                         orderable: true,
                         width: '100px',
                     },
-                    
+
                     {
                         data: 'status',
                         name: 'status',
@@ -137,8 +168,9 @@
                     {
                         data: 'created_at',
                         name: 'created_at',
-                        searchable: true, 
-                        orderable: true
+                        searchable: true,
+                        orderable: true,
+                        width: '100px',
                     },
                     {
                         data: 'actions',
@@ -155,10 +187,10 @@
                 // Reset all filter input fields
                 nameFilter.val('');
                 emailFilter.val('');
-                statusFilter.val('');
+                phoneFilter.val('');
                 startDateFilter.val('');
                 endDateFilter.val('');
-                plansFilter.val('');
+                statusFilter.val('');
                 // Reset the DataTable's search and reload
                 dbTableAjax.ajax.reload();
             });

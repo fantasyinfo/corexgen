@@ -150,7 +150,7 @@ class RoleController extends Controller
             CRMRole::create($validated);
 
                     // update current usage
-            $this->updateUsage(strtolower(PLANS_FEATURES['ROLE']), '+','1');
+            $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['ROLE']]), '+','1');
 
             // Redirect with success message
             return redirect()->route($this->tenantRoute . 'role.index')
@@ -310,7 +310,7 @@ class RoleController extends Controller
                 $totalAdd++;
             }
 
-            $this->updateUsage(strtolower(PLANS_FEATURES['ROLE']), '+',$totalAdd);
+            $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['ROLE']]), '+',$totalAdd);
 
             return response()->json([
                 'success' => true,
@@ -338,7 +338,7 @@ class RoleController extends Controller
             $query = $this->applyTenantFilter($query);
             $query->delete();
 
-            $this->updateUsage(strtolower(PLANS_FEATURES['ROLE']), '-','1');
+            $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['ROLE']]), '-','1');
             // Redirect with success message
             return redirect()->back()->with('success', 'Role deleted successfully.');
         } catch (\Exception $e) {
@@ -384,7 +384,7 @@ class RoleController extends Controller
             if (is_array($ids) && count($ids) > 0) {
                 // Validate ownership/permissions if necessary
                 $this->applyTenantFilter(CRMRole::query()->whereIn('id', $ids))->delete();
-                $this->updateUsage(strtolower(PLANS_FEATURES['ROLE']), '-',count($ids));
+                $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['ROLE']]), '-',count($ids));
                 return response()->json(['message' => 'Selected roles deleted successfully.'], 200);
             }
 

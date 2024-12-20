@@ -13,6 +13,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use OwenIt\Auditing\Contracts\Auditable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable implements Auditable
 {
@@ -21,6 +22,7 @@ class User extends Authenticatable implements Auditable
     use HasProfilePhoto;
     use Notifiable;
     use TwoFactorAuthenticatable;
+    use SoftDeletes;
     use \OwenIt\Auditing\Auditable;
     /**
      * The attributes that are mass assignable.
