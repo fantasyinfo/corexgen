@@ -49,6 +49,8 @@ return [
     'Street Address' => 'Street Address',
     'Tags' => 'Tags',
     'Additional Details' => 'Additional Details',
+    'End Date' => 'End Date',
+    'Start Date' => 'Start Date'
 
 
 

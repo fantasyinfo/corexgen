@@ -72,6 +72,7 @@
                 serverSide: true,
                 stateSave: true,
                 responsive: true,
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
                 language: {
                     "lengthMenu": "_MENU_ per page",
                 },

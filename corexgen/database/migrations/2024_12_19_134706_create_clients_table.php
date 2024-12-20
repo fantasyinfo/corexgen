@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('clients', function (Blueprint $table) {
             $table->id();
-            $table->enum('type', ['Individual', 'Company']);
+            $table->enum('type', ['Individual', 'Company'])->default('Individual');
             $table->string('title')->nullable();
             $table->string('first_name');
             $table->string('middle_name')->nullable();

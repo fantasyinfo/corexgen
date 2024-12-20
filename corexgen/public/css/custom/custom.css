@@ -1,6 +1,6 @@
 .logo {
     height: 60px;
-    filter: invert(100%);
+    /* filter: invert(100%); */
 }
 
 .divider-v {
@@ -113,13 +113,14 @@ table tr {
         position: fixed;
         top: 0;
         right: -350px;
-        background: #14071e;
+        background: var(--sidebar-bg);
         color: #fff;
    
         box-shadow: -4px 0 6px rgba(0,0,0,0.1);
         transition: right 0.3s ease-in-out;
         z-index: 1050;
         overflow-y: auto;
+        border-left: 0.2px solid #e2e1e1;
     }
 
     .filter-sidebar.show {

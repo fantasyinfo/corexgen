@@ -10,6 +10,8 @@
                 <div class="card stretch stretch-full">
                     <form id="clientForm" action="{{ route(getPanelRoutes('clients.update')) }}" method="POST">
                         @csrf
+                        @method('PUT')
+                        <input type="hidden" name="id" value="{{ $client->id }}" />
                         <div class="card-body">
                             <div class="mb-4 d-flex align-items-center justify-content-between">
                                 <p class="fw-bold mb-0 me-4">
@@ -61,8 +63,11 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <select class="form-select" name="type" id="clientType" required>
-                                                <option value="Individual"  {{ $client->type == 'Individual' ? 'selected' : '' }} >Individual</option>
-                                                <option value="Company"  {{ $client->type == 'Company' ? 'selected' : '' }}>Company</option>
+                                                <option value="Individual"
+                                                    {{ $client->type == 'Individual' ? 'selected' : '' }}>Individual
+                                                </option>
+                                                <option value="Company" {{ $client->type == 'Company' ? 'selected' : '' }}>
+                                                    Company</option>
                                             </select>
                                         </div>
                                     </div>
@@ -75,7 +80,8 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="text" name="title" id="clientTitle"
-                                                placeholder="{{ __('Mr./Mrs./Ms.') }}" value="{{ old('title',$client->title) }}" />
+                                                placeholder="{{ __('Mr./Mrs./Ms.') }}"
+                                                value="{{ old('title', $client->title) }}" />
                                         </div>
                                     </div>
 
@@ -87,8 +93,8 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="text" name="first_name" id="firstName"
-                                                placeholder="{{ __('First Name') }}" value="{{ old('first_name',$client->first_name) }}"
-                                                required />
+                                                placeholder="{{ __('First Name') }}"
+                                                value="{{ old('first_name', $client->first_name) }}" required />
                                         </div>
                                     </div>
 
@@ -101,7 +107,7 @@
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="text" name="middle_name" id="middleName"
                                                 placeholder="{{ __('Middle Name') }}"
-                                                value="{{ old('middle_name',$client->middle_name) }}" />
+                                                value="{{ old('middle_name', $client->middle_name) }}" />
                                         </div>
                                     </div>
 
@@ -113,8 +119,8 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="text" name="last_name" id="lastName"
-                                                placeholder="{{ __('Last Name') }}" value="{{ old('last_name',$client->last_name) }}"
-                                                required />
+                                                placeholder="{{ __('Last Name') }}"
+                                                value="{{ old('last_name', $client->last_name) }}" required />
                                         </div>
                                     </div>
 
@@ -126,7 +132,7 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="date" name="birthdate" id="birthdate"
-                                                value="{{  old('birthdate',$client->birthdate)  }}" />
+                                                value="{{ old('birthdate', $client->birthdate) }}" />
                                         </div>
                                     </div>
 
@@ -139,7 +145,9 @@
                                         <div class="col-lg-8">
                                             <select class="form-select searchSelectBox" name="category" id="category">
                                                 @foreach (CLIENTS_CATEGORY_TYPES['TABLE_STATUS'] as $category)
-                                                    <option value="{{ $category }}" {{ $client->category == $category ? 'selected' : '' }}>{{ $category }}</option>
+                                                    <option value="{{ $category }}"
+                                                        {{ $client->category == $category ? 'selected' : '' }}>
+                                                        {{ $category }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -357,7 +365,7 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <textarea name="details" id="details" class="form-control wysiwyg-editor" rows="5">{{ old('details',$client->details) }}</textarea>
+                                            <textarea name="details" id="details" class="form-control wysiwyg-editor" rows="5">{{ old('details', $client->details) }}</textarea>
                                         </div>
                                     </div>
 
@@ -456,9 +464,9 @@
                         'wordcount'
                     ],
                     toolbar: 'undo redo | formatselect | bold italic backcolor | \
-                  alignleft aligncenter alignright alignjustify | \
-                  bullist numlist outdent indent | removeformat | help | \
-                  link image media preview codesample table'
+                              alignleft aligncenter alignright alignjustify | \
+                              bullist numlist outdent indent | removeformat | help | \
+                              link image media preview codesample table'
                 });
             }
 
@@ -492,49 +500,61 @@
                 attachValidationListeners(newGroup.querySelector('input'));
             });
 
+
             // Handle old email values
             if (@json($client->email)) {
                 const oldEmails = @json($client->email);
                 oldEmails.forEach((email, index) => {
                     if (index === 0) {
-                        document.querySelector('input[name="email[]"]').value = email;
+                        // Set the value for the first input field
+                        const firstEmailField = document.querySelector('input[name="email[]"]');
+                        if (firstEmailField) {
+                            firstEmailField.value = email;
+                        }
                     } else {
+                        // Create additional input fields for other emails
                         const container = document.getElementById('emailContainer');
                         const newGroup = document.createElement('div');
                         newGroup.className = 'input-group mb-2';
                         newGroup.innerHTML = `
-                            <input type="email" name="email[]" class="form-control" value="${email}" placeholder="Email Address">
-                            <button type="button" class="btn btn-outline-danger remove-field">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                        `;
+                <input type="email" name="email[]" class="form-control" value="${email}" placeholder="Email Address">
+                <button type="button" class="btn btn-outline-danger remove-field">
+                    <i class="fas fa-minus"></i>
+                </button>
+            `;
                         container.appendChild(newGroup);
                         attachValidationListeners(newGroup.querySelector('input'));
                     }
                 });
             }
 
+
             // Handle old phone values
+
             if (@json($client->phone)) {
                 const oldPhones = @json($client->phone);
                 oldPhones.forEach((phone, index) => {
                     if (index === 0) {
-                        document.querySelector('input[name="phone[]"]').value = phone;
+                        const firstPhoneField = document.querySelector('input[name="phone[]"]');
+                        if (firstPhoneField) {
+                            firstPhoneField.value = phone;
+                        }
                     } else {
                         const container = document.getElementById('phoneContainer');
                         const newGroup = document.createElement('div');
                         newGroup.className = 'input-group mb-2';
                         newGroup.innerHTML = `
-                            <input type="tel" name="phone[]" class="form-control" value="${phone}" placeholder="Phone Number">
-                            <button type="button" class="btn btn-outline-danger remove-field">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                        `;
+                <input type="tel" name="phone[]" class="form-control" value="${phone}" placeholder="Phone Number">
+                <button type="button" class="btn btn-outline-danger remove-field">
+                    <i class="fas fa-minus"></i>
+                </button>
+            `;
                         container.appendChild(newGroup);
                         attachValidationListeners(newGroup.querySelector('input'));
                     }
                 });
             }
+
 
             // Handle dynamic address blocks
             let addressCount = 1;
@@ -635,7 +655,7 @@
                 const clientAddresses = @json($client->addresses);
                 clientAddresses.forEach((address, index) => {
                     if (index === 0) {
-                        // Fill the first address block that already exists
+                        // Fill the first address block
                         fillAddressBlock(document.querySelector('.address-block'), address, index);
                     } else {
                         // Create new address blocks for additional addresses
@@ -653,6 +673,7 @@
                 });
             }
 
+
             // Function to fill an address block with client address data
             function fillAddressBlock(block, address, index) {
                 block.querySelector(`select[name="addresses[${index}][type]"]`).value = address.pivot.type;
@@ -660,7 +681,7 @@
                     .street_address;
                 block.querySelector(`select[name="addresses[${index}][country_id]"]`).value = address.country_id;
                 block.querySelector(`input[name="addresses[${index}][city]"]`).value = address
-                .city_id; // Use city ID if applicable
+                    .city_id; // Use city ID if applicable
                 block.querySelector(`input[name="addresses[${index}][pincode]"]`).value = address.postal_code;
             }
 

@@ -120,7 +120,7 @@ class UserController extends Controller
             $userService->createUser($request->validated());
 
             // update current usage
-            $this->updateUsage(strtolower(PLANS_FEATURES['USERS']), '+', '1');
+            $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['USERS']]), '+', '1');
 
             return redirect()->route($this->tenantRoute . 'users.index')
                 ->with('success', 'User created successfully.');
@@ -337,7 +337,7 @@ class UserController extends Controller
                 $totalAdd++;
 
             }
-            $this->updateUsage(strtolower(PLANS_FEATURES['USERS']), '+', $totalAdd);
+            $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['USERS']]), '+', $totalAdd);
             return response()->json([
                 'success' => true,
                 'message' => 'Users imported successfully!',
@@ -364,7 +364,7 @@ class UserController extends Controller
 
             $this->applyTenantFilter(User::query()->where('id', '=', $id))->delete();
             // update current usage
-            $this->updateUsage(strtolower(PLANS_FEATURES['USERS']), '-', '1');
+            $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['USERS']]), '-', '1');
             // Return success response
             return redirect()->back()->with('success', 'User deleted successfully.');
         } catch (\Exception $e) {
@@ -415,7 +415,7 @@ class UserController extends Controller
             if (is_array($ids) && count($ids) > 0) {
                 // Validate ownership/permissions if necessary
                 $this->applyTenantFilter(User::query()->whereIn('id', $ids))->delete();
-                $this->updateUsage(strtolower(PLANS_FEATURES['USERS']), '-', count($ids));
+                $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['USERS']]), '-', count($ids));
                 return response()->json(['message' => 'Selected users deleted successfully.'], 200);
             }
 
