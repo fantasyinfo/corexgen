@@ -72,11 +72,19 @@ class CRMClients extends Model implements Auditable
         parent::boot();
 
         static::creating(function ($client) {
-            // Set default values
+            // Set default values using null coalescing
             $client->status = $client->status ?? CRM_STATUS_TYPES['CLIENTS']['STATUS']['ACTIVE'];
-            $client->company_id = Auth::user()->company_id ?? null;
-            $client->created_by = Auth::id() ?? null;
-            $client->updated_by = Auth::id() ?? null;
+
+            if (Auth::check()) {
+                $client->company_id = $client->company_id ?? Auth::user()->company_id;
+                $client->created_by = $client->created_by ?? Auth::id();
+                $client->updated_by = $client->updated_by ?? Auth::id();
+            } else {
+                // Handle cases where Auth is not available (e.g., background jobs)
+                $client->company_id = $client->company_id ?? null;
+                $client->created_by = $client->created_by ?? null;
+                $client->updated_by = $client->updated_by ?? null;
+            }
         });
     }
 

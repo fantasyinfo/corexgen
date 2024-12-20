@@ -356,7 +356,7 @@ class CompaniesController extends Controller
     public function import(Request $request, CompanyService $companyService)
     {
         $validator = Validator::make($request->all(), [
-            'file' => 'required|mimes:csv,txt|max:2048', // Validate file type and size
+            'file' => 'required|mimes:csv,txt|max:' . BULK_CSV_UPLOAD_FILE_SIZE . '', // Validate file type and size
         ]);
     
         if ($validator->fails()) {

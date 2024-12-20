@@ -9,11 +9,15 @@ use App\Http\Requests\ClientsEditRequest;
 use App\Models\Country;
 use App\Models\CRM\CRMClients;
 use App\Repositories\ClientRepository;
+use App\Services\ClientCSVRowProcessor;
 use App\Services\ClientService;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
 use App\Traits\SubscriptionUsageFilter;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
+use App\Jobs\CsvImportJob;
 
 class ClientsController extends Controller
 {
@@ -274,12 +278,12 @@ class ClientsController extends Controller
                 $phones,
                 $socialMedia,
                 $client->category,
-                $address?->street_address ?? 'N/A',
-                $address?->city_id ?? 'N/A',
-                $address?->city?->name ?? 'N/A',
-                $address?->country_id ?? 'N/A',
-                $address?->country?->name ?? 'N/A',
-                $address?->postal_code ?? 'N/A',
+                $address?->street_address ?? '',
+                $address?->city_id ?? '',
+                $address?->city?->name ?? '',
+                $address?->country_id ?? '',
+                $address?->country?->name ?? '',
+                $address?->postal_code ?? '',
                 $client->status,
                 $client?->created_at?->format('Y-m-d H:i:s') ?? 'N/A',
             ];
@@ -300,10 +304,93 @@ class ClientsController extends Controller
         ];
     }
 
-    public function import()
+    public function import(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'file' => 'required|mimes:csv,txt|max:' . BULK_CSV_UPLOAD_FILE_SIZE, // Validate file type and size
+        ]);
 
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+            ]);
+        }
+
+        try {
+            $file = $request->file('file');
+            $filePath = $file->storeAs('csv', uniqid() . '_' . $file->getClientOriginalName()); // Store file in a persistent directory
+            $absoluteFilePath = storage_path('app/' . $filePath); // Get the absolute path
+
+            // Validation rules for each row
+            $rules = [
+                'Type' => ['required', 'string', Rule::in(['Individual', 'Company'])],
+                'Title' => ['nullable', 'string'],
+                'First Name' => ['required', 'string'],
+                'Middle Name' => ['nullable', 'string'],
+                'Last Name' => ['required', 'string'],
+                'Emails' => ['required', 'string'],
+                'Phones' => ['required', 'string'],
+                'Social Media Links' => ['nullable', 'string'], // Allow empty
+                'Category' => ['nullable', Rule::in(CLIENTS_CATEGORY_TYPES['TABLE_STATUS'])],
+                'Street Address' => ['nullable', 'string', 'max:255'], // Allow empty
+                'City Name' => ['nullable', 'string'], // Allow empty
+                'Country ID' => ['nullable', 'exists:countries,id'], // Allow empty
+                'Pincode' => ['nullable', 'string'], // Allow empty
+            ];
+
+            // Expected CSV headers
+            $expectedHeaders = ['Type', 'Title', 'First Name', 'Middle Name', 'Last Name', 'Emails', 'Phones', 'Social Media Links', 'Category', 'Street Address', 'City Name', 'Country ID', 'Pincode'];
+
+            // Dispatch the job
+            CsvImportJob::dispatch(
+                $absoluteFilePath,
+                $rules,
+                ClientCSVRowProcessor::class,
+                $expectedHeaders,
+                [
+                    'company_id' => Auth::user()->company_id,
+                    'user_id' => Auth::id(),
+                ]
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'CSV file uploaded successfully. Processing will happen in the background.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred: ' . $e->getMessage(),
+            ]);
+        }
     }
+
+
+    /**
+     * Parse social media links into key-value JSON
+     */
+    private function parseSocialMedia($links)
+    {
+        $result = [];
+        if (empty($links))
+            return $result; // Return empty array if no links provided
+        $pairs = explode(';', $links);
+
+        foreach ($pairs as $pair) {
+            $keyValue = explode("':", $pair);
+            if (count($keyValue) === 2) {
+                $key = trim($keyValue[0], " '");
+                $value = trim($keyValue[1]);
+                $result[$key] = $value;
+            }
+        }
+
+        return $result;
+    }
+
+
+
     public function bulkDelete(Request $request)
     {
 
