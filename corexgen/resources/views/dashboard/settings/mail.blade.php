@@ -96,7 +96,7 @@
 
                             <x-form-components.input-group type="{{ $item['input_type'] }}" class="custom-class"
                                 id="{{ $item['key'] }}" name="{{ $item['name'] }}" placeholder="{{ $item['placeholder'] }}"
-                                value="{{ $item['value'] }}" required />
+                                value="{{ old($item['name'], $item['value']) }}" required />
                         </div>
                     @break
 

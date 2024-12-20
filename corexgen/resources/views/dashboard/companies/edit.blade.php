@@ -56,7 +56,7 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="text" name="cname" id="companyName"
-                                                placeholder="{{ __('Enter Company Name') }}" value="{{ $company->cname }}"
+                                                placeholder="{{ __('Enter Company Name') }}" value="{{ old('cname', $company->cname) }}"
                                                 required class="custom-class" />
 
                                         </div>
@@ -71,7 +71,7 @@
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="text" name="name"
                                                 id="compnayUserName" placeholder="{{ __('John Doe') }}"
-                                                value="{{ @$company->users[0]['name'] }}" required class="custom-class" />
+                                                value="{{  old('name', @$company->users[0]['name']) }}" required class="custom-class" />
 
                                         </div>
                                     </div>
@@ -83,7 +83,7 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="email" name="email" id="compnayEmail"
-                                                placeholder="{{ __('john@email.com') }}" disabled value="{{ $company->email }}"
+                                                placeholder="{{ __('john@email.com') }}" disabled value="{{  old('email', $company->email) }}"
                                                 required class="custom-class" />
 
                                         </div>
@@ -96,7 +96,7 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="tel" name="phone" id="compnayPhone"
-                                                placeholder="{{ __('9876543210') }}" value="{{ $company->phone }}"
+                                                placeholder="{{ __('9876543210') }}" value="{{ old('phone', $company->phone) }}"
                                                 required class="custom-class" />
 
                                         </div>
@@ -157,7 +157,7 @@
                                         <div class="col-lg-8">
                                             <x-form-components.textarea-group name="address.street_address"
                                                 id="compnayAddressStreet" placeholder="Enter Registered Street Address"
-                                                value="{{ @$company->addresses->street_address }}" class="custom-class" />
+                                                value="{{ old('address.street_address', @$company->addresses->street_address)  }}" class="custom-class" />
                                              
 
                                         </div>
@@ -206,7 +206,7 @@
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="text" name="address.city_name"
                                             id="compnayAddressCity" placeholder="{{ __('Enter City') }}"
-                                            value="{{ @$company->addresses->city->name }}" class="custom-class" />
+                                            value="{{ old('address.city_name', @$company->addresses->city->name)   }}" class="custom-class" />
                                         </div>
                                     </div>
                                     <div class="row mb-4 align-items-center">
@@ -219,7 +219,7 @@
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="text" name="address.pincode"
                                                 id="compnayAddressPincode" placeholder="{{ __('Enter Pincode') }}"
-                                                value="{{ @$company->addresses->postal_code }}" class="custom-class" />
+                                                value="{{ old('address.pincode', @$company->addresses->postal_code)  }}" class="custom-class" />
 
                                         </div>
                                     </div>

@@ -35,7 +35,7 @@
                                 <div class="col-lg-8">
                                     <x-form-components.input-group type="text" disabled="true" class="custom-class"
                                         name="name" id="pName" placeholder="{{ __('Paypal') }}"
-                                        value="{{ $gateway['name'] }}" />
+                                        value="{{ old('name',$gateway['name']) }}" />
                                 </div>
                             </div>
                             <div class="row mb-4 align-items-center">
@@ -47,7 +47,7 @@
                                 <div class="col-lg-8">
                                     <x-form-components.input-group type="text"  class="custom-class"
                                         name="config_key" id="pKey" placeholder="{{ __('Paypal') }}"
-                                        value="{{ $gateway['config_key'] }}" />
+                                        value="{{ old('config_key',$gateway['config_key']) }}" />
                                 </div>
                             </div>
                             <div class="row mb-4 align-items-center">
@@ -59,7 +59,7 @@
                                 <div class="col-lg-8">
                                     <x-form-components.input-group type="text"  class="custom-class"
                                         name="config_value" id="pValue" placeholder="{{ __('Paypal') }}"
-                                        value="{{ $gateway['config_value'] }}" />
+                                        value="{{ old('config_value',$gateway['config_value']) }}" />
                                 </div>
                             </div>
                             <div class="row mb-4 align-items-center">

@@ -61,8 +61,8 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <select class="form-select" name="type" id="clientType" required>
-                                                <option value="Individual">Individual</option>
-                                                <option value="Company">Company</option>
+                                                <option value="Individual"  {{ $client->type == 'Individual' ? 'selected' : '' }} >Individual</option>
+                                                <option value="Company"  {{ $client->type == 'Company' ? 'selected' : '' }}>Company</option>
                                             </select>
                                         </div>
                                     </div>
@@ -75,7 +75,7 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="text" name="title" id="clientTitle"
-                                                placeholder="{{ __('Mr./Mrs./Ms.') }}" value="{{ $client->title }}" />
+                                                placeholder="{{ __('Mr./Mrs./Ms.') }}" value="{{ old('title',$client->title) }}" />
                                         </div>
                                     </div>
 
@@ -87,7 +87,7 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="text" name="first_name" id="firstName"
-                                                placeholder="{{ __('First Name') }}" value="{{ $client->first_name }}"
+                                                placeholder="{{ __('First Name') }}" value="{{ old('first_name',$client->first_name) }}"
                                                 required />
                                         </div>
                                     </div>
@@ -101,7 +101,7 @@
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="text" name="middle_name" id="middleName"
                                                 placeholder="{{ __('Middle Name') }}"
-                                                value="{{ $client->middle_name }}" />
+                                                value="{{ old('middle_name',$client->middle_name) }}" />
                                         </div>
                                     </div>
 
@@ -113,7 +113,7 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="text" name="last_name" id="lastName"
-                                                placeholder="{{ __('Last Name') }}" value="{{ $client->last_name }}"
+                                                placeholder="{{ __('Last Name') }}" value="{{ old('last_name',$client->last_name) }}"
                                                 required />
                                         </div>
                                     </div>
@@ -126,7 +126,7 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="date" name="birthdate" id="birthdate"
-                                                value="{{ $client->birthdate }}" />
+                                                value="{{  old('birthdate',$client->birthdate)  }}" />
                                         </div>
                                     </div>
 
@@ -139,7 +139,7 @@
                                         <div class="col-lg-8">
                                             <select class="form-select searchSelectBox" name="category" id="category">
                                                 @foreach (CLIENTS_CATEGORY_TYPES['TABLE_STATUS'] as $category)
-                                                    <option value="{{ $category }}">{{ $category }}</option>
+                                                    <option value="{{ $category }}" {{ $client->category == $category ? 'selected' : '' }}>{{ $category }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -357,7 +357,7 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <textarea name="details" id="details" class="form-control wysiwyg-editor" rows="5">{{ $client->details }}</textarea>
+                                            <textarea name="details" id="details" class="form-control wysiwyg-editor" rows="5">{{ old('details',$client->details) }}</textarea>
                                         </div>
                                     </div>
 
