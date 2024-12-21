@@ -11,11 +11,12 @@ class PlansPaymentTransactionsRepository
     // Your repository methods
     use TenantFilter;
 
-    public function getTrnasactionQuery($request)
+    public function getTransactionQuery($request)
     {
+        // dd($request->all());
         $query = PaymentTransaction::with(['plans', 'subscription', 'company']);
 
-        return $query = $query->get();
+        return $query;
 
         // Dynamic filters
         // return $this->applyFilters($query, $request);
@@ -24,7 +25,7 @@ class PlansPaymentTransactionsRepository
     {
         $query = Subscription::with(['plans', 'company','payment_transaction']);
 
-        return $query = $query->get();
+        return $query;
 
         // Dynamic filters
         // return $this->applyFilters($query, $request);

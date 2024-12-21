@@ -1,7 +1,7 @@
 <div class="mb-3 d-flex justify-content-end">
     @if (isset($permissions['CREATE']) && hasPermission(strtoupper($module) . '.' . $permissions['CREATE']['KEY']))
         <a href="{{ route(getPanelRoutes($module . '.create')) }}" class="btn btn-primary btn-xl me-2" title="{{ __('crud.Create New') }}" >
-            <i class="fas fa-plus"></i>
+            <i class="fas fa-plus me-2"></i> {{ __('Create')}}
         </a>
     @endif
 

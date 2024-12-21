@@ -22,7 +22,7 @@
                     </x-form-components.input-label>
 
                     <x-form-components.input-group type="text" class="custom-class" id="nameFilter" name="name"
-                        placeholder="{{ __('John Doe') }}" value="{{ request('name') }}" />
+                        placeholder="{{ __('John Doe') }}" value="{{ request('name') }}" data-filter="name" />
                 </div>
             </div>
             <div class="mb-3">
@@ -31,14 +31,14 @@
                         {{ __('users.Email') }}
                     </x-form-components.input-label>
                     <x-form-components.input-group type="email" class="custom-class" id="emailFilter" name="email"
-                        placeholder="{{ __('john@email.com') }}" value="{{ request('email') }}" />
+                        placeholder="{{ __('john@email.com') }}" value="{{ request('email') }}"  data-filter="email" />
                 </div>
             </div>
             <div class="mb-3">
                 <div class="form-group">
                     <label for="roleFilter" class="mb-2 font-12">{{ __('users.Role') }}</label>
                     <select id="roleFilter" class="form-control searchSelectBox  @error('role_id') is-invalid @enderror"
-                        name="role_id" id="role_id">
+                        name="role_id" id="role_id"  data-filter="role_id">
                         <option selected value="0">Select Role</option>
                         @if ($roles && $roles->isNotEmpty())
                             @foreach ($roles as $role)
@@ -57,7 +57,7 @@
             <div class="mb-3">
                 <div class="form-group">
                     <label for="statusFilter" class="mb-2 font-12">{{ __('users.All Statuses') }}</label>
-                    <select name="status" class="form-select" id="statusFilter">
+                    <select name="status" class="form-select" id="statusFilter" data-filter="status">
                         <option value="">{{ __('users.All Statuses') }}</option>
                         <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>
                             {{ __('Active') }}

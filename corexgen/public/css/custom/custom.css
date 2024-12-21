@@ -83,15 +83,15 @@
 }
 
 .card {
-    border-top:2px solid var(--primary-color) ;
+    border-top: 2px solid var(--primary-color);
 }
 
 table tr {
-    font-size:14px;
+    font-size: 14px;
 }
 
-.tooltip{
-    font-size:12px;
+.tooltip {
+    font-size: 12px;
 }
 
 .status-circle {
@@ -106,43 +106,40 @@ table tr {
     /* Align with text */
 }
 
-     /* Custom styling for filter sidebar */
-     .filter-sidebar {
-        width: 350px;
-        height: 100vh;
-        position: fixed;
-        top: 0;
-        right: -350px;
-        background: var(--sidebar-bg);
-        color: #fff;
-   
-        box-shadow: -4px 0 6px rgba(0,0,0,0.1);
-        transition: right 0.3s ease-in-out;
-        z-index: 1050;
-        overflow-y: auto;
-        border-left: 0.2px solid #e2e1e1;
+/* Custom styling for filter sidebar */
+.filter-sidebar {
+    width: 350px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    right: -350px;
+    background: var(--sidebar-bg);
+    color: #fff;
+
+    box-shadow: -4px 0 6px rgba(0, 0, 0, 0.1);
+    transition: right 0.3s ease-in-out;
+    z-index: 1050;
+    overflow-y: auto;
+    border-left: 0.2px solid #e2e1e1;
+}
+
+.filter-sidebar.show {
+    right: 0;
+}
+
+.filter-sidebar-content {
+    padding: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .filter-sidebar {
+        width: 100%;
+        right: -100%;
     }
+}
 
-    .filter-sidebar.show {
-        right: 0;
-    }
-
-
-    .filter-sidebar-content {
-        padding: 20px;
-    }
-
-   
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        .filter-sidebar {
-            width: 100%;
-            right: -100%;
-        }
-    }
-
-
-    /* Custom Nav Tabs Styling */
+/* Custom Nav Tabs Styling */
 .nav-tabs {
     border-bottom: 0.1px solid var(--body-color);
     margin-bottom: 20px;
@@ -170,7 +167,7 @@ table tr {
 }
 
 .nav-tabs .nav-link.active::after {
-    content: '';
+    content: "";
     position: absolute;
     left: 0;
     bottom: -2px;
@@ -216,14 +213,9 @@ table tr {
     }
 }
 
-
-
-.select2
-{
+.select2 {
     width: 100% !important;
 }
-
-
 
 /* Select2 Styling Integrated with Custom Dark Theme */
 .select2-container .select2-selection {
@@ -238,11 +230,12 @@ table tr {
     box-shadow: 0 0 0 0.25rem rgba(103, 61, 230, 0.25);
 }
 
-.select2-selection__rendered{
+.select2-selection__rendered {
     color: var(--body-color) !important;
 }
 
-.select2-container--default .select2-results__option--highlighted[aria-selected]{
+.select2-container--default
+    .select2-results__option--highlighted[aria-selected] {
     background-color: var(--primary-color);
 }
 .select2-dropdown {
@@ -312,10 +305,10 @@ table tr {
     border-radius: 4px;
 }
 
-.select2-container--default.select2-container--disabled .select2-selection--single{
+.select2-container--default.select2-container--disabled
+    .select2-selection--single {
     background-color: var(--body-bg);
 }
-
 
 /* Increase row height */
 .table > tbody > tr > td,
@@ -324,30 +317,29 @@ table tr {
 .table > tfoot > tr > th,
 .table > thead > tr > td,
 .table > thead > tr > th {
-  /* padding-top: 1.25rem; */
-  padding-bottom: .75rem;
-  border:0px;
+    /* padding-top: 1.25rem; */
+    padding-bottom: 0.75rem;
+    border: 0px;
 }
 
 /* Apply minimum column widths */
 .table th,
 .table td {
-  /* min-width: 150px; */
-} 
+    /* min-width: 150px; */
+}
 
 /* Odd/even row hover effect */
 .table tbody tr:nth-child(odd):hover {
-  background-color: var(--body-bg);
+    background-color: var(--body-bg);
 }
 
 .table tbody tr:nth-child(even):hover {
-  background-color: var(--body-bg);
+    background-color: var(--body-bg);
 }
-
 
 .table-bg {
     background-color: var(--card-bg);
-    padding:20px 0px;
+    padding: 20px 0px;
     border-radius: 10px;
     -webkit-border-radius: 10px;
     -moz-border-radius: 10px;
@@ -367,24 +359,25 @@ table tr {
     -o-transition: all 0.3s ease;
 }
 .dt-link::after {
-    content: '\f35d'; /* Unicode for link icon in Font Awesome */
+    content: "\f35d"; /* Unicode for link icon in Font Awesome */
     font-weight: 900; /* For solid icons */
-    font-family: 'Font Awesome 5 Free';
+    font-family: "Font Awesome 5 Free";
     margin-left: 5px;
     display: inline-block;
     color: var(--primary-color);
 }
 
-.dt-link:hover{
+.dt-link:hover {
     color: var(--secondary-color);
 }
 
-.form-control:disabled, .form-control[readonly] {
-     background-color: var(--body-bg);
-  
+.form-control:disabled,
+.form-control[readonly] {
+    background-color: var(--body-bg);
 }
 
-.form-control:disabled, .form-control[disabled] {
+.form-control:disabled,
+.form-control[disabled] {
     background-color: rgba(103, 61, 230, 0.25);
 }
 
@@ -397,14 +390,14 @@ ul.pagination {
     padding: 0;
     margin: 1rem 0;
     gap: 8px;
-  }
-  
-  /* Pagination Items */
-  ul.pagination .page-item {
+}
+
+/* Pagination Items */
+ul.pagination .page-item {
     display: inline-block;
-  }
-  
-  ul.pagination .page-link {
+}
+
+ul.pagination .page-link {
     display: inline-flex;
     justify-content: center;
     align-items: center;
@@ -417,62 +410,61 @@ ul.pagination {
     border-radius: 4px;
     transition: all 0.3s ease;
     cursor: pointer;
-  }
-  
-  /* Hover Effect */
-  ul.pagination .page-link:hover {
+}
+
+/* Hover Effect */
+ul.pagination .page-link:hover {
     background-color: var(--primary-hover);
     color: #fff;
     border-color: var(--primary-hover);
-  }
-  
-  /* Active Page Styling */
-  ul.pagination .page-item.active .page-link {
+}
+
+/* Active Page Styling */
+ul.pagination .page-item.active .page-link {
     background-color: var(--primary-color);
     color: #fff;
     border-color: var(--primary-color);
     cursor: default;
-  }
-  
-  /* Disabled Buttons */
-  ul.pagination .page-item.disabled .page-link {
+}
+
+/* Disabled Buttons */
+ul.pagination .page-item.disabled .page-link {
     cursor: not-allowed;
     color: var(--neutral-gray);
     background-color: var(--input-bg);
     border-color: var(--input-border);
-  }
-  
-  /* Light Mode Overrides */
-  :root ul.pagination .page-link {
+}
+
+/* Light Mode Overrides */
+:root ul.pagination .page-link {
     color: var(--body-color);
     background-color: var(--card-bg);
     border-color: var(--border-color);
-  }
-  
-  /* Dark Mode Overrides */
-  [data-bs-theme="dark"] ul.pagination .page-link {
+}
+
+/* Dark Mode Overrides */
+[data-bs-theme="dark"] ul.pagination .page-link {
     color: var(--body-color);
     background-color: var(--card-bg);
     border-color: var(--border-color);
-  }
-  
-  [data-bs-theme="dark"] ul.pagination .page-link:hover {
+}
+
+[data-bs-theme="dark"] ul.pagination .page-link:hover {
     background-color: var(--primary-hover);
     color: #fff;
-  }
-  
-  [data-bs-theme="dark"] ul.pagination .page-item.active .page-link {
+}
+
+[data-bs-theme="dark"] ul.pagination .page-item.active .page-link {
     background-color: var(--primary-color);
     color: #fff;
-  }
-  
-  /* Optional Transitions for Smoothness */
-  ul.pagination {
-    transition: all 0.3s ease;
-  }
-  
+}
 
-  /* General Dropdown Styles */
+/* Optional Transitions for Smoothness */
+ul.pagination {
+    transition: all 0.3s ease;
+}
+
+/* General Dropdown Styles */
 .dropdown-menu {
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
@@ -482,10 +474,10 @@ ul.pagination {
     padding: 0.5rem 0;
     overflow: hidden;
     transition: all 0.3s ease;
-  }
-  
-  /* Dropdown Item Styles */
-  .dropdown-item {
+}
+
+/* Dropdown Item Styles */
+.dropdown-item {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -497,24 +489,24 @@ ul.pagination {
     background-color: transparent;
     border: none;
     transition: all 0.3s ease;
-  }
-  
-  /* Dropdown Item Hover State */
-  .dropdown-item:hover {
+}
+
+/* Dropdown Item Hover State */
+.dropdown-item:hover {
     background-color: var(--primary-hover);
     color: #fff;
-  }
-  
-  /* Dropdown Separator */
-  .dropdown-menu .dropdown-divider {
+}
+
+/* Dropdown Separator */
+.dropdown-menu .dropdown-divider {
     height: 1px;
     margin: 0.5rem 0;
     background-color: var(--border-color);
     border: none;
-  }
-  
-  /* Dropdown Toggle Button */
-  .dropdown-toggle {
+}
+
+/* Dropdown Toggle Button */
+.dropdown-toggle {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -526,28 +518,28 @@ ul.pagination {
     border-radius: 4px;
     padding: 0.6rem 1rem;
     transition: all 0.3s ease;
-  }
-  
-  .dropdown-toggle:hover {
+}
+
+.dropdown-toggle:hover {
     /* background-color: var(--primary-color); */
     color: #fff !important;
     /* border-color: var(--primary-color); */
-  }
-  
-  /* Active Dropdown Item */
-  .dropdown-item.active,
-  .dropdown-item:active {
+}
+
+/* Active Dropdown Item */
+.dropdown-item.active,
+.dropdown-item:active {
     background-color: var(--primary-color);
     color: #fff;
-  }
-  
-  /* Optional: Additional Hover Animation */
-  .dropdown-menu.show {
+}
+
+/* Optional: Additional Hover Animation */
+.dropdown-menu.show {
     opacity: 1;
     transform: translateY(0);
-  }
-  
-  .dropdown-menu {
+}
+
+.dropdown-menu {
     opacity: 0;
     transform: translateX(-10px);
     -webkit-transform: translateX(-10px);
@@ -555,14 +547,14 @@ ul.pagination {
     -ms-transform: translateX(-10px);
     -o-transform: translateX(-10px);
 }
-  
-  /* Mobile-Friendly Adjustments */
-  @media (max-width: 768px) {
+
+/* Mobile-Friendly Adjustments */
+@media (max-width: 768px) {
     .dropdown-menu {
-      min-width: 100%;
+        min-width: 100%;
     }
-  }
-  
+}
+
 /* General Toast Styling */
 .custom-toast {
     border-radius: 0.5rem;
@@ -616,14 +608,24 @@ ul.pagination {
     z-index: 1055;
 }
 
-
-
 .gateway_logo_img {
     height: 50px;
     width: 150px;
 }
 
-.select2-container--default .select2-selection--multiple .select2-selection__choice{
+.select2-container--default
+    .select2-selection--multiple
+    .select2-selection__choice {
     background-color: transparent !important;
+}
+
+table.celled {
+    table-layout: fixed !important;
+    word-wrap: break-word;
+}
+
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
 }
 

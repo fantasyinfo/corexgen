@@ -15,27 +15,76 @@
 
 
                 @if (hasPermission('USERS.READ_ALL') || hasPermission('USERS.READ'))
-                    <div class="table-responsive table-bg">
 
-                        <table id="userTable" class="table table-striped table-bordered ui celled">
-                            <thead>
-                                <tr>
-                                    <th><input type="checkbox" id="select-all" /></th>
-                                    <th> {{ __('users.Name') }}</th>
-                                    <th>{{ __('users.Email') }}</th>
-                                    <th>{{ __('users.Role') }}</th>
-                                    <th>{{ __('crud.Status') }}</th>
-                                    <th>{{ __('crud.Created At') }}</th>
-                                    <th class="text-end">{{ __('crud.Actions') }}</th>
-                                </tr>
+                @php
 
-                            </thead>
-                            <tbody></tbody>
-                        </table>
+                $columns = [
+                    [
+                        'data' => null,
+                        'label' => new \Illuminate\Support\HtmlString('<input type="checkbox" id="select-all" />'),
+                        'orderable' => false,
+                        'searchable' => false,
+                        'width' => '10px',
+                        'render' => 'function(data, type, row) {
+                            return `<input type="checkbox" class="bulk-select" data-id="${row.id}" />`;
+                        }',
+                    ],
+                    [
+                        'data' => 'name',
+                        'name' => 'name',
+                        'label' => __('users.Name'),
+                        'searchable' => true,
+                        'orderable' => true,
+                        'width' => '150px',
+                    ],
+                    [
+                        'data' => 'email',
+                        'name' => 'email',
+                        'label' => __('users.Email'),
+                        'searchable' => true,
+                        'orderable' => true,
+                        'width' => '100px',
+                    ],
+                    [
+                        'data' => 'role.role_name',
+                        'name' => 'role.role_name',
+                        'label' => __('users.Role'),
+                        'searchable' => false,
+                        'orderable' => false,
+                        'width' => '150px',
+                    ],
+                    
+                    [
+                        'data' => 'status',
+                        'name' => 'status',
+                        'label' => __('crud.Status'),
+                        'searchable' => false,
+                        'orderable' => true,
+                        'width' => '100px',
+                    ],
+                    [
+                        'data' => 'created_at',
+                        'name' => 'created_at',
+                        'label' => __('crud.Created At'),
+                        'searchable' => true,
+                        'orderable' => true,
+                        'width' => '100px',
+                    ],
+                    [
+                        'data' => 'actions',
+                        'name' => 'actions',
+                        'label' => __('crud.Actions'),
+                        'orderable' => false,
+                        'searchable' => false,
+                        'width' => '100px',
+                    ],
+                ];
+            @endphp
 
+            <x-data-table id="usersTable" :columns="$columns" :ajax-url="route(getPanelRoutes($module . '.index'))" :is-checkbox="true"
+                :bulk-delete-url="route(getPanelRoutes($module . '.bulkDelete'))" :csrf-token="csrf_token()" />
 
-
-                    </div>
+            
                 @else
                     {{-- no permissions to view --}}
                     <div class="no-data-found">
@@ -57,160 +106,7 @@
 
 @push('scripts')
     <script type="text/javascript">
-        $(document).ready(function() {
-            const nameFilter = $('#nameFilter');
-            const emailFilter = $('#emailFilter');
-            const roleFilter = $('#roleFilter');
-            const statusFilter = $('#statusFilter');
-            const startDateFilter = $('#startDateFilter');
-            const endDateFilter = $('#endDateFilter');
-
-            const dbTableAjax = $("#userTable").DataTable({
-                processing: true,
-                serverSide: true,
-                stateSave: true,
-                responsive: true,
-                lengthMenu: [
-                    [10, 25, 50, -1],
-                    [10, 25, 50, "All"]
-                ],
-                language: {
-                    "lengthMenu": "_MENU_ per page",
-                },
-                ajax: {
-                    url: "{{ route(getPanelRoutes($module . '.index')) }}",
-                    data: function(d) {
-                        d.name = nameFilter.val();
-                        d.email = emailFilter.val();
-                        d.status = statusFilter.val();
-                        d.role_id = roleFilter.val();
-                        d.start_date = startDateFilter.val();
-                        d.end_date = endDateFilter.val();
-                    },
-                },
-                columns: [{
-                        data: null,
-                        orderable: false,
-                        searchable: false,
-                        width: '10px',
-                        render: function(data, type, row) {
-                            return `<input type="checkbox" class="bulk-select" data-id="${row.id}" />`;
-                        },
-                    },
-                    {
-                        data: 'name',
-                        name: 'name',
-                        searchable: true,
-                        orderable: true
-                    },
-                    {
-                        data: 'email',
-                        name: 'email',
-                        searchable: true,
-                        orderable: true
-                    },
-                    {
-                        data: 'role_name',
-                        name: 'role_name',
-                        searchable: false,
-                        orderable: true
-                    },
-                    {
-                        data: 'status',
-                        name: 'status',
-                        searchable: false,
-                        orderable: true
-                    },
-                    {
-                        data: 'created_at',
-                        name: 'created_at',
-                        searchable: true,
-                        orderable: true
-                    },
-                    {
-                        data: 'actions',
-                        name: 'actions',
-                        orderable: false,
-                        searchable: false
-                    },
-                ],
-            });
-
-            // Clear Filter Button
-            $('#clearFilter').on('click', function() {
-                nameFilter.val('');
-                emailFilter.val('');
-                roleFilter.val('');
-                statusFilter.val('');
-                startDateFilter.val('');
-                endDateFilter.val('');
-                dbTableAjax.ajax.reload();
-            });
-
-            // Filter Button
-            $('#filterBtn').click(function() {
-                dbTableAjax.ajax.reload();
-                const filterSidebar = document.getElementById('filterSidebar');
-                filterSidebar.classList.remove('show');
-            });
-
-            // "Select All" functionality
-            $('#select-all').on('click', function() {
-                let isChecked = $(this).is(':checked');
-                $('.bulk-select').prop('checked', isChecked);
-            });
-
-   
-            // bulk delete btn
-            $('#bulk-delete-btn').on('click', function() {
-                let selectedIds = [];
-                $('.bulk-select:checked').each(function() {
-                    selectedIds.push($(this).data('id'));
-                });
-
-                if (selectedIds.length > 0) {
-                    // Show the custom confirmation modal
-                    $('#bulkDeleteModal').modal('show');
-
-                    // Attach the event to the confirm button in the modal
-                    $('#confirmDeleteBtn').off('click').on('click', function() {
-                        $.ajax({
-                            url: "{{ route(getPanelRoutes($module . '.bulkDelete')) }}",
-                            method: "POST",
-                            data: {
-                                ids: selectedIds,
-                                _token: '{{ csrf_token() }}' // CSRF token for security
-                            },
-                            success: function(response) {
-                                // Hide the confirmation modal
-                                $('#bulkDeleteModal').modal('hide');
-
-                                // Show the success modal with the response message
-                                $('#successModal .modal-body').text(response
-                                    .message);
-                                $('#successModal').modal('show');
-
-                                // Reload the DataTable
-                                dbTableAjax.ajax.reload();
-                            },
-                            error: function(error) {
-                                // Handle errors (optional)
-                                $('#bulkDeleteModal').modal('hide');
-                                alert(
-                                    'An error occurred while deleting items.');
-                            }
-                        });
-                    });
-                } else {
-                    // No items selected
-                    $('#alertModal .modal-body').text('No items selected for deletion.');
-                    $('#alertModal').modal('show');
-                }
-            });
-
-        });
-
-
+     
         // change password
         $(document).ready(function() {
 

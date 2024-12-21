@@ -25,6 +25,7 @@ return new class extends Migration
             $table->enum('status', CRM_STATUS_TYPES['SUBSCRIPTION']['TABLE_STATUS'])->default(CRM_STATUS_TYPES['SUBSCRIPTION']['STATUS']['ACTIVE']);
 
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('plan_id')->references('id')->on('plans')->onDelete('cascade');
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');

@@ -17,5 +17,23 @@
         "titleBar.activeForeground": "#e7e7e7",
         "titleBar.inactiveBackground": "#0000ff99",
         "titleBar.inactiveForeground": "#e7e7e799"
-    }
+    },
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "corexgen",
+            "group": "corexgen",
+            "database": "core_x_gen_mac",
+            "username": "root",
+            "connectionTimeout": 30,
+            "password": ""
+        }
+    ]
 }

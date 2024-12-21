@@ -3,9 +3,11 @@
 namespace App\Services;
 
 use App\Helpers\PermissionsHelper;
+use App\Models\Company;
 use App\Repositories\PlansPaymentTransactionsRepository;
 use App\Traits\TenantFilter;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\View;
 
@@ -29,9 +31,10 @@ class PlansPaymentTransactionsService
 
         $this->tenantRoute = $this->getTenantRoute();
 
-        $query = $this->plansPaymentTransactionRepository->getTrnasactionQuery($request);
+        $query = $this->plansPaymentTransactionRepository->getTransactionQuery($request);
 
-        //  dd($query->toArray());
+       // dd($query->get()->toArray());
+
 
         $module = PANEL_MODULES[$this->getPanelModule()]['planPaymentTransaction'];
         $cmodule = PANEL_MODULES[$this->getPanelModule()]['companies'];
@@ -47,28 +50,18 @@ class PlansPaymentTransactionsService
                 return Carbon::parse($ppT->transaction_date)->format('d M Y');
             })
             ->editColumn('name', function ($ppT) use ($cmodule) {
-                return "<a class='dt-link' href='" . route($this->tenantRoute . $cmodule . '.view', $ppT->company->id) . "' target='_blank'>"
-                    . $ppT->company->name . "</a>";
+                if(isset($ppT?->company) && isset($ppT?->company?->name)){
+                    return "<a class='dt-link' href='" . route($this->tenantRoute . $cmodule . '.view', $ppT?->company?->id) . "' target='_blank'>"
+                    . $ppT?->company?->name . "</a>";
+                }else {
+                    return '';
+                }
+   
             })
-            // ->editColumn('status', function ($ppT) {
-            //     return $this->renderStatusColumn($ppT);
-            // })
-            ->editColumn('plan_name', function ($ppT) {
-                return $ppT->plans->name;
-            })
-            ->editColumn('amount', function ($ppT) {
-                return $ppT->amount;
-            })
-            ->editColumn('currecny', function ($ppT) {
-                return $ppT->currency;
-            })
-            ->editColumn('payment_gateway', function ($ppT) {
-                return $ppT->payment_gateway;
-            })
-            ->editColumn('start_date', function ($ppT) {
+            ->editColumn('subscription.start_date', function ($ppT) {
                 return Carbon::parse($ppT->subscription->start_date)->format('d M Y');
             })
-            ->rawColumns(['plan_name', 'start_date', 'status', 'name']) // Add 'status' to raw columns
+            ->rawColumns([  'name','subscription.start_date','created_at','transaction_date']) // Add 'status' to raw columns
             ->make(true);
     }
 
@@ -94,29 +87,18 @@ class PlansPaymentTransactionsService
             ->editColumn('end_date', function ($ppT) {
                 return Carbon::parse($ppT->end_date)->format('d M Y');
             })
+            ->editColumn('next_billing_date', function ($ppT) {
+                return Carbon::parse($ppT->next_billing_date)->format('d M Y');
+            })
             ->editColumn('upgrade_date', function ($ppT) {
+                if($ppT->upgrade_date == null) return;
                 return Carbon::parse($ppT->upgrade_date)->format('d M Y');
             })
             ->editColumn('name', function ($ppT) use ($cmodule) {
                 return "<a class='dt-link' href='" . route($this->tenantRoute . $cmodule . '.view', $ppT->company->id) . "' target='_blank'>"
                     . $ppT->company->name . "</a>";
             })
-            ->editColumn('plan_name', function ($ppT) {
-                return $ppT->plans->name;
-            })
-            ->editColumn('amount', function ($ppT) {
-                return $ppT->payment_transaction->amount;
-            })
-            ->editColumn('currency', function ($ppT) {
-                return $ppT->payment_transaction->currency;
-            })
-            ->editColumn('payment_type', function ($ppT) {
-                return $ppT->payment_transaction->payment_type;
-            })
-            ->editColumn('payment_gateway', function ($ppT) {
-                return $ppT->payment_transaction->payment_gateway;
-            })
-            ->rawColumns(['plan_name', 'start_date', 'end_date', 'upgrade_date', 'status', 'name'])
+            ->rawColumns([ 'start_date', 'end_date', 'upgrade_date','next_billing_date', 'status', 'name'])
             ->make(true);
     }
 

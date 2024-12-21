@@ -8,6 +8,7 @@
 
 <!-- datatables js -->
 <script src="{{asset('js/datatables/datatables.min.js')}}"></script>
+<script src="{{asset('js/datatables/datatable-config.js')}}"></script>
 
 
 

@@ -21,7 +21,7 @@
                         {{ __('companies.Company Name') }}
                     </x-form-components.input-label>
 
-                    <x-form-components.input-group type="text" name="cname" id="nameFilter"
+                    <x-form-components.input-group type="text" data-filter="name" name="name" id="nameFilter"
                     placeholder="{{ __('Enter Company Name') }}" value="{{ request('name') }}"
                     required class="custom-class" />
                   
@@ -34,7 +34,7 @@
                         {{ __('companies.Email') }}
                     </x-form-components.input-label>
               
-                    <x-form-components.input-group type="email" name="email" id="emailFilter"
+                    <x-form-components.input-group type="email" data-filter="email"  name="email" id="emailFilter"
                     placeholder="{{ __('Enter Company Email') }}" value="{{ request('email') }}"
                     required class="custom-class" />
 
@@ -49,7 +49,7 @@
                   
                     <select id="plansFilter"
                         class="form-control searchSelectBox  @error('plans') is-invalid @enderror"
-                        name="plans" id="plans">
+                        name="plans" id="plans" data-filter="plans" >
                         <option selected value="0">Select Plans</option>
                         @if ($plans && $plans->isNotEmpty())
                             @foreach ($plans as $plan)
@@ -71,7 +71,7 @@
                         {{ __('companies.All Statuses') }}
                     </x-form-components.input-label>
                  
-                    <select name="status" class="form-select" id="statusFilter">
+                    <select name="status" class="form-select" id="statusFilter" data-filter="status" >
                         <option selected value="0">Select Status</option>
                         <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>
                             {{ __('Active') }}
