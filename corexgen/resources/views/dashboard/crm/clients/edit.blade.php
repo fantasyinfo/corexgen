@@ -152,6 +152,9 @@
                                             </select>
                                         </div>
                                     </div>
+                                    <hr>
+                                    <p class="alert alert-secondary"><i class="fas fa-info-circle me-2 "></i>
+                                        Please add / update <span class="text-success">Contact Details</span> on contact details tabs.</p>
                                 </div>
 
                                 <!-- Contact Details Tab -->
@@ -171,6 +174,7 @@
                                                         <i class="fas fa-plus"></i>
                                                     </button>
                                                 </div>
+                                                <p class="px-2 font-12 my-2 text-secondary">First email will be primary email for this client.</p>
                                             </div>
                                         </div>
                                     </div>
@@ -190,6 +194,7 @@
                                                         <i class="fas fa-plus"></i>
                                                     </button>
                                                 </div>
+                                                <p class="px-2 font-12 my-2 text-secondary">First phone number will be primary phone number for this client.</p>
                                             </div>
                                         </div>
                                     </div>
@@ -258,6 +263,9 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <hr>
+                                    <p class="alert alert-secondary"><i class="fas fa-info-circle me-2 "></i>
+                                        Please add / update <span class="text-success">Address Details</span> on address tabs.</p>
                                 </div>
 
                                 <!-- Address Tab -->
@@ -338,6 +346,9 @@
                                             <i class="fas fa-plus"></i> Add Another Address
                                         </button>
                                     </div>
+                                       <hr>
+                                    <p class="alert alert-secondary"><i class="fas fa-info-circle me-2 "></i>
+                                        Please add / update <span class="text-success">Additional Details</span> on additional details tabs.</p>
                                 </div>
 
                                 <!-- Additional Information Tab -->
@@ -352,10 +363,15 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <select name="tags[]" id="tags" class="form-select" multiple>
-                                                <!-- Add your tag options here -->
-                                            </select>
+                                                @foreach($client->tags  as $tag)
+                                                    <option value="{{ $tag }}" {{ in_array($tag, old('tags', $client->tags ?? [])) ? 'selected' : '' }}>
+                                                        {{ $tag }}
+                                                    </option>
+                                                @endforeach
                                             </select>
                                         </div>
+                                        
+                                        
                                     </div>
 
                                     <div class="row mb-4">

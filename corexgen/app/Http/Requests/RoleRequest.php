@@ -45,7 +45,7 @@ class RoleRequest extends FormRequest
                         }
                     }),
             ],
-            'role_desc' => 'nullable|string|max:1000',
+            'role_desc' => 'nullable|string|max:255',
         ];
     }
     
@@ -55,7 +55,7 @@ class RoleRequest extends FormRequest
         return [
             'role_name' => 'Please add role name',
             'role_name.unique' => 'The role name has already been taken.',
-            'role_desc' => 'Please enter only 1000 characters for role desc.'
+            'role_desc' => 'Please enter only 255 max characters for role desc.'
         ];
     }
 }

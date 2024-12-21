@@ -351,34 +351,7 @@ class UserController extends Controller
                     'import_type' => 'Users'
                 ]
             );
-            // foreach ($data as $row) {
-            //     $row = array_combine($header, $row);
-
-            //     // Skip if email already exists
-            //     if (User::where('email', $row['email'])->exists()) {
-            //         continue;
-            //     }
-
-            //     // Check if role_id exists in crm_roles table
-            //     $roleExists = $row['role_id'] && DB::table('crm_roles')->where('id', $row['role_id'])->exists();
-
-            //     if (!$roleExists) {
-            //         // Skip this row if the role doesn't exist
-            //         continue;
-            //     }
-
-            //     User::create([
-            //         'name' => $row['name'] ?? '',
-            //         'email' => $row['email'] ?? '',
-            //         'password' => Hash::make($row['password']) ?? '',
-            //         'role_id' => $row['role_id'] ?? '',
-            //         'company_id' => Auth::user()->company_id
-
-            //     ]);
-
-            //     $totalAdd++;
-
-            // }
+            
             return response()->json([
                 'success' => true,
                 'message' => 'CSV file uploaded successfully. Processing will happen in the background.',

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Jobs;
 
 use App\Models\ImportHistory;
@@ -31,7 +32,6 @@ class CsvImportJob implements ShouldQueue
 
     public function handle()
     {
-        // Create import history record
         $this->importHistory = ImportHistory::create([
             'company_id' => $this->userContext['company_id'] ?? null,
             'user_id' => $this->userContext['user_id'] ?? null,
@@ -46,7 +46,7 @@ class CsvImportJob implements ShouldQueue
             'file' => $this->filePath,
             'processor' => $this->processorClass,
             'context' => $this->userContext,
-            'import_id' => $this->importHistory->id
+            'import_id' => $this->importHistory->id,
         ]);
 
         try {
@@ -54,25 +54,17 @@ class CsvImportJob implements ShouldQueue
                 throw new \Exception("Unable to read the uploaded file: {$this->filePath}");
             }
 
-            // Read and process file
             $fileContents = file_get_contents($this->filePath);
-            $fileContents = str_replace(["\r\n", "\r"], "\n", $fileContents);
-            $rows = explode("\n", $fileContents);
+            $rows = explode("\n", str_replace(["\r\n", "\r"], "\n", $fileContents));
 
-            $data = array_map(function ($row) {
-                return str_getcsv($row, ',', '"', '\\');
-            }, array_filter($rows));
-
+            $data = array_map(fn($row) => str_getcsv($row, ',', '"', '\\'), array_filter($rows));
+            $header = array_map('trim', array_shift($data));
+            
             if (empty($data)) {
                 throw new \Exception("CSV file is empty");
             }
 
-            $header = array_map('trim', array_shift($data));
-
-            // Update total rows count
-            $this->importHistory->update([
-                'total_rows' => count($data)
-            ]);
+            $this->importHistory->update(['total_rows' => count($data)]);
 
             if ($this->headerValidation) {
                 $expectedHeaders = array_map('trim', $this->headerValidation);
@@ -88,31 +80,29 @@ class CsvImportJob implements ShouldQueue
             foreach ($data as $index => $row) {
                 $rowNumber = $index + 2;
 
-                if (empty(array_filter($row))) {
-                    continue;
-                }
-
                 $row = array_pad($row, count($header), null);
                 $rowData = array_combine($header, $row);
 
-                $rowData = array_map(function ($value) {
-                    $trimmed = trim($value ?? '');
-                    return $trimmed === '' ? null : $trimmed;
-                }, $rowData);
+                $rowData = array_map(fn($value) => trim($value) ?: null, $rowData);
 
                 $validator = Validator::make($rowData, $this->rules);
 
                 if ($validator->fails()) {
+                    $errors = $validator->errors()->all();
+                    info('Row skipped due to validation errors', [
+                        'row_number' => $rowNumber,
+                        'errors' => $errors,
+                    ]);
+
                     $skippedRows[] = [
                         'row' => $rowNumber,
-                        'errors' => $validator->errors()->all(),
+                        'errors' => $errors,
                     ];
                     continue;
                 }
 
                 try {
-                    $result = $processor->processRow($rowData, $this->userContext);
-                    if ($result) {
+                    if ($processor->processRow($rowData, $this->userContext)) {
                         $successfulCount++;
                     } else {
                         $skippedRows[] = [
@@ -121,49 +111,44 @@ class CsvImportJob implements ShouldQueue
                         ];
                     }
                 } catch (\Exception $e) {
+                    info('Row skipped due to processing error', [
+                        'row_number' => $rowNumber,
+                        'error' => $e->getMessage(),
+                    ]);
+
                     $skippedRows[] = [
                         'row' => $rowNumber,
                         'errors' => ['Processing error: ' . $e->getMessage()],
                     ];
                 }
-
-                // Update progress
-                $this->importHistory->update([
-                    'processed_rows' => $index + 1,
-                    'successful_rows' => $successfulCount,
-                    'failed_rows' => count($skippedRows),
-                    'failed_rows_details' => $skippedRows
-                ]);
             }
 
-            // Mark as completed
             $this->importHistory->update([
                 'status' => 'completed',
-                'completed_at' => now()
+                'successful_rows' => $successfulCount,
+                'failed_rows' => count($skippedRows),
+                'failed_rows_details' => json_encode($skippedRows),
+                'completed_at' => now(),
             ]);
-
         } catch (\Exception $e) {
-            // Update import history with error
             $this->importHistory->update([
                 'status' => 'failed',
                 'error_message' => $e->getMessage(),
-                'completed_at' => now()
+                'completed_at' => now(),
             ]);
 
             throw $e;
         } finally {
-            // Clean up the file
             if (file_exists($this->filePath)) {
                 unlink($this->filePath);
                 info('Cleaned up CSV file', ['file' => $this->filePath]);
             }
+
+            info('CSV Import Completed', [
+                'import_id' => $this->importHistory->id,
+                'successful' => $successfulCount,
+                'skipped' => count($skippedRows),
+            ]);
         }
-
-        info('CSV Import Completed', [
-            'import_id' => $this->importHistory->id,
-            'successful' => $successfulCount,
-            'skipped' => count($skippedRows)
-        ]);
     }
-
 }
