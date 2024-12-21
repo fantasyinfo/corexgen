@@ -40,8 +40,12 @@ class ClientRequest extends FormRequest
             'email' => ['required', 'array', 'min:1'],
             'email.*' => ['required', 'email', 'max:255', 'distinct'],
 
+            'email.0' => ['required', 'email', 'max:255', Rule::unique('clients', 'primary_email')],
+
             'phone' => ['nullable', 'array'],
             'phone.*' => ['required', 'string', 'max:20', 'distinct'],
+
+            'phone.0' => ['required', 'string', 'max:255', Rule::unique('clients', 'primary_phone')],
 
             // Social Media
             'social_media' => ['nullable', 'array'],
@@ -80,8 +84,13 @@ class ClientRequest extends FormRequest
             'email.*.email' => 'Please enter a valid email address',
             'email.*.distinct' => 'Duplicate email addresses are not allowed',
 
+        
+            'email.0.unique' => 'The first email address is already associated with another client.',
+
             'phone.required' => 'At least one phone number is required',
             'phone.*.distinct' => 'Duplicate phone numbers are not allowed',
+
+            'phone.0.unique' => 'The first phone number is already associated with another client.',
 
             // Social Media Messages
 

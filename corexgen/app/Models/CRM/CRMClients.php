@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use OwenIt\Auditing\Contracts\Auditable;
+use Illuminate\Support\Str;
 
 class CRMClients extends Model implements Auditable
 {
@@ -74,7 +75,7 @@ class CRMClients extends Model implements Auditable
         static::creating(function ($client) {
             // Set default values using null coalescing
             $client->status = $client->status ?? CRM_STATUS_TYPES['CLIENTS']['STATUS']['ACTIVE'];
-
+            $client->uuid = (string) Str::uuid();
             if (Auth::check()) {
                 $client->company_id = $client->company_id ?? Auth::user()->company_id;
                 $client->created_by = $client->created_by ?? Auth::id();
@@ -84,6 +85,15 @@ class CRMClients extends Model implements Auditable
                 $client->company_id = $client->company_id ?? null;
                 $client->created_by = $client->created_by ?? null;
                 $client->updated_by = $client->updated_by ?? null;
+            }
+        });
+
+        static::saving(function ($client) {
+            if (is_array($client->email) && count($client->email) > 0) {
+                $client->primary_email = $client->email[0];
+            }
+            if (is_array($client->phone) && count($client->phone) > 0) {
+                $client->primary_phone = $client->phone[0];
             }
         });
     }
