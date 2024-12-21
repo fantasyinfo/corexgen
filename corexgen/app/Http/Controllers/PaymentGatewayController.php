@@ -220,4 +220,24 @@ class PaymentGatewayController extends Controller
                 ->with('error', 'An error occurred while updating the gateway: ' . $e->getMessage());
         }
     }
+
+       /**
+     * Chaning the status 
+     * 
+     * @param int $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function changeStatus($id, $status)
+    {
+        try {
+            // Apply tenant filtering and find role
+            $query = PaymentGateway::query()->where('id', $id);
+            $query->update(['status' => $status]);
+            // Redirect with success message
+            return redirect()->back()->with('success', 'Gateway status changed successfully.');
+        } catch (\Exception $e) {
+            // Handle any status change errors
+            return redirect()->back()->with('error', 'Failed to change the Gateway status: ' . $e->getMessage());
+        }
+    }
 }

@@ -16,7 +16,7 @@
                         {{ __('crm_role.Role Name') }}
                     </x-form-components.input-label>
 
-                    <x-form-components.input-group type="text" name="name" id="nameFilter"
+                    <x-form-components.input-group type="text" name="name" id="nameFilter" data-filter="name"
                         placeholder="{{ __('Admin/Manager') }}" value="{{ old('name') }}" class="custom-class" />
 
                 </div>
@@ -28,7 +28,7 @@
                     <x-form-components.input-label for="roleDesc" class="custom-class">
                         {{ __('crm_role.All Statuses') }}
                     </x-form-components.input-label>
-                    <select name="status" class="form-select" id="statusFilter">
+                    <select name="status" class="form-select" id="statusFilter" data-filter="status">
                         <option value="">{{ __('crm_role.All Statuses') }}</option>
                         <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>
                             {{ __('Active') }}

@@ -26,6 +26,7 @@ return new class extends Migration
 
             $table->foreign('plan_id')->references('id')->on('plans')->onDelete('cascade');
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

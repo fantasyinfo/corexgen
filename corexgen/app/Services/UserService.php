@@ -162,6 +162,8 @@ class UserService
     public function getDatatablesResponse($request)
     {
         $query = $this->userRepository->getUsersQuery($request);
+
+   
         $module = PANEL_MODULES[$this->getPanelModule()]['users'];
         $this->tenantRoute = $this->getTenantRoute();
 
@@ -173,11 +175,10 @@ class UserService
                 return "<a class='dt-link' href='" . route($this->tenantRoute . $module . '.view', $user->id) . "' target='_blank'>$user->name</a>";
             })
             ->editColumn('created_at', fn($user) => $user?->created_at ? $user?->created_at->format('d M Y') : '')
-            ->editColumn('role_name', fn($user) => $user->role?->role_name ?? '')
             ->editColumn('status', function ($user) {
                 return $this->renderStatusColumn($user);
             })
-            ->rawColumns(['actions', 'status', 'role_name', 'name'])
+            ->rawColumns(['actions', 'status', 'name'])
             ->make(true);
     }
 

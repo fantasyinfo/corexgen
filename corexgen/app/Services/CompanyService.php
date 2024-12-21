@@ -706,22 +706,16 @@ class CompanyService
             ->editColumn('status', function ($company) {
                 return $this->renderStatusColumn($company);
             })
-            ->editColumn('plan_name', function ($company) {
-                return $company->plan_name;
+            ->editColumn('latestSubscription.start_date', function ($company) {
+                return Carbon::parse($company->latestSubscription->start_date)->format('d M Y');
             })
-            ->editColumn('billing_cycle', function ($company) {
-                return $company->billing_cycle;
+            ->editColumn('latestSubscription.end_date', function ($company) {
+                return Carbon::parse($company->latestSubscription->end_date)->format('d M Y');
             })
-            ->editColumn('start_date', function ($company) {
-                return Carbon::parse($company->start_date)->format('d M Y');
+            ->editColumn('latestSubscription.next_billing_date', function ($company) {
+                return Carbon::parse($company->latestSubscription->next_billing_date)->format('d M Y');
             })
-            ->editColumn('end_date', function ($company) {
-                return Carbon::parse($company->end_date)->format('d M Y');
-            })
-            ->editColumn('next_billing_date', function ($company) {
-                return Carbon::parse($company->next_billing_date)->format('d M Y');
-            })
-            ->rawColumns(['plan_name', 'billing_cycle', 'start_date', 'end_date', 'next_billing_date', 'actions', 'status', 'name']) // Add 'status' to raw columns
+            ->rawColumns([  'actions', 'status', 'name']) // Add 'status' to raw columns
             ->make(true);
     }
 

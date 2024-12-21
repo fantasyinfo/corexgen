@@ -3,27 +3,34 @@
 @section('content')
     <div class="container-fluid">
         <div class="">
-          
+
             @include('layout.components.header-buttons')
             <div class="shadow-sm rounded">
 
                 @if (hasPermission('PERMISSIONS.READ_ALL') || hasPermission('PERMISSIONS.READ'))
-                    <div class="table-responsive  table-bg">
+                    @php
 
-                        <table id="permissionTable" class="table table-striped table-bordered ui celled">
-                            <thead>
-                                <tr>
-                                    <th> {{ __('crm_permissions.Role Name') }}</th>
-                                    <th class="text-end">{{ __('crud.Actions') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                        $columns = [
+                            [
+                                'data' => 'role_name',
+                                'name' => 'role_name',
+                                'label' => __('crm_permissions.Role Name'),
+                                'searchable' => true,
+                                'orderable' => true,
+                                'width' => '150px',
+                            ],
+                            [
+                                'data' => 'actions',
+                                'name' => 'actions',
+                                'label' => __('crud.Actions'),
+                                'orderable' => false,
+                                'searchable' => false,
+                                'width' => '100px',
+                            ],
+                        ];
+                    @endphp
 
-                            </tbody>
-                        </table>
-
-
-                    </div>
+                    <x-data-table id="permissionsTable" :columns="$columns" :ajax-url="route(getPanelRoutes($module . '.index'))" />
                 @else
                     {{-- no permissions to view --}}
                     <div class="no-data-found">
@@ -39,40 +46,4 @@
             </div>
         </div>
     </div>
-
 @endsection
-
-
-
-@push('scripts')
-    <script type="text/javascript">
-        
-        $(document).ready(function() {
-
-  
-
-            const dbTableAjax = $("#permissionTable").DataTable({
-                processing: true,
-                serverSide: true,
-                stateSave: true,
-                 language: {
-                    "lengthMenu": "_MENU_ per page",
-                },
-                ajax: {
-                    url: "{{ route(getPanelRoutes($module . '.index')) }}",
-                },
-                columns: [{
-                        data: 'role_name',
-                        name: 'role_name'
-                    },
-                    {
-                        data: 'actions',
-                        name: 'actions',
-                        orderable: false,
-                        searchable: false
-                    },
-                ],
-            });
-        });
-    </script>
-@endpush
