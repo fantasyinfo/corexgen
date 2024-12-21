@@ -1,3 +1,3 @@
-name,email,password,role_id
-Jhonny,jhonny@gmail.com,secret,8
-Bonny,bonny@gmail.com,pappu,7
+Name,Email,Password,Role,Street Address,City Name,Country ID,Pincode
+Jhonny,jhonny@gmail.com,secret,Account Manager,mera ghar,baraut,1,23222
+Bonny,bonny@gmail.com,pappu,Manager,

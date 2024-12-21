@@ -13,13 +13,16 @@ return new class extends Migration
     {
         Schema::create('clients', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique();
             $table->enum('type', ['Individual', 'Company'])->default('Individual');
             $table->string('title')->nullable();
             $table->string('first_name');
             $table->string('middle_name')->nullable();
             $table->string('last_name');
             $table->json('email')->nullable(); // Multiple emails
+            $table->string('primary_email')->nullable()->unique();
             $table->json('phone')->nullable(); // Multiple phone numbers
+            $table->string('primary_phone')->nullable()->unique();
             $table->json('social_media')->nullable(); // Social media links
             $table->enum('category', CLIENTS_CATEGORY_TYPES['TABLE_STATUS'])->nullable();
             $table->text('details')->nullable(); // WYSIWYG editor content

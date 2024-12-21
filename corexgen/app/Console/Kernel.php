@@ -24,6 +24,7 @@ class Kernel extends ConsoleKernel
 
         // check company subscription 
         $schedule->command('app:subscription-check')->daily();
+        $schedule->command('queue:listen --sleep=3 --tries=3')->everyMinute();
     }
 
     /**

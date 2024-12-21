@@ -168,10 +168,10 @@ class ClientService
             //     return "<a class='dt-link' href='" . route($this->tenantRoute . $module . '.view', $client->id) . "' target='_blank'>$fullName</a>";
             // })
             ->editColumn('email', function ($client) {
-                return isset($client->email[0]) ? $client->email[0] : 'N/A';
+                return isset($client->primary_email) ? $client->primary_email : 'N/A';
             })
             ->editColumn('phone', function ($client) {
-                return isset($client->phone[0]) ? $client->phone[0] : 'N/A';
+                return isset($client->primary_phone) ? $client->primary_phone : 'N/A';
             })
             ->editColumn('address', function ($client) {
                 if (isset($client->addresses[0])) {
