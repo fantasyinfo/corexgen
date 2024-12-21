@@ -9,7 +9,7 @@ use App\Http\Requests\ClientsEditRequest;
 use App\Models\Country;
 use App\Models\CRM\CRMClients;
 use App\Repositories\ClientRepository;
-use App\Services\ClientCSVRowProcessor;
+use App\Services\Csv\ClientsCsvRowProcessor;
 use App\Services\ClientService;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
@@ -113,6 +113,7 @@ class ClientsController extends Controller
     }
     public function create()
     {
+        $this->checkCurrentUsage(strtolower(PermissionsHelper::$plansPermissionsKeys['CLIENTS']));
         $countries = Country::all();
         return view($this->getViewFilePath('create'), [
             'title' => 'Create Client',
@@ -346,11 +347,13 @@ class ClientsController extends Controller
             CsvImportJob::dispatch(
                 $absoluteFilePath,
                 $rules,
-                ClientCSVRowProcessor::class,
+                ClientsCsvRowProcessor::class,
                 $expectedHeaders,
                 [
                     'company_id' => Auth::user()->company_id,
                     'user_id' => Auth::id(),
+                    'is_tenant' => Auth::user()->is_tenant,
+                    'import_type' => 'Clients'
                 ]
             );
 

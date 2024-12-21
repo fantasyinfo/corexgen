@@ -36,7 +36,7 @@ class RoleRequest extends FormRequest
                 Rule::unique('crm_roles')
                     ->ignore($roleId)
                     ->where(function ($query) use ($companyId) {
-                        if ($companyId === null) {
+                        if ($companyId == null) {
                             // If company_id is null (super admin role), check where company_id is NULL in the table
                             $query->whereNull('company_id');
                         } else {

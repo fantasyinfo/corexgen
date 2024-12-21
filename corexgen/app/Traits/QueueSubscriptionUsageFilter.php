@@ -3,34 +3,43 @@ namespace App\Traits;
 
 use App\Models\Subscription;
 use App\Models\SubscriptionUsage;
-use Illuminate\Support\Facades\Auth;
 
-trait SubscriptionUsageFilter
+trait QueueSubscriptionUsageFilter
 {
+    protected $userId;
+    protected $companyId;
+    protected $isTenant;
 
+    /**
+     * Initialize the trait with user data
+     * 
+     * @param array $userData
+     * @return void
+     */
+    public function initializeUsageFilter(array $userData)
+    {
+        $this->userId = $userData['user_id'] ?? null;
+        $this->companyId = $userData['company_id'] ?? null;
+        $this->isTenant = $userData['is_tenant'] ?? false;
+    }
 
     public function checkCurrentUsage($module)
     {
-        if ($this->isTenantUser()) {
+        if ($this->isTenant) {
             return true;
         }
 
-
         $totalAllow = $this->getTotalAllowed($module);
 
-
-
         // fetch current usage
-
-        $currentUsage = $this->getCurrentUsage($this->getCurrentSubscriptionId(),$module);
+        $currentUsage = $this->getCurrentUsage($this->getCurrentSubscriptionId(), $module);
 
         \Log::info('Usage', [
             'currentUsage' => $currentUsage,
             'totalAllow' => $totalAllow,
-            'companyId' => $this->getCompanyId(),
+            'companyId' => $this->companyId,
             'currentSubID' => $this->getCurrentSubscriptionId()
         ]);
-        // check 
 
         // for unlimited
         if ($totalAllow == '-1') {
@@ -38,18 +47,16 @@ trait SubscriptionUsageFilter
         }
 
         if ($currentUsage >= $totalAllow) {
-
-            return abort(redirect()->route(getPanelRoutes('planupgrade.index'))->with('error', 'Please Upgrade the plan, current plan resources exceeds'));
+            // Instead of redirect, throw an exception that can be caught by the queue job
+            throw new \Exception('Subscription limit reached. Please upgrade the plan.');
         }
 
         return true;
-
     }
-
 
     public function updateUsage($module, $sign, $value)
     {
-        if ($this->isTenantUser()) {
+        if ($this->isTenant) {
             return true;
         }
 
@@ -58,49 +65,42 @@ trait SubscriptionUsageFilter
 
         // Find existing usage
         $subUsageFind = SubscriptionUsage::where('subscription_id', $subId)
-            ->where('company_id', $this->getCompanyId())
+            ->where('company_id', $this->companyId)
             ->where('module_name', $module)
             ->first();
 
         if ($subUsageFind) {
-            // Perform mathematical calculation based on sign
             if ($sign === '+') {
                 $newValue = $subUsageFind->value + $value;
             } else {
-                // Ensure value does not go negative
                 if ($subUsageFind->value <= 0) {
-                    return false; // Prevent updating to a negative value
+                    return false;
                 }
-
                 $newValue = max(0, $subUsageFind->value - $value);
             }
 
-            // Update existing record
             $subUsageFind->update([
                 'value' => $newValue
             ]);
-
         } else {
-            // If creating a new record, only allow if the sign is '+'
             if ($sign === '+') {
                 SubscriptionUsage::create([
                     'subscription_id' => $subId,
-                    'company_id' => $this->getCompanyId(),
+                    'company_id' => $this->companyId,
                     'module_name' => $module,
                     'value' => $value
                 ]);
             } else {
-                return false; // Do not create negative records
+                return false;
             }
         }
 
-        return true; // Indicate successful operation
+        return true;
     }
-
 
     private function getTotalAllowed($module)
     {
-        if ($this->isTenantUser()) {
+        if ($this->isTenant) {
             return true;
         }
 
@@ -113,48 +113,33 @@ trait SubscriptionUsageFilter
                 ]);
             }
         ])
-            ->where('company_id', $this->getCompanyId())
+            ->where('company_id', $this->companyId)
             ->latest()
             ->first();
 
-
         return $currentSubscriptionsAllowed->plans->planFeatures[0]->value;
-
-
     }
 
     private function getCurrentSubscriptionId()
     {
-        if (Auth::user()->is_tenant) {
-            return;
+        if ($this->isTenant) {
+            return null;
         }
 
-        $subscription = Subscription::where('company_id', $this->getCompanyId())->latest()->first();
+        $subscription = Subscription::where('company_id', $this->companyId)
+            ->latest()
+            ->first();
 
         return $subscription->id;
     }
 
-    private function getCurrentUsage(int $subId,$module): int
+    private function getCurrentUsage(int $subId, $module): int
     {
-        // Find existing usage
         $subUsageFind = SubscriptionUsage::where('subscription_id', $subId)
-            ->where('company_id', $this->getCompanyId())
+            ->where('company_id', $this->companyId)
             ->where('module_name', $module)
             ->first();
 
-        if ($subUsageFind) {
-            return $subUsageFind->value;
-
-        }
-        return 0;
-    }
-
-    private function isTenantUser()
-    {
-        return Auth::check() && Auth::user()->is_tenant;
-    }
-    private function getCompanyId()
-    {
-        return Auth::check() && Auth::user()->company_id;
+        return $subUsageFind ? $subUsageFind->value : 0;
     }
 }

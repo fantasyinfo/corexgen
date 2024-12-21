@@ -36,7 +36,7 @@ class UserService
             // create address 
             $address = $this->createAddressIfProvided($validatedData);
             // create user
-            $user = $this->registerUser($validatedData,$address?->id);
+            $user = $this->registerUser($validatedData, $address?->id);
 
             //
 
@@ -44,7 +44,8 @@ class UserService
         });
     }
 
-    public function updateUser(array $validatedData){
+    public function updateUser(array $validatedData)
+    {
         return DB::transaction(function () use ($validatedData) {
 
             $query = $this->applyTenantFilter(User::where('id', $validatedData['id']));
@@ -53,24 +54,24 @@ class UserService
             // update address 
             $address = $this->updateUserAddress($user, $validatedData);
             // update user
-            $user->update(array_merge($validatedData,['address_id' => $address?->id]));
+            $user->update(array_merge($validatedData, ['address_id' => $address?->id]));
 
             //
 
             return $user;
-        }); 
+        });
     }
 
-    public function registerUser($validatedData,$address_id = null)
+
+
+    public function registerUser(array $validatedData, $address_id = null, )
     {
-
         $validatedData = array_merge($validatedData, [
-            'is_tenant' => Auth::user()->is_tenant,
+            'is_tenant' => $validatedData['is_tenant'], // Explicitly pass or default this value
             'password' => Hash::make($validatedData['password']),
-            'company_id' => Auth::user()->company_id,
-            'address_id' => $address_id
+            'company_id' => $validatedData['company_id'], // Use provided or fallback
+            'address_id' => $address_id,
         ]);
-
 
         return User::create($validatedData);
     }
@@ -106,8 +107,8 @@ class UserService
     private function updateUserAddress(User $user, array $data): ?Address
     {
 
-        \Log::info('User' , [$user]);
-        \Log::info('Data',[$data]);
+        \Log::info('User', [$user]);
+        \Log::info('Data', [$data]);
         // Check if address fields are provided
         $requiredAddressFields = [
             'address_street_address',
@@ -120,8 +121,8 @@ class UserService
             return null;
         }
 
-        $city = City::where('name',$data['address_city_name'] )->where('country_id', $data['address_country_id'])->first();
-        if(!$city){
+        $city = City::where('name', $data['address_city_name'])->where('country_id', $data['address_country_id'])->first();
+        if (!$city) {
             $city = City::create([
                 'name' => $data['address_city_name'],
                 'country_id' => $data['address_country_id']
@@ -129,7 +130,7 @@ class UserService
         }
         // If company already has an address, update it
         if ($user->address_id) {
-          
+
             $address = Address::findOrFail($user->address_id);
             $address->update([
                 'street_address' => $data['address_street_address'],
@@ -163,7 +164,7 @@ class UserService
     {
         $query = $this->userRepository->getUsersQuery($request);
 
-   
+
         $module = PANEL_MODULES[$this->getPanelModule()]['users'];
         $this->tenantRoute = $this->getTenantRoute();
 

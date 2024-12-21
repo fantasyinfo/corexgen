@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Helpers\PermissionsHelper;
 use App\Http\Requests\UserRequest;
+use App\Jobs\CsvImportJob;
 use App\Models\Country;
 use App\Models\CRM\CRMRole;
 use App\Repositories\UserRepository;
+use App\Services\Csv\UsersCsvRowProcessor;
 use App\Services\UserService;
 use App\Traits\SubscriptionUsageFilter;
 use App\Traits\TenantFilter;
@@ -116,8 +118,11 @@ class UserController extends Controller
 
         try {
 
+            $userData = $request->validated();
+            $userData['company_id'] = Auth::user()->company_id;
+            $userData['is_tenant'] = Auth::user()->is_tenant;
 
-            $userService->createUser($request->validated());
+            $userService->createUser($userData);
 
             // update current usage
             $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['USERS']]), '+', '1');
@@ -305,42 +310,78 @@ class UserController extends Controller
 
         try {
             $file = $request->file('file');
-            $data = array_map('str_getcsv', file($file->getRealPath()));
-            $header = array_shift($data);
+            $filePath = $file->storeAs('csv', uniqid() . '_' . $file->getClientOriginalName()); // Store file in a persistent directory
+            $absoluteFilePath = storage_path('app/' . $filePath); // Get the absolute path
 
-            $totalAdd = 0;
-            foreach ($data as $row) {
-                $row = array_combine($header, $row);
 
-                // Skip if email already exists
-                if (User::where('email', $row['email'])->exists()) {
-                    continue;
-                }
+            $rules = [
+                'Name' => ['required', 'string'],
+                'Email' => ['required', 'email', 'unique:users,email'],
+                'Password' => ['required', 'string'],
+                'Role' => ['required', 'string'],
+                'Street Address' => ['nullable', 'string'],
+                'City Name' => ['nullable', 'string'],
+                'Country ID' => ['nullable', 'exists:countries,id'],
+                'Pincode' => ['nullable', 'string'],
+            ];
 
-                // Check if role_id exists in crm_roles table
-                $roleExists = $row['role_id'] && DB::table('crm_roles')->where('id', $row['role_id'])->exists();
+            // Expected CSV headers
+            $expectedHeaders = [
+                'Name',
+                'Email',
+                'Password',
+                'Role',
+                'Street Address',
+                'City Name',
+                'Country ID',
+                'Pincode'
+            ];
 
-                if (!$roleExists) {
-                    // Skip this row if the role doesn't exist
-                    continue;
-                }
 
-                User::create([
-                    'name' => $row['name'] ?? '',
-                    'email' => $row['email'] ?? '',
-                    'password' => Hash::make($row['password']) ?? '',
-                    'role_id' => $row['role_id'] ?? '',
-                    'company_id' => Auth::user()->company_id
+            // Dispatch the job
+            CsvImportJob::dispatch(
+                $absoluteFilePath,
+                $rules,
+                UsersCsvRowProcessor::class,
+                $expectedHeaders,
+                [
+                    'company_id' => Auth::user()->company_id,
+                    'user_id' => Auth::id(),
+                    'is_tenant' => Auth::user()->is_tenant,
+                    'import_type' => 'Users'
+                ]
+            );
+            // foreach ($data as $row) {
+            //     $row = array_combine($header, $row);
 
-                ]);
+            //     // Skip if email already exists
+            //     if (User::where('email', $row['email'])->exists()) {
+            //         continue;
+            //     }
 
-                $totalAdd++;
+            //     // Check if role_id exists in crm_roles table
+            //     $roleExists = $row['role_id'] && DB::table('crm_roles')->where('id', $row['role_id'])->exists();
 
-            }
-            $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['USERS']]), '+', $totalAdd);
+            //     if (!$roleExists) {
+            //         // Skip this row if the role doesn't exist
+            //         continue;
+            //     }
+
+            //     User::create([
+            //         'name' => $row['name'] ?? '',
+            //         'email' => $row['email'] ?? '',
+            //         'password' => Hash::make($row['password']) ?? '',
+            //         'role_id' => $row['role_id'] ?? '',
+            //         'company_id' => Auth::user()->company_id
+
+            //     ]);
+
+            //     $totalAdd++;
+
+            // }
             return response()->json([
                 'success' => true,
-                'message' => 'Users imported successfully!',
+                'message' => 'CSV file uploaded successfully. Processing will happen in the background.',
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -480,7 +521,7 @@ class UserController extends Controller
             ->with([
                 'addresses' => function ($query) {
                     $query->with('country')
-                   
+
                         ->with(['city' => fn($q) => $q->select('id', 'name as city_name')])
                         ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
                 },
