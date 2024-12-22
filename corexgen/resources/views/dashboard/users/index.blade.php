@@ -102,7 +102,7 @@
     </div>
 @endsection
 
-@include('layout.components.bulk-import-js')
+
 
 @push('scripts')
     <script type="text/javascript">

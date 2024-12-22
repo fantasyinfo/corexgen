@@ -26,5 +26,11 @@ return [
     'results' => 'results',
     'You do not have permission to view the table' => 'You do not have permission to view the table',
     'No Permission' => 'No Permission',
-    'Create New' => 'Create New'
+    'Create New' => 'Create New',
+    'Download Sample Csv' => 'Download Sample Csv',
+    'Import Clients Lists' => 'Import Clients Lists',
+    'Import Users Lists' => 'Import Users Lists',
+    'Import Companies Lists' => 'Import Companies Lists',
+    'Import Roles Lists' => 'Import Roles Lists',
+    'Download Countries List for Country ID' => 'Download Countries List for Country ID',
 ];

@@ -288,6 +288,80 @@ class UserController extends Controller
             ->header('Content-Disposition', "attachment; filename={$fileName}");
     }
 
+
+    public function importView()
+    {
+        $expectedHeaders = [
+            'Name' => [
+                'key' => 'Name',
+                'message' => 'string, e.g., John Kumar Verma or Jamei Sharma',
+            ],
+            'Email' => [
+                'key' => 'Email',
+                'message' => 'string, email, e.g., john@emails.com',
+            ],
+            'Password' => [
+                'key' => 'Password',
+                'message' => 'string, e.g., Secret@123#',
+            ],
+            'Role' => [
+                'key' => 'Role',
+                'message' => 'string,  e.g., Accounts Manager, Sales Executive',
+            ],
+            'Street Address' => [
+                'key' => 'Street Address',
+                'message' => 'string, optional, e.g., 123 Elm Street',
+            ],
+            'City Name' => [
+                'key' => 'City Name',
+                'message' => 'string, optional, e.g., Springfield, London',
+            ],
+            'Country ID' => [
+                'key' => 'Country ID',
+                'message' => 'string or integer, optional, e.g., 1 for USA, 44 for UK',
+            ],
+            'Pincode' => [
+                'key' => 'Pincode',
+                'message' => 'string or integer, optional, e.g., 12345, E1 6AN',
+            ],
+        ];
+
+
+        $sampleData = [
+            [
+
+                'Name' => 'John Doe',
+                'Email' => 'john@mail.com',
+                'Password' => 'John@Secret123',
+                'Role' => 'Manager',
+                'Street Address' => '123 Elm Street',
+                'City Name' => 'Springfield',
+                'Country ID' => '1',
+                'Pincode' => '12345',
+            ],
+            [
+                'Name' => 'Parul Sharma',
+                'Email' => 'originaparul@mail.com',
+                'Password' => 'ParulPa@Secret123',
+                'Role' => 'Digital Head',
+                'Street Address' => '456 Oak Avenue',
+                'City Name' => 'London',
+                'Country ID' => '44',
+                'Pincode' => 'E1 6AN',
+            ],
+        ];
+
+
+
+        return view($this->getViewFilePath('import'), [
+
+            'title' => 'Import Users',
+            'headers' => $expectedHeaders,
+            'data' => $sampleData,
+
+            'module' => PANEL_MODULES[$this->getPanelModule()]['users'],
+        ]);
+    }
     /**
      * Method import bulk import users
      *
@@ -351,34 +425,7 @@ class UserController extends Controller
                     'import_type' => 'Users'
                 ]
             );
-            // foreach ($data as $row) {
-            //     $row = array_combine($header, $row);
 
-            //     // Skip if email already exists
-            //     if (User::where('email', $row['email'])->exists()) {
-            //         continue;
-            //     }
-
-            //     // Check if role_id exists in crm_roles table
-            //     $roleExists = $row['role_id'] && DB::table('crm_roles')->where('id', $row['role_id'])->exists();
-
-            //     if (!$roleExists) {
-            //         // Skip this row if the role doesn't exist
-            //         continue;
-            //     }
-
-            //     User::create([
-            //         'name' => $row['name'] ?? '',
-            //         'email' => $row['email'] ?? '',
-            //         'password' => Hash::make($row['password']) ?? '',
-            //         'role_id' => $row['role_id'] ?? '',
-            //         'company_id' => Auth::user()->company_id
-
-            //     ]);
-
-            //     $totalAdd++;
-
-            // }
             return response()->json([
                 'success' => true,
                 'message' => 'CSV file uploaded successfully. Processing will happen in the background.',

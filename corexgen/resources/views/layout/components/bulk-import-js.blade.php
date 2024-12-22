@@ -1,11 +1,13 @@
       <script>
           document.addEventListener('DOMContentLoaded', function() {
               let bulkImportForm = document.querySelector('#bulkImportForm');
-              console.log(bulkImportForm);
+
 
               if (bulkImportForm) {
                   bulkImportForm.addEventListener('submit', async function(e) {
                       e.preventDefault();
+
+
 
                       const formData = new FormData(this);
                       const response = await fetch('{{ route(getPanelRoutes($module . '.import')) }}', {
@@ -18,10 +20,34 @@
 
                       const result = await response.json();
                       if (result.success) {
-                          alert(result.message);
-                          location.reload();
+
+                          $('#bulkImportModal').hide();
+                          $('.modal-backdrop').remove(); // Remove the backdrop
+
+                          // Show success message
+                          const successModal = new bootstrap.Modal(
+                              document.getElementById("successModal")
+                          );
+
+
+                          $("#successModal .modal-body").text(
+                              result.message
+                          );
+                          successModal.show();
+
+                          //location.reload();
                       } else {
-                          alert(result.message || 'Import failed. Please check the file format.');
+                          $('#bulkImportModal').hide();
+                          $('.modal-backdrop').remove(); // Remove the backdrop
+
+                          const alertModal = new bootstrap.Modal(
+                              document.getElementById("alertModal")
+                          );
+                          $("#alertModal .modal-body").text(
+                              "result.message || 'Import failed. Please check the file format.'"
+                          );
+                          alertModal.show();
+
                       }
                   });
               }

@@ -9,6 +9,7 @@ use App\Http\Controllers\CompanyRegisterController;
 use App\Http\Controllers\CountryCitySeederController;
 use App\Http\Controllers\CompaniesController;
 use App\Http\Controllers\CRM\ClientsController;
+use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RolePermissionsController;
 use App\Http\Controllers\SettingsController;
@@ -153,6 +154,12 @@ Route::get('/register', function () {
     return redirect()->route('login');
 })->name('register');
 
+// open routes for download
+Route::prefix('download')->as('download.')->group(function(){
+    Route::get('/countries',[DownloadController::class,'countries'])->name('countries');
+});
+
+
 
 
 Route::get('/super-admin-login', function () {
@@ -218,6 +225,7 @@ Route::middleware([
 
         // validate, export, import
         Route::get('/export', [RoleController::class, 'export'])->name('export')->middleware('check.permission:ROLE.EXPORT');
+        Route::get('/import', [RoleController::class, 'importView'])->name('importView')->middleware('check.permission:ROLE.IMPORT');
         Route::post('/import', [RoleController::class, 'import'])->name('import')->middleware('check.permission:ROLE.IMPORT');
         Route::post('/bulkDelete', [RoleController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:ROLE.BULK_DELETE');
 
@@ -238,6 +246,7 @@ Route::middleware([
 
         // validate, export, import
         Route::get('/export', [UserController::class, 'export'])->name('export')->middleware('check.permission:USERS.EXPORT');
+        Route::get('/import', [UserController::class, 'importView'])->name('importView')->middleware('check.permission:USERS.IMPORT');
         Route::post('/import', [UserController::class, 'import'])->name('import')->middleware('check.permission:USERS.IMPORT');
         Route::post('/bulkDelete', [UserController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:USERS.BULK_DELETE');
         Route::post('/changePassword', [UserController::class, 'changePassword'])->name('changePassword')->middleware('check.permission:USERS.CHANGE_PASSWORD');
@@ -323,7 +332,9 @@ Route::middleware([
 
         // validate, export, import
         Route::get('/export', [ClientsController::class, 'export'])->name('export')->middleware('check.permission:CLIENTS.EXPORT');
+        Route::get('/import', [ClientsController::class, 'importView'])->name('importView')->middleware('check.permission:CLIENTS.IMPORT');
         Route::post('/import', [ClientsController::class, 'import'])->name('import')->middleware('check.permission:CLIENTS.IMPORT');
+
         Route::post('/bulkDelete', [ClientsController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:CLIENTS.BULK_DELETE');
     
         Route::get('/view/{id}', [ClientsController::class, 'view'])->name('view')->middleware('check.permission:CLIENTS.VIEW');
@@ -364,6 +375,7 @@ Route::middleware([
 
         // validate, export, import
         Route::get('/export', [RoleController::class, 'export'])->name('export')->middleware('check.permission:ROLE.EXPORT');
+        Route::get('/import', [RoleController::class, 'importView'])->name('importView')->middleware('check.permission:ROLE.IMPORT');
         Route::post('/import', [RoleController::class, 'import'])->name('import')->middleware('check.permission:ROLE.IMPORT');
         Route::post('/bulkDelete', [RoleController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:ROLE.BULK_DELETE');
 
@@ -384,6 +396,7 @@ Route::middleware([
 
         // validate, export, import
         Route::get('/export', [UserController::class, 'export'])->name('export')->middleware('check.permission:USERS.EXPORT');
+        Route::get('/import', [UserController::class, 'importView'])->name('importView')->middleware('check.permission:USERS.IMPORT');
         Route::post('/import', [UserController::class, 'import'])->name('import')->middleware('check.permission:USERS.IMPORT');
         Route::post('/bulkDelete', [UserController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:USERS.BULK_DELETE');
         Route::post('/changePassword', [UserController::class, 'changePassword'])->name('changePassword')->middleware('check.permission:USERS.CHANGE_PASSWORD');
@@ -409,6 +422,7 @@ Route::middleware([
 
         // validate, export, import
         Route::get('/export', [CompaniesController::class, 'export'])->name('export')->middleware('check.permission:COMPANIES.EXPORT');
+        Route::get('/import', [CompaniesController::class, 'importView'])->name('importView')->middleware('check.permission:COMPANIES.IMPORT');
         Route::post('/import', [CompaniesController::class, 'import'])->name('import')->middleware('check.permission:COMPANIES.IMPORT');
 
         // view compnay login as company

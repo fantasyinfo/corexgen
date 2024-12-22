@@ -13,6 +13,7 @@ use App\Traits\MediaTrait;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class SettingsController extends Controller
 {
@@ -203,6 +204,7 @@ class SettingsController extends Controller
                 'is_media_setting' => true,
                 'media_id' => $media->id,
             ]);
+            Cache::forget('tenant_company_logo');
 
             \Log::info('Company logo updated successfully', [
                 'media_id' => $media->id,

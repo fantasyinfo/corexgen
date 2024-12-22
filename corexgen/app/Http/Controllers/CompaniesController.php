@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Helpers\PermissionsHelper;
 use App\Http\Requests\CompaniesRequest;
 use App\Http\Requests\UserRequest;
+use App\Jobs\CsvImportJob;
 use App\Models\Company;
 use App\Models\Country;
 use App\Models\CRM\CRMRole;
 use App\Models\Plans;
 use App\Services\CompanyService;
+use App\Services\Csv\CompaniesCsvRowProcessor;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -91,7 +93,7 @@ class CompaniesController extends Controller
      */
     public function index(Request $request)
     {
-    
+
         $this->tenantRoute = $this->getTenantRoute();
 
 
@@ -105,7 +107,7 @@ class CompaniesController extends Controller
         $plans = Plans::with('planFeatures')->get();
         $country = Country::all();
 
-    
+
         return view($this->getViewFilePath('index'), [
             'filters' => $request->all(),
             'title' => 'Companies Management',
@@ -130,7 +132,7 @@ class CompaniesController extends Controller
         try {
             $company = $companyService->createCompany($request->validated());
 
-            
+
             return redirect()
                 ->route($this->getTenantRoute() . 'companies.index')
                 ->with('success', 'Company created successfully.');
@@ -234,7 +236,7 @@ class CompaniesController extends Controller
 
             // If validation fails, it will throw an exception
             return redirect()
-            ->back()
+                ->back()
                 ->with('success', 'Company updated successfully.');
         } catch (\Exception $e) {
             \Log::error('Company updation failed', [
@@ -276,11 +278,10 @@ class CompaniesController extends Controller
             'Company Name',
             'Email',
             'Phone',
-            'Address Id',
             'Street Address',
-            'City Id',
+            'City ID',
             'City Name',
-            'Country Id',
+            'Country ID',
             'Country Name',
             'Pincode',
             'Plan Id',
@@ -314,13 +315,12 @@ class CompaniesController extends Controller
                 $company->name,
                 $company->email,
                 $company->phone,
-                optional($company->addresses)->id,
-                optional($company->addresses)->street_address,
-                optional($company->addresses->city)->id,
-                optional($company->addresses->city)->name,
-                optional($company->addresses->country)->id,
-                optional($company->addresses->country)->name,
-                optional($company->addresses)->postal_code,
+                optional($company?->addresses)->street_address,
+                optional($company?->addresses?->city)->id,
+                optional($company?->addresses?->city)->name,
+                optional($company?->addresses?->country)->id,
+                optional($company?->addresses?->country)->name,
+                optional($company?->addresses)->postal_code,
                 optional($company->plans)->id,
                 optional($company->plans)->name,
                 optional($company->plans)->billing_cycle,
@@ -346,6 +346,90 @@ class CompaniesController extends Controller
             ->header('Content-Disposition', "attachment; filename={$fileName}");
     }
 
+    public function importView(){
+        $expectedHeaders = [
+            'Company Name' => [
+                'key' => 'Company Name',
+                'message' => 'string, e.g., Abc Public Digital Ltd or Pharma Pvt Ltd',
+            ],
+            'Owner Full Name' => [
+                'key' => 'Owner Full Name',
+                'message' => 'string,  e.g., Gaurav Kumar Sharma, John Doe',
+            ],
+            'Email' => [
+                'key' => 'Email',
+                'message' => 'string, email, e.g., john@doe.com',
+            ],
+            'Phone' => [
+                'key' => 'Phone',
+                'message' => 'string, number between 10 to 15 digit e.g.,9989009656, 12312312321',
+            ],
+            'Password' => [
+                'key' => 'Password',
+                'message' => 'string, must be 8 charactes long secretPass e.g.SecretPass',
+            ],
+            'Plan ID' => [
+                'key' => 'Plan ID',
+                'message' => 'string, plans table id e.g.1 , 2, 3',
+            ],
+            'Street Address' => [
+                'key' => 'Street Address',
+                'message' => 'string, optional, e.g., 123 Elm Street',
+            ],
+            'City Name' => [
+                'key' => 'City Name',
+                'message' => 'string, optional, e.g., Springfield, London',
+            ],
+            'Country ID' => [
+                'key' => 'Country ID',
+                'message' => 'string or integer, optional, e.g., 1 for USA, 44 for UK',
+            ],
+            'Pincode' => [
+                'key' => 'Pincode',
+                'message' => 'string or integer, optional, e.g., 12345, E1 6AN',
+            ],
+        ];
+
+
+        $sampleData = [
+            [
+                'Company Name' => 'Abc Limited',
+                'Owner Full Name' => 'John Doe',
+                'Email' => 'john@mail.com',
+                'Phone' => '9898767767',
+                'Password' => 'John@Secret123',
+                'Plan ID' => '1',
+                'Street Address' => '123 Elm Street',
+                'City Name' => 'Springfield',
+                'Country ID' => '1',
+                'Pincode' => '12345',
+            ],
+            [
+                'Company Name' => 'Parul Digitals Limited',
+                'Owner Full Name' => 'Parul Doe',
+                'Email' => 'originaparul@mail.com',
+                'Phone' => '1213232321',
+                'Password' => 'ParulPa@Secret123',
+                'Plan ID' => '2',
+                'Street Address' => '456 Oak Avenue',
+                'City Name' => 'London',
+                'Country ID' => '44',
+                'Pincode' => 'E1 6AN',
+            ],
+        ];
+
+
+
+        return view($this->getViewFilePath('import'), [
+
+            'title' => 'Import Companies',
+            'headers' => $expectedHeaders,
+            'data' => $sampleData,
+
+            'module' => PANEL_MODULES[$this->getPanelModule()]['companies'],
+        ]);
+    }
+
     /**
      * Method import bulk import company
      *
@@ -358,19 +442,19 @@ class CompaniesController extends Controller
         $validator = Validator::make($request->all(), [
             'file' => 'required|mimes:csv,txt|max:' . BULK_CSV_UPLOAD_FILE_SIZE . '', // Validate file type and size
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'errors' => $validator->errors(),
             ]);
         }
-    
+
         try {
             $file = $request->file('file');
-            $data = array_map('str_getcsv', file($file->getRealPath()));
-            $header = array_map('trim', array_shift($data)); // Extract and trim header row
-    
+            $filePath = $file->storeAs('csv', uniqid() . '_' . $file->getClientOriginalName()); // Store file in a persistent directory
+            $absoluteFilePath = storage_path('app/' . $filePath); // Get the absolute path
+
             $rules = [
                 'Company Name' => ['required', 'string', 'max:255'],
                 'Owner Full Name' => ['required', 'string', 'max:255'],
@@ -378,51 +462,34 @@ class CompaniesController extends Controller
                 'Phone' => ['required', 'digits_between:10,15'],
                 'Password' => ['required', 'string', 'min:8'],
                 'Plan ID' => ['required', 'exists:plans,id'],
-                'Street Address' => ['nullable', 'string', 'max:255'],
-                'Country ID' => ['nullable', 'exists:countries,id'],
-                'City ID' => ['nullable', 'exists:cities,id'],
-                'Pincode' => ['nullable', 'string', 'max:10'],
+                'Street Address' => ['nullable', 'string', 'max:255'], // Allow empty
+                'City Name' => ['nullable', 'string'], // Allow empty
+                'Country ID' => ['nullable', 'exists:countries,id'], // Allow empty
+                'Pincode' => ['nullable', 'string'], // Allow empty
             ];
-    
-            $skippedRows = [];
-            $successfulImportsCount = 0;
-    
-            foreach ($data as $index => $row) {
-                $row = array_combine($header, $row);
-                $rowValidator = Validator::make($row, $rules);
-    
-                if ($rowValidator->fails()) {
-                    // Log or collect skipped rows with errors
-                    $skippedRows[] = [
-                        'row' => $index + 2, // Adding 2 to account for header row and zero-based index
-                        'errors' => $rowValidator->errors()->all(),
-                    ];
-                    continue; // Skip this row
-                }
-    
-                // Pass each validated row to the CompanyService
-                $companyService->createCompany([
-                    'cname' => $row['Company Name'],
-                    'name' => $row['Owner Full Name'],
-                    'email' => $row['Email'],
-                    'phone' => $row['Phone'],
-                    'password' => $row['Password'], // Pass raw password, handle hashing in the service
-                    'plan_id' => $row['Plan ID'],
-                    'address_street_address' => $row['Street Address'] ?? null,
-                    'address_country_id' => $row['Country ID'] ?? null,
-                    'address_city_id' => $row['City ID'] ?? null,
-                    'address_pincode' => $row['Pincode'] ?? null,
-                ]);
-    
-                $successfulImportsCount++;
-            }
-    
+
+
+            // Expected CSV headers
+            $expectedHeaders = ['Company Name', 'Owner Full Name', 'Email', 'Phone', 'Password', 'Plan ID', 'Street Address', 'City Name', 'Country ID', 'Pincode'];
+
+            // Dispatch the job
+            CsvImportJob::dispatch(
+                $absoluteFilePath,
+                $rules,
+                CompaniesCsvRowProcessor::class,
+                $expectedHeaders,
+                [
+                    'company_id' => Auth::user()->company_id,
+                    'user_id' => Auth::id(),
+                    'is_tenant' => Auth::user()->is_tenant,
+                    'import_type' => 'Companies'
+                ]
+            );
+
+
             return response()->json([
                 'success' => true,
-                'message' => 'CSV processed successfully.',
-                'imported_count' => $successfulImportsCount,
-                'skipped_count' => count($skippedRows),
-                'skipped_rows' => $skippedRows, // Optional: Include details about skipped rows
+                'message' => 'CSV file uploaded successfully. Processing will happen in the background.',
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -431,8 +498,8 @@ class CompaniesController extends Controller
             ]);
         }
     }
-    
-    
+
+
 
 
     /**

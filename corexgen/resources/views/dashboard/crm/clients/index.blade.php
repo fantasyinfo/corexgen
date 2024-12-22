@@ -126,6 +126,3 @@
         </div>
     </div>
 @endsection
-
-@include('layout.components.bulk-import-js')
-

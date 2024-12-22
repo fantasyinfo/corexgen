@@ -164,7 +164,9 @@
                                                 class="text-success">one time cost</span>, no billing to this company.</p>
                                     </div>
                                     <hr>
-                                    <p class="alert alert-secondary">Please add <span class="text-success">Plans
+                                    <p class="alert alert-secondary">
+                                        <i class="fas fa-info-circle me-2 "></i>
+                                        Please add <span class="text-success">Plans
                                             Features</span> on features tabs, default to 10</p>
                                 </div>
                                 <div class="tab-pane fade" id="features" role="tabpanel">

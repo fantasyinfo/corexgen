@@ -42,7 +42,7 @@ class CompaniesRequest extends FormRequest
                 'email',
                 $this->uniqueEmailRule($companyId),
             ],
-            'phone' => ['required', 'min:10'],
+            'phone' => ['required', 'digits_between:10,15'],
             'password' => [$isUpdate ? 'nullable' : 'required', 'min:8'],
             'plan_id' => ['required', 'exists:plans,id'],
             'address_street_address' => 'nullable|string|max:255',

@@ -22,7 +22,7 @@
                 </a>
             @endif
             @if (isset($permissions['IMPORT']) && hasPermission(strtoupper($module) . '.' . $permissions['IMPORT']['KEY']))
-                <a class="btn btn-outline-secondary btn-xl me-2" href="#" data-bs-toggle="modal" data-bs-target="#bulkImportModal" title="{{ __('crud.Import') }}">
+                <a class="btn btn-outline-secondary btn-xl me-2" href="{{ route(getPanelRoutes($module . '.import'), request()->all()) }}"  title="{{ __('crud.Import') }}">
                     <i class="fas fa-upload"></i>
                 </a>
             @endif
