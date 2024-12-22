@@ -9,6 +9,7 @@ use App\Http\Controllers\CompanyRegisterController;
 use App\Http\Controllers\CountryCitySeederController;
 use App\Http\Controllers\CompaniesController;
 use App\Http\Controllers\CRM\ClientsController;
+use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RolePermissionsController;
 use App\Http\Controllers\SettingsController;
@@ -152,6 +153,12 @@ Route::get('/register', function () {
     // disable registration redirect to login page
     return redirect()->route('login');
 })->name('register');
+
+// open routes for download
+Route::prefix('download')->as('download.')->group(function(){
+    Route::get('/countries',[DownloadController::class,'countries'])->name('countries');
+});
+
 
 
 
@@ -323,7 +330,9 @@ Route::middleware([
 
         // validate, export, import
         Route::get('/export', [ClientsController::class, 'export'])->name('export')->middleware('check.permission:CLIENTS.EXPORT');
+        Route::get('/import', [ClientsController::class, 'importView'])->name('importView')->middleware('check.permission:CLIENTS.IMPORT');
         Route::post('/import', [ClientsController::class, 'import'])->name('import')->middleware('check.permission:CLIENTS.IMPORT');
+
         Route::post('/bulkDelete', [ClientsController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:CLIENTS.BULK_DELETE');
     
         Route::get('/view/{id}', [ClientsController::class, 'view'])->name('view')->middleware('check.permission:CLIENTS.VIEW');

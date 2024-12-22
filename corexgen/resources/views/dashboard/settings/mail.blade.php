@@ -5,7 +5,7 @@
 @section('settings_content')
     @php
         // prePrintR($defaultSettings[0]);
-        // prePrintR($tenant);
+        // prePrintR($defaultSettings);
     @endphp
 
     <div class="container-fluid">
@@ -20,64 +20,64 @@
                     @switch($item['name'])
                         @case('tenant_mail_provider')
                             @php
-                                if (isset($defaultSettings[0]) && isset($defaultSettings[0]['MAIL_MAILER'])) {
-                                    $item['value'] = $defaultSettings[0]['MAIL_MAILER'];
+                                if (isset($defaultSettings) && isset($defaultSettings['smtp_details'])) {
+                                    $item['value'] = 'smtp';
                                 }
                             @endphp
                         @break
 
                         @case('tenant_mail_host')
                             @php
-                                if (isset($defaultSettings[0]) && isset($defaultSettings[0]['MAIL_HOST'])) {
-                                    $item['value'] = $defaultSettings[0]['MAIL_HOST'];
+                                if (isset($defaultSettings) && isset($defaultSettings['smtp_details']['smtp_host'])) {
+                                    $item['value'] = $defaultSettings['smtp_details']['smtp_host'];
                                 }
                             @endphp
                         @break
 
                         @case('tenant_mail_port')
                             @php
-                                if (isset($defaultSettings[0]) && isset($defaultSettings[0]['MAIL_PORT'])) {
-                                    $item['value'] = $defaultSettings[0]['MAIL_PORT'];
+                                if (isset($defaultSettings) && isset($defaultSettings['smtp_details']['smtp_port'])) {
+                                    $item['value'] = $defaultSettings['smtp_details']['smtp_port'];
                                 }
                             @endphp
                         @break
 
                         @case('tenant_mail_username')
                             @php
-                                if (isset($defaultSettings[0]) && isset($defaultSettings[0]['MAIL_USERNAME'])) {
-                                    $item['value'] = $defaultSettings[0]['MAIL_USERNAME'];
+                                if (isset($defaultSettings) && isset($defaultSettings['smtp_details']['smtp_username'])) {
+                                    $item['value'] = $defaultSettings['smtp_details']['smtp_username'];
                                 }
                             @endphp
                         @break
 
                         @case('tenant_mail_password')
                             @php
-                                if (isset($defaultSettings[0]) && isset($defaultSettings[0]['MAIL_PASSWORD'])) {
-                                    $item['value'] = $defaultSettings[0]['MAIL_PASSWORD'];
+                                if (isset($defaultSettings) && isset($defaultSettings['smtp_details']['smtp_password'])) {
+                                    $item['value'] = $defaultSettings['smtp_details']['smtp_password'];
                                 }
                             @endphp
                         @break
 
                         @case('tenant_mail_encryption')
                             @php
-                                if (isset($defaultSettings[0]) && isset($defaultSettings[0]['MAIL_ENCRYPTION'])) {
-                                    $item['value'] = $defaultSettings[0]['MAIL_ENCRYPTION'];
+                                if (isset($defaultSettings) && isset($defaultSettings['smtp_details']['smtp_encryption'])) {
+                                    $item['value'] = $defaultSettings['smtp_details']['smtp_encryption'];
                                 }
                             @endphp
                         @break
 
                         @case('tenant_mail_from_address')
                             @php
-                                if (isset($defaultSettings[0]) && isset($defaultSettings[0]['MAIL_FROM_ADDRESS'])) {
-                                    $item['value'] = $defaultSettings[0]['MAIL_FROM_ADDRESS'];
+                                if (isset($defaultSettings) && isset($defaultSettings['smtp_details']['mail_from_address'])) {
+                                    $item['value'] = $defaultSettings['smtp_details']['mail_from_address'];
                                 }
                             @endphp
                         @break
 
                         @case('tenant_mail_from_name')
                             @php
-                                if (isset($defaultSettings[0]) && isset($defaultSettings[0]['MAIL_FROM_NAME'])) {
-                                    $item['value'] = $defaultSettings[0]['MAIL_FROM_NAME'];
+                                if (isset($defaultSettings) && isset($defaultSettings['smtp_details']['mail_from_name'])) {
+                                    $item['value'] = $defaultSettings['smtp_details']['mail_from_name'];
                                 }
                             @endphp
                         @break

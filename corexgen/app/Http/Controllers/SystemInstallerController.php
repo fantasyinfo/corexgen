@@ -133,6 +133,15 @@ class SystemInstallerController extends Controller
                 'mail.from.address' => $request->mail_from_address,
                 'mail.from.name' => $request->mail_from_name,
             ]);
+            session()->put('smtp_details', $request->only([
+                'smtp_host',
+                'smtp_port',
+                'smtp_username',
+                'smtp_password',
+                'smtp_encryption',
+                'mail_from_address',
+                'mail_from_name',
+            ]));
 
             // Try to send a test email
             Mail::raw('Test email from installer', function ($message) use ($request) {
@@ -421,6 +430,8 @@ class SystemInstallerController extends Controller
 
         $replacements = [
             'APP_NAME' => '"' . str_replace('"', '', $request->site_name) . '"',
+            'APP_ENV' => 'production',
+            'APP_DEBUG' => false,
             'APP_URL' => url('/'),
             'DB_HOST' => $request->db_host ?? '127.0.0.1',
             'DB_PORT' => $request->db_port ?? '3306',
@@ -487,18 +498,22 @@ class SystemInstallerController extends Controller
      *
      * @param Request $request creating a super admin user to access the admin panel
      *
-     * @return void
+     * @return array
      */
     private function createSuperAdmin(Request $request)
     {
 
+        $settings = array_merge($request->all(), [
+            'smtp_details' => session()->get('smtp_details'),
+        ]);
+        
         $tenant = Tenant::create([
             'name' => $request->name,
             'domain' => $request->admin_email,
             'currency_code' => $request->currency_code,
             'currency_symbol' => $request->currency_symbol,
             'timezone' => $request->timezone,
-            'settings' => json_encode([$request->all()])
+            'settings' => json_encode($settings),
         ]);
 
         $user = User::create([

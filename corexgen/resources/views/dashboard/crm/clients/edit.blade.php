@@ -363,11 +363,13 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <select name="tags[]" id="tags" class="form-select" multiple>
-                                                @foreach($client->tags  as $tag)
-                                                    <option value="{{ $tag }}" {{ in_array($tag, old('tags', $client->tags ?? [])) ? 'selected' : '' }}>
-                                                        {{ $tag }}
-                                                    </option>
-                                                @endforeach
+                                                @if($client->tags && is_array($client->tags))
+                                                    @foreach($client->tags  as $tag)
+                                                        <option value="{{ $tag }}" {{ in_array($tag, old('tags', $client->tags ?? [])) ? 'selected' : '' }}>
+                                                            {{ $tag }}
+                                                        </option>
+                                                    @endforeach
+                                                @endif
                                             </select>
                                         </div>
                                         

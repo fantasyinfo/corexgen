@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class ClientSeeder extends Seeder
 {
@@ -17,6 +18,7 @@ class ClientSeeder extends Seeder
         for ($i = 0; $i <= 100; $i++) {
             $clients[] = [
                 'type' => 'Individual',
+                'uuid' => Str::uuid(),
                 'title' => ['Mr', 'Miss', 'Dr', 'Master'][array_rand(['Mr', 'Miss', 'Dr', 'Master'])], // Correct array_rand usage
                 'first_name' => fake()->firstName(),
                 'middle_name' => fake()->firstName(),
@@ -29,8 +31,10 @@ class ClientSeeder extends Seeder
                     fake()->phoneNumber(),
                     fake()->phoneNumber(),
                 ]), // Multiple phone numbers as JSON
+                'primary_email' => fake()->safeEmail(),
+                'primary_phone' => fake()->phoneNumber(),
                 'category' => CLIENTS_CATEGORY_TYPES['STATUS'][array_rand(CLIENTS_CATEGORY_TYPES['STATUS'])], // Corrected for CLIENTS_CATEGORY_TYPES['STATUS']
-                'company_id' => 12, // Generate random company_id
+                'company_id' => 1, // Generate random company_id
             ];
         }
 

@@ -171,6 +171,8 @@ class ClientsController extends Controller
             'module' => PANEL_MODULES[$this->getPanelModule()]['clients'],
         ]);
     }
+
+
     public function destroy($id)
     {
         try {
@@ -305,6 +307,109 @@ class ClientsController extends Controller
         ];
     }
 
+    public function importView()
+    {
+     
+
+        $expectedHeaders = [
+            'Type' => [
+                'key' => 'Type',
+                'message' => 'string, e.g., Individual or Company',
+            ],
+            'Title' => [
+                'key' => 'Title',
+                'message' => 'string, e.g., Mr, Miss, Dr, Master',
+            ],
+            'First Name' => [
+                'key' => 'First Name',
+                'message' => 'string, e.g., John, Anna',
+            ],
+            'Middle Name' => [
+                'key' => 'Middle Name',
+                'message' => 'string, optional, e.g., Edward, Marie',
+            ],
+            'Last Name' => [
+                'key' => 'Last Name',
+                'message' => 'string, e.g., Doe, Smith',
+            ],
+            'Emails' => [
+                'key' => 'Emails',
+                'message' => 'array, comma-separated, e.g., john.doe@example.com, jane.doe@example.org',
+            ],
+            'Phones' => [
+                'key' => 'Phones',
+                'message' => 'array, comma-separated, e.g., +1-555-123-4567, +1-555-765-4321',
+            ],
+            'Social Media Links' => [
+                'key' => 'Social Media Links',
+                'message' => 'array, optional, comma-separated, e.g., x: https://x.com/user, fb: https://www.facebook.com/user',
+            ],
+            'Category' => [
+                'key' => 'Category',
+                'message' => 'string, must be these only '. implode(',',CLIENTS_CATEGORY_TYPES['TABLE_STATUS']),
+            ],
+            'Street Address' => [
+                'key' => 'Street Address',
+                'message' => 'string, optional, e.g., 123 Elm Street',
+            ],
+            'City Name' => [
+                'key' => 'City Name',
+                'message' => 'string, optional, e.g., Springfield, London',
+            ],
+            'Country ID' => [
+                'key' => 'Country ID',
+                'message' => 'string or integer, optional, e.g., 1 for USA, 44 for UK',
+            ],
+            'Pincode' => [
+                'key' => 'Pincode',
+                'message' => 'string or integer, optional, e.g., 12345, E1 6AN',
+            ],
+        ];
+        
+
+        $sampleData = [
+            [
+                'Type' => 'Individual',
+                'Title' => 'Mr',
+                'First Name' => 'John',
+                'Middle Name' => 'Edward',
+                'Last Name' => 'Doe',
+                'Emails' => 'john.doe@example.com; jane.doe@example.org',
+                'Phones' => '+91 8989898989; +1 89898989898',
+                'Social Media Links' => 'x: https://x.com/johndoe, fb: https://www.facebook.com/johndoe, in: https://www.instagram.com/johndoe, ln: https://www.linkedin.com/in/johndoe',
+                'Category' => 'Normal',
+                'Street Address' => '123 Elm Street',
+                'City Name' => 'Springfield',
+                'Country ID' => '1',
+                'Pincode' => '12345',
+            ],
+            [
+                'Type' => 'Company',
+                'Title' => 'Dr',
+                'First Name' => 'Anna',
+                'Middle Name' => 'Marie',
+                'Last Name' => 'Smith',
+                'Emails' => 'anna.smith@example.org; contact@smithco.com',
+                'Phones' => '+44 8787878787; +44 7676767676',
+                'Social Media Links' => 'x: https://x.com/smithco, fb: https://www.facebook.com/smithco, in: https://www.instagram.com/smithco, ln: https://www.linkedin.com/company/smithco',
+                'Category' => 'High Budget',
+                'Street Address' => '456 Oak Avenue',
+                'City Name' => 'London',
+                'Country ID' => '44',
+                'Pincode' => 'E1 6AN',
+            ],
+        ];
+
+
+
+        return view($this->getViewFilePath('import'), [
+
+            'title' => 'Import Clients',
+            'headers' => $expectedHeaders,
+            'data' => $sampleData,
+            'module' => PANEL_MODULES[$this->getPanelModule()]['clients'],
+        ]);
+    }
     public function import(Request $request)
     {
         $validator = Validator::make($request->all(), [
