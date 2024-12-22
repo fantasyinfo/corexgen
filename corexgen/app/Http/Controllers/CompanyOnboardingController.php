@@ -99,17 +99,25 @@ class CompanyOnboardingController extends Controller
             return null;
         }
 
-        $city = City::create([
-            'name' => $data['address_city_name'],
-            'country_id' => $data['address_country_id']
-        ]);
+        $cityId =  $this->findOrCreateCity($data['address_city_name'], $data['address_country_id']);
+     
         return Address::create([
             'street_address' => $data['address_street_address'],
             'postal_code' => $data['address_pincode'],
-            'city_id' => $city->id,
+            'city_id' => $cityId,
             'country_id' => $data['address_country_id'],
             'address_type' => ADDRESS_TYPES['USER']['SHOW']['HOME'],
         ]);
+    }
+
+    private function findOrCreateCity($cityName, $countryId)
+    {
+        $city = City::firstOrCreate(
+            ['name' => $cityName, 'country_id' => $countryId],
+            ['name' => $cityName, 'country_id' => $countryId]
+        );
+
+        return $city->id;
     }
     private function hasAllAddressFields(array $data, array $requiredFields): bool
     {

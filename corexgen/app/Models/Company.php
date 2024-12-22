@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\SoftDeletes;
+
 use Illuminate\Support\Facades\Auth;
 use OwenIt\Auditing\Contracts\Auditable;
 
@@ -16,7 +16,7 @@ class Company extends Model implements Auditable
 {
     use HasFactory;
 
-    use SoftDeletes;
+
     use \OwenIt\Auditing\Auditable;
 
     const table = 'companies';
@@ -83,6 +83,7 @@ class Company extends Model implements Auditable
         });
 
         static::deleting(function ($company) {
+            \Log::info('Deleting the company'.[$company]);
             // If it's a force delete, let Laravel handle the cascading
             if ($company->isForceDeleting()) {
                 return;
@@ -90,24 +91,16 @@ class Company extends Model implements Auditable
 
             // Soft delete associated records
             $company->paymentTransactions()->get()->each(function ($transaction) {
+                \Log::info('Deleting its transaction'.[$transaction]);
                 $transaction->delete();
             });
 
             $company->subscriptions()->get()->each(function ($subscription) {
+                \Log::info('Deleting its transaction'.[$subscription]);
                 $subscription->delete();
             });
         });
 
-        // Handle restoration of soft-deleted records
-        static::restoring(function ($company) {
-            // Restore associated soft-deleted records
-            $company->paymentTransactions()->withTrashed()->get()->each(function ($transaction) {
-                $transaction->restore();
-            });
-
-            $company->subscriptions()->withTrashed()->get()->each(function ($subscription) {
-                $subscription->restore();
-            });
-        });
+    
     }
 }

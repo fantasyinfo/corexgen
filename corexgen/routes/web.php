@@ -314,6 +314,7 @@ Route::middleware([
     // audits routes
     Route::prefix('audit')->as('audit.')->group(function () {
         Route::get('/', [AuditController::class, 'index'])->name('index')->middleware('check.permission:EVENTS_AUDIT_LOG.READ_ALL');
+        Route::get('/bulk-import', [AuditController::class, 'bulkimport'])->name('bulkimport')->middleware('check.permission:BULK_IMPORT_STATUS.READ_ALL');
     });
 
 
@@ -488,6 +489,7 @@ Route::middleware([
     // audits routes
     Route::prefix('audit')->as('audit.')->group(function () {
         Route::get('/', [AuditController::class, 'index'])->name('index')->middleware('check.permission:EVENTS_AUDIT_LOG.READ_ALL');
+        Route::get('/bulk-import', [AuditController::class, 'bulkimport'])->name('bulkimport')->middleware('check.permission:BULK_IMPORT_STATUS.READ_ALL');
     });
     // audits routes
     Route::prefix('backup')->as('backup.')->group(function () {

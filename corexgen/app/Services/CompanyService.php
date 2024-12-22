@@ -53,14 +53,14 @@ class CompanyService
 
             $userFullName = $validatedData['name'];
             $company = Company::create(array_merge($validatedData, [
-                'address_id' => $address?->id,
+                'address_id' => $address?->id ?? null,
                 'name' => $validatedData['cname'],
             ]));
 
             $companyAdminUser = $this->createCompanyUser($company, $validatedData, $userFullName);
 
 
-            if($validatedData['from_admin'] == true){
+            if(isset($validatedData['from_admin']) && $validatedData['from_admin'] == true){
                 $this->updateCompanyPlanAndPermissions($company,$validatedData['plan_id']);
                 $this->generateAllSettings($company->id);
                 $company->update(['status' => CRM_STATUS_TYPES['COMPANIES']['STATUS']['ACTIVE']]);
@@ -94,8 +94,8 @@ class CompanyService
                     if (Storage::disk('public')->exists($relativePath)) {
                         $media = $this->createMedia($relativePath, [
                             'folder' => 'logos',
-                            'created_by' => Auth::id(), // Fixed admin ID
-                            'updated_by' => Auth::id(),
+                            'created_by' => Auth::id() ?? '1', // Fixed admin ID
+                            'updated_by' => Auth::id() ?? '1',
                         ]);
                     } else {
                         \Log::warning("File not found for media creation: {$absolutePath}");
@@ -116,8 +116,8 @@ class CompanyService
                 'is_tenant' => $setting['is_tenant'],
                 'company_id' => $companyid,
                 'type' => 'General',
-                'updated_by' => Auth::id(), // Fixed admin ID
-                'created_by' => Auth::id(),
+                'updated_by' => Auth::id() ?? '1', // Fixed admin ID
+                'created_by' => Auth::id() ?? '1',
             ]);
         }
     }
@@ -136,8 +136,8 @@ class CompanyService
                 'placeholder' => $setting['placeholder'] ?? '',
                 'is_tenant' => @$setting['is_tenant'] ?? false,
                 'type' => 'Mail',
-                'updated_by' => Auth::id(), // Fixed admin ID
-                'created_by' => Auth::id(),
+                'updated_by' => Auth::id() ?? '1', // Fixed admin ID
+                'created_by' => Auth::id() ?? '1',
             ]);
         }
     }
@@ -193,19 +193,28 @@ class CompanyService
             return null;
         }
 
-        $city = City::create([
-            'name' => $data['address_city_name'],
-            'country_id' => $data['address_country_id']
-        ]);
+     
+
+        $cityId = $this->findOrCreateCity($data['address_city_name'], $data['address_country_id']);
+
         return Address::create([
             'street_address' => $data['address_street_address'],
             'postal_code' => $data['address_pincode'],
-            'city_id' => $city->id,
+            'city_id' => $cityId,
             'country_id' => $data['address_country_id'],
             'address_type' => ADDRESS_TYPES['USER']['SHOW']['HOME'],
         ]);
     }
 
+    private function findOrCreateCity($cityName, $countryId)
+    {
+        $city = City::firstOrCreate(
+            ['name' => $cityName, 'country_id' => $countryId],
+            ['name' => $cityName, 'country_id' => $countryId]
+        );
+
+        return $city->id;
+    }
     private function createCompanyUser(Company $company, array $data, $userFullName)
     {
         unset($data['name']);
@@ -626,13 +635,7 @@ class CompanyService
             return null;
         }
 
-        $city = City::where('name', $data['address_city_name'])->where('country_id', $data['address_country_id'])->first();
-        if (!$city) {
-            $city = City::create([
-                'name' => $data['address_city_name'],
-                'country_id' => $data['address_country_id']
-            ]);
-        }
+         $cityId = $this->findOrCreateCity($data['address_city_name'], $data['address_country_id']);
         // If company already has an address, update it
         if ($company->address_id) {
 
@@ -640,7 +643,7 @@ class CompanyService
             $address->update([
                 'street_address' => $data['address_street_address'],
                 'postal_code' => $data['address_pincode'],
-                'city_id' => $city->id,
+                'city_id' => $cityId,
                 'country_id' => $data['address_country_id'],
             ]);
             return $address;
@@ -650,7 +653,7 @@ class CompanyService
         return Address::create([
             'street_address' => $data['address_street_address'],
             'postal_code' => $data['address_pincode'],
-            'city_id' => $city->id,
+            'city_id' => $cityId,
             'country_id' => $data['address_country_id'],
             'address_type' => ADDRESS_TYPES['USER']['SHOW']['HOME'],
         ]);

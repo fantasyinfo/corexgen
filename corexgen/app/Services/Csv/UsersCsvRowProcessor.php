@@ -25,9 +25,11 @@ class UsersCsvRowProcessor
 
         try {
             // Check for existing user
-            if (User::where('email', $row['Email'])
+            if (
+                User::where('email', $row['Email'])
                     ->where('company_id', $userContext['company_id'])
-                    ->exists()) {
+                    ->exists()
+            ) {
                 throw new ImportException(
                     "User with email {$row['Email']} already exists",
                     'duplicate_user'
@@ -86,32 +88,76 @@ class UsersCsvRowProcessor
 
             // Update usage after successful creation
             $this->updateUsage(
-                strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['USERS']]), 
-                '+', 
+                strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['USERS']]),
+                '+',
                 '1'
             );
 
             return true;
 
+        } catch (\Illuminate\Database\QueryException $e) {
+            $userFriendlyMessage = $this->handleDatabaseError($e, $row);
+            throw new ImportException(
+                $userFriendlyMessage,
+                'database_conflict'
+            );
         } catch (ImportException $e) {
             info('Import error', [
-                'email' => $row['Email'], 
+                'email' => $row['Email'],
                 'error' => $e->getMessage(),
-                'code' => $e->getCode()
+                'code' => $e->getErrorCode()
             ]);
             throw $e;
         } catch (\Exception $e) {
             info('Unexpected error during import', [
-                'email' => $row['Email'], 
+                'email' => $row['Email'],
                 'error' => $e->getMessage()
             ]);
             throw new ImportException(
-                "Unexpected error: {$e->getMessage()}",
+                "Failed to create user: " . $this->getUserFriendlyError($e->getMessage()),
                 'unexpected_error',
                 $e
             );
         }
     }
+
+
+    private function handleDatabaseError(\Exception $e, array $row): string
+    {
+        if (strpos($e->getMessage(), 'users.users_email_unique') !== false) {
+            return "Email address '{$row['Email']}' is already registered to another user";
+        }
+
+        if (strpos($e->getMessage(), 'users.users_phone_unique') !== false) {
+            return "Phone number '{$row['Phone']}' is already registered to another user";
+        }
+
+        if (strpos($e->getMessage(), 'foreign key constraint fails (`crm_roles`)') !== false) {
+            return "Invalid role selected. Please check if the role exists in your company.";
+        }
+
+        return "Unable to create user due to database conflict. Please check for duplicate information.";
+    }
+
+    private function getUserFriendlyError(string $message): string
+    {
+        $errorMap = [
+            'SQLSTATE[23000]' => 'A duplicate record was found',
+            'Integrity constraint violation' => 'This information conflicts with an existing user',
+            'foreign key constraint fails' => 'Invalid reference to another record',
+            'Data too long' => 'One or more fields exceed maximum length',
+            'Column cannot be null' => 'Required information is missing',
+        ];
+
+        foreach ($errorMap as $technical => $friendly) {
+            if (strpos($message, $technical) !== false) {
+                return $friendly;
+            }
+        }
+
+        return "An unexpected error occurred while creating the user";
+    }
+
 
     /**
      * Get role ID for the given role name and company

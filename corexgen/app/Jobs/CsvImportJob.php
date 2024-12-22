@@ -32,6 +32,9 @@ class CsvImportJob implements ShouldQueue
 
     public function handle()
     {
+        if (ImportHistory::where('file_name', basename($this->filePath))->exists()) {
+            return;
+        }
         $this->importHistory = ImportHistory::create([
             'company_id' => $this->userContext['company_id'] ?? null,
             'user_id' => $this->userContext['user_id'] ?? null,
@@ -59,7 +62,7 @@ class CsvImportJob implements ShouldQueue
 
             $data = array_map(fn($row) => str_getcsv($row, ',', '"', '\\'), array_filter($rows));
             $header = array_map('trim', array_shift($data));
-            
+
             if (empty($data)) {
                 throw new \Exception("CSV file is empty");
             }

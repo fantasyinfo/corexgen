@@ -29,6 +29,7 @@ class PermissionsHelper
         'EVENTS_AUDIT_LOG' => 'EVENTS_AUDIT_LOG',
         'DOWNLOAD_BACKUP' => 'DOWNLOAD_BACKUP',
         'CLIENTS' => 'CLIENTS',
+        'BULK_IMPORT_STATUS' => 'BULK_IMPORT_STATUS'
     ];
 
 
@@ -83,6 +84,7 @@ class PermissionsHelper
             self::$plansPermissionsKeys['DOWNLOAD_BACKUP'] => [1301 => 'READ', 1302 => 'READ_ALL', 1303 => 'CREATE', 1304 => 'DOWNLOAD'],
 
             self::$plansPermissionsKeys['SETTINGS_CRON'] => [1351 => 'READ', 1352 => 'READ_ALL'],
+            self::$plansPermissionsKeys['BULK_IMPORT_STATUS'] => [1401 => 'READ', 1402 => 'READ_ALL'],
 
 
             // starring from 3k
@@ -100,7 +102,8 @@ class PermissionsHelper
             'SETTINGS_GENERAL' => 'SETTINGS_GENERAL',
             'SETTINGS_MAIL' => 'SETTINGS_MAIL',
             'EVENTS_AUDIT_LOG' => 'EVENTS_AUDIT_LOG',
-            'PLANUPGRADE' => 'PLANUPGRADE'
+            'PLANUPGRADE' => 'PLANUPGRADE',
+            'BULK_IMPORT_STATUS' => 'BULK_IMPORT_STATUS',
         ];
     }
 
