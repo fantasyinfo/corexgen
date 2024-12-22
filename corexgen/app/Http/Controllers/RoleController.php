@@ -13,7 +13,9 @@ use Yajra\DataTables\Facades\DataTables;
 use App\Traits\TenantFilter;
 use Illuminate\Support\Facades\View;
 use App\Helpers\PermissionsHelper;
+use App\Models\User;
 use App\Traits\SubscriptionUsageFilter;
+use Illuminate\Support\Facades\DB;
 
 /**
  * CRMRoleController handles CRUD operations for CRM Roles
@@ -121,12 +123,53 @@ class RoleController extends Controller
                 ->make(true);
         }
 
+
+        // Build base query for user totals
+        $user = Auth::user();
+        $userQuery = CRMRole::query();
+
+        $userQuery = $this->applyTenantFilter($userQuery);
+
+        // Get all totals in a single query
+        $usersTotals = $userQuery->select([
+            DB::raw('COUNT(*) as totalUsers'),
+            DB::raw(sprintf(
+                'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalActive',
+                CRM_STATUS_TYPES['CRM_ROLES']['STATUS']['ACTIVE']
+            )),
+            DB::raw(sprintf(
+                'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalInactive',
+                CRM_STATUS_TYPES['CRM_ROLES']['STATUS']['DEACTIVE']
+            ))
+        ])->first();
+
+        // fetch usage
+
+        if (!$user->is_tenant && !is_null($user->company_id)) {
+            $usages = $this->fetchTotalAllowAndUsedUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['ROLE']]));
+        } else if ($user->is_tenant) {
+            $usages = [
+                'totalAllow' => '-1',
+                'currentUsage' => $usersTotals->totalUsers,
+                
+            ];
+        }
+
+
+
+
         // Render index view with filterss
         return view($this->getViewFilePath('index'), [
             'filters' => $request->all(),
             'title' => 'Roles Management',
             'permissions' => PermissionsHelper::getPermissionsArray('ROLE'),
             'module' => PANEL_MODULES[$this->getPanelModule()]['role'],
+            'type' => 'Roles',
+            'total_allow' => $usages['totalAllow'],
+            'total_used' => $usages['currentUsage'],
+            'total_active' => $usersTotals->totalActive,
+            'total_inactive' => $usersTotals->totalInactive,
+            'total_ussers' => $usersTotals->totalUsers,
         ]);
     }
 

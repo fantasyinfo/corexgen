@@ -96,12 +96,54 @@ class UserController extends Controller
         // Regular view rendering
         $roles = $this->applyTenantFilter(CRMRole::query())->get();
 
+
+
+
+        // Fetch the totals in a single query
+
+        // Build base query for user totals
+        $user = Auth::user();
+        $userQuery = User::where('deleted_at', null)->whereNot('id',$user->id);
+
+        $userQuery = $this->applyTenantFilter($userQuery);
+
+        // Get all totals in a single query
+        $usersTotals = $userQuery->select([
+            DB::raw('COUNT(*) as totalUsers'),
+            DB::raw(sprintf(
+                'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalActive',
+                CRM_STATUS_TYPES['USERS']['STATUS']['ACTIVE']
+            )),
+            DB::raw(sprintf(
+                'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalInactive',
+                CRM_STATUS_TYPES['USERS']['STATUS']['DEACTIVE']
+            ))
+        ])->first();
+
+        // fetch usage
+
+        if (!$user->is_tenant && !is_null($user->company_id)) {
+            $usages = $this->fetchTotalAllowAndUsedUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['USERS']]));
+        } else if ($user->is_tenant) {
+            $usages = [
+                'totalAllow' => '-1',
+                'currentUsage' => $usersTotals->totalUsers,
+            ];
+        }
+
+
         return view($this->getViewFilePath('index'), [
             'filters' => $request->all(),
             'title' => 'Users Management',
             'roles' => $roles,
             'permissions' => PermissionsHelper::getPermissionsArray('USERS'),
             'module' => PANEL_MODULES[$this->getPanelModule()]['users'],
+            'type' => 'Users',
+            'total_allow' => $usages['totalAllow'],
+            'total_used' => $usages['currentUsage'],
+            'total_active' => $usersTotals->totalActive,
+            'total_inactive' => $usersTotals->totalInactive,
+            'total_ussers' => $usersTotals->totalUsers,
         ]);
     }
 

@@ -108,13 +108,48 @@ class CompaniesController extends Controller
         $country = Country::all();
 
 
+        $user = Auth::user();
+
+        $userQuery = Company::query();
+        // $userQuery = $this->applyTenantFilter($userQuery);
+
+        // Get all totals in a single query
+        $usersTotals = $userQuery->select([
+            DB::raw('COUNT(*) as totalUsers'),
+            DB::raw(sprintf(
+                'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalActive',
+                CRM_STATUS_TYPES['COMPANIES']['STATUS']['ACTIVE']
+            )),
+            DB::raw(sprintf(
+                'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalInactive',
+                CRM_STATUS_TYPES['COMPANIES']['STATUS']['DEACTIVE']
+            ))
+        ])->first();
+
+        // fetch usage
+
+        if (!$user->is_tenant && !is_null($user->company_id)) {
+            $usages = $this->fetchTotalAllowAndUsedUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['COMPANIES']]));
+        } else if ($user->is_tenant) {
+            $usages = [
+                'totalAllow' => '-1',
+                'currentUsage' => $usersTotals->totalUsers,
+            ];
+        }
+
         return view($this->getViewFilePath('index'), [
             'filters' => $request->all(),
             'title' => 'Companies Management',
             'permissions' => PermissionsHelper::getPermissionsArray('COMPANIES'),
             'module' => PANEL_MODULES[$this->getPanelModule()]['companies'],
             'plans' => $plans,
-            'country' => $country
+            'country' => $country,
+            'type' => 'Companies',
+            'total_allow' => $usages['totalAllow'],
+            'total_used' => $usages['currentUsage'],
+            'total_active' => $usersTotals->totalActive,
+            'total_inactive' => $usersTotals->totalInactive,
+            'total_ussers' => $usersTotals->totalUsers,
         ]);
     }
 
