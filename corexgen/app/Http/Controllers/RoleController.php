@@ -272,6 +272,44 @@ class RoleController extends Controller
             ->header('Content-Disposition', "attachment; filename={$fileName}");
     }
 
+    public function importView(){
+        $expectedHeaders = [
+            'Role Name' => [
+                'key' => 'Role Name',
+                'message' => 'string, e.g., Manager, Accountant, Sales',
+            ],
+            'Role Description' => [
+                'key' => 'Role Description',
+                'message' => 'string, optional, e.g., for sales',
+            ]
+        ];
+
+
+        $sampleData = [
+            [
+
+                'Role Name' => 'Printing Sales Executive',
+                'Role Description' => 'to manage print things'
+
+            ],
+            [
+                'Role Name' => 'Ditial Manager',
+                'Role Description' => 'to manager ditial',
+             
+            ],
+        ];
+
+
+
+        return view($this->getViewFilePath('import'), [
+
+            'title' => 'Import Roles',
+            'headers' => $expectedHeaders,
+            'data' => $sampleData,
+            'module' => PANEL_MODULES[$this->getPanelModule()]['role'],
+        ]);
+    }
+
     /**
      * Import roles from CSV
      * 
@@ -302,11 +340,16 @@ class RoleController extends Controller
             foreach ($data as $row) {
                 $row = array_combine($header, $row);
 
-                CRMRole::create([
-                    'role_name' => $row['role_name'] ?? '',
-                    'role_desc' => $row['role_desc'] ?? '',
-                    'status' => CRM_STATUS_TYPES['CRM_ROLES']['STATUS']['ACTIVE'],
-                ]);
+                CRMRole::updateOrCreate(
+                    [
+                        'role_name' => $row['Role Name'] ?? '',
+                        'company_id' => Auth::user()->company_id ?? null, 
+                    ],
+                    [
+                        'role_desc' => $row['Role Description'] ?? '',
+                        'status' => CRM_STATUS_TYPES['CRM_ROLES']['STATUS']['ACTIVE'],
+                    ]
+                );
                 $totalAdd++;
             }
 

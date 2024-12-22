@@ -74,6 +74,7 @@ class CompaniesCsvRowProcessor
                 'address_pincode' => $row['Pincode'] ?? null,
                 'company_id' => $userContext['company_id'],
                 'is_tenant' => $userContext['is_tenant'],
+                'from_admin' => true,
             ];
 
             info('Prepared company data', ['company_data' => $companyData]);

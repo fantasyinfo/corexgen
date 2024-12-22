@@ -81,8 +81,8 @@
                 @include('layout.components.bulk-import-modal')
 
 
-                @if (hasPermission('CLIENTS.IMPORT') )
-                    <h5>{{ __('Bulk Import Clients Sample CSV Format') }}</h5>
+                @if (hasPermission('ROLE.IMPORT'))
+                    <h5>{{ __('Bulk Import Roles Sample CSV Format') }}</h5>
 
 
 
@@ -117,18 +117,17 @@
                         <!-- Primary action first -->
                         <a class="btn btn-primary btn-xl" href="#" data-bs-toggle="modal"
                             data-bs-target="#bulkImportModal" title="{{ __('crud.Import') }}">
-                            <i class="fas fa-upload me-2"></i> {{ __('crud.Import Clients Lists') }}
+                            <i class="fas fa-upload me-2"></i> {{ __('crud.Import Roles Lists') }}
                         </a>
 
                         <!-- Secondary actions -->
-                        <a class="btn btn-outline-primary btn-xl" href="/importcsv/clients.csv" target="_blank"
+                        <a class="btn btn-outline-primary btn-xl" href="/importcsv/roles.csv" target="_blank"
                             title="{{ __('crud.Download Sample Csv') }}">
                             <i class="fas fa-download me-2"></i> {{ __('crud.Download Sample Csv') }}
                         </a>
 
-                        <a href="{{ route('download.countries') }}" class="btn btn-outline-primary btn-xl">
-                            <i class="fas fa-download me-2"></i> {{ __('crud.Download Countries List for Country ID') }}
-                        </a>
+                   
+
                     </div>
 
                     <div class="table-responsive">

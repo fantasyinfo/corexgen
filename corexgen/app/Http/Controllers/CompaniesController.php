@@ -346,6 +346,90 @@ class CompaniesController extends Controller
             ->header('Content-Disposition', "attachment; filename={$fileName}");
     }
 
+    public function importView(){
+        $expectedHeaders = [
+            'Company Name' => [
+                'key' => 'Company Name',
+                'message' => 'string, e.g., Abc Public Digital Ltd or Pharma Pvt Ltd',
+            ],
+            'Owner Full Name' => [
+                'key' => 'Owner Full Name',
+                'message' => 'string,  e.g., Gaurav Kumar Sharma, John Doe',
+            ],
+            'Email' => [
+                'key' => 'Email',
+                'message' => 'string, email, e.g., john@doe.com',
+            ],
+            'Phone' => [
+                'key' => 'Phone',
+                'message' => 'string, number between 10 to 15 digit e.g.,9989009656, 12312312321',
+            ],
+            'Password' => [
+                'key' => 'Password',
+                'message' => 'string, must be 8 charactes long secretPass e.g.SecretPass',
+            ],
+            'Plan ID' => [
+                'key' => 'Plan ID',
+                'message' => 'string, plans table id e.g.1 , 2, 3',
+            ],
+            'Street Address' => [
+                'key' => 'Street Address',
+                'message' => 'string, optional, e.g., 123 Elm Street',
+            ],
+            'City Name' => [
+                'key' => 'City Name',
+                'message' => 'string, optional, e.g., Springfield, London',
+            ],
+            'Country ID' => [
+                'key' => 'Country ID',
+                'message' => 'string or integer, optional, e.g., 1 for USA, 44 for UK',
+            ],
+            'Pincode' => [
+                'key' => 'Pincode',
+                'message' => 'string or integer, optional, e.g., 12345, E1 6AN',
+            ],
+        ];
+
+
+        $sampleData = [
+            [
+                'Company Name' => 'Abc Limited',
+                'Owner Full Name' => 'John Doe',
+                'Email' => 'john@mail.com',
+                'Phone' => '9898767767',
+                'Password' => 'John@Secret123',
+                'Plan ID' => '1',
+                'Street Address' => '123 Elm Street',
+                'City Name' => 'Springfield',
+                'Country ID' => '1',
+                'Pincode' => '12345',
+            ],
+            [
+                'Company Name' => 'Parul Digitals Limited',
+                'Owner Full Name' => 'Parul Doe',
+                'Email' => 'originaparul@mail.com',
+                'Phone' => '1213232321',
+                'Password' => 'ParulPa@Secret123',
+                'Plan ID' => '2',
+                'Street Address' => '456 Oak Avenue',
+                'City Name' => 'London',
+                'Country ID' => '44',
+                'Pincode' => 'E1 6AN',
+            ],
+        ];
+
+
+
+        return view($this->getViewFilePath('import'), [
+
+            'title' => 'Import Companies',
+            'headers' => $expectedHeaders,
+            'data' => $sampleData,
+
+            'module' => PANEL_MODULES[$this->getPanelModule()]['companies'],
+        ]);
+    }
+
     /**
      * Method import bulk import company
      *
