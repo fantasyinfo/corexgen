@@ -10,6 +10,8 @@
                 @include('dashboard.crm.clients.components.clients-filters')
                 @include('layout.components.bulk-import-modal')
 
+                @include('layout.components.header-stats')
+
 
                 @if (hasPermission('CLIENTS.READ_ALL') || hasPermission('CLIENTS.READ'))
                     @php

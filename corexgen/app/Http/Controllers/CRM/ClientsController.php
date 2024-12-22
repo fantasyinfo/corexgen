@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use App\Jobs\CsvImportJob;
-
+use Illuminate\Support\Facades\DB;
 class ClientsController extends Controller
 {
 
@@ -77,11 +77,49 @@ class ClientsController extends Controller
             return $this->clientService->getDatatablesResponse($request);
         }
 
+
+
+        $user = Auth::user();
+        $userQuery = CRMClients::where('deleted_at', null);
+
+        $userQuery = $this->applyTenantFilter($userQuery);
+
+        // Get all totals in a single query
+        $usersTotals = $userQuery->select([
+            DB::raw('COUNT(*) as totalUsers'),
+            DB::raw(sprintf(
+                'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalActive',
+                CRM_STATUS_TYPES['CLIENTS']['STATUS']['ACTIVE']
+            )),
+            DB::raw(sprintf(
+                'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalInactive',
+                CRM_STATUS_TYPES['CLIENTS']['STATUS']['DEACTIVE']
+            ))
+        ])->first();
+
+        // fetch usage
+
+        if (!$user->is_tenant && !is_null($user->company_id)) {
+            $usages = $this->fetchTotalAllowAndUsedUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['CLIENTS']]));
+        } else if ($user->is_tenant) {
+            $usages = [
+                'totalAllow' => '-1',
+                'currentUsage' => $usersTotals->totalUsers,
+            ];
+        }
+
+
         return view($this->getViewFilePath('index'), [
             'filters' => $request->all(),
             'title' => 'Clients Management',
             'permissions' => PermissionsHelper::getPermissionsArray('CLIENTS'),
             'module' => PANEL_MODULES[$this->getPanelModule()]['clients'],
+            'type' => 'Clients',
+            'total_allow' => $usages['totalAllow'],
+            'total_used' => $usages['currentUsage'],
+            'total_active' => $usersTotals->totalActive,
+            'total_inactive' => $usersTotals->totalInactive,
+            'total_ussers' => $usersTotals->totalUsers,
         ]);
     }
     public function store(ClientRequest $request)

@@ -22,7 +22,7 @@ trait SubscriptionUsageFilter
 
         // fetch current usage
 
-        $currentUsage = $this->getCurrentUsage($this->getCurrentSubscriptionId(),$module);
+        $currentUsage = $this->getCurrentUsage($this->getCurrentSubscriptionId(), $module);
 
         \Log::info('Usage', [
             'currentUsage' => $currentUsage,
@@ -104,6 +104,7 @@ trait SubscriptionUsageFilter
             return true;
         }
 
+
         $currentSubscriptionsAllowed = Subscription::with([
             'plans' => function ($q) use ($module) {
                 $q->with([
@@ -116,7 +117,7 @@ trait SubscriptionUsageFilter
             ->where('company_id', $this->getCompanyId())
             ->latest()
             ->first();
-
+        // dd($currentSubscriptionsAllowed->toSql());
 
         return $currentSubscriptionsAllowed->plans->planFeatures[0]->value;
 
@@ -134,7 +135,7 @@ trait SubscriptionUsageFilter
         return $subscription->id;
     }
 
-    private function getCurrentUsage(int $subId,$module): int
+    private function getCurrentUsage(int $subId, $module): int
     {
         // Find existing usage
         $subUsageFind = SubscriptionUsage::where('subscription_id', $subId)
@@ -155,6 +156,27 @@ trait SubscriptionUsageFilter
     }
     private function getCompanyId()
     {
-        return Auth::check() && Auth::user()->company_id;
+        if (Auth::check()) {
+            return Auth::user()->company_id;
+        }
+        return null;
+    }
+
+    public function fetchTotalAllowAndUsedUsage($module)
+    {
+
+        $totalAllow = $this->getTotalAllowed($module);
+        // fetch current usage
+
+        $currentUsage = $this->getCurrentUsage($this->getCurrentSubscriptionId(), $module);
+
+        return [
+            'currentUsage' => $currentUsage,
+            'totalAllow' => $totalAllow,
+            'companyId' => $this->getCompanyId(),
+            'currentSubID' => $this->getCurrentSubscriptionId()
+        ];
+
+
     }
 }

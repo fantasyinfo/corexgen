@@ -9,8 +9,9 @@
 
             <div class="shadow-sm rounded">
 
-                @include('dashboard.users.components.header-stats')
                 @include('dashboard.users.components.users-filters')
+                
+                @include('layout.components.header-stats')
                 @include('layout.components.bulk-import-modal')
 
 
