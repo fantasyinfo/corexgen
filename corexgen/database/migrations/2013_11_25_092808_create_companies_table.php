@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('companies', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email');
+            $table->string('name')->unique()->index();
+            $table->string('email')->unique()->index();
             $table->string('phone')->nullable();
             $table->enum('status', CRM_STATUS_TYPES['COMPANIES']['TABLE_STATUS']);
 
@@ -28,7 +28,6 @@ return new class extends Migration
             $table->foreign('plan_id')->references('id')->on('plans')->onDelete('cascade');
 
             
-            $table->softDeletes();
             $table->timestamps();
         });
     }

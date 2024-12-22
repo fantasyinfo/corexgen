@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services\Csv;
 
 use App\Models\Plans;
@@ -93,28 +94,64 @@ class CompaniesCsvRowProcessor
             info('Company created successfully', ['email' => $row['Email'], 'company_id' => $company->id]);
 
             return true;
-
+        } catch (\Illuminate\Database\QueryException $e) {
+            $userFriendlyMessage = $this->handleDatabaseError($e, $row);
+            throw new ImportException(
+                $userFriendlyMessage,
+                'database_conflict'
+            );
         } catch (ImportException $e) {
             info('Import exception encountered', [
                 'row' => $row,
-                'context' => $userContext,
                 'error' => $e->getMessage(),
-                'code' => $e->getCode(),
+                'code' => $e->getErrorCode()
             ]);
             throw $e;
         } catch (\Exception $e) {
             info('Unexpected error encountered during row processing', [
                 'row' => $row,
-                'context' => $userContext,
-                'error' => $e->getMessage(),
+                'error' => $e->getMessage()
             ]);
             throw new ImportException(
-                "Unexpected error: {$e->getMessage()}",
+                "Failed to create company: " . $this->getUserFriendlyError($e->getMessage()),
                 'unexpected_error',
                 $e
             );
         } finally {
             info('finally row processing', ['row_data' => $row, 'context' => $userContext]);
         }
+    }
+
+    private function handleDatabaseError(\Exception $e, array $row): string
+    {
+        if (strpos($e->getMessage(), 'companies.companies_email_unique') !== false) {
+            return "Email address '{$row['Email']}' is already registered to another company";
+        }
+
+  
+
+        if (strpos($e->getMessage(), 'companies.companies_name_unique') !== false) {
+            return "Company name '{$row['Company Name']}' is already taken";
+        }
+
+        return "Unable to create company due to database conflict. Please check for duplicate information.";
+    }
+
+    private function getUserFriendlyError(string $message): string
+    {
+        $errorMap = [
+            'SQLSTATE[23000]' => 'A duplicate record was found',
+            'Integrity constraint violation' => 'This information conflicts with an existing company',
+            'foreign key constraint fails' => 'Invalid reference to another record',
+            'Data too long' => 'One or more fields exceed maximum length',
+        ];
+
+        foreach ($errorMap as $technical => $friendly) {
+            if (strpos($message, $technical) !== false) {
+                return $friendly;
+            }
+        }
+
+        return "An unexpected error occurred while creating the company";
     }
 }

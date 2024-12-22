@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('company_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
             $table->boolean('is_tenant')->default(false);
-            $table->string('file_name');
+            $table->string('file_name')->unique();
             $table->string('import_type');  // e.g., 'users', 'products', etc.
             $table->integer('total_rows')->default(0);
             $table->integer('processed_rows')->default(0);

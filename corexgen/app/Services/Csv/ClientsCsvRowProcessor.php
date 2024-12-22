@@ -45,13 +45,13 @@ class ClientsCsvRowProcessor
 
             // Validate and parse emails
             $emails = $this->parseAndValidateEmails($row['Emails']);
-            
+
             // Validate and parse phone numbers
             $phones = $this->parseAndValidatePhones($row['Phones']);
-            
+
             // Parse social media
             $socialMedia = $this->parseSocialMedia($row['Social Media Links'] ?? '');
-            
+
             // Build address array
             $address = $this->buildAddressArray($row);
 
@@ -84,8 +84,8 @@ class ClientsCsvRowProcessor
 
             // Update usage after successful creation
             $this->updateUsage(
-                strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['CLIENTS']]), 
-                '+', 
+                strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['CLIENTS']]),
+                '+',
                 '1'
             );
 
@@ -95,6 +95,12 @@ class ClientsCsvRowProcessor
 
             return true;
 
+        } catch (\Illuminate\Database\QueryException $e) {
+            $userFriendlyMessage = $this->handleDatabaseError($e);
+            throw new ImportException(
+                $userFriendlyMessage,
+                'database_conflict'
+            );
         } catch (ImportException $e) {
             info('Import error', [
                 'name' => $row['First Name'] . ' ' . $row['Last Name'],
@@ -108,7 +114,7 @@ class ClientsCsvRowProcessor
                 'error' => $e->getMessage()
             ]);
             throw new ImportException(
-                "Unexpected error: {$e->getMessage()}",
+                "Failed to create client: " . $this->getUserFriendlyError($e->getMessage()),
                 'unexpected_error',
                 $e
             );
@@ -196,19 +202,61 @@ class ClientsCsvRowProcessor
      */
     private function buildAddressArray($row)
     {
-        if (empty($row['Street Address']) && 
-            empty($row['City Name']) && 
-            empty($row['Country ID']) && 
-            empty($row['Pincode'])) {
+        if (
+            empty($row['Street Address']) &&
+            empty($row['City Name']) &&
+            empty($row['Country ID']) &&
+            empty($row['Pincode'])
+        ) {
             return [];
         }
 
-        return [[
-            'type' => 'home',
-            'city' => $row['City Name'] ?? null,
-            'country_id' => $row['Country ID'] ?? null,
-            'street_address' => $row['Street Address'] ?? null,
-            'pincode' => $row['Pincode'] ?? null,
-        ]];
+        return [
+            [
+                'type' => 'home',
+                'city' => $row['City Name'] ?? null,
+                'country_id' => $row['Country ID'] ?? null,
+                'street_address' => $row['Street Address'] ?? null,
+                'pincode' => $row['Pincode'] ?? null,
+            ]
+        ];
+    }
+
+    private function handleDatabaseError(\Exception $e): string
+    {
+        // Check for duplicate email error
+        if (strpos($e->getMessage(), 'clients.clients_primary_email_unique') !== false) {
+            preg_match("/Duplicate entry '(.+?)' for key/", $e->getMessage(), $matches);
+            $email = $matches[1] ?? 'unknown';
+            return "Email address '{$email}' is already in use by another client";
+        }
+
+        // Check for duplicate phone error (if you have such constraint)
+        if (strpos($e->getMessage(), 'clients.clients_primary_phone_unique') !== false) {
+            preg_match("/Duplicate entry '(.+?)' for key/", $e->getMessage(), $matches);
+            $phone = $matches[1] ?? 'unknown';
+            return "Phone number '{$phone}' is already in use by another client";
+        }
+
+        // Generic database error
+        return "Unable to create client due to database conflict. Please check for duplicate information.";
+    }
+
+    private function getUserFriendlyError(string $message): string
+    {
+        // Map of technical error messages to user-friendly ones
+        $errorMap = [
+            'SQLSTATE[23000]' => 'A duplicate record was found',
+            'Integrity constraint violation' => 'This information conflicts with an existing client',
+            // Add more mappings as needed
+        ];
+
+        foreach ($errorMap as $technical => $friendly) {
+            if (strpos($message, $technical) !== false) {
+                return $friendly;
+            }
+        }
+
+        return "An unexpected error occurred while creating the client";
     }
 }

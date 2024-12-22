@@ -13,10 +13,12 @@ class CompanyRepository
 
     public function getCompanyQuery($request)
     {
+        $query = Company::query()
+            ->with(['plans', 'latestSubscription'])
+            ->whereHas('plans') // Ensures the company has at least one plan
+            ->whereHas('latestSubscription'); // Ensures the company has a latest subscription
 
-        $query = Company::query()->with(['plans', 'latestSubscription']);
-
-        // Dynamic filters
+        // Apply dynamic filters if any
         return $this->applyFilters($query, $request);
     }
 
@@ -33,7 +35,7 @@ class CompanyRepository
                 fn($q) => $q->where('companies.email', 'LIKE', "%{$request->email}%")
             )
             ->when(
-                $request->filled('status')  && $request->status != '0',
+                $request->filled('status') && $request->status != '0',
                 fn($q) => $q->where('companies.status', $request->status)
             )
             ->when(

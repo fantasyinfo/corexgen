@@ -144,6 +144,13 @@ PermissionsHelper::initializePermissions();
         'for' => 'tenant',
         'is_feature' => false
     ],
+    PermissionsHelper::$plansPermissionsKeys['BULK_IMPORT_STATUS'] => [
+        'name' => 'BULK_IMPORT_STATUS',
+        'id' => PermissionsHelper::getParentPermissionId('18'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['BULK_IMPORT_STATUS'],
+        'for' => 'both',
+        'is_feature' => false
+    ],
 
     // starting from 100
     PermissionsHelper::$plansPermissionsKeys['CLIENTS'] => [
@@ -231,6 +238,7 @@ PermissionsHelper::initializePermissions();
         'permission_id' => PermissionsHelper::getParentPermissionId('16'),
         'children' => [
             'Audit' => ['menu_url' => 'audit.index', 'menu_icon' => 'fa-box', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['EVENTS_AUDIT_LOG'], 'READ_ALL')],
+            'Bulk Import' => ['menu_url' => 'audit.bulkimport', 'menu_icon' => 'fa-box', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['BULK_IMPORT_STATUS'], 'READ_ALL')],
 
         ]
     ],
@@ -293,6 +301,7 @@ PermissionsHelper::initializePermissions();
         'permission_id' => PermissionsHelper::getParentPermissionId('16'),
         'children' => [
             'Audit' => ['menu_url' => 'audit.index', 'menu_icon' => 'fa-box', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['EVENTS_AUDIT_LOG'], 'READ_ALL')],
+            'Bulk Import' => ['menu_url' => 'audit.bulkimport', 'menu_icon' => 'fa-box', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['BULK_IMPORT_STATUS'], 'READ_ALL')],
 
         ]
     ],

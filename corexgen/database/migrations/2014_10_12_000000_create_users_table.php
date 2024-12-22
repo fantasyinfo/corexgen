@@ -35,9 +35,9 @@ return new class extends Migration
 
             $table->foreignId('current_team_id')->nullable();
 
-            $table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('set null');
+            $table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('cascade');
             $table->foreign('role_id')->references('id')->on('crm_roles')->onDelete('set null');
-            $table->foreign('company_id')->references('id')->on('companies')->onDelete('set null');
+            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
             $table->foreign('address_id')->references('id')->on('addresses')->onDelete('cascade');
 
 
