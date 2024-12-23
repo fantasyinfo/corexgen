@@ -2,6 +2,7 @@
 
 use App\Models\Company;
 use App\Models\CRM\CRMMenu;
+use App\Models\Tenant;
 use App\Models\User;
 use App\Models\CRM\CRMRole;
 use App\Models\CRM\CRMRolePermissions;
@@ -263,7 +264,6 @@ function hasPermission($permissionKey)
     return CRMRolePermissions::where('role_id', $user->role_id)
         ->where('permission_id', $modulePermissionId)
         ->exists();
-
 }
 
 
@@ -304,7 +304,6 @@ function hasMenuPermission($permissionId = null)
         ->where('permission_id', $permissionId)
         ->where('role_id', $user->role_id)
         ->exists();
-
 }
 
 
@@ -906,4 +905,18 @@ function getActivePlanWithFeatuers($companyId)
         'plans.planFeatures' // Load plans and their planFeatures
     ])->where('id', $companyId) // Use company_id from Auth
         ->first();
+}
+
+
+function getCompanyName($companyid = null)
+{
+    if (Auth::user()->is_tenant) {
+        return Tenant::where('id', Auth::user()->tenant_id)->value('name');
+    }
+
+    if (is_null($companyid)) {
+        return Company::where('id', Auth::user()->company_id)->value('name');
+    }
+
+    return Company::where('id', $companyid)->value('name');
 }

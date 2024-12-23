@@ -2,12 +2,14 @@
 namespace App\Services\Csv;
 
 use App\Helpers\PermissionsHelper;
+use App\Traits\CategoryGroupTagsFilter;
 use App\Traits\QueueSubscriptionUsageFilter;
 use App\Exceptions\ImportException;
 
 class ClientsCsvRowProcessor
 {
     use QueueSubscriptionUsageFilter;
+    use CategoryGroupTagsFilter;
 
     /**
      * Process a single row of CSV data.
@@ -54,6 +56,15 @@ class ClientsCsvRowProcessor
 
             // Build address array
             $address = $this->buildAddressArray($row);
+
+            $validCGTID = $this->checkIsValidCGTID($row['CGT ID'], $companyId, 'categories', 'clients');
+
+            if (!$validCGTID) {
+                throw new ImportException(
+                    "Failed to create client {$row['First Name']} {$row['Last Name']} beacuse invalid CGT ID {$row['CGT ID']}",
+                    'invalid_cgt_id'
+                );
+            }
 
             // Prepare client data
             $clientData = [
@@ -260,4 +271,6 @@ class ClientsCsvRowProcessor
 
         return "An unexpected error occurred while creating the client";
     }
+
+
 }

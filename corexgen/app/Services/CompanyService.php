@@ -157,7 +157,7 @@ class CompanyService
         foreach ($clientsCategory as $cc) {
             $insertArray[] = [
                 'name' => $cc,
-                'color' => array_rand($colors),
+                'color' => $colors[array_rand($colors)],
                 'relation_type' => 'clients',
                 'type' => 'categories',
                 'status' => 'active',

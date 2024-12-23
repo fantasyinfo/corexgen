@@ -19,7 +19,9 @@
                         $columns = [
                             [
                                 'data' => null,
-                                'label' => new \Illuminate\Support\HtmlString('<input type="checkbox" id="select-all" />'),
+                                'label' => new \Illuminate\Support\HtmlString(
+                                    '<input type="checkbox" id="select-all" />',
+                                ),
                                 'orderable' => false,
                                 'searchable' => false,
                                 'width' => '10px',
@@ -96,6 +98,14 @@
                                 'name' => 'address',
                                 'label' => __('clients.Address'),
                                 'searchable' => false,
+                                'orderable' => true,
+                                'width' => '100px',
+                            ],
+                            [
+                                'data' => 'category_name',
+                                'name' => 'category_group_tag.name',
+                                'label' => __('clients.Category'),
+                                'searchable' => true,
                                 'orderable' => true,
                                 'width' => '100px',
                             ],

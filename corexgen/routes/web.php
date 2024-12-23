@@ -194,8 +194,13 @@ Route::middleware([
 ])->prefix(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']))->as(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']) . '.')->group(function () {
 
     Route::get('/', function () {
-        dd('Company Panel Home');
+        // dd('Company Panel Home');
+        return redirect()->route(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']) . '.role.index');
     })->name('home');
+
+
+
+
 
     // role routes
     Route::prefix(PANEL_MODULES['COMPANY_PANEL']['role'])->as(PANEL_MODULES['COMPANY_PANEL']['role'] . '.')->group(function () {
@@ -241,6 +246,10 @@ Route::middleware([
         Route::post('/changePassword', [UserController::class, 'changePassword'])->name('changePassword')->middleware('check.permission:USERS.CHANGE_PASSWORD');
         Route::get('/view/{id}', [UserController::class, 'view'])->name('view')->middleware('check.permission:USERS.VIEW');
         Route::get('/profile', [UserController::class, 'profile'])->name('profile');
+
+
+        // login back
+        Route::get('/login-back', [CompaniesController::class, 'loginback'])->name('loginback');
     });
 
 
@@ -335,7 +344,8 @@ Route::middleware([
 ])->prefix(getPanelUrl(PANEL_TYPES['SUPER_PANEL']))->as(getPanelUrl(PANEL_TYPES['SUPER_PANEL']) . '.')->group(function () {
 
     Route::get('/', function () {
-        dd('Super Panel Home');
+        // dd('Super Panel Home');
+        return redirect()->route(getPanelUrl(PANEL_TYPES['SUPER_PANEL']) . '.companies.index');
     })->name('home');
     // role routes
     Route::prefix('role')->as('role.')->group(function () {
