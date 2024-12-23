@@ -419,6 +419,7 @@ PermissionsHelper::initializePermissions();
         'planupgrade' => 'planupgrade',
         'audit' => 'audit',
         'clients' => 'clients',
+        
     ]
 ]);
 

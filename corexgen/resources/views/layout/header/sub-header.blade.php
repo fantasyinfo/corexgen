@@ -15,10 +15,18 @@
                 @elseif(!Auth::user()->is_tenant && Auth::user()->role_id != null)
                     Company Employee
                 @endif
+
+                {{ getCompanyName() }}
             </span>
 
         </div>
         <div class="d-flex align-items-center">
+            @if (session()->get('login_as') == true)
+                <div>
+                    <a href="{{ route(getPanelRoutes('users.loginback')) }}" class="btn btn-primary btn-sm">Login Back to
+                        Super Panel</a>
+                </div>
+            @endif
             <div class=" mx-1 theme-toggle" id="themeToggle">
                 <i class="fas fa-sun fa-lg"></i>
             </div>
@@ -49,7 +57,8 @@
                     <li>
                         <hr class="dropdown-divider">
                     </li>
-                    <li><a class="dropdown-item" href="{{route(getPanelRoutes('users.profile'))}}"><i class="fas fa-user me-2"></i>
+                    <li><a class="dropdown-item" href="{{ route(getPanelRoutes('users.profile')) }}"><i
+                                class="fas fa-user me-2"></i>
                             {{ __('general.Profile') }}</a></li>
                     <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>
                             {{ __('general.Settings') }}</a></li>

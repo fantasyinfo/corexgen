@@ -12,4 +12,14 @@ trait CategoryGroupTagsFilter
         return CategoryGroupTag::where('type', $type)->where('relation_type', $relation)->where('status', $status);
     }
 
+    public function checkIsValidCGTID($id, $company_id, $type, $relation): bool
+    {
+        return CategoryGroupTag::where('type', $type)
+            ->where('relation_type', $relation)
+            ->where('company_id', $company_id)
+            ->where('id', $id)->exists();
+
+
+    }
+
 }

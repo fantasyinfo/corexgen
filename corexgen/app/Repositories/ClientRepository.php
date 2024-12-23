@@ -6,22 +6,41 @@ use App\Models\CRM\CRMClients;
 
 class ClientRepository
 {
-    // Your repository methods
-
     public function getClientsQuery($request)
     {
-        $query = CRMClients::query()->with([
-            'addresses' => function ($query) {
-                $query->select('addresses.id', 'addresses.street_address', 'addresses.postal_code', 'addresses.city_id', 'addresses.country_id')
-                    ->withPivot('type');
-            }
-        ]);
+        $query = CRMClients::query()
+            ->leftJoin('category_group_tag', 'clients.cgt_id', '=', 'category_group_tag.id')
+            ->select('clients.*', 'category_group_tag.name as category_name', 'category_group_tag.color as category_color')
+            ->with([
+                'categoryGroupTag' => function ($query) {
+                    $query->where('status', 'active')
+                        ->where('relation_type', 'clients');
+                },
+                'addresses' => function ($query) {
+                    $query->select('addresses.id', 'addresses.street_address', 'addresses.postal_code', 'addresses.city_id', 'addresses.country_id')
+                        ->withPivot('type');
+                }
+            ]);
+
         // Dynamic filters
         return $this->applyFilters($query, $request);
     }
+
     protected function applyFilters($query, $request)
     {
         return $query
+            ->when(
+                $request->filled('search'),
+                fn($q) => $q->where(function ($subQuery) use ($request) {
+                    $searchTerm = strtolower($request->search['value']);
+                    $subQuery->where('clients.type', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('clients.company_name', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('clients.title', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('clients.first_name', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('category_group_tag.name', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('clients.created_at', 'LIKE', "%{$searchTerm}%");
+                })
+            )
             ->when(
                 $request->filled('name'),
                 fn($q) => $q->where(function ($subQuery) use ($request) {
@@ -51,5 +70,4 @@ class ClientRepository
                 fn($q) => $q->whereDate('clients.created_at', '<=', $request->end_date)
             );
     }
-
 }

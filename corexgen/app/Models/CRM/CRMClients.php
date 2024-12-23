@@ -3,6 +3,7 @@
 namespace App\Models\CRM;
 
 use App\Models\Address;
+use App\Models\CategoryGroupTag;
 use App\Models\Company;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -66,6 +67,10 @@ class CRMClients extends Model implements Auditable
         return $this->belongsTo(Company::class, 'company_id');
     }
 
+    public function categoryGroupTag()
+    {
+        return $this->belongsTo(CategoryGroupTag::class, 'cgt_id');
+    }
 
     protected static function boot()
     {

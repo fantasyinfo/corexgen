@@ -28,6 +28,7 @@ return [
     'No Permission' => 'No Permission',
     'Create New' => 'Create New',
     'Download Sample Csv' => 'Download Sample Csv',
+    'Download CGT ID' => 'Download CGT ID',
     'Import Clients Lists' => 'Import Clients Lists',
     'Import Users Lists' => 'Import Users Lists',
     'Import Companies Lists' => 'Import Companies Lists',

@@ -8,18 +8,22 @@ use App\Models\City;
 use App\Models\ClientAddress;
 use App\Models\CRM\CRMClients;
 use App\Repositories\ClientRepository;
+use App\Traits\CategoryGroupTagsFilter;
 use App\Traits\MediaTrait;
 use App\Traits\TenantFilter;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
 use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
+use Exception;
+use Illuminate\Support\Facades\Auth;
 
 class ClientService
 {
 
     use TenantFilter;
     use MediaTrait;
+    use CategoryGroupTagsFilter;
 
 
     protected $clientRepository;
@@ -37,6 +41,12 @@ class ClientService
     {
         return DB::transaction(function () use ($validatedData) {
 
+            $validCGTID = $this->checkIsValidCGTID($validatedData['cgt_id'], Auth::user()->company_id, 'categories', 'clients');
+
+            if (!$validCGTID) {
+                throw new \InvalidArgumentException("Failed to create client beacuse invalid CGT ID ");
+            }
+
             $client = CRMClients::create($validatedData);
             $client_address = $this->createOrUpdateAddresses($validatedData, $client);
 
@@ -48,6 +58,8 @@ class ClientService
     }
 
 
+
+
     public function updateClient(array $validatedData)
     {
         // Validate that company ID is provided
@@ -56,6 +68,14 @@ class ClientService
         }
 
         return DB::transaction(function () use ($validatedData) {
+
+            $validCGTID = $this->checkIsValidCGTID($validatedData['cgt_id'], Auth::user()->company_id, 'categories', 'clients');
+
+            if (!$validCGTID) {
+                throw new \InvalidArgumentException("Failed to update client beacuse invalid CGT ID ");
+            }
+
+
             // Retrieve the existing client
             $client = CRMClients::findOrFail($validatedData['id']);
 
@@ -163,6 +183,9 @@ class ClientService
             ->editColumn('created_at', function ($client) {
                 return Carbon::parse($client->created_at)->format('d M Y');
             })
+            ->editColumn('category_name', function ($client) {
+                return "<span style='color:".$client->category_color.";'>$client->category_name</span>";
+            })
             // ->editColumn('name', function ($client) use ($module) {
             //     $fullName = trim("{$client->title} {$client->first_name} {$client->middle_name} {$client->last_name}");
             //     return "<a class='dt-link' href='" . route($this->tenantRoute . $module . '.view', $client->id) . "' target='_blank'>$fullName</a>";
@@ -183,7 +206,7 @@ class ClientService
             ->editColumn('status', function ($client) {
                 return $this->renderStatusColumn($client);
             })
-            ->rawColumns(['actions', 'name', 'status']) // Include any HTML columns
+            ->rawColumns(['actions','category_name', 'name', 'status']) // Include any HTML columns
             ->make(true);
     }
 
