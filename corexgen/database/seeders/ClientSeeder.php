@@ -33,7 +33,7 @@ class ClientSeeder extends Seeder
                 ]), // Multiple phone numbers as JSON
                 'primary_email' => fake()->safeEmail(),
                 'primary_phone' => fake()->phoneNumber(),
-                'category' => CLIENTS_CATEGORY_TYPES['STATUS'][array_rand(CLIENTS_CATEGORY_TYPES['STATUS'])], // Corrected for CLIENTS_CATEGORY_TYPES['STATUS']
+              
                 'company_id' => 1, // Generate random company_id
             ];
         }

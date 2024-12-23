@@ -11,6 +11,7 @@ use App\Models\CRM\CRMClients;
 use App\Repositories\ClientRepository;
 use App\Services\Csv\ClientsCsvRowProcessor;
 use App\Services\ClientService;
+use App\Traits\CategoryGroupTagsFilter;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
 use App\Traits\SubscriptionUsageFilter;
@@ -18,12 +19,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use App\Jobs\CsvImportJob;
+use App\Models\CategoryGroupTag;
 use Illuminate\Support\Facades\DB;
 class ClientsController extends Controller
 {
 
     use TenantFilter;
     use SubscriptionUsageFilter;
+    use CategoryGroupTagsFilter;
     //
     /**
      * Number of items per page for pagination
@@ -80,7 +83,7 @@ class ClientsController extends Controller
 
 
         $user = Auth::user();
-        $userQuery = CRMClients::where('deleted_at', null);
+        $userQuery = CRMClients::query();
 
         $userQuery = $this->applyTenantFilter($userQuery);
 
@@ -153,10 +156,17 @@ class ClientsController extends Controller
     {
         $this->checkCurrentUsage(strtolower(PermissionsHelper::$plansPermissionsKeys['CLIENTS']));
         $countries = Country::all();
+
+
+        $categoryQuery = $this->getCategoryGroupTags('categories', 'clients');
+        $categoryQuery = $this->applyTenantFilter($categoryQuery);
+        $categories = $categoryQuery->get();
+
         return view($this->getViewFilePath('create'), [
             'title' => 'Create Client',
             'countries' => $countries,
             'module' => PANEL_MODULES[$this->getPanelModule()]['clients'],
+            'categories' => $categories
 
         ]);
     }
@@ -200,6 +210,9 @@ class ClientsController extends Controller
 
         $countries = Country::all();
 
+        $categoryQuery = $this->getCategoryGroupTags('categories', 'clients');
+        $categoryQuery = $this->applyTenantFilter($categoryQuery);
+        $categories = $categoryQuery->get();
 
         return view($this->getViewFilePath('edit'), [
 
@@ -207,6 +220,7 @@ class ClientsController extends Controller
             'client' => $client,
             'countries' => $countries,
             'module' => PANEL_MODULES[$this->getPanelModule()]['clients'],
+            'categories' => $categories
         ]);
     }
 
@@ -279,6 +293,7 @@ class ClientsController extends Controller
         $csvData[] = [
             'Client ID',
             'Type',
+            'Company Name',
             'Title',
             'First Name',
             'Middle Name',
@@ -286,7 +301,7 @@ class ClientsController extends Controller
             'Emails',
             'Phones',
             'Social Media Links',
-            'Category',
+            'CGT ID',
             'Street Address',
             'City ID',
             'City Name',
@@ -311,6 +326,7 @@ class ClientsController extends Controller
             $csvData[] = [
                 $client->id,
                 $client->type,
+                $client->company_name,
                 $client->title,
                 $client->first_name,
                 $client->middle_name,
@@ -318,7 +334,7 @@ class ClientsController extends Controller
                 $emails,
                 $phones,
                 $socialMedia,
-                $client->category,
+                $client->cgt_id,
                 $address?->street_address ?? '',
                 $address?->city_id ?? '',
                 $address?->city?->name ?? '',
@@ -347,12 +363,16 @@ class ClientsController extends Controller
 
     public function importView()
     {
-     
+
 
         $expectedHeaders = [
             'Type' => [
                 'key' => 'Type',
                 'message' => 'string, e.g., Individual or Company',
+            ],
+            'Company Name' => [
+                'key' => 'Company Name',
+                'message' => 'string, required only if type is company e.g., Abc Ltd Pty, Xyz Limited',
             ],
             'Title' => [
                 'key' => 'Title',
@@ -382,9 +402,9 @@ class ClientsController extends Controller
                 'key' => 'Social Media Links',
                 'message' => 'array, optional, comma-separated, e.g., x: https://x.com/user, fb: https://www.facebook.com/user',
             ],
-            'Category' => [
-                'key' => 'Category',
-                'message' => 'string, must be these only '. implode(',',CLIENTS_CATEGORY_TYPES['TABLE_STATUS']),
+            'CGT ID' => [
+                'key' => 'CGT ID',
+                'message' => 'required,  exists:from CGT ID,id, e.g., 1 ,2,3 ' ,
             ],
             'Street Address' => [
                 'key' => 'Street Address',
@@ -403,11 +423,12 @@ class ClientsController extends Controller
                 'message' => 'string or integer, optional, e.g., 12345, E1 6AN',
             ],
         ];
-        
+
 
         $sampleData = [
             [
                 'Type' => 'Individual',
+                'Company Name' => '',
                 'Title' => 'Mr',
                 'First Name' => 'John',
                 'Middle Name' => 'Edward',
@@ -415,7 +436,7 @@ class ClientsController extends Controller
                 'Emails' => 'john.doe@example.com; jane.doe@example.org',
                 'Phones' => '+91 8989898989; +1 89898989898',
                 'Social Media Links' => 'x: https://x.com/johndoe, fb: https://www.facebook.com/johndoe, in: https://www.instagram.com/johndoe, ln: https://www.linkedin.com/in/johndoe',
-                'Category' => 'Normal',
+                'CGT ID' => '2',
                 'Street Address' => '123 Elm Street',
                 'City Name' => 'Springfield',
                 'Country ID' => '1',
@@ -423,6 +444,7 @@ class ClientsController extends Controller
             ],
             [
                 'Type' => 'Company',
+                'Company Name' => 'ABC Multi Brach Hospital For Children',
                 'Title' => 'Dr',
                 'First Name' => 'Anna',
                 'Middle Name' => 'Marie',
@@ -430,7 +452,7 @@ class ClientsController extends Controller
                 'Emails' => 'anna.smith@example.org; contact@smithco.com',
                 'Phones' => '+44 8787878787; +44 7676767676',
                 'Social Media Links' => 'x: https://x.com/smithco, fb: https://www.facebook.com/smithco, in: https://www.instagram.com/smithco, ln: https://www.linkedin.com/company/smithco',
-                'Category' => 'High Budget',
+                'CGT ID' => '1',
                 'Street Address' => '456 Oak Avenue',
                 'City Name' => 'London',
                 'Country ID' => '44',
@@ -439,6 +461,7 @@ class ClientsController extends Controller
         ];
 
 
+    
 
         return view($this->getViewFilePath('import'), [
 
@@ -469,14 +492,15 @@ class ClientsController extends Controller
             // Validation rules for each row
             $rules = [
                 'Type' => ['required', 'string', Rule::in(['Individual', 'Company'])],
+                'Company Name' => ['nullable','required_if:Type,Company'],
                 'Title' => ['nullable', 'string'],
                 'First Name' => ['required', 'string'],
                 'Middle Name' => ['nullable', 'string'],
                 'Last Name' => ['required', 'string'],
-                'Emails' => ['required', 'string'],
+                'Emails' => ['required','string'],
                 'Phones' => ['required', 'string'],
                 'Social Media Links' => ['nullable', 'string'], // Allow empty
-                'Category' => ['nullable', Rule::in(CLIENTS_CATEGORY_TYPES['TABLE_STATUS'])],
+                'CGT ID' => ['required','string', 'exists:category_group_tag,id'],
                 'Street Address' => ['nullable', 'string', 'max:255'], // Allow empty
                 'City Name' => ['nullable', 'string'], // Allow empty
                 'Country ID' => ['nullable', 'exists:countries,id'], // Allow empty
@@ -484,7 +508,7 @@ class ClientsController extends Controller
             ];
 
             // Expected CSV headers
-            $expectedHeaders = ['Type', 'Title', 'First Name', 'Middle Name', 'Last Name', 'Emails', 'Phones', 'Social Media Links', 'Category', 'Street Address', 'City Name', 'Country ID', 'Pincode'];
+            $expectedHeaders = ['Type', 'Company Name','Title', 'First Name', 'Middle Name', 'Last Name', 'Emails', 'Phones', 'Social Media Links', 'CGT ID', 'Street Address', 'City Name', 'Country ID', 'Pincode'];
 
             // Dispatch the job
             CsvImportJob::dispatch(

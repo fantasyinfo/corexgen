@@ -129,6 +129,9 @@
                         <a href="{{ route('download.countries') }}" class="btn btn-outline-primary btn-xl">
                             <i class="fas fa-download me-2"></i> {{ __('crud.Download Countries List for Country ID') }}
                         </a>
+                        <a href="{{ route('download.cgt', ['type' => 'categories', 'relation' => 'clients']) }}" class="btn btn-outline-primary btn-xl">
+                            <i class="fas fa-download me-2"></i> {{ __('crud.Download CGT ID') }}
+                        </a>
                     </div>
 
                     <div class="table-responsive">

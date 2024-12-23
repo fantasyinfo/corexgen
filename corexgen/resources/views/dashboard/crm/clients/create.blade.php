@@ -1,6 +1,7 @@
 @extends('layout.app')
 
 @section('content')
+ 
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
@@ -61,6 +62,19 @@
                                                 <option value="Individual">Individual</option>
                                                 <option value="Company">Company</option>
                                             </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-4" id="company_name_div">
+                                        <div class="col-lg-4">
+                                            <x-form-components.input-label for="companyName" required>
+                                                {{ __('clients.Company Name') }}
+                                            </x-form-components.input-label>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <x-form-components.input-group type="text" name="company_name"
+                                                id="companyName" placeholder="{{ __('Abc Pvt Ltd') }}"
+                                                value="{{ old('company_name') }}" />
                                         </div>
                                     </div>
 
@@ -133,9 +147,9 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <select class="form-select" name="category" id="category">
-                                                @foreach (CLIENTS_CATEGORY_TYPES['TABLE_STATUS'] as $category)
-                                                    <option value="{{ $category }}">{{ $category }}</option>
+                                            <select class="form-select" name="cgt_id" id="cgt_id">
+                                                @foreach ($categories as $category)
+                                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -143,7 +157,8 @@
 
                                     <hr>
                                     <p class="alert alert-secondary"><i class="fas fa-info-circle me-2 "></i>
-                                        Please add / update <span class="text-success">Contact Details</span> on contact details tabs.</p>
+                                        Please add / update <span class="text-success">Contact Details</span> on contact
+                                        details tabs.</p>
                                 </div>
 
                                 <!-- Contact Details Tab -->
@@ -163,7 +178,8 @@
                                                         <i class="fas fa-plus"></i>
                                                     </button>
                                                 </div>
-                                                <p class="px-2 font-12 my-2 text-secondary">First email will be primary email for this client.</p>
+                                                <p class="px-2 font-12 my-2 text-secondary">First email will be primary
+                                                    email for this client.</p>
                                             </div>
                                         </div>
                                     </div>
@@ -183,7 +199,8 @@
                                                         <i class="fas fa-plus"></i>
                                                     </button>
                                                 </div>
-                                                <p class="px-2 font-12 my-2 text-secondary">First phone number will be primary phone number for this client.</p>
+                                                <p class="px-2 font-12 my-2 text-secondary">First phone number will be
+                                                    primary phone number for this client.</p>
                                             </div>
                                         </div>
                                     </div>
@@ -255,7 +272,8 @@
 
                                     <hr>
                                     <p class="alert alert-secondary"><i class="fas fa-info-circle me-2 "></i>
-                                        Please add / update <span class="text-success">Address Details</span> on address tabs.</p>
+                                        Please add / update <span class="text-success">Address Details</span> on address
+                                        tabs.</p>
                                 </div>
 
                                 <!-- Address Tab -->
@@ -338,7 +356,8 @@
                                     </div>
                                     <hr>
                                     <p class="alert alert-secondary"><i class="fas fa-info-circle me-2 "></i>
-                                        Please add / update <span class="text-success">Additional Details</span> on additional details tabs.</p>
+                                        Please add / update <span class="text-success">Additional Details</span> on
+                                        additional details tabs.</p>
                                 </div>
 
                                 <!-- Additional Information Tab -->
@@ -355,7 +374,7 @@
                                             <select name="tags[]" id="tags" class="form-select" multiple>
                                                 <!-- Add your tag options here -->
                                             </select>
-                                    
+
                                         </div>
                                     </div>
 
@@ -384,6 +403,24 @@
 @push('scripts')
     <script src="{{ asset('js/tinymce/tinymce.min.js') }}"></script>
     <script>
+        $(document).ready(function() {
+            $('#clientType').on('change', function() {
+                var selectedType = $(this).val();
+                if (selectedType === 'Company') {
+                    $('#company_name_div').show();
+                } else {
+                    $('#company_name_div').hide();
+                }
+            });
+
+            // Trigger change event on page load
+            $('#clientType').trigger('change');
+        });
+
+
+
+
+
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize Select2 for searchable dropdowns
             $('.searchSelectBox').select2({
@@ -465,9 +502,9 @@
                         'wordcount'
                     ],
                     toolbar: 'undo redo | formatselect | bold italic backcolor | \
-              alignleft aligncenter alignright alignjustify | \
-              bullist numlist outdent indent | removeformat | help | \
-              link image media preview codesample table'
+                      alignleft aligncenter alignright alignjustify | \
+                      bullist numlist outdent indent | removeformat | help | \
+                      link image media preview codesample table'
                 });
             }
 

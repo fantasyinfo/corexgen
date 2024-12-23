@@ -92,7 +92,6 @@ Route::middleware(['check.installation'])->group(function () {
     Route::get('/login', function () {
         return view('auth.login');
     })->name('login');
-
 });
 
 
@@ -118,8 +117,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/onboarding/complete', [CompanyOnboardingController::class, 'completeOnboarding'])
         ->name('onboarding.complete');
-
-
 });
 
 // payment gateway routes
@@ -155,8 +152,9 @@ Route::get('/register', function () {
 })->name('register');
 
 // open routes for download
-Route::prefix('download')->as('download.')->group(function(){
-    Route::get('/countries',[DownloadController::class,'countries'])->name('countries');
+Route::prefix('download')->as('download.')->group(function () {
+    Route::get('/countries', [DownloadController::class, 'countries'])->name('countries');
+    Route::get('/ctg/{type}/{relation}', [DownloadController::class, 'cgt'])->name('cgt')->middleware('auth:sanctum');
 });
 
 
@@ -184,14 +182,6 @@ Route::get('/setlang/{locale}', function (string $locale) {
     }
     return redirect()->back()->with('success', 'Language Changed Successfully!');
 });
-
-
-
-
-
-
-
-
 
 
 
@@ -228,7 +218,6 @@ Route::middleware([
         Route::get('/import', [RoleController::class, 'importView'])->name('importView')->middleware('check.permission:ROLE.IMPORT');
         Route::post('/import', [RoleController::class, 'import'])->name('import')->middleware('check.permission:ROLE.IMPORT');
         Route::post('/bulkDelete', [RoleController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:ROLE.BULK_DELETE');
-
     });
 
     // users routes
@@ -268,9 +257,6 @@ Route::middleware([
         Route::get('/edit/{id}', [RolePermissionsController::class, 'edit'])->name('edit')->middleware('check.permission:PERMISSIONS.UPDATE');
 
         Route::delete('/destroy/{id}', [RolePermissionsController::class, 'destroy'])->name('destroy')->middleware('check.permission:PERMISSIONS.DELETE');
-
-
-
     });
 
 
@@ -286,9 +272,6 @@ Route::middleware([
 
         Route::get('/mail', [SettingsController::class, 'mail'])->name('mail')->middleware('check.permission:SETTINGS_MAIL.READ_ALL');
         Route::put('/mail', [SettingsController::class, 'mailUpdate'])->name('mailUpdate')->middleware('check.permission:SETTINGS_MAIL.UPDATE');
-
-
-
     });
     // upgrade routes
     Route::prefix(PANEL_MODULES['COMPANY_PANEL']['planupgrade'])->as(PANEL_MODULES['COMPANY_PANEL']['planupgrade'] . '.')->group(function () {
@@ -296,8 +279,6 @@ Route::middleware([
         Route::get('/', [PlanUpgrade::class, 'index'])->name('index')->middleware('check.permission:PLANUPGRADE.READ_ALL');
 
         Route::put('/', [PlanUpgrade::class, 'upgrade'])->name('upgrade')->middleware('check.permission:PLANUPGRADE.UPGRADE');
-
-
     });
 
 
@@ -337,12 +318,10 @@ Route::middleware([
         Route::post('/import', [ClientsController::class, 'import'])->name('import')->middleware('check.permission:CLIENTS.IMPORT');
 
         Route::post('/bulkDelete', [ClientsController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:CLIENTS.BULK_DELETE');
-    
+
         Route::get('/view/{id}', [ClientsController::class, 'view'])->name('view')->middleware('check.permission:CLIENTS.VIEW');
         Route::get('/profile', [ClientsController::class, 'profile'])->name('profile');
     });
-
-
 });
 
 
@@ -379,7 +358,6 @@ Route::middleware([
         Route::get('/import', [RoleController::class, 'importView'])->name('importView')->middleware('check.permission:ROLE.IMPORT');
         Route::post('/import', [RoleController::class, 'import'])->name('import')->middleware('check.permission:ROLE.IMPORT');
         Route::post('/bulkDelete', [RoleController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:ROLE.BULK_DELETE');
-
     });
 
     // users routes
@@ -403,7 +381,6 @@ Route::middleware([
         Route::post('/changePassword', [UserController::class, 'changePassword'])->name('changePassword')->middleware('check.permission:USERS.CHANGE_PASSWORD');
         Route::get('/view/{id}', [UserController::class, 'view'])->name('view')->middleware('check.permission:USERS.VIEW');
         Route::get('/profile', [UserController::class, 'profile'])->name('profile');
-
     });
 
 
@@ -431,8 +408,6 @@ Route::middleware([
         Route::post('/bulkDelete', [CompaniesController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:COMPANIES.BULK_DELETE');
         Route::post('/changePassword', [CompaniesController::class, 'changePassword'])->name('changePassword')->middleware('check.permission:COMPANIES.CHANGE_PASSWORD');
         Route::get('/view/{id}', [CompaniesController::class, 'view'])->name('view')->middleware('check.permission:COMPANIES.VIEW');
-
-
     });
 
     // permissions routes
@@ -447,9 +422,6 @@ Route::middleware([
         Route::get('/edit/{id}', [RolePermissionsController::class, 'edit'])->name('edit')->middleware('check.permission:PERMISSIONS.UPDATE');
 
         Route::delete('/destroy/{id}', [RolePermissionsController::class, 'destroy'])->name('destroy')->middleware('check.permission:PERMISSIONS.DELETE');
-
-
-
     });
 
 
@@ -471,8 +443,6 @@ Route::middleware([
             [PlansController::class, 'changeStatus']
         )->name('changeStatus')->middleware('check.permission:PLANS.CHANGE_STATUS');
         Route::delete('/destroy/{id}', [PlansController::class, 'destroy'])->name('destroy')->middleware('check.permission:PLANS.DELETE');
-
-
     });
 
     // planPaymentTransaction routes
@@ -515,9 +485,6 @@ Route::middleware([
             '/changeStatus/{id}/{status}',
             [PaymentGatewayController::class, 'changeStatus']
         )->name('changeStatus')->middleware('check.permission:PAYMENTGATEWAYS.CHANGE_STATUS');
-
-
-
     });
     // settings routes
     Route::prefix('settings')->as('settings.')->group(function () {
@@ -532,7 +499,6 @@ Route::middleware([
 
 
         Route::get('/cron', [SettingsController::class, 'cron'])->name('cron')->middleware('check.permission:SETTINGS_CRON.READ_ALL');
-
     });
 
 
@@ -548,9 +514,5 @@ Route::middleware([
     Route::prefix('appupdates')->as('appupdates.')->group(function () {
         Route::get('/', [AppUpdateController::class, 'index'])->name('index')->middleware('check.permission:APPUPDATES.READ_ALL');
         Route::post('/', [AppUpdateController::class, 'create'])->name('create')->middleware('check.permission:APPUPDATES.CREATE');
-
     });
-
-
-
 });

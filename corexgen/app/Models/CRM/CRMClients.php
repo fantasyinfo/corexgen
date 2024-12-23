@@ -6,7 +6,6 @@ use App\Models\Address;
 use App\Models\Company;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use OwenIt\Auditing\Contracts\Auditable;
 use Illuminate\Support\Str;
@@ -14,7 +13,6 @@ use Illuminate\Support\Str;
 class CRMClients extends Model implements Auditable
 {
     use HasFactory;
-    use SoftDeletes;
     use \OwenIt\Auditing\Auditable;
 
     const table = 'clients';
@@ -27,10 +25,11 @@ class CRMClients extends Model implements Auditable
         'first_name',
         'middle_name',
         'last_name',
+        'company_name',
         'email',
         'phone',
         'social_media',
-        'category',
+        'cgt_id',
         'details',
         'tags',
         'birthdate',
