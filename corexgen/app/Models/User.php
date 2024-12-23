@@ -15,6 +15,8 @@ use Laravel\Sanctum\HasApiTokens;
 use OwenIt\Auditing\Contracts\Auditable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+use App\Traits\HasCustomFields;
+
 class User extends Authenticatable implements Auditable
 {
     use HasApiTokens;
@@ -24,6 +26,7 @@ class User extends Authenticatable implements Auditable
     use TwoFactorAuthenticatable;
     use SoftDeletes;
     use \OwenIt\Auditing\Auditable;
+    use HasCustomFields;
     /**
      * The attributes that are mass assignable.
      *

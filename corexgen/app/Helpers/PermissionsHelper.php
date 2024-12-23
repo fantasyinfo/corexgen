@@ -29,7 +29,8 @@ class PermissionsHelper
         'EVENTS_AUDIT_LOG' => 'EVENTS_AUDIT_LOG',
         'DOWNLOAD_BACKUP' => 'DOWNLOAD_BACKUP',
         'CLIENTS' => 'CLIENTS',
-        'BULK_IMPORT_STATUS' => 'BULK_IMPORT_STATUS'
+        'BULK_IMPORT_STATUS' => 'BULK_IMPORT_STATUS',
+        'CUSTOM_FIELDS' => 'CUSTOM_FIELDS',
     ];
 
 
@@ -89,6 +90,8 @@ class PermissionsHelper
 
             // starring from 3k
             self::$plansPermissionsKeys['CLIENTS'] => [3001 => 'CREATE', 3002 => 'READ', 3003 => 'READ_ALL', 3004 => 'UPDATE', 3005 => 'DELETE', 3006 => 'IMPORT', 3007 => 'EXPORT', 3008 => 'FILTER', 3009 => 'CHANGE_STATUS', 3010 => 'BULK_DELETE', 3011 => 'VIEW'],
+            
+            self::$plansPermissionsKeys['CUSTOM_FIELDS'] => [3051 => 'CREATE', 3052 => 'READ', 3053 => 'READ_ALL', 3054 => 'UPDATE', 3055 => 'DELETE', 3056 => 'IMPORT', 3057 => 'EXPORT', 3058 => 'FILTER', 3059 => 'CHANGE_STATUS', 3060 => 'BULK_DELETE', 3061 => 'VIEW'],
         ];
     }
 

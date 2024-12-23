@@ -9,6 +9,7 @@ use App\Models\Country;
 use App\Models\CRM\CRMRole;
 use App\Repositories\UserRepository;
 use App\Services\Csv\UsersCsvRowProcessor;
+use App\Services\CustomFieldService;
 use App\Services\UserService;
 use App\Traits\SubscriptionUsageFilter;
 use App\Traits\TenantFilter;
@@ -72,12 +73,17 @@ class UserController extends Controller
     protected $userRepository;
     protected $userService;
 
+    protected $customFieldService;
+
     public function __construct(
         UserRepository $userRepository,
-        UserService $userService
+        UserService $userService,
+        CustomFieldService $customFieldService
+
     ) {
         $this->userRepository = $userRepository;
         $this->userService = $userService;
+        $this->customFieldService = $customFieldService;
     }
 
     /**
@@ -103,7 +109,7 @@ class UserController extends Controller
 
         // Build base query for user totals
         $user = Auth::user();
-        $userQuery = User::where('deleted_at', null)->whereNot('id',$user->id);
+        $userQuery = User::where('deleted_at', null)->whereNot('id', $user->id);
 
         $userQuery = $this->applyTenantFilter($userQuery);
 
@@ -164,7 +170,12 @@ class UserController extends Controller
             $userData['company_id'] = Auth::user()->company_id;
             $userData['is_tenant'] = Auth::user()->is_tenant;
 
-            $userService->createUser($userData);
+            $user = $userService->createUser($userData);
+
+            // Save custom field values if any
+            if ($request->has('custom_fields')) {
+                $this->customFieldService->saveValues($user, $request->custom_fields);
+            }
 
             // update current usage
             $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['USERS']]), '+', '1');
@@ -248,7 +259,11 @@ class UserController extends Controller
         $this->tenantRoute = $this->getTenantRoute();
 
         try {
-            $userService->updateUser($request->validated());
+            $user = $userService->updateUser($request->validated());
+
+            if ($request->has('custom_fields')) {
+                $this->customFieldService->saveValues($user, $request->custom_fields);
+            }
 
             if ($request->boolean('is_profile')) {
                 return redirect()
@@ -623,11 +638,14 @@ class UserController extends Controller
 
         // dd($user);
 
+        $customFields = $this->customFieldService->getValuesForEntity($user);
+
         return view($this->getViewFilePath('view'), [
 
             'title' => 'View User',
             'user' => $user,
             'module' => PANEL_MODULES[$this->getPanelModule()]['users'],
+            'customFields' => $customFields
 
         ]);
     }

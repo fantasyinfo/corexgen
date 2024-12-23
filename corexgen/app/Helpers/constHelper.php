@@ -160,6 +160,13 @@ PermissionsHelper::initializePermissions();
         'for' => 'company',
         'is_feature' => true
     ],
+    PermissionsHelper::$plansPermissionsKeys['CUSTOM_FIELDS'] => [
+        'name' => 'CUSTOM_FIELDS',
+        'id' => PermissionsHelper::getParentPermissionId('101'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['CUSTOM_FIELDS'],
+        'for' => 'company',
+        'is_feature' => true
+    ],
 ]);
 
 // super panel menus
@@ -315,6 +322,15 @@ PermissionsHelper::initializePermissions();
             'Clients' => ['menu_url' => 'clients.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['CLIENTS'], 'READ_ALL')],
         ]
     ],
+    'Custom Fields' => [
+        'menu_icon' => 'fa-plus-square',
+        'feature_type' => PermissionsHelper::$plansPermissionsKeys['CUSTOM_FIELDS'], // this need to match the PLANS_FEATURES key
+        'permission_plan' => PermissionsHelper::$plansPermissionsKeys['CUSTOM_FIELDS'],
+        'permission_id' => PermissionsHelper::getParentPermissionId('101'),
+        'children' => [
+            'Custom Fields' => ['menu_url' => 'customfields.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['CUSTOM_FIELDS'], 'READ_ALL')],
+        ]
+    ],
 ]);
 
 
@@ -419,6 +435,7 @@ PermissionsHelper::initializePermissions();
         'planupgrade' => 'planupgrade',
         'audit' => 'audit',
         'clients' => 'clients',
+        'customfields' => 'customfields',
         
     ]
 ]);
@@ -442,6 +459,7 @@ PermissionsHelper::initializePermissions();
     PermissionsHelper::$plansPermissionsKeys['USERS'] => PermissionsHelper::$plansPermissionsKeys['USERS'],
     PermissionsHelper::$plansPermissionsKeys['ROLE'] => PermissionsHelper::$plansPermissionsKeys['ROLE'],
     PermissionsHelper::$plansPermissionsKeys['CLIENTS'] => PermissionsHelper::$plansPermissionsKeys['CLIENTS'],
+    PermissionsHelper::$plansPermissionsKeys['CUSTOM_FIELDS'] => PermissionsHelper::$plansPermissionsKeys['CUSTOM_FIELDS'],
 ]);
 
 !defined('ADDRESS_TYPES') && define('ADDRESS_TYPES', [
@@ -842,11 +860,6 @@ PermissionsHelper::initializePermissions();
     ],
 ]);
 
-
-!defined('CLIENTS_CATEGORY_TYPES') && define('CLIENTS_CATEGORY_TYPES', [
-    'TABLE_STATUS' => ['VIP', 'Normal', 'High Budget', 'Low Budget'],
-    'STATUS' => ['VIP' => 'VIP', 'Normal' => 'Normal', 'High Budget' => 'High Budget', 'Low Budget' => 'Low Budget'],
-]);
 
 
 

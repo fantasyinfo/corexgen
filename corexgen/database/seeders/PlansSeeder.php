@@ -45,6 +45,7 @@ class PlansSeeder extends Seeder
         // delete all exiting first
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         Plans::truncate();
+        PlansFeatures::truncate();
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     
         DB::beginTransaction();
