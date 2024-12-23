@@ -9,6 +9,7 @@ use App\Http\Controllers\CompanyRegisterController;
 use App\Http\Controllers\CountryCitySeederController;
 use App\Http\Controllers\CompaniesController;
 use App\Http\Controllers\CRM\ClientsController;
+use App\Http\Controllers\CustomFieldController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RolePermissionsController;
@@ -330,6 +331,31 @@ Route::middleware([
 
         Route::get('/view/{id}', [ClientsController::class, 'view'])->name('view')->middleware('check.permission:CLIENTS.VIEW');
         Route::get('/profile', [ClientsController::class, 'profile'])->name('profile');
+    });
+
+
+    // custom fields routes
+    Route::prefix(PANEL_MODULES['COMPANY_PANEL']['customfields'])->as(PANEL_MODULES['COMPANY_PANEL']['customfields'] . '.')->group(function () {
+        // role for fetch, store, update
+        Route::get('/', [CustomFieldController::class, 'index'])->name('index')->middleware('check.permission:CUSTOM_FIELDS.READ_ALL');
+        Route::post('/', [CustomFieldController::class, 'store'])->name('store')->middleware('check.permission:CUSTOM_FIELDS.CREATE');
+        Route::put('/', [CustomFieldController::class, 'update'])->name('update')->middleware('check.permission:CUSTOM_FIELDS.UPDATE');
+
+        // create, edit, change status, delete
+        Route::get('/create', [CustomFieldController::class, 'create'])->name('create')->middleware('check.permission:CUSTOM_FIELDS.CREATE');
+        Route::get('/edit/{id}', [CustomFieldController::class, 'edit'])->name('edit')->middleware('check.permission:CUSTOM_FIELDS.UPDATE');
+        Route::get('/changeStatus/{id}/{status}', [CustomFieldController::class, 'changeStatus'])->name('changeStatus')->middleware('check.permission:CUSTOM_FIELDS.CHANGE_STATUS');
+        Route::delete('/destroy/{id}', [CustomFieldController::class, 'destroy'])->name('destroy')->middleware('check.permission:CUSTOM_FIELDS.DELETE');
+
+        // validate, export, import
+        Route::get('/export', [CustomFieldController::class, 'export'])->name('export')->middleware('check.permission:CUSTOM_FIELDS.EXPORT');
+        Route::get('/import', [CustomFieldController::class, 'importView'])->name('importView')->middleware('check.permission:CUSTOM_FIELDS.IMPORT');
+        Route::post('/import', [CustomFieldController::class, 'import'])->name('import')->middleware('check.permission:CUSTOM_FIELDS.IMPORT');
+
+        Route::post('/bulkDelete', [CustomFieldController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:CUSTOM_FIELDS.BULK_DELETE');
+
+        Route::get('/view/{id}', [CustomFieldController::class, 'view'])->name('view')->middleware('check.permission:CUSTOM_FIELDS.VIEW');
+        Route::get('/profile', [CustomFieldController::class, 'profile'])->name('profile');
     });
 });
 
