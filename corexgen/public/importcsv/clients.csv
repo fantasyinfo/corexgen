@@ -1,10 +1,10 @@
-Type,Title,First Name,Middle Name,Last Name,Emails,Phones,Social Media Links,Category,Street Address,City Name,Country ID,Pincode
-Individual,Mr,Carey,Dorian,Langosh,schumm.ryder@example.org; eliza79@example.org,+16516416000; +1 (571) 576-4076,,VIP,Abc Building,Brisbane,1,534333
-Individual,Dr,Angel,Kavon,Parisian,hank05@example.org; ebahringer@example.com,+1 (540) 417-9008; 912.677.5838,,High Budget,House no 12 neear abc building,London,2,23414213
-Company,Master,Jensen,Maya,Weber,jefferey68@example.org; nina.leannon@example.net,(754) 800-8860; +15612539201,,High Budget,Abc Building,New York,3,12412341234
-Individual,Mr,Zack,Billie,McKenzie,daniel.yasmine@example.com; oferry@example.org,+1-425-526-7340; 458-736-4859,,Low Budget,House no 12 neear abc building,Delhi,4,1241234
-Individual,Master,Thurman,Princess,Tillman,kris.arely@example.com; qdibbert@example.net,445.792.7931; +15039427276,,Low Budget,Abc Building,Lahor,5,1241234
-Company,Dr,Guiseppe,Malvina,Russel,mackenzie79@example.org; purdy.gina@example.net,959.418.8659; +17473814618,,Low Budget,House no 12 neear abc building,Mumbai,6,341432
-Individual,Miss,Marjolaine,Leone,McClure,holden32@example.com; mariana09@example.org,305-899-4946; +1-336-718-2707,,Low Budget,Abc Building,Kolkata,7,4123234
-Individual,Mr,Baylee,Aletha,Roberts,heaney.lauretta@example.net; rebekah.kris@example.com,1-216-998-5658; 1-586-376-1071,,Normal,House no 12 neear abc building,Agra,8,12341234
-Individual,Master,Kaley,Meda,Williamson,presley.abshire@example.com; devon82@example.com,283-397-1506; +1 (636) 487-9707,,Normal,,,,
+Type,Company Name,Title,First Name,Middle Name,Last Name,Emails,Phones,Social Media Links,CGT ID,Street Address,City Name,Country ID,Pincode
+Individual,,Mr,Carey,Dorian,Langosh,schumm.ryder@example.org; eliza79@example.org,+16516416000; +1 (571) 576-4076,,1,Abc Building,Brisbane,1,534333
+Individual,,Dr,Angel,Kavon,Parisian,hank05@example.org; ebahringer@example.com,+1 (540) 417-9008; 912.677.5838,,2,House no 12 neear abc building,London,2,23414213
+Company,Abc School,Master,Jensen,Maya,Weber,jefferey68@example.org; nina.leannon@example.net,(754) 800-8860; +15612539201,,3,Abc Building,New York,3,12412341234
+Individual,,Mr,Zack,Billie,McKenzie,daniel.yasmine@example.com; oferry@example.org,+1-425-526-7340; 458-736-4859,,4,House no 12 neear abc building,Delhi,4,1241234
+Individual,,Master,Thurman,Princess,Tillman,kris.arely@example.com; qdibbert@example.net,445.792.7931; +15039427276,,5,Abc Building,Lahor,5,1241234
+Company,Clicnic,Dr,Guiseppe,Malvina,Russel,mackenzie79@example.org; purdy.gina@example.net,959.418.8659; +17473814618,,6,House no 12 neear abc building,Mumbai,6,341432
+Individual,,Miss,Marjolaine,Leone,McClure,holden32@example.com; mariana09@example.org,305-899-4946; +1-336-718-2707,,2,Abc Building,Kolkata,7,4123234
+Individual,,Mr,Baylee,Aletha,Roberts,heaney.lauretta@example.net; rebekah.kris@example.com,1-216-998-5658; 1-586-376-1071,,2,House no 12 neear abc building,Agra,8,12341234
+Individual,,Master,Kaley,Meda,Williamson,presley.abshire@example.com; devon82@example.com,283-397-1506; +1 (636) 487-9707,,1,,,,

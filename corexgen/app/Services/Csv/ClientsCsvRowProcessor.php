@@ -58,6 +58,7 @@ class ClientsCsvRowProcessor
             // Prepare client data
             $clientData = [
                 'type' => $row['Type'],
+                'company_name' => $row['Company Name'],
                 'title' => $row['Title'],
                 'first_name' => $row['First Name'],
                 'middle_name' => $row['Middle Name'],
@@ -65,7 +66,7 @@ class ClientsCsvRowProcessor
                 'email' => $emails,
                 'phone' => $phones,
                 'social_media' => $socialMedia,
-                'category' => $row['Category'],
+                'cgt_id' => $row['CGT ID'],
                 'addresses' => $address,
                 'company_id' => $companyId,
                 'created_by' => $userId,

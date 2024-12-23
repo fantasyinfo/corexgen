@@ -50,7 +50,9 @@ return [
     'Tags' => 'Tags',
     'Additional Details' => 'Additional Details',
     'End Date' => 'End Date',
-    'Start Date' => 'Start Date'
+    'Start Date' => 'Start Date',
+    'Company Name' => 'Company Name',
+    'Type' => 'Type'
 
 
 

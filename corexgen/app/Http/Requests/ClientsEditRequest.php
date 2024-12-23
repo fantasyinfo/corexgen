@@ -36,6 +36,7 @@ class ClientsEditRequest extends FormRequest
             'middle_name' => ['nullable', 'string', 'max:100'],
             'last_name' => ['required', 'string', 'max:100'],
             'birthdate' => ['nullable', 'date', 'before:today'],
+            'company_name' => ['required_if:type,Company', 'nullable', 'max:255'],
 
             // Contact Information (Multiple Emails & Phones)
             'email' => ['required', 'array', 'min:1'],
@@ -64,7 +65,7 @@ class ClientsEditRequest extends FormRequest
             'social_media.*' => ['nullable'],
 
             // Category and Status
-            'category' => ['nullable', Rule::in(CLIENTS_CATEGORY_TYPES['TABLE_STATUS'])],
+            'cgt_id' => ['required', 'exists:category_group_tag,id'],
 
             // Additional Details
             'details' => ['nullable', 'string'],

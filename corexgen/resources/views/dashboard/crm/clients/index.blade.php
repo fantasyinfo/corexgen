@@ -28,6 +28,22 @@
                                 }',
                             ],
                             [
+                                'data' => 'type',
+                                'name' => 'type',
+                                'label' => __('clients.Type'),
+                                'searchable' => true,
+                                'orderable' => true,
+                                'width' => '100px',
+                            ],
+                            [
+                                'data' => 'company_name',
+                                'name' => 'company_name',
+                                'label' => __('clients.Company Name'),
+                                'searchable' => true,
+                                'orderable' => true,
+                                'width' => '150px',
+                            ],
+                            [
                                 'data' => 'title',
                                 'name' => 'title',
                                 'label' => __('clients.Title'),

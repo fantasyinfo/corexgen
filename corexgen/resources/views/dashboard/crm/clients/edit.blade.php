@@ -72,6 +72,19 @@
                                         </div>
                                     </div>
 
+                                    <div class="row mb-4" id="company_name_div">
+                                        <div class="col-lg-4">
+                                            <x-form-components.input-label for="companyName" required>
+                                                {{ __('clients.Company Name') }}
+                                            </x-form-components.input-label>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <x-form-components.input-group type="text" name="company_name"
+                                                id="companyName" placeholder="{{ __('Abc Pvt Ltd') }}"
+                                                value="{{ old('company_name', $client->company_name) }}" />
+                                        </div>
+                                    </div>
+
                                     <div class="row mb-4">
                                         <div class="col-lg-4">
                                             <x-form-components.input-label for="clientTitle">
@@ -105,8 +118,8 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <x-form-components.input-group type="text" name="middle_name" id="middleName"
-                                                placeholder="{{ __('Middle Name') }}"
+                                            <x-form-components.input-group type="text" name="middle_name"
+                                                id="middleName" placeholder="{{ __('Middle Name') }}"
                                                 value="{{ old('middle_name', $client->middle_name) }}" />
                                         </div>
                                     </div>
@@ -143,18 +156,19 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <select class="form-select searchSelectBox" name="category" id="category">
-                                                @foreach (CLIENTS_CATEGORY_TYPES['TABLE_STATUS'] as $category)
-                                                    <option value="{{ $category }}"
-                                                        {{ $client->category == $category ? 'selected' : '' }}>
-                                                        {{ $category }}</option>
+                                            <select class="form-select searchSelectBox" name="cgt_id" id="cgt_id">
+                                                @foreach ($categories as $category)
+                                                    <option value="{{ $category->id }}"
+                                                        {{ $client->cgt_id == $category->id ? 'selected' : '' }}>
+                                                        {{ $category->name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
                                     </div>
                                     <hr>
                                     <p class="alert alert-secondary"><i class="fas fa-info-circle me-2 "></i>
-                                        Please add / update <span class="text-success">Contact Details</span> on contact details tabs.</p>
+                                        Please add / update <span class="text-success">Contact Details</span> on contact
+                                        details tabs.</p>
                                 </div>
 
                                 <!-- Contact Details Tab -->
@@ -174,7 +188,8 @@
                                                         <i class="fas fa-plus"></i>
                                                     </button>
                                                 </div>
-                                                <p class="px-2 font-12 my-2 text-secondary">First email will be primary email for this client.</p>
+                                                <p class="px-2 font-12 my-2 text-secondary">First email will be primary
+                                                    email for this client.</p>
                                             </div>
                                         </div>
                                     </div>
@@ -194,7 +209,8 @@
                                                         <i class="fas fa-plus"></i>
                                                     </button>
                                                 </div>
-                                                <p class="px-2 font-12 my-2 text-secondary">First phone number will be primary phone number for this client.</p>
+                                                <p class="px-2 font-12 my-2 text-secondary">First phone number will be
+                                                    primary phone number for this client.</p>
                                             </div>
                                         </div>
                                     </div>
@@ -265,7 +281,8 @@
                                     </div>
                                     <hr>
                                     <p class="alert alert-secondary"><i class="fas fa-info-circle me-2 "></i>
-                                        Please add / update <span class="text-success">Address Details</span> on address tabs.</p>
+                                        Please add / update <span class="text-success">Address Details</span> on address
+                                        tabs.</p>
                                 </div>
 
                                 <!-- Address Tab -->
@@ -346,9 +363,10 @@
                                             <i class="fas fa-plus"></i> Add Another Address
                                         </button>
                                     </div>
-                                       <hr>
+                                    <hr>
                                     <p class="alert alert-secondary"><i class="fas fa-info-circle me-2 "></i>
-                                        Please add / update <span class="text-success">Additional Details</span> on additional details tabs.</p>
+                                        Please add / update <span class="text-success">Additional Details</span> on
+                                        additional details tabs.</p>
                                 </div>
 
                                 <!-- Additional Information Tab -->
@@ -363,17 +381,18 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <select name="tags[]" id="tags" class="form-select" multiple>
-                                                @if($client->tags && is_array($client->tags))
-                                                    @foreach($client->tags  as $tag)
-                                                        <option value="{{ $tag }}" {{ in_array($tag, old('tags', $client->tags ?? [])) ? 'selected' : '' }}>
+                                                @if ($client->tags && is_array($client->tags))
+                                                    @foreach ($client->tags as $tag)
+                                                        <option value="{{ $tag }}"
+                                                            {{ in_array($tag, old('tags', $client->tags ?? [])) ? 'selected' : '' }}>
                                                             {{ $tag }}
                                                         </option>
                                                     @endforeach
                                                 @endif
                                             </select>
                                         </div>
-                                        
-                                        
+
+
                                     </div>
 
                                     <div class="row mb-4">
@@ -401,6 +420,22 @@
 @push('scripts')
     <script src="{{ asset('js/tinymce/tinymce.min.js') }}"></script>
     <script>
+        $(document).ready(function() {
+            $('#clientType').on('change', function() {
+                var selectedType = $(this).val();
+                if (selectedType === 'Company') {
+                    $('#company_name_div').show();
+                } else {
+                    $('#company_name_div').hide();
+                }
+            });
+
+            // Trigger change event on page load
+            $('#clientType').trigger('change');
+        });
+
+
+
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize Select2 for searchable dropdowns
             $('.searchSelectBox').select2({
@@ -482,9 +517,9 @@
                         'wordcount'
                     ],
                     toolbar: 'undo redo | formatselect | bold italic backcolor | \
-                              alignleft aligncenter alignright alignjustify | \
-                              bullist numlist outdent indent | removeformat | help | \
-                              link image media preview codesample table'
+                                  alignleft aligncenter alignright alignjustify | \
+                                  bullist numlist outdent indent | removeformat | help | \
+                                  link image media preview codesample table'
                 });
             }
 

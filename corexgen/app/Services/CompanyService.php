@@ -12,6 +12,7 @@ use App\Traits\MediaTrait;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Helpers\PermissionsHelper;
+use App\Models\CategoryGroupTag;
 use App\Models\City;
 use App\Models\CRM\CRMPermissions;
 use App\Models\CRM\CRMRolePermissions;
@@ -23,6 +24,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Yajra\DataTables\Facades\DataTables;
+
 
 class CompanyService
 {
@@ -60,8 +62,8 @@ class CompanyService
             $companyAdminUser = $this->createCompanyUser($company, $validatedData, $userFullName);
 
 
-            if(isset($validatedData['from_admin']) && $validatedData['from_admin'] == true){
-                $this->updateCompanyPlanAndPermissions($company,$validatedData['plan_id']);
+            if (isset($validatedData['from_admin']) && $validatedData['from_admin'] == true) {
+                $this->updateCompanyPlanAndPermissions($company, $validatedData['plan_id']);
                 $this->generateAllSettings($company->id);
                 $company->update(['status' => CRM_STATUS_TYPES['COMPANIES']['STATUS']['ACTIVE']]);
             }
@@ -76,9 +78,11 @@ class CompanyService
 
 
 
-    public function generateAllSettings($companyid){
+    public function generateAllSettings($companyid)
+    {
         $this->generateGeneralSettingsForCompany($companyid);
         $this->generateMailSettingsForCompany($companyid);
+        $this->generateCategoryGroupsTags($companyid);
     }
     public function generateGeneralSettingsForCompany($companyid)
     {
@@ -121,7 +125,8 @@ class CompanyService
             ]);
         }
     }
-    public function generateMailSettingsForCompany($companyid){
+    public function generateMailSettingsForCompany($companyid)
+    {
         foreach (CRM_COMPANY_MAIL_SETTINGS as $setting) {
             // Create CRM setting
             CRMSettings::create([
@@ -140,6 +145,26 @@ class CompanyService
                 'created_by' => Auth::id() ?? '1',
             ]);
         }
+    }
+
+    public function generateCategoryGroupsTags($companyid)
+    {
+        $insertArray = [];
+        $clientsCategory = ['VIP', 'Normal', 'High Budget', 'Low Budget'];
+        $colors = ['#673DE6', '#2F1C6A', '#00B090', '#FF3C5C', '#FFB800', '#2C5CC5'];
+
+        // clients category
+        foreach ($clientsCategory as $cc) {
+            $insertArray[] = [
+                'name' => $cc,
+                'color' => array_rand($colors),
+                'relation_type' => 'clients',
+                'type' => 'categories',
+                'status' => 'active',
+                'company_id' => $companyid
+            ];
+        }
+        CategoryGroupTag::insert($insertArray);
     }
 
 
@@ -193,7 +218,7 @@ class CompanyService
             return null;
         }
 
-     
+
 
         $cityId = $this->findOrCreateCity($data['address_city_name'], $data['address_country_id']);
 
@@ -635,7 +660,7 @@ class CompanyService
             return null;
         }
 
-         $cityId = $this->findOrCreateCity($data['address_city_name'], $data['address_country_id']);
+        $cityId = $this->findOrCreateCity($data['address_city_name'], $data['address_country_id']);
         // If company already has an address, update it
         if ($company->address_id) {
 
@@ -661,7 +686,7 @@ class CompanyService
 
     private function updateCompanyPlanAndPermissions(Company $company, $newPlanId)
     {
- 
+
         // Create a new payment transaction for the new plan
         $paymentTransactionResult = $this->createPaymentTransaction($newPlanId, $company->id, []);
 
@@ -678,7 +703,7 @@ class CompanyService
         $this->givePermissionsToCompany($company, $companyAdminUser);
 
         // Optionally, create new menu items for the company panel
-       $this->createMenuItemsForCompanyPanel($newPlanId);
+        $this->createMenuItemsForCompanyPanel($newPlanId);
 
         return $company;
     }
@@ -718,7 +743,7 @@ class CompanyService
             ->editColumn('latestSubscription.next_billing_date', function ($company) {
                 return Carbon::parse($company->latestSubscription->next_billing_date)->format('d M Y');
             })
-            ->rawColumns([  'actions', 'status', 'name']) // Add 'status' to raw columns
+            ->rawColumns(['actions', 'status', 'name']) // Add 'status' to raw columns
             ->make(true);
     }
 
