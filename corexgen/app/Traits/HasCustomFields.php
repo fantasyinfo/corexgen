@@ -16,6 +16,7 @@ trait HasCustomFields
 
     public function getCustomFieldEntityType(): string
     {
-        return strtolower(class_basename($this));
+        $entityType = strtolower(class_basename($this));
+        return $entityType;
     }
 }

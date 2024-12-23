@@ -5,12 +5,14 @@
         <div class="row">
             <div class="justify-content-md-center col-lg-9">
                 <div class="card stretch stretch-full">
-                    <form id="customFieldsForm" action="{{ route(getPanelRoutes('customfields.store')) }}" method="POST">
+                    <form id="customFieldsForm" action="{{ route(getPanelRoutes('customfields.update')) }}" method="POST">
                         @csrf
+                        @method('PUT')
+                        <input type='hidden' name='id' value='{{ $customfield['id'] }}' />
                         <div class="card-body general-info">
                             <div class="mb-5 d-flex align-items-center justify-content-between">
                                 <p class="fw-bold mb-0 me-4">
-                                    <span class="d-block">{{ __('customfields.Create New Custom Field') }}</span>
+                                    <span class="d-block">{{ __('customfields.Update Custom Field') }}</span>
                                     <span class="fs-12 fw-normal text-muted text-truncate-1-line">
                                         {{ __('crud.Please add correct information') }}
                                     </span>
@@ -34,8 +36,8 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="text" name="fields[0][label]"
-                                                id="fieldLabel_0" placeholder="{{ __('Ex: Employee Department') }}"
-                                                required />
+                                                id="fieldLabel_0" placeholder="{{ __('Ex: Employee Department') }}" required
+                                                value="{{ old('fields.0.label', $customfield['fields'][0]['label']) }}" />
                                         </div>
                                     </div>
 
@@ -48,9 +50,13 @@
                                         <div class="col-lg-8">
                                             <div class="input-group">
                                                 <select name="fields[0][type]" id="fieldType_0" required
-                                                    class="form-control ">
+                                                    class="form-control">
+
                                                     @foreach (CUSTOM_FIELDS_INPUT_TYPES as $key => $item)
-                                                        <option value="{{$key}}">{{$item }}</option>
+                                                        <option value="{{ $key }}"
+                                                            {{ old('fields.0.type', $customfield['fields'][0]['type']) == $key ? 'selected' : '' }}>
+                                                            {{ __($item) }}
+                                                        </option>
                                                     @endforeach
                                                 </select>
 
@@ -67,9 +73,11 @@
                                         <div class="col-lg-8">
                                             <div class="input-group">
                                                 <select name="fields[0][entity_type]" id="entityType_0" required
-                                                    class="form-control  ">
+                                                    class="form-control">
                                                     @foreach (CUSTOM_FIELDS_RELATION_TYPES['VALUES'] as $key => $item)
-                                                        <option value="{{$key}}">{{$item }}</option>
+                                                        <option value="{{ $key }}"
+                                                            {{ old('fields.0.entity_type', $customfield['fields'][0]['entity_type']) == $key ? 'selected' : '' }}>
+                                                            {{ $item }}</option>
                                                     @endforeach
                                                 </select>
 
@@ -86,7 +94,9 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <x-form-components.textarea-group name="fields[0][options]" id="fieldOptions_0"
-                                                placeholder="{{ __('Enter options, one per line') }}" rows="4" />
+                                                placeholder="{{ __('Enter options, one per line') }}" rows="4"
+                                                value="{{ old('fields.0.options', $customfield['fields'][0]['options']) }}"
+                                                class="custom-class" />
                                         </div>
                                     </div>
 
@@ -99,7 +109,8 @@
                                         <div class="col-lg-8">
                                             <div class="form-check">
                                                 <input type="checkbox" class="form-check-input"
-                                                    name="fields[0][is_required]" id="isRequired_0">
+                                                    name="fields[0][is_required]" id="isRequired_0"
+                                                    {{ old('fields.0.is_required', $customfield['fields'][0]['is_required']) ? 'checked' : '' }}>
                                                 <label class="form-check-label" for="isRequired_0">
                                                     {{ __('customfields.Required Field') }}
                                                 </label>
@@ -108,9 +119,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <button type="button" class="btn btn-outline-primary me-2" id="addMoreFields">
+                            {{-- <button type="button" class="btn btn-outline-primary me-2" id="addMoreFields">
                                 <i class="fas fa-plus"></i> {{ __('customfields.Add Another Field') }}
-                            </button>
+                            </button> --}}
                         </div>
                     </form>
                 </div>
@@ -123,6 +134,11 @@
             document.addEventListener('DOMContentLoaded', function() {
                 let fieldCounter = 1;
 
+                const initialFieldType = document.querySelector('#fieldType_0');
+                if (initialFieldType) {
+                    toggleOptionsVisibility(initialFieldType);
+                }
+
                 // Function to show/hide options based on field type
                 function toggleOptionsVisibility(selectElement) {
                     const optionsGroup = selectElement.closest('.custom-field-group').querySelector('.options-group');
@@ -134,50 +150,7 @@
                     select.addEventListener('change', (e) => toggleOptionsVisibility(e.target));
                 });
 
-                // Add new field group
-                document.getElementById('addMoreFields').addEventListener('click', function() {
-                    const container = document.getElementById('customFieldsContainer');
-                    const template = container.querySelector('.custom-field-group').cloneNode(true);
 
-                    // Update IDs and names
-                    template.querySelectorAll('[id]').forEach(element => {
-                        element.id = element.id.replace('_0', `_${fieldCounter}`);
-                    });
-                    template.querySelectorAll('[name]').forEach(element => {
-                        element.name = element.name.replace('[0]', `[${fieldCounter}]`);
-                    });
-
-                    // Clear values
-                    template.querySelectorAll('input[type="text"], textarea').forEach(element => {
-                        element.value = '';
-                    });
-                    template.querySelectorAll('select').forEach(element => {
-                        element.selectedIndex = 0;
-                    });
-                    template.querySelectorAll('input[type="checkbox"]').forEach(element => {
-                        element.checked = false;
-                    });
-
-                    // Add remove button for additional fields
-                    if (fieldCounter > 0) {
-                        const removeBtn = document.createElement('button');
-                        removeBtn.type = 'button';
-                        removeBtn.className = 'btn btn-outline-danger btn-sm mt-2';
-                        removeBtn.innerHTML = '<i class="fas fa-trash"></i> Remove Field';
-                        removeBtn.onclick = function() {
-                            this.closest('.custom-field-group').remove();
-                        };
-                        template.appendChild(removeBtn);
-                    }
-
-                    // Add new event listeners
-                    template.querySelectorAll('[id^="fieldType_"]').forEach(select => {
-                        select.addEventListener('change', (e) => toggleOptionsVisibility(e.target));
-                    });
-
-                    container.appendChild(template);
-                    fieldCounter++;
-                });
             });
         </script>
     @endpush

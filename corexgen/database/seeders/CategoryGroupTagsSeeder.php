@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\CategoryGroupTag;
-use CategoryGroupsTagsRelationsEnum;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 

@@ -436,7 +436,7 @@ PermissionsHelper::initializePermissions();
         'audit' => 'audit',
         'clients' => 'clients',
         'customfields' => 'customfields',
-        
+
     ]
 ]);
 
@@ -861,5 +861,23 @@ PermissionsHelper::initializePermissions();
 ]);
 
 
+!defined('CUSTOM_FIELDS_INPUT_TYPES') && define('CUSTOM_FIELDS_INPUT_TYPES', [
 
+    'text' => 'Text',
+    'number' => 'Number',
+    'select' => 'Dropdown',
+    'date' => 'Date',
+    'time' => 'Time',
+    'textarea' => 'TeaxArea',
+    'checkbox' => 'Checkbox',
+
+]);
+
+
+
+// kyes must match the model name in lowercase
+!defined('CUSTOM_FIELDS_RELATION_TYPES') && define('CUSTOM_FIELDS_RELATION_TYPES', [
+    'KEYS' => ['crmclients' => 'crmclients', 'user' => 'user', 'crmrole' => 'crmrole'],
+    'VALUES' => ['crmclients' => 'Clients', 'user' => 'Users & Employees', 'crmrole' => 'Roles'],
+]);
 
