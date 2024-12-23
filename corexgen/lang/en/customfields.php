@@ -3,6 +3,7 @@
 return [
 
     'Custom Field' => "Custom Field",
+    'Custom Fields' => "Custom Fields",
     'Custom Fields Management' => 'Custom Fields Management',
     'Create Custom Field' => 'Create Custom Field',
     'Custom Field Name' => 'Custom Field Name',
@@ -18,7 +19,8 @@ return [
     'Save All Fields' => 'Save All Fields',
     'Add Another Field' => 'Add Another Field',
     'Required Field' => 'Required Field',
-    'Is Required' => 'Is Required'
+    'Is Required' => 'Is Required',
+    'Options' => 'Options',
 
 
 ];

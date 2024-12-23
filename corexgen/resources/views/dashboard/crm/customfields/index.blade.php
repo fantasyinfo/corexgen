@@ -30,7 +30,7 @@
                             [
                                 'data' => 'entity_type',
                                 'name' => 'entity_type',
-                                'label' => __('customfields.Field Type'),
+                                'label' => __('customfields.Apply To'),
                                 'searchable' => true,
                                 'orderable' => true,
                                 'width' => '100px',
@@ -61,7 +61,7 @@
                             ],
                             [
                                 'data' => 'status',
-                                'name' => 'status',
+                                'name' => 'is_active',
                                 'label' => __('crud.Status'),
                                 'searchable' => false,
                                 'orderable' => true,

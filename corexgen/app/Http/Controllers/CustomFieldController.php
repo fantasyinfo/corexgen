@@ -115,8 +115,8 @@ class CustomFieldController extends Controller
     {
         $data = $request->validate([
             'fields.*.label' => 'required|string|max:255',
-            'fields.*.type' => 'required|in:text,number,select,date,textarea',
-            'fields.*.entity_type' => 'required|in:client,user,role',
+            'fields.*.type' => 'required|in:' . implode(',', array_keys(CUSTOM_FIELDS_INPUT_TYPES)),
+            'fields.*.entity_type' => 'required|in:' . implode(',', array_keys(CUSTOM_FIELDS_RELATION_TYPES['KEYS'])),
             'fields.*.options' => 'required_if:fields.*.type,select',
             'fields.*.is_required' => 'nullable'
         ]);
@@ -141,7 +141,7 @@ class CustomFieldController extends Controller
 
                 $this->customFieldService->createDefinition($fieldData);
 
-                $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['CUSTOM_FIELDS']]), '+','1');
+                $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['CUSTOM_FIELDS']]), '+', '1');
             }
 
             DB::commit();
@@ -157,7 +157,7 @@ class CustomFieldController extends Controller
         }
     }
 
-   
+
 
     public function create()
     {
@@ -166,5 +166,122 @@ class CustomFieldController extends Controller
         return view($this->getViewFilePath('create'), [
             'title' => 'Create Custom Fields'
         ]);
+    }
+
+
+    public function edit($id)
+    {
+        // Apply tenant filtering to role query
+        $query = CustomFieldDefinition::query()->where('id', $id);
+        $query = $this->applyTenantFilter($query);
+        $customfield = $query->firstOrFail();
+
+        $fieldData = [
+            'id' => $customfield->id,
+            'fields' => [
+                [
+                    'label' => $customfield->field_label,
+                    'type' => $customfield->field_type,
+                    'entity_type' => $customfield->entity_type,
+                    'options' => is_array($customfield->options) ? implode("\n", $customfield->options) : '',
+                    'is_required' => $customfield->is_required
+                ]
+            ]
+        ];
+
+        return view($this->getViewFilePath('edit'), [
+            'title' => 'Edit Custom Field',
+            'customfield' => $fieldData
+        ]);
+    }
+
+    public function update(Request $request)
+    {
+        $this->tenantRoute = $this->getTenantRoute();
+
+        $data = $request->validate([
+            'id' => 'required|exists:custom_field_definitions,id',
+            'fields.*.label' => 'required|string|max:255',
+            'fields.*.type' => 'required|in:' . implode(',', array_keys(CUSTOM_FIELDS_INPUT_TYPES)),
+            'fields.*.entity_type' => 'required|in:' . implode(',', array_keys(CUSTOM_FIELDS_RELATION_TYPES['KEYS'])),
+            'fields.*.options' => 'required_if:fields.*.type,select',
+            'fields.*.is_required' => 'nullable'
+        ]);
+
+        $query = CustomFieldDefinition::query()->where('id', $data['id']);
+        $query = $this->applyTenantFilter($query);
+        $customfield = $query->firstOrFail();
+
+        $fieldData = [
+            'field_label' => $data['fields'][0]['label'],
+            'field_name' => Str::slug($data['fields'][0]['label']),
+            'field_type' => $data['fields'][0]['type'],
+            'entity_type' => $data['fields'][0]['entity_type'],
+            'is_required' => !empty($data['fields'][0]['is_required']),
+            'options' => $data['fields'][0]['type'] === 'select' ?
+                array_filter(explode("\n", $data['fields'][0]['options'])) :
+                null
+        ];
+
+        $this->customFieldService->updateDefinition($customfield, $fieldData);
+
+        return redirect()
+            ->route(getPanelRoutes('customfields.index'))
+            ->with('success', __('Custom Field updated successfully'));
+    }
+
+    public function destroy($id)
+    {
+        try {
+            // Apply tenant filtering and delete role
+            $query = CustomFieldDefinition::query()->where('id', $id);
+            $query = $this->applyTenantFilter($query);
+            $query->delete();
+
+            $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['CUSTOM_FIELDS']]), '-', '1');
+            // Redirect with success message
+            return redirect()->back()->with('success', 'Custom Field deleted successfully.');
+        } catch (\Exception $e) {
+            // Handle any deletion errors
+            return redirect()->back()->with('error', 'Failed to delete the Custom Field: ' . $e->getMessage());
+        }
+    }
+
+    public function changeStatus($id, $status)
+    {
+        try {
+            // Apply tenant filtering and find role
+            $query = CustomFieldDefinition::query()->where('id', $id);
+            $query = $this->applyTenantFilter($query);
+            $query->update(['is_active' => $status == 'Active' ? '1' : '0']);
+            // Redirect with success message
+            return redirect()->back()->with('success', 'Custom Fields status changed successfully.');
+        } catch (\Exception $e) {
+            // Handle any status change errors
+            return redirect()->back()->with('error', 'Failed to change the Custom Fields status: ' . $e->getMessage());
+        }
+    }
+
+    public function bulkDelete(Request $request)
+    {
+
+        $ids = $request->input('ids');
+
+        try {
+            // Delete the role
+
+            if (is_array($ids) && count($ids) > 0) {
+                // Validate ownership/permissions if necessary
+                $this->applyTenantFilter(CustomFieldDefinition::query()->whereIn('id', $ids))->delete();
+                $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['CUSTOM_FIELDS']]), '-', count($ids));
+                return response()->json(['message' => 'Selected custom fields deleted successfully.'], 200);
+            }
+
+            return response()->json(['message' => 'No custom fields selected for deletion.'], 400);
+
+        } catch (\Exception $e) {
+            // Handle any exceptions
+            return redirect()->back()->with('error', 'Failed to delete the custom fields: ' . $e->getMessage());
+        }
     }
 }

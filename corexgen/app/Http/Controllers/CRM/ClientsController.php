@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\CRM;
 
+use App\Helpers\CustomFieldsValidation;
 use App\Helpers\PermissionsHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ClientRequest;
@@ -20,7 +21,10 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use App\Jobs\CsvImportJob;
 use App\Models\CategoryGroupTag;
+use App\Services\CustomFieldService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
+
 class ClientsController extends Controller
 {
 
@@ -61,12 +65,16 @@ class ClientsController extends Controller
     protected $clientRepository;
     protected $clientService;
 
+    protected $customFieldService;
+
     public function __construct(
         ClientRepository $clientRepository,
-        ClientService $clientService
+        ClientService $clientService,
+        CustomFieldService $customFieldService
     ) {
         $this->clientRepository = $clientRepository;
         $this->clientService = $clientService;
+        $this->customFieldService = $customFieldService;
     }
 
 
@@ -128,10 +136,27 @@ class ClientsController extends Controller
     public function store(ClientRequest $request)
     {
 
+
+        // dd($request->all());
+
         try {
+
+            // custom fields validation if any
+            $validatedData = [];
+            if ($request->has('custom_fields')) {
+                $validator = new CustomFieldsValidation();
+                $validatedData = $validator->validate($request->input('custom_fields'), CUSTOM_FIELDS_RELATION_TYPES['KEYS']['crmclients'], Auth::user()->company_id);
+            }
+
+
             // Create client
             $client = $this->clientService->createClient($request->validated());
 
+
+            // insert custom fields values to db
+            if ($request->has('custom_fields') && !empty($validatedData) && count($validatedData) > 0) {
+                $this->customFieldService->saveValues($client['client'], $validatedData);
+            }
 
             $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['CLIENTS']]), '+', '1');
 
@@ -162,11 +187,17 @@ class ClientsController extends Controller
         $categoryQuery = $this->applyTenantFilter($categoryQuery);
         $categories = $categoryQuery->get();
 
+        $customFields = [];
+        if (!is_null(Auth::user()->company_id)) {
+            $customFields = $this->customFieldService->getFieldsForEntity(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['crmclients'], Auth::user()->company_id);
+        }
+
         return view($this->getViewFilePath('create'), [
             'title' => 'Create Client',
             'countries' => $countries,
             'module' => PANEL_MODULES[$this->getPanelModule()]['clients'],
-            'categories' => $categories
+            'categories' => $categories,
+            'customFields' => $customFields
 
         ]);
     }
@@ -404,7 +435,7 @@ class ClientsController extends Controller
             ],
             'CGT ID' => [
                 'key' => 'CGT ID',
-                'message' => 'required,  exists:from CGT ID,id, e.g., 1 ,2,3 ' ,
+                'message' => 'required,  exists:from CGT ID,id, e.g., 1 ,2,3 ',
             ],
             'Street Address' => [
                 'key' => 'Street Address',
@@ -461,7 +492,7 @@ class ClientsController extends Controller
         ];
 
 
-    
+
 
         return view($this->getViewFilePath('import'), [
 
@@ -492,15 +523,15 @@ class ClientsController extends Controller
             // Validation rules for each row
             $rules = [
                 'Type' => ['required', 'string', Rule::in(['Individual', 'Company'])],
-                'Company Name' => ['nullable','required_if:Type,Company'],
+                'Company Name' => ['nullable', 'required_if:Type,Company'],
                 'Title' => ['nullable', 'string'],
                 'First Name' => ['required', 'string'],
                 'Middle Name' => ['nullable', 'string'],
                 'Last Name' => ['required', 'string'],
-                'Emails' => ['required','string'],
+                'Emails' => ['required', 'string'],
                 'Phones' => ['required', 'string'],
                 'Social Media Links' => ['nullable', 'string'], // Allow empty
-                'CGT ID' => ['required','string', 'exists:category_group_tag,id'],
+                'CGT ID' => ['required', 'string', 'exists:category_group_tag,id'],
                 'Street Address' => ['nullable', 'string', 'max:255'], // Allow empty
                 'City Name' => ['nullable', 'string'], // Allow empty
                 'Country ID' => ['nullable', 'exists:countries,id'], // Allow empty
@@ -508,7 +539,7 @@ class ClientsController extends Controller
             ];
 
             // Expected CSV headers
-            $expectedHeaders = ['Type', 'Company Name','Title', 'First Name', 'Middle Name', 'Last Name', 'Emails', 'Phones', 'Social Media Links', 'CGT ID', 'Street Address', 'City Name', 'Country ID', 'Pincode'];
+            $expectedHeaders = ['Type', 'Company Name', 'Title', 'First Name', 'Middle Name', 'Last Name', 'Emails', 'Phones', 'Social Media Links', 'CGT ID', 'Street Address', 'City Name', 'Country ID', 'Pincode'];
 
             // Dispatch the job
             CsvImportJob::dispatch(

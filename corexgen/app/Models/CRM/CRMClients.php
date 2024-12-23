@@ -5,6 +5,7 @@ namespace App\Models\CRM;
 use App\Models\Address;
 use App\Models\CategoryGroupTag;
 use App\Models\Company;
+use App\Traits\HasCustomFields;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +16,7 @@ class CRMClients extends Model implements Auditable
 {
     use HasFactory;
     use \OwenIt\Auditing\Auditable;
+    use HasCustomFields;
 
     const table = 'clients';
 
