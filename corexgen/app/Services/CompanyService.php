@@ -158,10 +158,60 @@ class CompanyService
             $insertArray[] = [
                 'name' => $cc,
                 'color' => $colors[array_rand($colors)],
-                'relation_type' => 'clients',
-                'type' => 'categories',
+                'relation_type' => CATEGORY_GROUP_TAGS_RELATIONS['KEY']['clients'],
+                'type' => CATEGORY_GROUP_TAGS_TYPES['KEY']['categories'],
                 'status' => 'active',
-                'company_id' => $companyid
+                'company_id' => $companyid,
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        }
+
+        // leads groups
+        $leadsGroups = ['Hot', 'Warm', 'Cold'];
+
+        foreach ($leadsGroups as $cc) {
+            $insertArray[] = [
+                'name' => $cc,
+                'color' => $colors[array_rand($colors)],
+                'relation_type' => CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads'],
+                'type' => CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_groups'],
+                'status' => 'active',
+                'company_id' => $companyid,
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        }
+
+        // leads status
+        $leadsStatus = ['New', 'Disqualified', 'Qualified', 'Contacted', 'Proposal Sent', 'Converted'];
+
+        foreach ($leadsStatus as $cc) {
+            $insertArray[] = [
+                'name' => $cc,
+                'color' => $colors[array_rand($colors)],
+                'relation_type' => CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads'],
+                'type' => CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_status'],
+                'status' => 'active',
+                'company_id' => $companyid,
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        }
+
+        // leads sources
+        $leadsSources = ['Social Media', 'Website', 'Ads', 'Referral', 'Other'];
+
+        foreach ($leadsSources as $cc) {
+            $insertArray[] = [
+                'name' => $cc,
+                'color' => $colors[array_rand($colors)],
+                'relation_type' => CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads'],
+                'type' => CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_sources'],
+                'status' => 'active',
+                'company_id' => $companyid,
+                'created_at' => now(),
+                'updated_at' => now()
             ];
         }
         CategoryGroupTag::insert($insertArray);

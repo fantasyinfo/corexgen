@@ -25,7 +25,7 @@ use App\Services\CustomFieldService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
-class ClientsController extends Controller
+class LeadsController extends Controller
 {
 
     use TenantFilter;

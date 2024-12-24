@@ -25,7 +25,7 @@
             padding: 30px;
         }
 
-        .plan-price-strike{
+        .plan-price-strike {
             font-size: 1rem;
             font-weight: 500;
             color: var(--primary-secondary);
@@ -71,7 +71,7 @@
 @extends('layout.app')
 @section('content')
 
-@include('layout.components.header-buttons')
+    @include('layout.components.header-buttons')
     @if (hasPermission('PLANS.READ_ALL') || hasPermission('PLANS.READ'))
         <div class="row justify-content-center">
 
@@ -85,11 +85,14 @@
                             </div>
                             <div class="plan-card-body">
                                 <div class="plan-price-strike">
-                                    {{ getSettingValue('Panel Currency Symbol') }} <span>{{$plan->price}} ({{ getSettingValue('Panel Currency Code') }})</span>
+                                    {{ getSettingValue('Panel Currency Symbol') }} <span>{{ $plan->price }}
+                                        ({{ getSettingValue('Panel Currency Code') }})
+                                    </span>
                                 </div>
                                 <div class="plan-price text-center">
-                                    {{ getSettingValue('Panel Currency Symbol') }} {{ $plan->offer_price }} <span class="text-muted"
-                                        style="font-size: 1rem;">/{{ $plan->billing_cycle }} ({{ getSettingValue('Panel Currency Code') }})</span>
+                                    {{ getSettingValue('Panel Currency Symbol') }} {{ $plan->offer_price }} <span
+                                        class="text-muted" style="font-size: 1rem;">/{{ $plan->billing_cycle }}
+                                        ({{ getSettingValue('Panel Currency Code') }})</span>
                                 </div>
                                 @if ($plan->planFeatures)
                                     <div class="plan-features">
@@ -97,17 +100,20 @@
                                             @if ($features->value === -1)
                                                 <div class="feature-item">
                                                     <span class="feature-icon">✓</span>
-                                                    Unlimited {{ ucwords($features->module_name) }} Create
+                                                    Unlimited
+                                                    {{ ucwords(replaceUnderscoreWithSpace($features->module_name)) }}
                                                 </div>
                                             @elseif($features->value > 0)
                                                 <div class="feature-item">
                                                     <span class="feature-icon">✓</span>
-                                                    {{ $features->value }} {{ ucwords($features->module_name) }} Create
+                                                    {{ number_format($features->value) }}
+                                                    {{ ucwords(replaceUnderscoreWithSpace($features->module_name)) }}
                                                 </div>
                                             @elseif($features->value === 0)
                                                 <div class="feature-item text-muted">
                                                     <span class="feature-icon">✗</span>
-                                                    {{ $features->value }} {{ ucwords($features->module_name) }} Create
+                                                    {{ number_format($features->value) }}
+                                                    {{ ucwords(replaceUnderscoreWithSpace($features->module_name)) }}
                                                 </div>
                                             @endif
                                         @endforeach
@@ -117,9 +123,9 @@
                                     <div class="row my-2">
 
                                         <h6 class="my-2 text-center ">Actions</h6>
-                                      
+
                                         @if (hasPermission('PLANS.UPDATE'))
-                                        <div class="col">
+                                            <div class="col">
                                                 <a href="{{ route(getPanelRoutes($module . '.edit'), ['id' => $plan->id]) }}"
                                                     class="btn btn-outline-primary btn-plan-action">
                                                     <i class="fas fa-pencil-alt"></i>

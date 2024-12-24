@@ -9,6 +9,7 @@ use App\Http\Controllers\CompanyRegisterController;
 use App\Http\Controllers\CountryCitySeederController;
 use App\Http\Controllers\CompaniesController;
 use App\Http\Controllers\CRM\ClientsController;
+use App\Http\Controllers\CRM\LeadsController;
 use App\Http\Controllers\CustomFieldController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\RoleController;
@@ -331,6 +332,30 @@ Route::middleware([
 
         Route::get('/view/{id}', [ClientsController::class, 'view'])->name('view')->middleware('check.permission:CLIENTS.VIEW');
         Route::get('/profile', [ClientsController::class, 'profile'])->name('profile');
+    });
+
+    // leads routes
+    Route::prefix(PANEL_MODULES['COMPANY_PANEL']['leads'])->as(PANEL_MODULES['COMPANY_PANEL']['leads'] . '.')->group(function () {
+        // role for fetch, store, update
+        Route::get('/', [LeadsController::class, 'index'])->name('index')->middleware('check.permission:LEADS.READ_ALL');
+        Route::post('/', [LeadsController::class, 'store'])->name('store')->middleware('check.permission:LEADS.CREATE');
+        Route::put('/', [LeadsController::class, 'update'])->name('update')->middleware('check.permission:LEADS.UPDATE');
+
+        // create, edit, change status, delete
+        Route::get('/create', [LeadsController::class, 'create'])->name('create')->middleware('check.permission:LEADS.CREATE');
+        Route::get('/edit/{id}', [LeadsController::class, 'edit'])->name('edit')->middleware('check.permission:LEADS.UPDATE');
+        Route::get('/changeStatus/{id}/{status}', [LeadsController::class, 'changeStatus'])->name('changeStatus')->middleware('check.permission:LEADS.CHANGE_STATUS');
+        Route::delete('/destroy/{id}', [LeadsController::class, 'destroy'])->name('destroy')->middleware('check.permission:LEADS.DELETE');
+
+        // validate, export, import
+        Route::get('/export', [LeadsController::class, 'export'])->name('export')->middleware('check.permission:LEADS.EXPORT');
+        Route::get('/import', [LeadsController::class, 'importView'])->name('importView')->middleware('check.permission:LEADS.IMPORT');
+        Route::post('/import', [LeadsController::class, 'import'])->name('import')->middleware('check.permission:LEADS.IMPORT');
+
+        Route::post('/bulkDelete', [LeadsController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:LEADS.BULK_DELETE');
+
+        Route::get('/view/{id}', [LeadsController::class, 'view'])->name('view')->middleware('check.permission:LEADS.VIEW');
+        Route::get('/profile', [LeadsController::class, 'profile'])->name('profile');
     });
 
 

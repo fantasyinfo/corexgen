@@ -124,17 +124,19 @@
                                         @if ($features->value === -1)
                                             <div class="feature-item">
                                                 <span class="feature-icon">✓</span>
-                                                Unlimited {{ ucwords($features->module_name) }} Create
+                                                Unlimited {{ ucwords(replaceUnderscoreWithSpace($features->module_name)) }}
                                             </div>
                                         @elseif($features->value > 0)
                                             <div class="feature-item">
                                                 <span class="feature-icon">✓</span>
-                                                {{ $features->value }} {{ ucwords($features->module_name) }} Create
+                                                {{ number_format($features->value) }}
+                                                {{ ucwords(replaceUnderscoreWithSpace($features->module_name)) }}
                                             </div>
                                         @elseif($features->value === 0)
                                             <div class="feature-item text-muted">
                                                 <span class="feature-icon">✗</span>
-                                                {{ $features->value }} {{ ucwords($features->module_name) }} Create
+                                                {{ number_format($features->value) }}
+                                                {{ ucwords(replaceUnderscoreWithSpace($features->module_name)) }}
                                             </div>
                                         @endif
                                     @endforeach
@@ -177,16 +179,16 @@
                                 <div class="modal-body">
                                     <p>Are you sure you want to change your plan? This action cannot be easily reversed.</p>
                                     ${planPrice > 0 ? `
-                                            <div class="mt-3">
-                                                <label for="paymentGateway" class="form-label">Select Payment Method</label>
-                                                <select class="form-select" id="paymentGateway" required>
-                                                 
-                                                    @foreach ($payment_gateways as $pg)
-                                                        <option value="{{ strtolower($pg->name) }}">{{ $pg->name }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        ` : ''}
+                                                <div class="mt-3">
+                                                    <label for="paymentGateway" class="form-label">Select Payment Method</label>
+                                                    <select class="form-select" id="paymentGateway" required>
+                                                     
+                                                        @foreach ($payment_gateways as $pg)
+                                                            <option value="{{ strtolower($pg->name) }}">{{ $pg->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            ` : ''}
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
