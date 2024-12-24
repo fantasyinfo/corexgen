@@ -59,24 +59,79 @@ function createMedia(UploadedFile $file)
 
 
 
-function isFeatureEnable($module)
+// function isFeatureEnabled($module)
+// {
+//     if (!Auth::user() || Auth::user()->company_id == null) {
+//         return true;
+//     }
+
+
+//     $planFeatuers = Company::with(['plans.planFeatures' => fn($q) => $q->where('module_name', strtolower($module))])
+//         ->where('id', Auth::user()->company_id)
+//         ->first()->toArray();
+
+//     if (@$planFeatuers['plans']['plan_features'][0]['value'] == 0) {
+//         return false;
+//     }
+
+//     return true;
+// }
+
+
+// Cache storage using static variables
+$GLOBALS['feature_cache'] = null;
+$GLOBALS['default_user_cache'] = null;
+
+function isFeatureEnabled($module)
 {
-    if (!Auth::user() || Auth::user()->company_id == null) {
+    // Check if user is not logged in or has no company_id
+    if (isDefaultUser() === true) {
         return true;
     }
 
+    // Load all features once
+    $features = getAllFeatures();
 
-    $planFeatuers = Company::with(['plans.planFeatures' => fn($q) => $q->where('module_name', strtolower($module))])
-        ->where('id', Auth::user()->company_id)
-        ->first()->toArray();
+    // Convert module name to lowercase for comparison
+    $moduleName = strtolower($module);
 
-    if (@$planFeatuers['plans']['plan_features'][0]['value'] == 0) {
-        return false;
-    }
-
-    return true;
+    // Check if feature exists and is enabled
+    return !isset($features[$moduleName]) || $features[$moduleName] !== 0;
 }
 
+function isDefaultUser()
+{
+    if ($GLOBALS['default_user_cache'] === null) {
+        $GLOBALS['default_user_cache'] = !Auth::user() || Auth::user()->company_id === null;
+    }
+    return $GLOBALS['default_user_cache'];
+}
+
+function getAllFeatures()
+{
+    if ($GLOBALS['feature_cache'] === null) {
+        $company = Company::with(['plans.planFeatures'])
+            ->where('id', Auth::user()->company_id)
+            ->first();
+
+        $GLOBALS['feature_cache'] = [];
+
+        if ($company && $company->plans && $company->plans->planFeatures) {
+            foreach ($company->plans->planFeatures as $feature) {
+                $GLOBALS['feature_cache'][strtolower($feature->module_name)] = $feature->value;
+            }
+        }
+    }
+
+    return $GLOBALS['feature_cache'];
+}
+
+// Function to clear cache if needed (e.g., after plan changes)
+function clearFeatureCache()
+{
+    $GLOBALS['feature_cache'] = null;
+    $GLOBALS['default_user_cache'] = null;
+}
 
 
 

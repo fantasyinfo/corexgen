@@ -27,7 +27,7 @@
             @foreach ($menus->where('parent_menu', '1') as $parentMenu)
              
             {{-- Skip the menu if it's not enabled and not a default --}}
-            @if (!$parentMenu->is_default && !isFeatureEnable($parentMenu->feature_type))
+            @if (!$parentMenu->is_default && !isFeatureEnabled($parentMenu->feature_type))
                 <li class="nav-item">
                     <a title="Upgrade Your Plan to Use this feature" data-toggle="tooltip"
                         href="{{ route(getPanelRoutes('planupgrade.index')) }}" class="nav-link">

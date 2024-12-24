@@ -120,6 +120,28 @@ class CustomFieldService
             ->get();
     }
 
+    public function deleteEntityValues($entity)
+    {
+        return DB::transaction(function () use ($entity) {
+            return CustomFieldValue::where('entity_id', $entity->id)
+                ->whereHas('definition', function ($query) use ($entity) {
+                    $query->where('entity_type', $entity->getCustomFieldEntityType());
+                })
+                ->delete();
+        });
+    }
+
+    public function bulkDeleteEntityValues(string $entityType, array $entityIds)
+    {
+        return DB::transaction(function () use ($entityType, $entityIds) {
+            return CustomFieldValue::whereIn('entity_id', $entityIds)
+                ->whereHas('definition', function ($query) use ($entityType) {
+                    $query->where('entity_type', $entityType);
+                })
+                ->delete();
+        });
+    }
+
     public function getDatatablesResponse($request)
     {
         $this->tenantRoute = $this->getTenantRoute();

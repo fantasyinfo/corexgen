@@ -2,7 +2,8 @@
 
 @section('content')
     @php
-        // prePrintR($client->toArray());
+        //  prePrintR($client->toArray());
+        //  prePrintR($cfOldValues->toArray());
     @endphp
     <div class="container">
         <div class="row">
@@ -50,6 +51,14 @@
                                         {{ __('clients.Additional Information') }}
                                     </button>
                                 </li>
+                                @if (isset($customFields) && $customFields->isNotEmpty())
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="custom-fields-tab" data-bs-toggle="tab"
+                                            data-bs-target="#custom-fields" type="button" role="tab">
+                                            {{ __('customfields.Custom Fields') }}
+                                        </button>
+                                    </li>
+                                @endif
                             </ul>
 
                             <div class="tab-content mt-4" id="clientsTabsContent">
@@ -407,6 +416,11 @@
                                     </div>
 
                                 </div>
+
+                                <!-- Custom Fields Tab -->
+                                @if (isset($customFields) && $customFields->isNotEmpty())
+                                    <x-form-components.custom-fields-edit :customFields="$customFields" :cfOldValues="$cfOldValues" />
+                                @endif
                             </div>
                         </div>
                     </form>
@@ -517,9 +531,9 @@
                         'wordcount'
                     ],
                     toolbar: 'undo redo | formatselect | bold italic backcolor | \
-                                  alignleft aligncenter alignright alignjustify | \
-                                  bullist numlist outdent indent | removeformat | help | \
-                                  link image media preview codesample table'
+                                      alignleft aligncenter alignright alignjustify | \
+                                      bullist numlist outdent indent | removeformat | help | \
+                                      link image media preview codesample table'
                 });
             }
 

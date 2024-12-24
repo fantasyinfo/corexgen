@@ -143,7 +143,7 @@ class ClientsController extends Controller
 
             // custom fields validation if any
             $validatedData = [];
-            if ($request->has('custom_fields')) {
+            if ($request->has('custom_fields') && !is_null(Auth::user()->company_id)) {
                 $validator = new CustomFieldsValidation();
                 $validatedData = $validator->validate($request->input('custom_fields'), CUSTOM_FIELDS_RELATION_TYPES['KEYS']['crmclients'], Auth::user()->company_id);
             }
@@ -154,7 +154,7 @@ class ClientsController extends Controller
 
 
             // insert custom fields values to db
-            if ($request->has('custom_fields') && !empty($validatedData) && count($validatedData) > 0) {
+            if ($request->has('custom_fields') && !empty($validatedData) && count($validatedData) > 0 && !is_null(Auth::user()->company_id)) {
                 $this->customFieldService->saveValues($client['client'], $validatedData);
             }
 
@@ -187,7 +187,7 @@ class ClientsController extends Controller
         $categoryQuery = $this->applyTenantFilter($categoryQuery);
         $categories = $categoryQuery->get();
 
-        $customFields = [];
+        $customFields = collect();
         if (!is_null(Auth::user()->company_id)) {
             $customFields = $this->customFieldService->getFieldsForEntity(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['crmclients'], Auth::user()->company_id);
         }
@@ -206,8 +206,27 @@ class ClientsController extends Controller
     {
         $this->tenantRoute = $this->getTenantRoute();
 
+        // dd($request->all());
+
         try {
-            $this->clientService->updateClient($request->validated());
+
+            // custom fields validation if any
+            $validatedData = [];
+            if ($request->has('custom_fields') && !is_null(Auth::user()->company_id)) {
+                $validator = new CustomFieldsValidation();
+                $validatedData = $validator->validate($request->input('custom_fields'), CUSTOM_FIELDS_RELATION_TYPES['KEYS']['crmclients'], Auth::user()->company_id);
+            }
+
+
+
+            $client = $this->clientService->updateClient($request->validated());
+
+
+            // insert custom fields values to db
+            if ($request->has('custom_fields') && !empty($validatedData) && count($validatedData) > 0 && !is_null(Auth::user()->company_id)) {
+                $this->customFieldService->saveValues($client['client'], $validatedData);
+            }
+
 
             // If validation fails, it will throw an exception
             return redirect()
@@ -231,7 +250,8 @@ class ClientsController extends Controller
             'addresses' => function ($query) {
                 $query->select('addresses.id', 'addresses.street_address', 'addresses.postal_code', 'addresses.city_id', 'addresses.country_id')
                     ->withPivot('type');
-            }
+            },
+            'customFields'
         ])->where('id', $id);
 
         $query = $this->applyTenantFilter($query, 'clients');
@@ -239,11 +259,26 @@ class ClientsController extends Controller
         $client = $query->firstOrFail();
 
 
+        // countries
         $countries = Country::all();
 
+        // category groups tags
         $categoryQuery = $this->getCategoryGroupTags('categories', 'clients');
         $categoryQuery = $this->applyTenantFilter($categoryQuery);
         $categories = $categoryQuery->get();
+
+        // custom fields
+        $customFields = collect();
+        $cfOldValues = collect();
+        if (!is_null(Auth::user()->company_id)) {
+            $customFields = $this->customFieldService->getFieldsForEntity(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['crmclients'], Auth::user()->company_id);
+
+            // fetch already existing values
+
+            $cfOldValues = $this->customFieldService->getValuesForEntity($client);
+        }
+
+
 
         return view($this->getViewFilePath('edit'), [
 
@@ -251,7 +286,9 @@ class ClientsController extends Controller
             'client' => $client,
             'countries' => $countries,
             'module' => PANEL_MODULES[$this->getPanelModule()]['clients'],
-            'categories' => $categories
+            'categories' => $categories,
+            'customFields' => $customFields,
+            'cfOldValues' => $cfOldValues
         ]);
     }
 
@@ -260,10 +297,23 @@ class ClientsController extends Controller
     {
         try {
             // Delete the user
-            CRMClients::query()->where('id', '=', $id)->delete();
-            // Return success response
-            $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['CLIENTS']]), '-', '1');
-            return redirect()->back()->with('success', 'Client deleted successfully.');
+            $client = CRMClients::find($id);
+            if ($client) {
+
+                // delete its custom fields also if any
+                $this->customFieldService->deleteEntityValues($client);
+
+                // delete  now
+                $client->delete();
+
+                // update the subscription usage
+                $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['CLIENTS']]), '-', '1');
+
+                return redirect()->back()->with('success', 'Client deleted successfully.');
+            } else {
+                return redirect()->back()->with('error', 'Failed to delete the client: client not found with this id.');
+            }
+
         } catch (\Exception $e) {
             // Handle any exceptions
             return redirect()->back()->with('error', 'Failed to delete the client: ' . $e->getMessage());
@@ -594,30 +644,40 @@ class ClientsController extends Controller
 
     public function bulkDelete(Request $request)
     {
-
         $ids = $request->input('ids');
 
         try {
-            // Delete the companies
-
             if (is_array($ids) && count($ids) > 0) {
-                // Validate ownership/permissions if necessary
-                CRMClients::query()->whereIn('id', $ids)->delete();
+                DB::transaction(function () use ($ids) {
+                    // First, delete custom field values
+                    $this->customFieldService->bulkDeleteEntityValues(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['crmclients'], $ids);
 
-                $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['CLIENTS']]), '-', count($ids));
+                    // Then delete the clients
+                    CRMClients::whereIn('id', $ids)->delete();
+
+                    $this->updateUsage(
+                        strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['CLIENTS']]),
+                        '-',
+                        count($ids)
+                    );
+                });
 
                 return response()->json(['message' => 'Selected clients deleted successfully.'], 200);
             }
 
             return response()->json(['message' => 'No clients selected for deletion.'], 400);
 
-
-
-
-
         } catch (\Exception $e) {
-            // Handle any exceptions
-            return redirect()->back()->with('error', 'Failed to delete the clients: ' . $e->getMessage());
+            \Log::error('Bulk deletion failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'ids' => $ids
+            ]);
+
+            return response()->json(
+                ['error' => 'Failed to delete the clients: ' . $e->getMessage()],
+                500
+            );
         }
     }
     public function view()
