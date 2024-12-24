@@ -167,6 +167,13 @@ PermissionsHelper::initializePermissions();
         'for' => 'company',
         'is_feature' => true
     ],
+    PermissionsHelper::$plansPermissionsKeys['LEADS'] => [
+        'name' => 'LEADS',
+        'id' => PermissionsHelper::getParentPermissionId('102'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['LEADS'],
+        'for' => 'company',
+        'is_feature' => true,
+    ],
 ]);
 
 // super panel menus
@@ -322,6 +329,15 @@ PermissionsHelper::initializePermissions();
             'Clients' => ['menu_url' => 'clients.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['CLIENTS'], 'READ_ALL')],
         ]
     ],
+    'Leads' => [
+        'menu_icon' => 'fa-phone-volume',
+        'feature_type' => PermissionsHelper::$plansPermissionsKeys['LEADS'], // this need to match the PLANS_FEATURES key
+        'permission_plan' => PermissionsHelper::$plansPermissionsKeys['LEADS'],
+        'permission_id' => PermissionsHelper::getParentPermissionId('102'),
+        'children' => [
+            'Leads' => ['menu_url' => 'leads.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['LEADS'], 'READ_ALL')],
+        ]
+    ],
     'Custom Fields' => [
         'menu_icon' => 'fa-plus-square',
         'feature_type' => PermissionsHelper::$plansPermissionsKeys['CUSTOM_FIELDS'], // this need to match the PLANS_FEATURES key
@@ -367,6 +383,11 @@ PermissionsHelper::initializePermissions();
         'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger', 'BANNED' => 'warning'],
     ],
     'CLIENTS' => [
+        'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE', 'BANNED'],
+        'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE', 'BANNED' => 'BANNED'],
+        'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger', 'BANNED' => 'warning'],
+    ],
+    'LEADS' => [
         'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE', 'BANNED'],
         'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE', 'BANNED' => 'BANNED'],
         'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger', 'BANNED' => 'warning'],
@@ -436,6 +457,7 @@ PermissionsHelper::initializePermissions();
         'audit' => 'audit',
         'clients' => 'clients',
         'customfields' => 'customfields',
+        'leads' => 'leads',
 
     ]
 ]);
@@ -460,7 +482,9 @@ PermissionsHelper::initializePermissions();
     PermissionsHelper::$plansPermissionsKeys['ROLE'] => PermissionsHelper::$plansPermissionsKeys['ROLE'],
     PermissionsHelper::$plansPermissionsKeys['CLIENTS'] => PermissionsHelper::$plansPermissionsKeys['CLIENTS'],
     PermissionsHelper::$plansPermissionsKeys['CUSTOM_FIELDS'] => PermissionsHelper::$plansPermissionsKeys['CUSTOM_FIELDS'],
+    PermissionsHelper::$plansPermissionsKeys['LEADS'] => PermissionsHelper::$plansPermissionsKeys['LEADS'],
 ]);
+
 
 !defined('ADDRESS_TYPES') && define('ADDRESS_TYPES', [
     'COMPANY' => [
@@ -881,3 +905,45 @@ PermissionsHelper::initializePermissions();
     'VALUES' => ['crmclients' => 'Clients', 'user' => 'Users & Employees'],
 ]);
 
+
+!defined('CATEGORY_GROUP_TAGS_TYPES') && define('CATEGORY_GROUP_TAGS_TYPES', [
+    'TABLE_STATUS' => [
+        'categories',
+        'groups',
+        'tags',
+        'leads_groups',
+        'leads_sources',
+        'leads_status'
+    ],
+    'STATUS' => [
+        'categories' => 'Categories',
+        'groups' => 'Groups',
+        'tags' => 'Tags',
+        'leads_groups' => 'Leads Groups',
+        'leads_sources' => 'Leads Sources',
+        'leads_status' => 'Leads Status',
+    ],
+    'KEY' => [
+        'categories' => 'categories',
+        'groups' => 'groups',
+        'tags' => 'tags',
+        'leads_groups' => 'leads_groups',
+        'leads_sources' => 'leads_sources',
+        'leads_status' => 'leads_status',
+    ],
+]);
+
+!defined('CATEGORY_GROUP_TAGS_RELATIONS') && define('CATEGORY_GROUP_TAGS_RELATIONS', [
+    'TABLE_STATUS' => [
+        'clients',
+        'leads',
+    ],
+    'STATUS' => [
+        'clients' => 'Clients',
+        'leads' => 'Leads',
+    ],
+    'KEY' => [
+        'clients' => 'clients',
+        'leads' => 'leads',
+    ],
+]);

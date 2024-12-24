@@ -14,7 +14,8 @@ class ClientRepository
             ->with([
                 'categoryGroupTag' => function ($query) {
                     $query->where('status', 'active')
-                        ->where('relation_type', 'clients');
+                        ->where('relation_type', CATEGORY_GROUP_TAGS_RELATIONS['STATUS']['clients'])
+                        ->where('type', CATEGORY_GROUP_TAGS_TYPES['STATUS']['categories']);
                 },
                 'addresses' => function ($query) {
                     $query->select('addresses.id', 'addresses.street_address', 'addresses.postal_code', 'addresses.city_id', 'addresses.country_id')

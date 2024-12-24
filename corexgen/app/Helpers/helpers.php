@@ -134,7 +134,10 @@ function clearFeatureCache()
 }
 
 
-
+function replaceUnderscoreWithSpace(string $str): string
+{
+    return str_replace('_', " ", $str);
+}
 
 
 

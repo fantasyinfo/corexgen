@@ -14,16 +14,10 @@ return new class extends Migration {
             $table->id();
             $table->string('name');
             $table->string('color')->default('#03D1AB');
-            $table->string('relation_type')->default('clients');
 
-            $table->enum(
-                'type',
-                [
-                    'categories',
-                    'groups',
-                    'tags'
-                ]
-            )->default('categories');
+            $table->enum('relation_type', CATEGORY_GROUP_TAGS_RELATIONS['TABLE_STATUS'])->default(CATEGORY_GROUP_TAGS_RELATIONS['STATUS']['clients']);
+
+            $table->enum('type', CATEGORY_GROUP_TAGS_TYPES['TABLE_STATUS'])->default(CATEGORY_GROUP_TAGS_TYPES['STATUS']['categories']);
 
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->foreignId('company_id')->nullable()->constrained('companies')->onDelete('cascade');

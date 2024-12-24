@@ -31,6 +31,7 @@ class PermissionsHelper
         'CLIENTS' => 'CLIENTS',
         'BULK_IMPORT_STATUS' => 'BULK_IMPORT_STATUS',
         'CUSTOM_FIELDS' => 'CUSTOM_FIELDS',
+        'LEADS' => 'LEADS'
     ];
 
 
@@ -92,6 +93,9 @@ class PermissionsHelper
             self::$plansPermissionsKeys['CLIENTS'] => [3001 => 'CREATE', 3002 => 'READ', 3003 => 'READ_ALL', 3004 => 'UPDATE', 3005 => 'DELETE', 3006 => 'IMPORT', 3007 => 'EXPORT', 3008 => 'FILTER', 3009 => 'CHANGE_STATUS', 3010 => 'BULK_DELETE', 3011 => 'VIEW'],
 
             self::$plansPermissionsKeys['CUSTOM_FIELDS'] => [3051 => 'CREATE', 3052 => 'READ', 3053 => 'READ_ALL', 3054 => 'UPDATE', 3055 => 'DELETE', 3059 => 'CHANGE_STATUS', 3060 => 'BULK_DELETE'],
+
+            self::$plansPermissionsKeys['LEADS'] => [3101 => 'CREATE', 3102 => 'READ', 3103 => 'READ_ALL', 3104 => 'UPDATE', 3105 => 'DELETE', 3106 => 'IMPORT', 3107 => 'EXPORT', 3108 => 'FILTER', 3109 => 'CHANGE_STATUS', 3110 => 'BULK_DELETE', 3111 => 'VIEW'],
+
         ];
     }
 
