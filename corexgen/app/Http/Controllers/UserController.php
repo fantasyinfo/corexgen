@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\CustomFieldsValidation;
 use App\Helpers\PermissionsHelper;
 use App\Http\Requests\UserRequest;
 use App\Jobs\CsvImportJob;
@@ -166,15 +167,23 @@ class UserController extends Controller
 
         try {
 
+            // custom fields validation if any
+            $validatedData = [];
+            if ($request->has('custom_fields') && !is_null(Auth::user()->company_id)) {
+                $validator = new CustomFieldsValidation();
+                $validatedData = $validator->validate($request->input('custom_fields'), CUSTOM_FIELDS_RELATION_TYPES['KEYS']['user'], Auth::user()->company_id);
+            }
+
+
             $userData = $request->validated();
             $userData['company_id'] = Auth::user()->company_id;
             $userData['is_tenant'] = Auth::user()->is_tenant;
 
             $user = $userService->createUser($userData);
 
-            // Save custom field values if any
-            if ($request->has('custom_fields')) {
-                $this->customFieldService->saveValues($user, $request->custom_fields);
+            // insert custom fields values to db
+            if ($request->has('custom_fields') && !empty($validatedData) && count($validatedData) > 0 && !is_null(Auth::user()->company_id)) {
+                $this->customFieldService->saveValues($user, $validatedData);
             }
 
             // update current usage
@@ -202,10 +211,17 @@ class UserController extends Controller
 
         $roles = $this->applyTenantFilter(CRMRole::query())->get();
         $country = Country::all();
+
+        $customFields = collect();
+        if (!is_null(Auth::user()->company_id)) {
+            $customFields = $this->customFieldService->getFieldsForEntity(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['user'], Auth::user()->company_id);
+        }
+
         return view($this->getViewFilePath('create'), [
             'title' => 'Create User',
             'roles' => $roles,
             'country' => $country,
+            'customFields' => $customFields
         ]);
     }
 
@@ -235,12 +251,26 @@ class UserController extends Controller
         $country = Country::all();
 
 
+
+        // custom fields
+        $customFields = collect();
+        $cfOldValues = collect();
+        if (!is_null(Auth::user()->company_id)) {
+            $customFields = $this->customFieldService->getFieldsForEntity(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['user'], Auth::user()->company_id);
+
+            // fetch already existing values
+
+            $cfOldValues = $this->customFieldService->getValuesForEntity($user);
+        }
+
         return view($this->getViewFilePath('edit'), [
 
             'title' => 'Edit User',
             'user' => $user,
             'roles' => $roles,
             'country' => $country,
+            'customFields' => $customFields,
+            'cfOldValues' => $cfOldValues
         ]);
     }
 
@@ -259,10 +289,19 @@ class UserController extends Controller
         $this->tenantRoute = $this->getTenantRoute();
 
         try {
+
+            // custom fields validation if any
+            $validatedData = [];
+            if ($request->has('custom_fields') && !is_null(Auth::user()->company_id)) {
+                $validator = new CustomFieldsValidation();
+                $validatedData = $validator->validate($request->input('custom_fields'), CUSTOM_FIELDS_RELATION_TYPES['KEYS']['user'], Auth::user()->company_id);
+            }
+
             $user = $userService->updateUser($request->validated());
 
-            if ($request->has('custom_fields')) {
-                $this->customFieldService->saveValues($user, $request->custom_fields);
+            // insert custom fields values to db
+            if ($request->has('custom_fields') && !empty($validatedData) && count($validatedData) > 0 && !is_null(Auth::user()->company_id)) {
+                $this->customFieldService->saveValues($user, $validatedData);
             }
 
             if ($request->boolean('is_profile')) {
@@ -507,11 +546,23 @@ class UserController extends Controller
         try {
             // Delete the user
 
-            $this->applyTenantFilter(User::query()->where('id', '=', $id))->delete();
-            // update current usage
-            $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['USERS']]), '-', '1');
-            // Return success response
-            return redirect()->back()->with('success', 'User deleted successfully.');
+            $user = User::find($id);
+            if ($user) {
+
+                // delete its custom fields also if any
+                $this->customFieldService->deleteEntityValues($user);
+
+                // delete  now
+                $user->delete();
+
+                // update the subscription usage
+                $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['USERS']]), '-', '1');
+
+                return redirect()->back()->with('success', 'User deleted successfully.');
+            } else {
+                return redirect()->back()->with('error', 'Failed to delete the User: User not found with this id.');
+            }
+
         } catch (\Exception $e) {
             // Handle any exceptions
             return redirect()->back()->with('error', 'Failed to delete the user: ' . $e->getMessage());
@@ -558,17 +609,24 @@ class UserController extends Controller
             // Delete the user
 
             if (is_array($ids) && count($ids) > 0) {
-                // Validate ownership/permissions if necessary
-                $this->applyTenantFilter(User::query()->whereIn('id', $ids))->delete();
-                $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['USERS']]), '-', count($ids));
+                DB::transaction(function () use ($ids) {
+                    // First, delete custom field values
+                    $this->customFieldService->bulkDeleteEntityValues(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['user'], $ids);
+
+                    // Then delete the clients
+                    User::whereIn('id', $ids)->delete();
+
+                    $this->updateUsage(
+                        strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['USERS']]),
+                        '-',
+                        count($ids)
+                    );
+                });
+
                 return response()->json(['message' => 'Selected users deleted successfully.'], 200);
             }
 
             return response()->json(['message' => 'No users selected for deletion.'], 400);
-
-
-
-
 
         } catch (\Exception $e) {
             // Handle any exceptions

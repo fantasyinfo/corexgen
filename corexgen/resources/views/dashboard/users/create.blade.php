@@ -1,15 +1,7 @@
 @extends('layout.app')
 
 @section('content')
-@if ($errors->any())
-<div class="alert alert-danger">
-    <ul>
-        @foreach ($errors->all() as $error)
-            <li>{{ $error }}</li>
-        @endforeach
-    </ul>
-</div>
-@endif
+
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
@@ -45,6 +37,15 @@
                                             {{ __('users.Address') }}
                                         </button>
                                     </li>
+
+                                    @if (isset($customFields) && $customFields->isNotEmpty())
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="custom-fields-tab" data-bs-toggle="tab"
+                                            data-bs-target="#custom-fields" type="button" role="tab">
+                                            {{ __('customfields.Custom Fields') }}
+                                        </button>
+                                    </li>
+                                @endif
                                 </ul>
     
                     <div class="tab-content mt-4" id="companyTabsContent">
@@ -221,6 +222,11 @@
                                 </div>
                             </div>
                         </div>
+
+                          <!-- Custom Fields Tab -->
+                          @if (isset($customFields) && $customFields->isNotEmpty())
+                          <x-form-components.custom-fields-create :customFields="$customFields" />
+                         @endif
 
                     </div>
                         </div>

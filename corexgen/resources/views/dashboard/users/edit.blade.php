@@ -26,8 +26,8 @@
                             </div>
 
 
-                               <!-- Bootstrap Tabs -->
-                               <ul class="nav nav-tabs" id="companyTabs" role="tablist">
+                            <!-- Bootstrap Tabs -->
+                            <ul class="nav nav-tabs" id="companyTabs" role="tablist">
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link active" id="general-tab" data-bs-toggle="tab"
                                         data-bs-target="#general" type="button" role="tab">
@@ -41,166 +41,181 @@
                                         {{ __('users.Address') }}
                                     </button>
                                 </li>
+
+                                @if (isset($customFields) && $customFields->isNotEmpty())
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="custom-fields-tab" data-bs-toggle="tab"
+                                            data-bs-target="#custom-fields" type="button" role="tab">
+                                            {{ __('customfields.Custom Fields') }}
+                                        </button>
+                                    </li>
+                                @endif
                             </ul>
-                     <div class="tab-content mt-4" id="companyTabsContent">
-                           <!-- General Information Tab -->
-                        <div class="tab-pane fade show active" id="general" role="tabpanel">
-                            <!-- Full Name Field -->
-                            <div class="row mb-4 align-items-center">
-                                <div class="col-lg-4">
+                            <div class="tab-content mt-4" id="companyTabsContent">
+                                <!-- General Information Tab -->
+                                <div class="tab-pane fade show active" id="general" role="tabpanel">
+                                    <!-- Full Name Field -->
+                                    <div class="row mb-4 align-items-center">
+                                        <div class="col-lg-4">
 
-                                    <x-form-components.input-label for="nameName" class="custom-class" required>
-                                        {{ __('users.Full Name') }}
-                                    </x-form-components.input-label>
-                                </div>
-                                <div class="col-lg-8">
-                                    <x-form-components.input-group type="text" class="custom-class" id="nameName"
-                                        name="name" placeholder="{{ __('John Doe') }}" value="{{ old('name', $user->name) }}"
-                                        required />
-
-                                </div>
-                            </div>
-
-                            <!-- Email Field -->
-                            <div class="row mb-4 align-items-center">
-                                <div class="col-lg-4">
-                                    <x-form-components.input-label for="emailName" class="custom-class" required>
-                                        {{ __('users.Email') }}
-                                    </x-form-components.input-label>
-                                </div>
-                                <div class="col-lg-8">
-                                    <x-form-components.input-group type="email" class="custom-class" id="emailName"
-                                        name="email" placeholder="{{ __('john@email.com') }}"
-                                        value="{{ old('email', $user->email) }}" required disabled />
-
-                                </div>
-                            </div>
-
-                            <!-- Role Selection Field -->
-                            <div class="row mb-4 align-items-center">
-                                <div class="col-lg-4">
-                                    <x-form-components.input-label for="role_id" class="custom-class" required>
-                                        {{ __('users.Select Role') }}
-                                    </x-form-components.input-label>
-                                </div>
-                                <div class="col-lg-8">
-                                    <div class="input-group">
-
-                                        <select class="form-control searchSelectBox @error('role_id') is-invalid @enderror"
-                                            name="role_id" id="role_id">
-                                            @if ($roles && $roles->isNotEmpty())
-                                                @foreach ($roles as $role)
-                                                    <option value="{{ $role->id }}"
-                                                        {{ $user->role_id == $role->id ? 'selected' : '' }}>
-                                                        {{ $role->role_name }}
-                                                    </option>
-                                                @endforeach
-                                            @else
-                                                <option disabled>No roles available</option>
-                                            @endif
-                                        </select>
-                                        <div class="invalid-feedback" id="role_idError">
-                                            @error('role_id')
-                                                {{ $message }}
-                                            @enderror
+                                            <x-form-components.input-label for="nameName" class="custom-class" required>
+                                                {{ __('users.Full Name') }}
+                                            </x-form-components.input-label>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
+                                        <div class="col-lg-8">
+                                            <x-form-components.input-group type="text" class="custom-class"
+                                                id="nameName" name="name" placeholder="{{ __('John Doe') }}"
+                                                value="{{ old('name', $user->name) }}" required />
 
-                            <div class="alert  alert-warning p-1 rounded border">
-                                <div class="alert-warning">
-                                    <i class="fas fa-info-circle me-2 "></i> Please add Address details on <span
-                                        class="text-success">Address Tab</span>.
-                                </div>
-                            </div>
-                        </div>
-
-                           <!-- Addresses Tab -->
-                           <div class="tab-pane fade" id="address" role="tabpanel">
-                            <div class="row mb-4 align-items-center">
-                                <div class="col-lg-4">
-                                    <x-form-components.input-label for="compnayAddressStreet"
-                                        class="custom-class">
-                                        {{ __('address.Address') }}
-                                    </x-form-components.input-label>
-                                </div>
-                                <div class="col-lg-8">
-                                    <x-form-components.textarea-group name="address.street_address"
-                                        id="compnayAddressStreet" placeholder="Enter Registered Street Address"
-                                        value="{{ old('address.street_address', @$user->addresses->street_address) }}" class="custom-class" />
-                                     
-
-                                </div>
-                            </div>
-                            <div class="row mb-4 align-items-center">
-                                <div class="col-lg-4">
-                                    <x-form-components.input-label for="compnayAddressCountry"
-                                        class="custom-class">
-                                        {{ __('address.Country') }}
-                                    </x-form-components.input-label>
-                                </div>
-                                <div class="col-lg-8">
-                                    <div class="input-group">
-
-                                        <select
-                                            class="form-control searchSelectBox  @error('address.country_id') is-invalid @enderror"
-                                            name="address.country_id" id="country_id">
-                                            <option value="0"> ----- Select Country ---------- </option>
-                                            @if ($country)
-                                                @foreach ($country as $country)
-                                                    <option value="{{ $country->id }}"
-                                                        {{ @$user->addresses->country_id == $country->id ? 'selected' : '' }}>
-                                                        {{ $country->name }}
-                                                    </option>
-                                                @endforeach
-                                            @else
-                                                <option disabled>No country available</option>
-                                            @endif
-                                        </select>
-                                        <div class="invalid-feedback" id="country_idError">
-                                            @error('address.country_id')
-                                                {{ $message }}
-                                            @enderror
                                         </div>
                                     </div>
 
-                                </div>
-                            </div>
+                                    <!-- Email Field -->
+                                    <div class="row mb-4 align-items-center">
+                                        <div class="col-lg-4">
+                                            <x-form-components.input-label for="emailName" class="custom-class" required>
+                                                {{ __('users.Email') }}
+                                            </x-form-components.input-label>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <x-form-components.input-group type="email" class="custom-class"
+                                                id="emailName" name="email" placeholder="{{ __('john@email.com') }}"
+                                                value="{{ old('email', $user->email) }}" required disabled />
 
-                            <div class="row mb-4 align-items-center">
-                                <div class="col-lg-4">
-                                    <x-form-components.input-label for="compnayAddressCity" class="custom-class">
-                                        {{ __('address.City') }}
-                                    </x-form-components.input-label>
-                                </div>
-                                <div class="col-lg-8">
-                                    <div class="col-lg-8">
-                                        <x-form-components.input-group type="text" name="address.city_name"
-                                        id="compnayAddressCity" placeholder="{{ __('Enter City') }}"
-                                        value="{{ old('address.city_name', @$user->addresses->city->name) }}" 
-                                       class="custom-class" />
+                                        </div>
+                                    </div>
+
+                                    <!-- Role Selection Field -->
+                                    <div class="row mb-4 align-items-center">
+                                        <div class="col-lg-4">
+                                            <x-form-components.input-label for="role_id" class="custom-class" required>
+                                                {{ __('users.Select Role') }}
+                                            </x-form-components.input-label>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <div class="input-group">
+
+                                                <select
+                                                    class="form-control searchSelectBox @error('role_id') is-invalid @enderror"
+                                                    name="role_id" id="role_id">
+                                                    @if ($roles && $roles->isNotEmpty())
+                                                        @foreach ($roles as $role)
+                                                            <option value="{{ $role->id }}"
+                                                                {{ $user->role_id == $role->id ? 'selected' : '' }}>
+                                                                {{ $role->role_name }}
+                                                            </option>
+                                                        @endforeach
+                                                    @else
+                                                        <option disabled>No roles available</option>
+                                                    @endif
+                                                </select>
+                                                <div class="invalid-feedback" id="role_idError">
+                                                    @error('role_id')
+                                                        {{ $message }}
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="alert  alert-warning p-1 rounded border">
+                                        <div class="alert-warning">
+                                            <i class="fas fa-info-circle me-2 "></i> Please add Address details on <span
+                                                class="text-success">Address Tab</span>.
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row mb-4 align-items-center">
-                                <div class="col-lg-4">
-                                    <x-form-components.input-label for="compnayAddressPincode"
-                                        class="custom-class">
-                                        {{ __('address.Pincode') }}
-                                    </x-form-components.input-label>
-                                </div>
-                                <div class="col-lg-8">
-                                    <x-form-components.input-group type="text" name="address.pincode"
-                                        id="compnayAddressPincode" placeholder="{{ __('Enter Pincode') }}"
-                                        value="{{ old('address.pincode', @$user->addresses->postal_code) }}" 
-                                       class="custom-class" />
 
-                                </div>
-                            </div>
-                        </div>
+                                <!-- Addresses Tab -->
+                                <div class="tab-pane fade" id="address" role="tabpanel">
+                                    <div class="row mb-4 align-items-center">
+                                        <div class="col-lg-4">
+                                            <x-form-components.input-label for="compnayAddressStreet" class="custom-class">
+                                                {{ __('address.Address') }}
+                                            </x-form-components.input-label>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <x-form-components.textarea-group name="address.street_address"
+                                                id="compnayAddressStreet" placeholder="Enter Registered Street Address"
+                                                value="{{ old('address.street_address', @$user->addresses->street_address) }}"
+                                                class="custom-class" />
 
-                    </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="row mb-4 align-items-center">
+                                        <div class="col-lg-4">
+                                            <x-form-components.input-label for="compnayAddressCountry"
+                                                class="custom-class">
+                                                {{ __('address.Country') }}
+                                            </x-form-components.input-label>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <div class="input-group">
+
+                                                <select
+                                                    class="form-control searchSelectBox  @error('address.country_id') is-invalid @enderror"
+                                                    name="address.country_id" id="country_id">
+                                                    <option value="0"> ----- Select Country ---------- </option>
+                                                    @if ($country)
+                                                        @foreach ($country as $country)
+                                                            <option value="{{ $country->id }}"
+                                                                {{ @$user->addresses->country_id == $country->id ? 'selected' : '' }}>
+                                                                {{ $country->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    @else
+                                                        <option disabled>No country available</option>
+                                                    @endif
+                                                </select>
+                                                <div class="invalid-feedback" id="country_idError">
+                                                    @error('address.country_id')
+                                                        {{ $message }}
+                                                    @enderror
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-4 align-items-center">
+                                        <div class="col-lg-4">
+                                            <x-form-components.input-label for="compnayAddressCity" class="custom-class">
+                                                {{ __('address.City') }}
+                                            </x-form-components.input-label>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <div class="col-lg-8">
+                                                <x-form-components.input-group type="text" name="address.city_name"
+                                                    id="compnayAddressCity" placeholder="{{ __('Enter City') }}"
+                                                    value="{{ old('address.city_name', @$user->addresses->city->name) }}"
+                                                    class="custom-class" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-4 align-items-center">
+                                        <div class="col-lg-4">
+                                            <x-form-components.input-label for="compnayAddressPincode"
+                                                class="custom-class">
+                                                {{ __('address.Pincode') }}
+                                            </x-form-components.input-label>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <x-form-components.input-group type="text" name="address.pincode"
+                                                id="compnayAddressPincode" placeholder="{{ __('Enter Pincode') }}"
+                                                value="{{ old('address.pincode', @$user->addresses->postal_code) }}"
+                                                class="custom-class" />
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Custom Fields Tab -->
+                                @if (isset($customFields) && $customFields->isNotEmpty())
+                                    <x-form-components.custom-fields-edit :customFields="$customFields" :cfOldValues="$cfOldValues" />
+                                @endif
+
+                            </div>
                         </div>
                     </form>
 
@@ -229,6 +244,5 @@
 
 
         });
-
     </script>
 @endpush

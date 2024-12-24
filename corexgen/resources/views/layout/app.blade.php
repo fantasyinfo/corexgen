@@ -1,5 +1,6 @@
     @include('layout.header.header')
 
+
     <body class="sidebar-collapsed">
         <!-- Sidebar Overlay for Mobile -->
         <div class="sidebar-overlay"></div>

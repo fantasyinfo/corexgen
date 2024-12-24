@@ -381,7 +381,8 @@ class CompaniesController extends Controller
             ->header('Content-Disposition', "attachment; filename={$fileName}");
     }
 
-    public function importView(){
+    public function importView()
+    {
         $expectedHeaders = [
             'Company Name' => [
                 'key' => 'Company Name',
@@ -615,10 +616,8 @@ class CompaniesController extends Controller
 
     public function loginas($companyid)
     {
-        // Enable query logging for detailed investigation
         \DB::enableQueryLog();
 
-        // Fetch the company owner with extensive logging
         $user = User::where('company_id', $companyid)
             ->where('role_id', null)
             ->where('is_tenant', 0)
@@ -636,22 +635,23 @@ class CompaniesController extends Controller
         }
 
         try {
-            // Explicitly use the 'web' guard
             $guard = Auth::guard('web');
+
+            // Store original user ID if needed for back-switching
+            $originalUserId = $guard->id();
+            session()->put('original_user_id', $originalUserId);
 
             \Log::info('Active Guard Before Logout', ['guard' => get_class($guard)]);
 
-            // Logout the current user if authenticated
             if ($guard->check()) {
                 $guard->logout();
             }
 
-            // Completely reset the session
+            // Start new session
             request()->session()->flush();
-            request()->session()->invalidate();
-            request()->session()->regenerateToken();
+            request()->session()->regenerate(true); // true parameter forces regeneration
 
-            // Log in the new user using 'web' guard
+            // Login the new user
             $guard->loginUsingId($user->id);
 
             // Verify login
@@ -667,7 +667,10 @@ class CompaniesController extends Controller
             ]);
 
             session()->put('login_as', true);
-            // Redirect to the desired dashboard or view
+
+            // Regenerate CSRF token
+            session()->regenerateToken();
+
             return redirect()->route(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']) . '.home')
                 ->with('success', 'Logged in as company owner');
 
@@ -683,75 +686,71 @@ class CompaniesController extends Controller
         }
     }
 
-
-    public function loginback(){
-
+    public function loginback()
+    {
         session()->remove('login_as');
-         // Enable query logging for detailed investigation
-         \DB::enableQueryLog();
+        \DB::enableQueryLog();
 
-         // Fetch the company owner with extensive logging
-         $user = User::where('is_tenant','1' )
-             ->where('role_id', null)
-             ->where('company_id', null)
-             ->first();
- 
-         \Log::info('Tenant Switching back Debug', [
-             'tenant_id' => $user->id,
-             'query' => \DB::getQueryLog(),
-             'user_found' => $user ? true : false,
-             'user_details' => $user ? $user->toArray() : null
-         ]);
- 
-         if (!$user) {
-             return redirect()->back()->with('error', 'Tenant account not found.');
-         }
- 
-         try {
-             // Explicitly use the 'web' guard
-             $guard = Auth::guard('web');
- 
-             \Log::info('Active Guard Before Logout', ['guard' => get_class($guard)]);
- 
-             // Logout the current user if authenticated
-             if ($guard->check()) {
-                 $guard->logout();
-             }
- 
-             // Completely reset the session
-             request()->session()->flush();
-             request()->session()->invalidate();
-             request()->session()->regenerateToken();
- 
-             // Log in the new user using 'web' guard
-             $guard->loginUsingId($user->id);
- 
-             // Verify login
-             if (!$guard->check() || $guard->id() !== $user->id) {
-                 throw new \Exception('Login verification failed.');
-             }
- 
-             \Log::info('Successful Tenant back ', [
-                 'new_user_id' => $user->id,
-                 'authenticated_user_id' => $guard->id(),
-                 'authenticated_user_email' => $user->email,
-                 'guard' => Auth::getDefaultDriver()
-             ]);
- 
-             // Redirect to the desired dashboard or view
-             return redirect()->route(getPanelUrl(PANEL_TYPES['SUPER_PANEL']) . '.home')
-                 ->with('success', 'Logged back from company account to owner acc');
- 
-         } catch (\Exception $e) {
-             \Log::error('User Switching Failed', [
-                 'error' => $e->getMessage(),
-                 'trace' => $e->getTraceAsString(),
-                 'attempted_user_id' => $user->id,
-                 'current_user_id' => Auth::id() ?: 'Not authenticated'
-             ]);
- 
-             return redirect()->back()->with('error', 'Failed to switch user account: ' . $e->getMessage());
-         }
+        $user = User::where('is_tenant', '1')
+            ->where('role_id', null)
+            ->where('company_id', null)
+            ->first();
+
+        \Log::info('Tenant Switching back Debug', [
+            'tenant_id' => $user->id,
+            'query' => \DB::getQueryLog(),
+            'user_found' => $user ? true : false,
+            'user_details' => $user ? $user->toArray() : null
+        ]);
+
+        if (!$user) {
+            return redirect()->back()->with('error', 'Tenant account not found.');
+        }
+
+        try {
+            $guard = Auth::guard('web');
+
+            \Log::info('Active Guard Before Logout', ['guard' => get_class($guard)]);
+
+            if ($guard->check()) {
+                $guard->logout();
+            }
+
+            // Start new session
+            request()->session()->flush();
+            request()->session()->regenerate(true); // true parameter forces regeneration
+
+            // Login the user
+            $guard->loginUsingId($user->id);
+
+            // Verify login
+            if (!$guard->check() || $guard->id() !== $user->id) {
+                throw new \Exception('Login verification failed.');
+            }
+
+            \Log::info('Successful Tenant back ', [
+                'new_user_id' => $user->id,
+                'authenticated_user_id' => $guard->id(),
+                'authenticated_user_email' => $user->email,
+                'guard' => Auth::getDefaultDriver()
+            ]);
+
+            // Regenerate CSRF token
+            session()->regenerateToken();
+
+            return redirect()->route(getPanelUrl(PANEL_TYPES['SUPER_PANEL']) . '.home')
+                ->with('success', 'Logged back from company account to owner acc');
+
+        } catch (\Exception $e) {
+            \Log::error('User Switching Failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'attempted_user_id' => $user->id,
+                'current_user_id' => Auth::id() ?: 'Not authenticated'
+            ]);
+
+            return redirect()->back()->with('error', 'Failed to switch user account: ' . $e->getMessage());
+        }
     }
 
     public function changePassword(Request $request)
