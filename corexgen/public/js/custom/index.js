@@ -5,6 +5,17 @@ document.addEventListener("DOMContentLoaded", function () {
         $(".searchSelectBox").select2();
     }
 
+    // date input
+    const dateInputs = document.querySelectorAll('input[type="date"]');
+
+
+    // Apply Flatpickr to each date input
+    dateInputs.forEach((input) => {
+        flatpickr(input,{
+            // altInput: true,
+        });
+    });
+
     // Ensure sidebar is open on desktop initially
     if (window.innerWidth > 768) {
         document.body.classList.remove("sidebar-collapsed");
@@ -158,9 +169,7 @@ $("#deleteModal").on("show.bs.modal", function (event) {
     form.attr("action", route);
 });
 
-
-
-document.querySelectorAll('.toast').forEach((toastEl) => {
+document.querySelectorAll(".toast").forEach((toastEl) => {
     const toast = new bootstrap.Toast(toastEl);
     toast.show();
 });

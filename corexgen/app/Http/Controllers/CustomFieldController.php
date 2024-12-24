@@ -81,7 +81,7 @@ class CustomFieldController extends Controller
             )),
             DB::raw(sprintf(
                 'SUM(CASE WHEN is_active = "%s" THEN 1 ELSE 0 END) as totalInactive',
-                '1'
+                '0'
             ))
         ])->first();
 
