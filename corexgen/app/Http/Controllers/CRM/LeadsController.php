@@ -7,6 +7,7 @@ use App\Helpers\PermissionsHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ClientRequest;
 use App\Http\Requests\ClientsEditRequest;
+use App\Http\Requests\LeadsEditRequest;
 use App\Http\Requests\LeadsRequest;
 use App\Models\Country;
 use App\Models\CRM\CRMClients;
@@ -202,11 +203,11 @@ class LeadsController extends Controller
         ]);
     }
 
-    public function update(ClientsEditRequest $request)
+    public function update(LeadsEditRequest $request)
     {
         $this->tenantRoute = $this->getTenantRoute();
 
-        // dd($request->all());
+       
 
         try {
 
@@ -219,12 +220,12 @@ class LeadsController extends Controller
 
 
 
-            $client = $this->leadsService->updateClient($request->validated());
+            $lead = $this->leadsService->updateLead($request->validated());
 
 
             // insert custom fields values to db
             if ($request->has('custom_fields') && !empty($validatedData) && count($validatedData) > 0 && !is_null(Auth::user()->company_id)) {
-                $this->customFieldService->saveValues($client['client'], $validatedData);
+                $this->customFieldService->saveValues($lead['lead'], $validatedData);
             }
 
 
@@ -240,23 +241,28 @@ class LeadsController extends Controller
 
             return redirect()
                 ->back()
-                ->with('error', 'An error occurred while updating the client. ' . $e->getMessage());
+                ->with('error', 'An error occurred while updating the lead. ' . $e->getMessage());
         }
 
     }
     public function edit($id)
     {
-        $query = CRMClients::query()->with([
-            'addresses' => function ($query) {
-                $query->select('addresses.id', 'addresses.street_address', 'addresses.postal_code', 'addresses.city_id', 'addresses.country_id')
-                    ->withPivot('type');
-            },
-            'customFields'
+        $query = CRMLeads::query()->with([
+            'address' => fn($q) => $q
+                ->select(['id', 'street_address', 'postal_code', 'city_id', 'country_id'])
+                ->with([
+                    'city:id,name',
+                    'country:id,name'
+                ]),
+            'customFields',
+            'assignees' => fn($q) => $q
+            ->select(['users.id', 'users.name'])
+            ->withOnly([])
         ])->where('id', $id);
 
         $query = $this->applyTenantFilter($query, 'leads');
 
-        $client = $query->firstOrFail();
+        $lead = $query->firstOrFail();
 
 
         // countries
@@ -271,7 +277,7 @@ class LeadsController extends Controller
 
             // fetch already existing values
 
-            $cfOldValues = $this->customFieldService->getValuesForEntity($client);
+            $cfOldValues = $this->customFieldService->getValuesForEntity($lead);
         }
 
 
@@ -279,13 +285,14 @@ class LeadsController extends Controller
         return view($this->getViewFilePath('edit'), [
 
             'title' => 'Edit Lead',
-            'client' => $client,
+            'lead' => $lead,
             'countries' => $countries,
             'module' => PANEL_MODULES[$this->getPanelModule()]['leads'],
             'leadsGroups' => $this->leadsService->getLeadsGroups(),
             'leadsSources' => $this->leadsService->getLeadsSources(),
             'leadsStatus' => $this->leadsService->getLeadsStatus(),
             'customFields' => $customFields,
+            'teamMates' => getTeamMates(),
             'cfOldValues' => $cfOldValues
         ]);
     }

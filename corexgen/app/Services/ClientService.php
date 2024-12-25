@@ -217,6 +217,16 @@ class ClientService
     }
 
 
+    public function findClientWithType($search, $type = 'email'): bool
+    {
+        if ($type == 'email') {
+            return CRMClients::where('primary_email', $search)->exists();
+        } else if ($type = 'phone') {
+            return CRMClients::where('primary_phone', $search)->exists();
+        }
+        return CRMClients::where('primary_email', $search)->exists();
+    }
+
 
     protected function renderActionsColumn($client)
     {

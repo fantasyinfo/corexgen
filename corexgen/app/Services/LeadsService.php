@@ -69,23 +69,110 @@ class LeadsService
             if (isset($validatedData['is_converted']) && $validatedData['is_converted'] == 'on') {
                 $validatedData['is_converted'] = '1';
                 // create a client users now //todo::
-                $clientData = [
-                    'type' => $validatedData['type'],
-                    'company_name' => $validatedData['company_name'],
-                    'first_name' => $validatedData['first_name'],
-                    'last_name' => $validatedData['last_name'],
-                    'primary_email' => $validatedData['email'],
-                    'primary_phone' => $validatedData['phone'] ?? '9876543210',
-                    'company_id' => Auth::user()->company_id,
-                    'created_by' => Auth::id(),
-                    'updated_by' => Auth::id(),
-                ];
+                $isClientAlreadyExists = false;
+                if (isset($validatedData['email'])) {
+                    $isClientAlreadyExists = $this->clientService->findClientWithType($validatedData['email'], 'email');
+                } else if (isset($validatedData['phone'])) {
+                    $isClientAlreadyExists = $this->clientService->findClientWithType($validatedData['phone'], 'phone');
+                }
+                if (!$isClientAlreadyExists) {
+                    $clientData = [
+                        'type' => $validatedData['type'],
+                        'company_name' => $validatedData['company_name'],
+                        'first_name' => $validatedData['first_name'],
+                        'last_name' => $validatedData['last_name'],
+                        'primary_email' => $validatedData['email'],
+                        'primary_phone' => $validatedData['phone'] ?? '9876543210',
+                        'company_id' => Auth::user()->company_id,
+                        'created_by' => Auth::id(),
+                        'updated_by' => Auth::id(),
+                    ];
 
-                $this->clientService->createClient($clientData);
+                    $this->clientService->createClient($clientData);
+                }
 
             }
             $lead = CRMLeads::create($validatedData);
-            //$lead_address = $this->createOrUpdateAddresses($validatedData, $lead);
+
+
+            // assign leads 
+            $this->assignLeadsToUserIfProvided($validatedData, $lead);
+
+            return [
+                'lead' => $lead,
+                // 'lead_address' => $lead_address
+            ];
+        });
+    }
+    public function updateLead(array $validatedData)
+    {
+        // Validate that company ID is provided
+        if (empty($validatedData['id'])) {
+            throw new \InvalidArgumentException('Lead ID is required for updating');
+        }
+
+        return DB::transaction(function () use ($validatedData) {
+
+            $validGroupID = $this->checkIsValidCGTID($validatedData['group_id'], Auth::user()->company_id, CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_groups'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads']);
+
+            $validSourceID = $this->checkIsValidCGTID($validatedData['source_id'], Auth::user()->company_id, CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_sources'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads']);
+
+            $validStatusID = $this->checkIsValidCGTID($validatedData['status_id'], Auth::user()->company_id, CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_status'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads']);
+
+            if (!$validGroupID) {
+                throw new \InvalidArgumentException("Failed to create lead beacuse invalid Group ID ");
+            }
+            if (!$validSourceID) {
+                throw new \InvalidArgumentException("Failed to create lead beacuse invalid Source ID ");
+            }
+            if (!$validStatusID) {
+                throw new \InvalidArgumentException("Failed to create lead beacuse invalid Stage ID ");
+            }
+
+
+            // Retrieve the existing client
+            $lead = CRMLeads::findOrFail($validatedData['id']);
+
+            unset($validatedData['id']);
+
+
+            $address = $this->updateUserAddress($lead, $validatedData, );
+
+            if (isset($address) && isset($address?->id)) {
+                $validatedData['address_id'] = $address?->id;
+            }
+
+            // convert to boolean of checkbox
+            if (isset($validatedData['is_converted']) && $validatedData['is_converted'] == 'on') {
+                $validatedData['is_converted'] = '1';
+                // create a client users now //todo::
+                // first ck if there is no client already created with the given email or phone
+                $isClientAlreadyExists = false;
+                if (isset($validatedData['email'])) {
+                    $isClientAlreadyExists = $this->clientService->findClientWithType($validatedData['email'], 'email');
+                } else if (isset($validatedData['phone'])) {
+                    $isClientAlreadyExists = $this->clientService->findClientWithType($validatedData['phone'], 'phone');
+                }
+                if (!$isClientAlreadyExists) {
+                    $clientData = [
+                        'type' => $validatedData['type'],
+                        'company_name' => $validatedData['company_name'],
+                        'first_name' => $validatedData['first_name'],
+                        'last_name' => $validatedData['last_name'],
+                        'primary_email' => $validatedData['email'],
+                        'primary_phone' => $validatedData['phone'] ?? '9876543210',
+                        'company_id' => Auth::user()->company_id,
+                        'created_by' => Auth::id(),
+                        'updated_by' => Auth::id(),
+                    ];
+
+                    $this->clientService->createClient($clientData);
+                }
+
+
+            }
+            $lead->update($validatedData);
+
 
             // assign leads 
             $this->assignLeadsToUserIfProvided($validatedData, $lead);
@@ -98,24 +185,32 @@ class LeadsService
     }
 
 
-    private function assignLeadsToUserIfProvided($validatedData, CRMLeads $lead)
+    private function assignLeadsToUserIfProvided(array $validatedData, CRMLeads $lead)
     {
-        if (isset($validatedData['assign_to']) && is_array($validatedData['assign_to'])) {
-            // Prepare data for pivot table
-            $assignToData = [];
-            foreach ($validatedData['assign_to'] as $userId) {
-                $assignToData[] = [
-                    'lead_id' => $lead->id,
-                    'user_id' => $userId,
-                    'company_id' => Auth::user()->company_id,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-            }
+        if (!empty($validatedData['assign_to']) && is_array($validatedData['assign_to'])) {
+            // Retrieve the current company ID for the authenticated user
+            $companyId = Auth::user()->company_id;
 
-            LeadUser::insert($assignToData);
+            // Prepare data for pivot table
+            $assignToData = collect($validatedData['assign_to'])->mapWithKeys(function ($userId) use ($companyId) {
+                return [
+                    $userId => [
+                        'company_id' => $companyId,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ],
+                ];
+            })->toArray();
+
+            // Sync user assignments, handling both insert and update scenarios
+            $lead->assignees()->sync($assignToData);
+        } else {
+            // If no assignees are provided, detach all existing ones
+            $lead->assignees()->detach();
         }
     }
+
+
     private function createAddressIfProvided(array $data): ?Address
     {
         $requiredAddressFields = [
@@ -245,6 +340,12 @@ class LeadsService
             ->editColumn('stage', function ($lead) {
                 return "<span style='color:" . $lead->stage->color . ";'>{$lead->stage->name}</span>";
             })
+            ->editColumn('assign_to', function ($lead) {
+                return "<span style='color:" . $lead->stage->color . ";'>{$lead->stage->name}</span>";
+            })
+            ->editColumn('assign_by', function ($lead) {
+                return "<span style='color:" . $lead->stage->color . ";'>{$lead->stage->name}</span>";
+            })
             // ->editColumn('name', function ($lead) use ($module) {
             //     $fullName = trim("{$lead->title} {$lead->first_name} {$lead->middle_name} {$lead->last_name}");
             //     return "<a class='dt-link' href='" . route($this->tenantRoute . $module . '.view', $lead->id) . "' target='_blank'>$fullName</a>";
@@ -258,7 +359,7 @@ class LeadsService
             // ->editColumn('status', function ($lead) {
             //     return $this->renderStatusColumn($lead);
             // })
-            ->rawColumns(['actions','group','source','stage',  'name']) // Include any HTML columns
+            ->rawColumns(['actions', 'group', 'source', 'stage', 'name']) // Include any HTML columns
             ->make(true);
     }
 
