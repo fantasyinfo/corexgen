@@ -339,6 +339,7 @@ Route::middleware([
     Route::prefix(PANEL_MODULES['COMPANY_PANEL']['leads'])->as(PANEL_MODULES['COMPANY_PANEL']['leads'] . '.')->group(function () {
         // role for fetch, store, update
         Route::get('/', [LeadsController::class, 'index'])->name('index')->middleware('check.permission:LEADS.READ_ALL');
+        Route::get('/kanban', [LeadsController::class, 'kanban'])->name('kanban')->middleware('check.permission:LEADS.KANBAN_BOARD');
         Route::post('/', [LeadsController::class, 'store'])->name('store')->middleware('check.permission:LEADS.CREATE');
         Route::put('/', [LeadsController::class, 'update'])->name('update')->middleware('check.permission:LEADS.UPDATE');
 

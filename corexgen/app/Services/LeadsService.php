@@ -389,4 +389,12 @@ class LeadsService
             ]
         ])->render();
     }
+
+    public function getKanbanLeadsResponse($request)
+    {
+        $this->tenantRoute = $this->getTenantRoute();
+        $query = $this->leadsRepository->getKanbanLeads($request);
+        return $this->applyTenantFilter($query, 'leads');
+
+    }
 }

@@ -136,6 +136,22 @@ class LeadsController extends Controller
             'total_ussers' => $usersTotals->totalUsers,
         ]);
     }
+
+    public function kanban(Request $request)
+    {
+        $this->tenantRoute = $this->getTenantRoute();
+
+
+
+        return view($this->getViewFilePath('kanban'), [
+            'filters' => $request->all(),
+            'title' => 'Leads Management',
+            'permissions' => PermissionsHelper::getPermissionsArray('LEADS'),
+            'module' => PANEL_MODULES[$this->getPanelModule()]['leads'],
+            'type' => 'Leads',
+            'stages' => $this->leadsService->getKanbanLeadsResponse($request->all())
+        ]);
+    }
     public function store(LeadsRequest $request)
     {
 
@@ -207,7 +223,7 @@ class LeadsController extends Controller
     {
         $this->tenantRoute = $this->getTenantRoute();
 
-       
+
 
         try {
 
@@ -256,8 +272,8 @@ class LeadsController extends Controller
                 ]),
             'customFields',
             'assignees' => fn($q) => $q
-            ->select(['users.id', 'users.name'])
-            ->withOnly([])
+                ->select(['users.id', 'users.name'])
+                ->withOnly([])
         ])->where('id', $id);
 
         $query = $this->applyTenantFilter($query, 'leads');
