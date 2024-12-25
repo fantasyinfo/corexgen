@@ -145,7 +145,7 @@ class UserService
         return Address::create([
             'street_address' => $data['address_street_address'],
             'postal_code' => $data['address_pincode'],
-            'city_id' => $city->id,
+            'city_id' => $cityId,
             'country_id' => $data['address_country_id'],
             'address_type' => ADDRESS_TYPES['USER']['SHOW']['HOME'],
         ]);

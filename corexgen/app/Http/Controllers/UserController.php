@@ -12,6 +12,7 @@ use App\Repositories\UserRepository;
 use App\Services\Csv\UsersCsvRowProcessor;
 use App\Services\CustomFieldService;
 use App\Services\UserService;
+use App\Traits\MediaTrait;
 use App\Traits\SubscriptionUsageFilter;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
@@ -22,6 +23,7 @@ use Illuminate\Support\Facades\Hash;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Media;
 /**
  * UserController handles CRUD operations for Users
  * 
@@ -40,6 +42,7 @@ class UserController extends Controller
 
     use TenantFilter;
     use SubscriptionUsageFilter;
+    use MediaTrait;
 
     /**
      * Number of items per page for pagination
@@ -286,6 +289,8 @@ class UserController extends Controller
     public function update(UserRequest $request, UserService $userService)
     {
 
+    
+
         $this->tenantRoute = $this->getTenantRoute();
 
         try {
@@ -303,6 +308,32 @@ class UserController extends Controller
             if ($request->has('custom_fields') && !empty($validatedData) && count($validatedData) > 0 && !is_null(Auth::user()->company_id)) {
                 $this->customFieldService->saveValues($user, $validatedData);
             }
+
+
+            // Handle avatar upload
+            if ($request->hasFile('avatar')) {
+                $oldMedia = $user->profile_photo_path ? Media::where('file_path', $user->profile_photo_path)->first() : null;
+
+                $attributes = [
+                    'folder' => 'avatars',
+                    'company_id' => Auth::user()->company_id,
+                    'updated_by' => Auth::id(),
+                    'created_by' => Auth::id(),
+                ];
+
+                $media = $this->createMedia($request->file('avatar'), $attributes);
+
+                // Update the profile_photo_path column in the user's table
+                $user->profile_photo_path = $media->file_path;
+                $user->save();
+
+                // Optionally delete the old media record
+                if ($oldMedia) {
+                    $this->updateMedia($request->file('avatar'), $oldMedia, $attributes);
+                }
+            }
+
+
 
             if ($request->boolean('is_profile')) {
                 return redirect()
@@ -675,6 +706,74 @@ class UserController extends Controller
             ], 500);
         }
     }
+    public function updatePassword(Request $request)
+    {
+        // Validate input
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:users,id',
+            'old_password' => 'required|string',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'regex:/[A-Z]/',          // Must contain at least one uppercase letter
+                'regex:/[a-z]/',          // Must contain at least one lowercase letter
+                'regex:/[0-9]/',          // Must contain at least one digit
+                'regex:/[@$!%*?&#]/',     // Must contain a special character
+                'confirmed'               // Must match the confirmation password
+            ]
+        ], [
+            'id.exists' => 'Invalid user ID.',
+            'password.regex' => 'The password must include at least one uppercase letter, one lowercase letter, one number, and one special character.',
+            'password.confirmed' => 'The password confirmation does not match.',
+        ]);
+
+        // Check validation
+        if ($validator->fails()) {
+            return redirect()
+                ->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        // Check if the authenticated user matches the user being updated
+        if (Auth::id() != $request->input('id')) {
+            return redirect()
+                ->back()
+                ->withErrors(['message' => 'You are not authorized to change this password.'])
+                ->withInput();
+        }
+
+        try {
+            // Find the user
+            $user = User::findOrFail($request->input('id'));
+
+            // Verify old password
+            if (!Hash::check($request->input('old_password'), $user->password)) {
+                return redirect()
+                    ->back()
+                    ->withErrors(['old_password' => 'The old password is incorrect.'])
+                    ->withInput();
+            }
+
+            // Update the password
+            $user->password = Hash::make($request->input('password'));
+            $user->save();
+
+            // Redirect back with success message
+            return redirect()
+                ->back()
+                ->with('success', 'Password updated successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Password change error: ' . $e->getMessage());
+
+            return redirect()
+                ->back()
+                ->withErrors(['message' => 'An unexpected error occurred. Please try again.']);
+        }
+    }
+
+
 
 
     public function view($id)
