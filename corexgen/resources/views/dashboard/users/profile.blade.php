@@ -20,7 +20,7 @@
                         <div class="text-center mb-4">
                             <div class="position-relative d-inline-block">
 
-                                <x-form-components.profile-avatar :hw="80" :url="asset('storage/' . ($user->profile_photo_path ?? 'avatars/default.webp'))" />
+                                <x-form-components.profile-avatar :id="'avatarPreview'" :hw="80" :url="asset('storage/' . ($user->profile_photo_path ?? 'avatars/default.webp'))" />
 
                                 <label for="avatarInput"
                                     class="position-absolute bottom-0 end-0 rounded-circle d-flex align-items-center justify-content-center"
