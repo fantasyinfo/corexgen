@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\CRM\CRMClients;
+use App\Models\CRM\CRMLeads;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -40,6 +41,9 @@ class Address extends Model
 
     public function users(){
         return $this->hasMany(User::class,'address_id');
+    }
+    public function leads(){
+        return $this->hasOne(CRMLeads::class,'address_id');
     }
 
     public function clients()

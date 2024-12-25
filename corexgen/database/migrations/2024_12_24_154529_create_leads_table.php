@@ -16,8 +16,8 @@ return new class extends Migration {
             $table->string('company_name')->nullable();
             $table->string('title');
             $table->decimal('value', 15, 2)->nullable();
-            $table->string('first_name')->nullable();
-            $table->string('last_name')->nullable();
+            $table->string('first_name');
+            $table->string('last_name');
             $table->string('email')->unique()->nullable();
             $table->string('phone')->unique()->nullable();
             $table->text('details')->nullable();

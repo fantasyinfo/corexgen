@@ -7,11 +7,11 @@ use App\Helpers\PermissionsHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ClientRequest;
 use App\Http\Requests\ClientsEditRequest;
+use App\Http\Requests\LeadsRequest;
 use App\Models\Country;
 use App\Models\CRM\CRMClients;
-use App\Repositories\ClientRepository;
+use App\Repositories\LeadsRepository;
 use App\Services\Csv\ClientsCsvRowProcessor;
-use App\Services\ClientService;
 use App\Traits\CategoryGroupTagsFilter;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
@@ -21,7 +21,9 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use App\Jobs\CsvImportJob;
 use App\Models\CategoryGroupTag;
+use App\Models\CRM\CRMLeads;
 use App\Services\CustomFieldService;
+use App\Services\LeadsService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -48,7 +50,7 @@ class LeadsController extends Controller
      * Base directory for view files
      * @var string
      */
-    private $viewDir = 'dashboard.crm.clients.';
+    private $viewDir = 'dashboard.crm.leads.';
 
     /**
      * Generate full view file path
@@ -62,18 +64,18 @@ class LeadsController extends Controller
     }
 
 
-    protected $clientRepository;
-    protected $clientService;
+    protected $leadsRepository;
+    protected $leadsService;
 
     protected $customFieldService;
 
     public function __construct(
-        ClientRepository $clientRepository,
-        ClientService $clientService,
+        LeadsRepository $leadsRepository,
+        LeadsService $leadsService,
         CustomFieldService $customFieldService
     ) {
-        $this->clientRepository = $clientRepository;
-        $this->clientService = $clientService;
+        $this->leadsRepository = $leadsRepository;
+        $this->leadsService = $leadsService;
         $this->customFieldService = $customFieldService;
     }
 
@@ -85,13 +87,13 @@ class LeadsController extends Controller
 
         // Server-side DataTables response
         if ($request->ajax()) {
-            return $this->clientService->getDatatablesResponse($request);
+            return $this->leadsService->getDatatablesResponse($request);
         }
 
 
 
         $user = Auth::user();
-        $userQuery = CRMClients::query();
+        $userQuery = CRMLeads::query();
 
         $userQuery = $this->applyTenantFilter($userQuery);
 
@@ -100,18 +102,18 @@ class LeadsController extends Controller
             DB::raw('COUNT(*) as totalUsers'),
             DB::raw(sprintf(
                 'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalActive',
-                CRM_STATUS_TYPES['CLIENTS']['STATUS']['ACTIVE']
+                CRM_STATUS_TYPES['LEADS']['STATUS']['ACTIVE']
             )),
             DB::raw(sprintf(
                 'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalInactive',
-                CRM_STATUS_TYPES['CLIENTS']['STATUS']['DEACTIVE']
+                CRM_STATUS_TYPES['LEADS']['STATUS']['DEACTIVE']
             ))
         ])->first();
 
         // fetch usage
 
         if (!$user->is_tenant && !is_null($user->company_id)) {
-            $usages = $this->fetchTotalAllowAndUsedUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['CLIENTS']]));
+            $usages = $this->fetchTotalAllowAndUsedUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['LEADS']]));
         } else if ($user->is_tenant) {
             $usages = [
                 'totalAllow' => '-1',
@@ -122,10 +124,10 @@ class LeadsController extends Controller
 
         return view($this->getViewFilePath('index'), [
             'filters' => $request->all(),
-            'title' => 'Clients Management',
-            'permissions' => PermissionsHelper::getPermissionsArray('CLIENTS'),
-            'module' => PANEL_MODULES[$this->getPanelModule()]['clients'],
-            'type' => 'Clients',
+            'title' => 'Leads Management',
+            'permissions' => PermissionsHelper::getPermissionsArray('LEADS'),
+            'module' => PANEL_MODULES[$this->getPanelModule()]['leads'],
+            'type' => 'Leads',
             'total_allow' => $usages['totalAllow'],
             'total_used' => $usages['currentUsage'],
             'total_active' => $usersTotals->totalActive,
@@ -133,11 +135,10 @@ class LeadsController extends Controller
             'total_ussers' => $usersTotals->totalUsers,
         ]);
     }
-    public function store(ClientRequest $request)
+    public function store(LeadsRequest $request)
     {
 
-
-        // dd($request->all());
+ 
 
         try {
 
@@ -145,27 +146,27 @@ class LeadsController extends Controller
             $validatedData = [];
             if ($request->has('custom_fields') && !is_null(Auth::user()->company_id)) {
                 $validator = new CustomFieldsValidation();
-                $validatedData = $validator->validate($request->input('custom_fields'), CUSTOM_FIELDS_RELATION_TYPES['KEYS']['crmclients'], Auth::user()->company_id);
+                $validatedData = $validator->validate($request->input('custom_fields'), CUSTOM_FIELDS_RELATION_TYPES['KEYS']['crmleads'], Auth::user()->company_id);
             }
 
 
-            // Create client
-            $client = $this->clientService->createClient($request->validated());
+            // Create lead
+            $lead = $this->leadsService->createLead($request->validated());
 
 
             // insert custom fields values to db
             if ($request->has('custom_fields') && !empty($validatedData) && count($validatedData) > 0 && !is_null(Auth::user()->company_id)) {
-                $this->customFieldService->saveValues($client['client'], $validatedData);
+                $this->customFieldService->saveValues($lead['lead'], $validatedData);
             }
 
-            $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['CLIENTS']]), '+', '1');
+            $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['LEADS']]), '+', '1');
 
             return redirect()
-                ->route($this->getTenantRoute() . 'clients.index')
-                ->with('success', 'Client created successfully.');
+                ->route($this->getTenantRoute() . 'leads.index')
+                ->with('success', 'Lead created successfully.');
 
         } catch (\Exception $e) {
-            \Log::error('Client creation failed', [
+            \Log::error('Lead creation failed', [
                 'error' => $e->getMessage(),
                 'data' => $request->validated()
             ]);
@@ -179,28 +180,35 @@ class LeadsController extends Controller
     }
     public function create()
     {
-        $this->checkCurrentUsage(strtolower(PermissionsHelper::$plansPermissionsKeys['CLIENTS']));
+        $this->checkCurrentUsage(strtolower(PermissionsHelper::$plansPermissionsKeys['LEADS']));
         $countries = Country::all();
 
 
-        $categoryQuery = $this->getCategoryGroupTags(CATEGORY_GROUP_TAGS_TYPES['STATUS']['categories'], CATEGORY_GROUP_TAGS_RELATIONS['STATUS']['clients']);
-        $categoryQuery = $this->applyTenantFilter($categoryQuery);
-        $categories = $categoryQuery->get();
-
         $customFields = collect();
         if (!is_null(Auth::user()->company_id)) {
-            $customFields = $this->customFieldService->getFieldsForEntity(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['crmclients'], Auth::user()->company_id);
+            $customFields = $this->customFieldService->getFieldsForEntity(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['crmleads'], Auth::user()->company_id);
         }
 
         return view($this->getViewFilePath('create'), [
-            'title' => 'Create Client',
+            'title' => 'Create Lead',
             'countries' => $countries,
-            'module' => PANEL_MODULES[$this->getPanelModule()]['clients'],
-            'categories' => $categories,
-            'customFields' => $customFields
+            'module' => PANEL_MODULES[$this->getPanelModule()]['leads'],
+            'leadsGroups' => $this->leadsService->getLeadsGroups(),
+            'leadsSources' => $this->leadsService->getLeadsSources(),
+            'leadsStatus' => $this->leadsService->getLeadsStatus(),
+            'customFields' => $customFields,
+            'teamMates' => getTeamMates()
 
         ]);
     }
+
+
+
+
+
+
+
+
 
     public function update(ClientsEditRequest $request)
     {
@@ -214,12 +222,12 @@ class LeadsController extends Controller
             $validatedData = [];
             if ($request->has('custom_fields') && !is_null(Auth::user()->company_id)) {
                 $validator = new CustomFieldsValidation();
-                $validatedData = $validator->validate($request->input('custom_fields'), CUSTOM_FIELDS_RELATION_TYPES['KEYS']['crmclients'], Auth::user()->company_id);
+                $validatedData = $validator->validate($request->input('custom_fields'), CUSTOM_FIELDS_RELATION_TYPES['KEYS']['crmleads'], Auth::user()->company_id);
             }
 
 
 
-            $client = $this->clientService->updateClient($request->validated());
+            $client = $this->leadsService->updateClient($request->validated());
 
 
             // insert custom fields values to db
@@ -230,10 +238,10 @@ class LeadsController extends Controller
 
             // If validation fails, it will throw an exception
             return redirect()
-                ->route($this->tenantRoute . 'clients.index')
-                ->with('success', 'Client updated successfully.');
+                ->route($this->tenantRoute . 'leads.index')
+                ->with('success', 'Lead updated successfully.');
         } catch (\Exception $e) {
-            \Log::error('Client updation failed', [
+            \Log::error('Lead updation failed', [
                 'error' => $e->getMessage(),
                 'data' => $request->validated()
             ]);
@@ -254,7 +262,7 @@ class LeadsController extends Controller
             'customFields'
         ])->where('id', $id);
 
-        $query = $this->applyTenantFilter($query, 'clients');
+        $query = $this->applyTenantFilter($query, 'leads');
 
         $client = $query->firstOrFail();
 
@@ -262,16 +270,12 @@ class LeadsController extends Controller
         // countries
         $countries = Country::all();
 
-        // category groups tags
-        $categoryQuery = $this->getCategoryGroupTags(CATEGORY_GROUP_TAGS_TYPES['STATUS']['categories'], CATEGORY_GROUP_TAGS_RELATIONS['STATUS']['clients']);
-        $categoryQuery = $this->applyTenantFilter($categoryQuery);
-        $categories = $categoryQuery->get();
 
         // custom fields
         $customFields = collect();
         $cfOldValues = collect();
         if (!is_null(Auth::user()->company_id)) {
-            $customFields = $this->customFieldService->getFieldsForEntity(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['crmclients'], Auth::user()->company_id);
+            $customFields = $this->customFieldService->getFieldsForEntity(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['crmleads'], Auth::user()->company_id);
 
             // fetch already existing values
 
@@ -282,11 +286,13 @@ class LeadsController extends Controller
 
         return view($this->getViewFilePath('edit'), [
 
-            'title' => 'Edit Client',
+            'title' => 'Edit Lead',
             'client' => $client,
             'countries' => $countries,
-            'module' => PANEL_MODULES[$this->getPanelModule()]['clients'],
-            'categories' => $categories,
+            'module' => PANEL_MODULES[$this->getPanelModule()]['leads'],
+            'leadsGroups' => $this->leadsService->getLeadsGroups(),
+            'leadsSources' => $this->leadsService->getLeadsSources(),
+            'leadsStatus' => $this->leadsService->getLeadsStatus(),
             'customFields' => $customFields,
             'cfOldValues' => $cfOldValues
         ]);
@@ -307,9 +313,9 @@ class LeadsController extends Controller
                 $client->delete();
 
                 // update the subscription usage
-                $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['CLIENTS']]), '-', '1');
+                $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['LEADS']]), '-', '1');
 
-                return redirect()->back()->with('success', 'Client deleted successfully.');
+                return redirect()->back()->with('success', 'Lead deleted successfully.');
             } else {
                 return redirect()->back()->with('error', 'Failed to delete the client: client not found with this id.');
             }
@@ -321,8 +327,8 @@ class LeadsController extends Controller
     }
     public function export(Request $request)
     {
-        // Apply filters and fetch clients
-        $clients = CRMClients::query()
+        // Apply filters and fetch leads
+        $leads = CRMClients::query()
             ->where('company_id', Auth::user()->company_id)
             ->with([
                 'addresses' => function ($query) {
@@ -360,19 +366,19 @@ class LeadsController extends Controller
             )
             ->get();
 
-        $csvData = $this->generateCSVForClients($clients);
+        $csvData = $this->generateCSVForClients($leads);
         return response($csvData['csvContent'])
             ->header('Content-Type', 'text/csv')
             ->header('Content-Disposition', "attachment; filename={$csvData['file']}");
     }
 
-    public function generateCSVForClients($clients)
+    public function generateCSVForClients($leads)
     {
 
         // Prepare CSV data
         $csvData = [];
         $csvData[] = [
-            'Client ID',
+            'Lead ID',
             'Type',
             'Company Name',
             'Title',
@@ -393,7 +399,7 @@ class LeadsController extends Controller
             'Created At',
         ]; // CSV headers
 
-        foreach ($clients as $client) {
+        foreach ($leads as $client) {
             // Prepare consolidated data
             $emails = isset($client->email) ? implode('; ', $client->email) : '';
             $phones = isset($client->phone) ? implode('; ', $client->phone) : '';
@@ -546,10 +552,10 @@ class LeadsController extends Controller
 
         return view($this->getViewFilePath('import'), [
 
-            'title' => 'Import Clients',
+            'title' => 'Import Leads',
             'headers' => $expectedHeaders,
             'data' => $sampleData,
-            'module' => PANEL_MODULES[$this->getPanelModule()]['clients'],
+            'module' => PANEL_MODULES[$this->getPanelModule()]['leads'],
         ]);
     }
     public function import(Request $request)
@@ -601,7 +607,7 @@ class LeadsController extends Controller
                     'company_id' => Auth::user()->company_id,
                     'user_id' => Auth::id(),
                     'is_tenant' => Auth::user()->is_tenant,
-                    'import_type' => 'Clients'
+                    'import_type' => 'Leads'
                 ]
             );
 
@@ -650,22 +656,21 @@ class LeadsController extends Controller
             if (is_array($ids) && count($ids) > 0) {
                 DB::transaction(function () use ($ids) {
                     // First, delete custom field values
-                    $this->customFieldService->bulkDeleteEntityValues(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['crmclients'], $ids);
+                    $this->customFieldService->bulkDeleteEntityValues(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['crmleads'], $ids);
 
-                    // Then delete the clients
+                    // Then delete the leads
                     CRMClients::whereIn('id', $ids)->delete();
 
                     $this->updateUsage(
-                        strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['CLIENTS']]),
                         '-',
                         count($ids)
                     );
                 });
 
-                return response()->json(['message' => 'Selected clients deleted successfully.'], 200);
+                return response()->json(['message' => 'Selected leads deleted successfully.'], 200);
             }
 
-            return response()->json(['message' => 'No clients selected for deletion.'], 400);
+            return response()->json(['message' => 'No leads selected for deletion.'], 400);
 
         } catch (\Exception $e) {
             \Log::error('Bulk deletion failed', [
@@ -675,7 +680,7 @@ class LeadsController extends Controller
             ]);
 
             return response()->json(
-                ['error' => 'Failed to delete the clients: ' . $e->getMessage()],
+                ['error' => 'Failed to delete the leads: ' . $e->getMessage()],
                 500
             );
         }
@@ -694,10 +699,10 @@ class LeadsController extends Controller
         try {
             CRMClients::query()->where('id', '=', $id)->update(['status' => $status]);
             // Return success response
-            return redirect()->back()->with('success', 'Clients status changed successfully.');
+            return redirect()->back()->with('success', 'Leads status changed successfully.');
         } catch (\Exception $e) {
             // Handle any exceptions
-            return redirect()->back()->with('error', 'Failed to changed the clients status: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to changed the leads status: ' . $e->getMessage());
         }
     }
 

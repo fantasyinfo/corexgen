@@ -1,25 +1,27 @@
 @extends('layout.app')
 
 @section('content')
-
     @php
-        // prePrintR($customFields->toArray());
+        //  prePrintR($client->toArray());
+        //  prePrintR($cfOldValues->toArray());
     @endphp
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
                 <div class="card stretch stretch-full">
-                    <form id="clientForm" action="{{ route(getPanelRoutes('clients.store')) }}" method="POST">
+                    <form id="clientForm" action="{{ route(getPanelRoutes('clients.update')) }}" method="POST">
                         @csrf
+                        @method('PUT')
+                        <input type="hidden" name="id" value="{{ $client->id }}" />
                         <div class="card-body">
                             <div class="mb-4 d-flex align-items-center justify-content-between">
                                 <p class="fw-bold mb-0 me-4">
-                                    <span class="d-block mb-2">{{ __('clients.Create New Client') }}</span>
+                                    <span class="d-block mb-2">{{ __('clients.Update Client') }}</span>
                                     <span
                                         class="fs-12 fw-normal text-muted text-truncate-1-line">{{ __('crud.Please add correct information') }}</span>
                                 </p>
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-plus"></i> <span>{{ __('clients.Create Client') }}</span>
+                                    <i class="fas fa-plus"></i> <span>{{ __('clients.Update Client') }}</span>
                                 </button>
                             </div>
 
@@ -70,8 +72,11 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <select class="form-select" name="type" id="clientType" required>
-                                                <option value="Individual">Individual</option>
-                                                <option value="Company">Company</option>
+                                                <option value="Individual"
+                                                    {{ $client->type == 'Individual' ? 'selected' : '' }}>Individual
+                                                </option>
+                                                <option value="Company" {{ $client->type == 'Company' ? 'selected' : '' }}>
+                                                    Company</option>
                                             </select>
                                         </div>
                                     </div>
@@ -85,7 +90,7 @@
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="text" name="company_name"
                                                 id="companyName" placeholder="{{ __('Abc Pvt Ltd') }}"
-                                                value="{{ old('company_name') }}" />
+                                                value="{{ old('company_name', $client->company_name) }}" />
                                         </div>
                                     </div>
 
@@ -97,7 +102,8 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="text" name="title" id="clientTitle"
-                                                placeholder="{{ __('Mr./Mrs./Ms.') }}" value="{{ old('title') }}" />
+                                                placeholder="{{ __('Mr./Mrs./Ms.') }}"
+                                                value="{{ old('title', $client->title) }}" />
                                         </div>
                                     </div>
 
@@ -109,8 +115,8 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="text" name="first_name" id="firstName"
-                                                placeholder="{{ __('First Name') }}" value="{{ old('first_name') }}"
-                                                required />
+                                                placeholder="{{ __('First Name') }}"
+                                                value="{{ old('first_name', $client->first_name) }}" required />
                                         </div>
                                     </div>
 
@@ -123,7 +129,7 @@
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="text" name="middle_name"
                                                 id="middleName" placeholder="{{ __('Middle Name') }}"
-                                                value="{{ old('middle_name') }}" />
+                                                value="{{ old('middle_name', $client->middle_name) }}" />
                                         </div>
                                     </div>
 
@@ -135,8 +141,8 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="text" name="last_name" id="lastName"
-                                                placeholder="{{ __('Last Name') }}" value="{{ old('last_name') }}"
-                                                required />
+                                                placeholder="{{ __('Last Name') }}"
+                                                value="{{ old('last_name', $client->last_name) }}" required />
                                         </div>
                                     </div>
 
@@ -148,7 +154,7 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="date" name="birthdate" id="birthdate"
-                                                value="{{ old('birthdate') }}" />
+                                                value="{{ old('birthdate', $client->birthdate) }}" />
                                         </div>
                                     </div>
 
@@ -159,17 +165,19 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <select class="form-select" name="cgt_id" id="cgt_id">
+                                            <select class="form-select searchSelectBox" name="cgt_id" id="cgt_id">
                                                 @foreach ($categories as $category)
-                                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                                    <option value="{{ $category->id }}"
+                                                        {{ $client->cgt_id == $category->id ? 'selected' : '' }}>
+                                                        {{ $category->name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
                                     </div>
-
                                     <hr>
-                                    <x-form-components.tab-guidebox :nextTab="'Contact'" />
-
+                                    <p class="alert alert-secondary"><i class="fas fa-info-circle me-2 "></i>
+                                        Please add / update <span class="text-success">Contact Details</span> on contact
+                                        details tabs.</p>
                                 </div>
 
                                 <!-- Contact Details Tab -->
@@ -280,10 +288,10 @@
                                             </div>
                                         </div>
                                     </div>
-
                                     <hr>
-                                    <x-form-components.tab-guidebox :nextTab="'Address'" />
-
+                                    <p class="alert alert-secondary"><i class="fas fa-info-circle me-2 "></i>
+                                        Please add / update <span class="text-success">Address Details</span> on address
+                                        tabs.</p>
                                 </div>
 
                                 <!-- Address Tab -->
@@ -297,7 +305,7 @@
                                                     </x-form-components.input-label>
                                                 </div>
                                                 <div class="col-lg-8">
-                                                    <select name="addresses[0][type]" class="form-select">
+                                                    <select name="addresses[0][type]" class="form-select searchSelectBox">
                                                         <option value="home">Home</option>
                                                         <option value="billing">Billing</option>
                                                         <option value="shipping">Shipping</option>
@@ -365,7 +373,9 @@
                                         </button>
                                     </div>
                                     <hr>
-                                    <x-form-components.tab-guidebox :nextTab="'Additional'" />
+                                    <p class="alert alert-secondary"><i class="fas fa-info-circle me-2 "></i>
+                                        Please add / update <span class="text-success">Additional Details</span> on
+                                        additional details tabs.</p>
                                 </div>
 
                                 <!-- Additional Information Tab -->
@@ -380,10 +390,18 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <select name="tags[]" id="tags" class="form-select" multiple>
-                                                <!-- Add your tag options here -->
+                                                @if ($client->tags && is_array($client->tags))
+                                                    @foreach ($client->tags as $tag)
+                                                        <option value="{{ $tag }}"
+                                                            {{ in_array($tag, old('tags', $client->tags ?? [])) ? 'selected' : '' }}>
+                                                            {{ $tag }}
+                                                        </option>
+                                                    @endforeach
+                                                @endif
                                             </select>
-
                                         </div>
+
+
                                     </div>
 
                                     <div class="row mb-4">
@@ -393,19 +411,15 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <textarea name="details" id="details" class="form-control wysiwyg-editor" rows="5">{{ old('details') }}</textarea>
+                                            <textarea name="details" id="details" class="form-control wysiwyg-editor" rows="5">{{ old('details', $client->details) }}</textarea>
                                         </div>
                                     </div>
 
-                                    @if (isset($customFields) && $customFields->isNotEmpty())
-                                        <hr>
-                                        <x-form-components.tab-guidebox :nextTab="'Custom Fields'" />
-                                    @endif
                                 </div>
 
                                 <!-- Custom Fields Tab -->
                                 @if (isset($customFields) && $customFields->isNotEmpty())
-                                    <x-form-components.custom-fields-create :customFields="$customFields" />
+                                    <x-form-components.custom-fields-edit :customFields="$customFields" :cfOldValues="$cfOldValues" />
                                 @endif
                             </div>
                         </div>
@@ -436,8 +450,6 @@
 
 
 
-
-
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize Select2 for searchable dropdowns
             $('.searchSelectBox').select2({
@@ -453,14 +465,14 @@
             });
 
             // Set old tags if they exist
-            if (@json(old('tags', []))) {
-                const oldTags = @json(old('tags', []));
+            if (@json($client->tags)) {
+                const oldTags = @json($client->tags);
                 $('#tags').val(oldTags).trigger('change');
             }
 
             // Initialize social media with old values
-            if (@json(old('social_media', []))) {
-                const oldSocialMedia = @json(old('social_media', []));
+            if (@json($client->social_media)) {
+                const oldSocialMedia = @json($client->social_media);
                 Object.keys(oldSocialMedia).forEach(platform => {
                     const input = document.querySelector(`input[name="social_media[${platform}]"]`);
                     if (input) {
@@ -481,7 +493,7 @@
                     content_css: currentTheme === 'dark' ? 'dark' : 'default',
                     setup: function(editor) {
                         editor.on('init', function() {
-                            editor.setContent(`{!! old('details', '') !!}`);
+                            editor.setContent(`{!! $client->details !!}`);
                         });
                     },
                     menubar: false,
@@ -519,9 +531,9 @@
                         'wordcount'
                     ],
                     toolbar: 'undo redo | formatselect | bold italic backcolor | \
-                                                                  alignleft aligncenter alignright alignjustify | \
-                                                                  bullist numlist outdent indent | removeformat | help | \
-                                                                  link image media preview codesample table'
+                                      alignleft aligncenter alignright alignjustify | \
+                                      bullist numlist outdent indent | removeformat | help | \
+                                      link image media preview codesample table'
                 });
             }
 
@@ -555,49 +567,61 @@
                 attachValidationListeners(newGroup.querySelector('input'));
             });
 
+
             // Handle old email values
-            if (@json(old('email', []))) {
-                const oldEmails = @json(old('email', []));
+            if (@json($client->email)) {
+                const oldEmails = @json($client->email);
                 oldEmails.forEach((email, index) => {
                     if (index === 0) {
-                        document.querySelector('input[name="email[]"]').value = email;
+                        // Set the value for the first input field
+                        const firstEmailField = document.querySelector('input[name="email[]"]');
+                        if (firstEmailField) {
+                            firstEmailField.value = email;
+                        }
                     } else {
+                        // Create additional input fields for other emails
                         const container = document.getElementById('emailContainer');
                         const newGroup = document.createElement('div');
                         newGroup.className = 'input-group mb-2';
                         newGroup.innerHTML = `
-                            <input type="email" name="email[]" class="form-control" value="${email}" placeholder="Email Address">
-                            <button type="button" class="btn btn-outline-danger remove-field">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                        `;
+                <input type="email" name="email[]" class="form-control" value="${email}" placeholder="Email Address">
+                <button type="button" class="btn btn-outline-danger remove-field">
+                    <i class="fas fa-minus"></i>
+                </button>
+            `;
                         container.appendChild(newGroup);
                         attachValidationListeners(newGroup.querySelector('input'));
                     }
                 });
             }
 
+
             // Handle old phone values
-            if (@json(old('phone', []))) {
-                const oldPhones = @json(old('phone', []));
+
+            if (@json($client->phone)) {
+                const oldPhones = @json($client->phone);
                 oldPhones.forEach((phone, index) => {
                     if (index === 0) {
-                        document.querySelector('input[name="phone[]"]').value = phone;
+                        const firstPhoneField = document.querySelector('input[name="phone[]"]');
+                        if (firstPhoneField) {
+                            firstPhoneField.value = phone;
+                        }
                     } else {
                         const container = document.getElementById('phoneContainer');
                         const newGroup = document.createElement('div');
                         newGroup.className = 'input-group mb-2';
                         newGroup.innerHTML = `
-                            <input type="tel" name="phone[]" class="form-control" value="${phone}" placeholder="Phone Number">
-                            <button type="button" class="btn btn-outline-danger remove-field">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                        `;
+                <input type="tel" name="phone[]" class="form-control" value="${phone}" placeholder="Phone Number">
+                <button type="button" class="btn btn-outline-danger remove-field">
+                    <i class="fas fa-minus"></i>
+                </button>
+            `;
                         container.appendChild(newGroup);
                         attachValidationListeners(newGroup.querySelector('input'));
                     }
                 });
             }
+
 
             // Handle dynamic address blocks
             let addressCount = 1;
@@ -694,12 +718,12 @@
             }
 
             // Handle old addresses
-            if (@json(old('addresses', []))) {
-                const oldAddresses = @json(old('addresses', []));
-                Object.entries(oldAddresses).forEach(([index, address]) => {
-                    if (index === '0') {
-                        // Fill the first address block that already exists
-                        fillAddressBlock(document.querySelector('.address-block'), address, 0);
+            if (@json($client->addresses)) {
+                const clientAddresses = @json($client->addresses);
+                clientAddresses.forEach((address, index) => {
+                    if (index === 0) {
+                        // Fill the first address block
+                        fillAddressBlock(document.querySelector('.address-block'), address, index);
                     } else {
                         // Create new address blocks for additional addresses
                         const container = document.getElementById('addressContainer');
@@ -716,15 +740,18 @@
                 });
             }
 
-            // Function to fill address block with old values
+
+            // Function to fill an address block with client address data
             function fillAddressBlock(block, address, index) {
-                block.querySelector(`select[name="addresses[${index}][type]"]`).value = address.type;
+                block.querySelector(`select[name="addresses[${index}][type]"]`).value = address.pivot.type;
                 block.querySelector(`textarea[name="addresses[${index}][street_address]"]`).value = address
                     .street_address;
                 block.querySelector(`select[name="addresses[${index}][country_id]"]`).value = address.country_id;
-                block.querySelector(`input[name="addresses[${index}][city]"]`).value = address.city;
-                block.querySelector(`input[name="addresses[${index}][pincode]"]`).value = address.pincode;
+                block.querySelector(`input[name="addresses[${index}][city]"]`).value = address
+                    .city_id; // Use city ID if applicable
+                block.querySelector(`input[name="addresses[${index}][pincode]"]`).value = address.postal_code;
             }
+
 
             // Handle removal of dynamic fields
             document.addEventListener('click', function(e) {

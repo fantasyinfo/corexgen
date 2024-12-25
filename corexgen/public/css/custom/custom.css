@@ -11,7 +11,8 @@
 }
 
 .sidebar-brand {
-    background-color: var(--dark-black-001);
+    /* background-color: var(--dark-black-001); */
+   
 }
 
 .h-200 {
@@ -83,7 +84,7 @@
 }
 
 .card {
-    border-top: 2px solid var(--primary-color);
+    /* border-top: 2px solid var(--primary-color); */
 }
 
 table tr {

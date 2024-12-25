@@ -136,11 +136,7 @@
                                     </div>
 
                                     <hr>
-                                    <p class="alert alert-secondary">
-                                        <i class="fas fa-info-circle me-2 "></i>
-                                        Please add <span class="text-success">Address
-                                        details</span> on Address tab, Payment Method will be <span
-                                        class="text-danger">offline</span>, if compnay's plan updated via this panel.</p>
+                                    <x-form-components.tab-guidebox :nextTab="'Address'" />
                                 </div>
 
 

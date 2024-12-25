@@ -23,6 +23,23 @@ class CategoryGroupTag extends Model
         return $this->hasMany(CRMClients::class, 'cgt_id');
     }
 
+
+    public function leadsGroups()
+    {
+        return $this->hasMany(CRMClients::class, 'group_id');
+    }
+    public function leadsSources()
+    {
+        return $this->hasMany(CRMClients::class, 'source_id');
+    }
+    public function leadsStatus()
+    {
+        return $this->hasMany(CRMClients::class, 'status_id');
+    }
+
+
+
+
     protected static function boot()
     {
         parent::boot();

@@ -175,9 +175,8 @@
                                         </div>
                                     </div>
                                     <hr>
-                                    <p class="alert alert-secondary"><i class="fas fa-info-circle me-2 "></i>
-                                        Please add / update <span class="text-success">Contact Details</span> on contact
-                                        details tabs.</p>
+                                    <x-form-components.tab-guidebox :nextTab="'Contact'" />
+                                  
                                 </div>
 
                                 <!-- Contact Details Tab -->
@@ -289,6 +288,9 @@
                                         </div>
                                     </div>
                                     <hr>
+                                    <x-form-components.tab-guidebox :nextTab="'Address'" />
+
+                                    <hr>
                                     <p class="alert alert-secondary"><i class="fas fa-info-circle me-2 "></i>
                                         Please add / update <span class="text-success">Address Details</span> on address
                                         tabs.</p>
@@ -373,9 +375,8 @@
                                         </button>
                                     </div>
                                     <hr>
-                                    <p class="alert alert-secondary"><i class="fas fa-info-circle me-2 "></i>
-                                        Please add / update <span class="text-success">Additional Details</span> on
-                                        additional details tabs.</p>
+                                    <x-form-components.tab-guidebox :nextTab="'Additional'" />
+                                
                                 </div>
 
                                 <!-- Additional Information Tab -->
@@ -415,6 +416,10 @@
                                         </div>
                                     </div>
 
+                                    @if (isset($customFields) && $customFields->isNotEmpty())
+                                        <hr>
+                                        <x-form-components.tab-guidebox :nextTab="'Custom Fields'" />
+                                    @endif
                                 </div>
 
                                 <!-- Custom Fields Tab -->
