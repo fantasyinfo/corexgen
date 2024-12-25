@@ -18,11 +18,11 @@
             <div class="mb-3">
                 <div class="form-group">
                     <x-form-components.input-label for="nameFilter" class="custom-class">
-                        {{ __('clients.Client Name') }}
+                        {{ __('clients.Name') }}
                     </x-form-components.input-label>
 
                     <x-form-components.input-group type="text" name="name" data-filter="name" id="nameFilter"
-                        placeholder="{{ __('Enter Client Name') }}" value="{{ request('name') }}" required
+                        placeholder="{{ __('Enter Name') }}" value="{{ request('name') }}" required
                         class="custom-class" />
 
 
@@ -35,7 +35,7 @@
                     </x-form-components.input-label>
 
                     <x-form-components.input-group type="email" name="email" data-filter="email" id="emailFilter"
-                        placeholder="{{ __('Enter Client Email') }}" value="{{ request('email') }}" required
+                        placeholder="{{ __('Enter Email') }}" value="{{ request('email') }}" required
                         class="custom-class" />
 
 
@@ -48,7 +48,7 @@
                     </x-form-components.input-label>
 
                     <x-form-components.input-group type="tel" name="phone" data-filter="phone" id="phoneFilter"
-                        placeholder="{{ __('Enter Client Phone') }}" value="{{ request('phone') }}" required
+                        placeholder="{{ __('Enter Phone') }}" value="{{ request('phone') }}" required
                         class="custom-class" />
 
 

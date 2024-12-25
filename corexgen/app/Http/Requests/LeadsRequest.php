@@ -40,7 +40,7 @@ class LeadsRequest extends FormRequest
             'preferred_contact_method' => 'nullable|in:Email,Phone,In-Person',
             'score' => 'nullable|integer|min:0|max:100',
             'follow_up_date' => 'nullable|date',
-            'is_converted' => 'nullable|accepted',
+            'is_converted' => 'nullable',
             'group_id' => 'nullable|exists:category_group_tag,id',
             'source_id' => 'nullable|exists:category_group_tag,id',
             'status_id' => 'nullable|exists:category_group_tag,id',
@@ -48,6 +48,7 @@ class LeadsRequest extends FormRequest
             'address_country_id' => 'nullable|exists:countries,id',
             'address_city_name' => 'nullable|string|max:255',
             'address_pincode' => 'nullable|string|max:20',
+            'assign_to' => 'array|nullable|exists:users,id'
         ];
     }
 
@@ -79,6 +80,7 @@ class LeadsRequest extends FormRequest
             'follow_up_date.date' => 'The follow-up date must be a valid date.',
             'last_contacted_date.date' => 'The last contacted date must be a valid date.',
             'last_activity_date.date' => 'The last activity date must be a valid date.',
+            
         ];
     }
 }

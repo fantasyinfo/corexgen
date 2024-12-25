@@ -6,6 +6,7 @@ use App\Helpers\PermissionsHelper;
 use App\Models\Address;
 use App\Models\City;
 use App\Models\CRM\CRMLeads;
+use App\Models\LeadUser;
 use App\Repositories\LeadsRepository;
 use App\Traits\CategoryGroupTagsFilter;
 use App\Traits\MediaTrait;
@@ -103,15 +104,16 @@ class LeadsService
             // Prepare data for pivot table
             $assignToData = [];
             foreach ($validatedData['assign_to'] as $userId) {
-                $assignToData[$userId] = [
-                    'company_id' => Auth::user()->company_id, // Replace with appropriate company_id logic
+                $assignToData[] = [
+                    'lead_id' => $lead->id,
+                    'user_id' => $userId,
+                    'company_id' => Auth::user()->company_id,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
             }
 
-            // Attach users to the lead
-            $lead->assignees()->attach($assignToData);
+            LeadUser::insert($assignToData);
         }
     }
     private function createAddressIfProvided(array $data): ?Address
@@ -222,72 +224,67 @@ class LeadsService
     {
         $this->tenantRoute = $this->getTenantRoute();
 
-        $query = $this->leadsRepository->getClientsQuery($request);
-        $query = $this->applyTenantFilter($query, 'clients');
+        $query = $this->leadsRepository->getLeadsQuery($request);
+        $query = $this->applyTenantFilter($query, 'leads');
 
-        $module = PANEL_MODULES[$this->getPanelModule()]['clients'];
+        $module = PANEL_MODULES[$this->getPanelModule()]['leads'];
 
         return DataTables::of($query)
-            ->addColumn('actions', function ($client) {
-                return $this->renderActionsColumn($client);
+            ->addColumn('actions', function ($lead) {
+                return $this->renderActionsColumn($lead);
             })
-            ->editColumn('created_at', function ($client) {
-                return Carbon::parse($client->created_at)->format('d M Y');
+            ->editColumn('created_at', function ($lead) {
+                return Carbon::parse($lead->created_at)->format('d M Y');
             })
-            ->editColumn('category_name', function ($client) {
-                return "<span style='color:" . $client->category_color . ";'>$client->category_name</span>";
+            ->editColumn('group', function ($lead) {
+                return "<span style='color:" . $lead->group->color . ";'>{$lead->group->name}</span>";
             })
-            // ->editColumn('name', function ($client) use ($module) {
-            //     $fullName = trim("{$client->title} {$client->first_name} {$client->middle_name} {$client->last_name}");
-            //     return "<a class='dt-link' href='" . route($this->tenantRoute . $module . '.view', $client->id) . "' target='_blank'>$fullName</a>";
+            ->editColumn('source', function ($lead) {
+                return "<span style='color:" . $lead->source->color . ";'>{$lead->source->name}</span>";
+            })
+            ->editColumn('stage', function ($lead) {
+                return "<span style='color:" . $lead->stage->color . ";'>{$lead->stage->name}</span>";
+            })
+            // ->editColumn('name', function ($lead) use ($module) {
+            //     $fullName = trim("{$lead->title} {$lead->first_name} {$lead->middle_name} {$lead->last_name}");
+            //     return "<a class='dt-link' href='" . route($this->tenantRoute . $module . '.view', $lead->id) . "' target='_blank'>$fullName</a>";
             // })
-            ->editColumn('email', function ($client) {
-                return isset($client->primary_email) ? $client->primary_email : 'N/A';
-            })
-            ->editColumn('phone', function ($client) {
-                return isset($client->primary_phone) ? $client->primary_phone : 'N/A';
-            })
-            ->editColumn('address', function ($client) {
-                if (isset($client->addresses[0])) {
-                    $address = $client->addresses[0];
-                    return "{$address['street_address']}, Postal: {$address['postal_code']}";
+            ->editColumn('address', function ($lead) {
+                if (isset($lead->address)) {
+                    return "{$lead->address->street_address}, {$lead->address->city->name} {$lead->address->country->name}, Postal: {$lead->address->postal_code}";
                 }
                 return 'N/A';
             })
-            ->editColumn('status', function ($client) {
-                return $this->renderStatusColumn($client);
-            })
-            ->rawColumns(['actions', 'category_name', 'name', 'status']) // Include any HTML columns
+            // ->editColumn('status', function ($lead) {
+            //     return $this->renderStatusColumn($lead);
+            // })
+            ->rawColumns(['actions','group','source','stage',  'name']) // Include any HTML columns
             ->make(true);
     }
 
 
 
-    protected function renderActionsColumn($client)
+    protected function renderActionsColumn($lead)
     {
-
-
         return View::make(getComponentsDirFilePath('dt-actions-buttons'), [
             'tenantRoute' => $this->tenantRoute,
-            'permissions' => PermissionsHelper::getPermissionsArray('CLIENTS'),
-            'module' => PANEL_MODULES[$this->getPanelModule()]['clients'],
-            'id' => $client->id
+            'permissions' => PermissionsHelper::getPermissionsArray('LEADS'),
+            'module' => PANEL_MODULES[$this->getPanelModule()]['leads'],
+            'id' => $lead->id
         ])->render();
     }
 
-    protected function renderStatusColumn($client)
+    protected function renderStatusColumn($lead)
     {
-
-
         return View::make(getComponentsDirFilePath('dt-status'), [
             'tenantRoute' => $this->tenantRoute,
-            'permissions' => PermissionsHelper::getPermissionsArray('CLIENTS'),
-            'module' => PANEL_MODULES[$this->getPanelModule()]['clients'],
-            'id' => $client->id,
+            'permissions' => PermissionsHelper::getPermissionsArray('LEADS'),
+            'module' => PANEL_MODULES[$this->getPanelModule()]['leads'],
+            'id' => $lead->id,
             'status' => [
-                'current_status' => $client->status,
-                'available_status' => CRM_STATUS_TYPES['CLIENTS']['STATUS'],
-                'bt_class' => CRM_STATUS_TYPES['CLIENTS']['BT_CLASSES'],
+                'current_status' => $lead->status,
+                'available_status' => CRM_STATUS_TYPES['LEADS']['STATUS'],
+                'bt_class' => CRM_STATUS_TYPES['LEADS']['BT_CLASSES'],
             ]
         ])->render();
     }

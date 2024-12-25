@@ -2,32 +2,51 @@
 
 namespace App\Repositories;
 use App\Models\CRM\CRMClients;
+use App\Models\CRM\CRMLeads;
 
 class LeadsRepository
 {
     // Your repository methods
 
-    public function getClientsQuery($request)
+    public function getLeadsQuery($request)
     {
-        $query = CRMClients::query()
-            ->leftJoin('category_group_tag', 'clients.cgt_id', '=', 'category_group_tag.id')
-            ->select('clients.*', 'category_group_tag.name as category_name', 'category_group_tag.color as category_color')
+        $query = CRMLeads::query()
+            ->select([
+                'leads.id',  // Specify table name to avoid ambiguity
+                'leads.type',
+                'leads.company_name',
+                'leads.title',
+                'leads.first_name',
+                'leads.last_name',
+                'leads.email',
+                'leads.phone',
+                'leads.status',
+                'leads.created_at',
+                'leads.group_id',
+                'leads.source_id',
+                'leads.status_id',
+                'leads.address_id',
+                'leads.assign_by'
+            ])
             ->with([
-                'categoryGroupTag' => function ($query) {
-                    $query->where('status', 'active')
-                        ->where('relation_type', CATEGORY_GROUP_TAGS_RELATIONS['STATUS']['clients'])
-                        ->where('type', CATEGORY_GROUP_TAGS_TYPES['STATUS']['categories']);
-                },
-                'addresses' => function ($query) {
-                    $query->select('addresses.id', 'addresses.street_address', 'addresses.postal_code', 'addresses.city_id', 'addresses.country_id')
-                        ->withPivot('type');
-                }
+                'group:id,name,color',
+                'source:id,name,color',
+                'stage:id,name,color',
+                'address' => fn($q) => $q
+                    ->select(['id', 'street_address', 'postal_code', 'city_id', 'country_id'])
+                    ->with([
+                        'city:id,name',
+                        'country:id,name'
+                    ]),
+                'assignedBy:id,name',
+                'assignees' => fn($q) => $q
+                    ->select(['users.id', 'users.name'])
+                    ->withOnly([])
             ]);
-
-        // Dynamic filters
+    
         return $this->applyFilters($query, $request);
     }
-
+    
     protected function applyFilters($query, $request)
     {
         return $query
@@ -35,41 +54,63 @@ class LeadsRepository
                 $request->filled('search'),
                 fn($q) => $q->where(function ($subQuery) use ($request) {
                     $searchTerm = strtolower($request->search['value']);
-                    $subQuery->where('clients.type', 'LIKE', "%{$searchTerm}%")
-                        ->orWhere('clients.company_name', 'LIKE', "%{$searchTerm}%")
-                        ->orWhere('clients.title', 'LIKE', "%{$searchTerm}%")
-                        ->orWhere('clients.first_name', 'LIKE', "%{$searchTerm}%")
-                        ->orWhere('category_group_tag.name', 'LIKE', "%{$searchTerm}%")
-                        ->orWhere('clients.created_at', 'LIKE', "%{$searchTerm}%");
+                    $subQuery->where('leads.type', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('leads.company_name', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('leads.title', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('leads.first_name', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('leads.email', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('leads.phone', 'LIKE', "%{$searchTerm}%")
+                        ->orWhereHas('group', fn($groupQuery) => 
+                            $groupQuery->where('name', 'LIKE', "%{$searchTerm}%")
+                        )
+                        ->orWhereHas('source', fn($sourceQuery) => 
+                            $sourceQuery->where('name', 'LIKE', "%{$searchTerm}%")
+                        )
+                        ->orWhereHas('stage', fn($stageQuery) => 
+                            $stageQuery->where('name', 'LIKE', "%{$searchTerm}%")
+                        )
+                        ->orWhere('leads.created_at', 'LIKE', "%{$searchTerm}%");
                 })
             )
             ->when(
                 $request->filled('name'),
                 fn($q) => $q->where(function ($subQuery) use ($request) {
-                    $subQuery->where('clients.first_name', 'LIKE', "%{$request->name}%")
-                        ->orWhere('clients.middle_name', 'LIKE', "%{$request->name}%")
-                        ->orWhere('clients.last_name', 'LIKE', "%{$request->name}%");
+                    $subQuery->where('leads.first_name', 'LIKE', "%{$request->name}%")
+                        ->orWhere('leads.last_name', 'LIKE', "%{$request->name}%");
                 })
             )
             ->when(
                 $request->filled('email'),
-                fn($q) => $q->whereJsonContains('clients.email', $request->email)
+                fn($q) => $q->where('leads.email', 'LIKE', "%{$request->email}%")
             )
             ->when(
                 $request->filled('phone'),
-                fn($q) => $q->whereJsonContains('clients.phone', $request->phone)
+                fn($q) => $q->where('leads.phone', 'LIKE', "%{$request->phone}%")
             )
             ->when(
                 $request->filled('status') && $request->status != 0,
-                fn($q) => $q->where('clients.status', $request->status)
+                fn($q) => $q->where('leads.status', $request->status)
             )
             ->when(
                 $request->filled('start_date'),
-                fn($q) => $q->whereDate('clients.created_at', '>=', $request->start_date)
+                fn($q) => $q->whereDate('leads.created_at', '>=', $request->start_date)
             )
             ->when(
                 $request->filled('end_date'),
-                fn($q) => $q->whereDate('clients.created_at', '<=', $request->end_date)
+                fn($q) => $q->whereDate('leads.created_at', '<=', $request->end_date)
+            )
+            ->when(
+                $request->filled('assign_to'),
+                fn($q) => $q->whereHas('assignees', fn($assigneeQuery) => 
+                    $assigneeQuery->whereIn('users.id', $request->assign_to)
+                )
+            )
+            ->when(
+                $request->filled('assign_by'),
+                fn($q) => $q->whereHas('assignedBy', fn($assignByQuery) => 
+                    $assignByQuery->where('users.id', $request->assign_by)
+                )
             );
     }
+    
 }

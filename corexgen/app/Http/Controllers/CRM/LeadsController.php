@@ -138,7 +138,7 @@ class LeadsController extends Controller
     public function store(LeadsRequest $request)
     {
 
- 
+
 
         try {
 
@@ -201,14 +201,6 @@ class LeadsController extends Controller
 
         ]);
     }
-
-
-
-
-
-
-
-
 
     public function update(ClientsEditRequest $request)
     {
@@ -303,14 +295,14 @@ class LeadsController extends Controller
     {
         try {
             // Delete the user
-            $client = CRMClients::find($id);
-            if ($client) {
+            $lead = CRMLeads::find($id);
+            if ($lead) {
 
                 // delete its custom fields also if any
-                $this->customFieldService->deleteEntityValues($client);
+                $this->customFieldService->deleteEntityValues($lead);
 
                 // delete  now
-                $client->delete();
+                $lead->delete();
 
                 // update the subscription usage
                 $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['LEADS']]), '-', '1');
@@ -624,28 +616,6 @@ class LeadsController extends Controller
     }
 
 
-    /**
-     * Parse social media links into key-value JSON
-     */
-    private function parseSocialMedia($links)
-    {
-        $result = [];
-        if (empty($links))
-            return $result; // Return empty array if no links provided
-        $pairs = explode(';', $links);
-
-        foreach ($pairs as $pair) {
-            $keyValue = explode("':", $pair);
-            if (count($keyValue) === 2) {
-                $key = trim($keyValue[0], " '");
-                $value = trim($keyValue[1]);
-                $result[$key] = $value;
-            }
-        }
-
-        return $result;
-    }
-
 
 
     public function bulkDelete(Request $request)
@@ -659,9 +629,10 @@ class LeadsController extends Controller
                     $this->customFieldService->bulkDeleteEntityValues(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['crmleads'], $ids);
 
                     // Then delete the leads
-                    CRMClients::whereIn('id', $ids)->delete();
+                    CRMLeads::whereIn('id', $ids)->delete();
 
                     $this->updateUsage(
+                        strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['LEADS']]),
                         '-',
                         count($ids)
                     );
@@ -697,7 +668,7 @@ class LeadsController extends Controller
     public function changeStatus($id, $status)
     {
         try {
-            CRMClients::query()->where('id', '=', $id)->update(['status' => $status]);
+            CRMLeads::query()->where('id', '=', $id)->update(['status' => $status]);
             // Return success response
             return redirect()->back()->with('success', 'Leads status changed successfully.');
         } catch (\Exception $e) {
