@@ -183,7 +183,7 @@ class ClientsController extends Controller
         $countries = Country::all();
 
 
-        $categoryQuery = $this->getCategoryGroupTags(CATEGORY_GROUP_TAGS_TYPES['STATUS']['categories'], CATEGORY_GROUP_TAGS_RELATIONS['STATUS']['clients']);
+        $categoryQuery = $this->getCategoryGroupTags(CATEGORY_GROUP_TAGS_TYPES['KEY']['categories'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['clients']);
         $categoryQuery = $this->applyTenantFilter($categoryQuery);
         $categories = $categoryQuery->get();
 
@@ -263,7 +263,7 @@ class ClientsController extends Controller
         $countries = Country::all();
 
         // category groups tags
-        $categoryQuery = $this->getCategoryGroupTags(CATEGORY_GROUP_TAGS_TYPES['STATUS']['categories'], CATEGORY_GROUP_TAGS_RELATIONS['STATUS']['clients']);
+        $categoryQuery = $this->getCategoryGroupTags(CATEGORY_GROUP_TAGS_TYPES['KEY']['categories'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['clients']);
         $categoryQuery = $this->applyTenantFilter($categoryQuery);
         $categories = $categoryQuery->get();
 

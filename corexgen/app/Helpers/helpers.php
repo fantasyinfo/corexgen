@@ -978,3 +978,15 @@ function getCompanyName($companyid = null)
 
     return Company::where('id', $companyid)->value('name');
 }
+
+
+function getTeamMates()
+{
+    if (Auth::user()->is_tenant) {
+        return User::where('is_tenant', '1')->get();
+    }
+
+    return User::where('is_tenant', '0')
+        ->where('company_id', Auth::user()->company_id)->get();
+
+}

@@ -30,6 +30,8 @@ class CRMClients extends Model implements Auditable
         'last_name',
         'company_name',
         'email',
+        'primary_email',
+        'primary_phone',
         'phone',
         'social_media',
         'cgt_id',

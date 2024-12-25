@@ -41,11 +41,17 @@ class ClientService
     {
         return DB::transaction(function () use ($validatedData) {
 
-            $validCGTID = $this->checkIsValidCGTID($validatedData['cgt_id'], Auth::user()->company_id, 'categories', 'clients');
+            if (isset($validatedData['cgt_id'])) {
+                $validCGTID = $this->checkIsValidCGTID($validatedData['cgt_id'], Auth::user()->company_id, 'categories', 'clients');
 
-            if (!$validCGTID) {
-                throw new \InvalidArgumentException("Failed to create client beacuse invalid CGT ID ");
+
+                if (!$validCGTID) {
+                    throw new \InvalidArgumentException("Failed to create client beacuse invalid CGT ID ");
+                }
             }
+
+
+
 
             $client = CRMClients::create($validatedData);
             $client_address = $this->createOrUpdateAddresses($validatedData, $client);
@@ -184,7 +190,7 @@ class ClientService
                 return Carbon::parse($client->created_at)->format('d M Y');
             })
             ->editColumn('category_name', function ($client) {
-                return "<span style='color:".$client->category_color.";'>$client->category_name</span>";
+                return "<span style='color:" . $client->category_color . ";'>$client->category_name</span>";
             })
             // ->editColumn('name', function ($client) use ($module) {
             //     $fullName = trim("{$client->title} {$client->first_name} {$client->middle_name} {$client->last_name}");
@@ -206,7 +212,7 @@ class ClientService
             ->editColumn('status', function ($client) {
                 return $this->renderStatusColumn($client);
             })
-            ->rawColumns(['actions','category_name', 'name', 'status']) // Include any HTML columns
+            ->rawColumns(['actions', 'category_name', 'name', 'status']) // Include any HTML columns
             ->make(true);
     }
 

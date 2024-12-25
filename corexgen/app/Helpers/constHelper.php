@@ -901,8 +901,8 @@ PermissionsHelper::initializePermissions();
 
 // kyes must match the model name in lowercase
 !defined('CUSTOM_FIELDS_RELATION_TYPES') && define('CUSTOM_FIELDS_RELATION_TYPES', [
-    'KEYS' => ['crmclients' => 'crmclients', 'user' => 'user'],
-    'VALUES' => ['crmclients' => 'Clients', 'user' => 'Users & Employees'],
+    'KEYS' => ['crmclients' => 'crmclients', 'user' => 'user','crmleads' => 'crmleads'],
+    'VALUES' => ['crmclients' => 'Clients', 'user' => 'Users & Employees','crmleads' => 'Leads'],
 ]);
 
 

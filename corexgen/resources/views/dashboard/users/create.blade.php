@@ -131,13 +131,8 @@
 
                                 </div>
                             </div>
-
-                            <div class="alert  alert-warning p-1 rounded border">
-                                <div class="alert-warning">
-                                    <i class="fas fa-info-circle me-2 "></i> Please add Address details on <span
-                                        class="text-success">Address Tab</span>.
-                                </div>
-                            </div>
+                            <hr>
+                            <x-form-components.tab-guidebox :nextTab="'Address'" />
                         </div>
                          <!-- Addresses Tab -->
                          <div class="tab-pane fade" id="address" role="tabpanel">

@@ -2,7 +2,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // dselect init
 
     if ($(".searchSelectBox").length > 0) {
-        $(".searchSelectBox").select2();
+        $(".searchSelectBox").select2({
+            'placeholder' : 'Please select an option'
+        });
     }
 
     // date input

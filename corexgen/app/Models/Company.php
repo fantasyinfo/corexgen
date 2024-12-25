@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\CRM\CRMClients;
+use App\Models\CRM\CRMLeads;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -52,7 +53,7 @@ class Company extends Model implements Auditable
         return $this->hasMany(Subscription::class);
     }
 
-    
+
     public function paymentTransactions(): HasMany
     {
         return $this->hasMany(PaymentTransaction::class);
@@ -70,7 +71,10 @@ class Company extends Model implements Auditable
     }
 
 
-
+    public function leads(): HasMany
+    {
+        return $this->hasMany(CRMLeads::class, 'company_id');
+    }
 
     protected static function boot()
     {
@@ -83,7 +87,7 @@ class Company extends Model implements Auditable
         });
 
         static::deleting(function ($company) {
-            \Log::info('Deleting the company'.[$company]);
+            \Log::info('Deleting the company' . [$company]);
             // If it's a force delete, let Laravel handle the cascading
             if ($company->isForceDeleting()) {
                 return;
@@ -91,16 +95,16 @@ class Company extends Model implements Auditable
 
             // Soft delete associated records
             $company->paymentTransactions()->get()->each(function ($transaction) {
-                \Log::info('Deleting its transaction'.[$transaction]);
+                \Log::info('Deleting its transaction' . [$transaction]);
                 $transaction->delete();
             });
 
             $company->subscriptions()->get()->each(function ($subscription) {
-                \Log::info('Deleting its transaction'.[$subscription]);
+                \Log::info('Deleting its transaction' . [$subscription]);
                 $subscription->delete();
             });
         });
 
-    
+
     }
 }

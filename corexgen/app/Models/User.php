@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\CRM\CRMLeads;
 use App\Models\CRM\CRMRole;
 use App\Models\Buyer;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -92,6 +93,20 @@ class User extends Authenticatable implements Auditable
     public function addresses()
     {
         return $this->belongsTo(Address::class, 'address_id');
+    }
+
+    // Leads assigned by this user
+    public function assignedLeads()
+    {
+        return $this->hasMany(CRMLeads::class, 'assign_by');
+    }
+
+    // Leads this user is associated with (via pivot table)
+    public function associatedLeads()
+    {
+        return $this->belongsToMany(CRMLeads::class, 'lead_user', 'user_id', 'lead_id')
+            ->withTimestamps()
+            ->withPivot('company_id');
     }
     protected static function boot()
     {

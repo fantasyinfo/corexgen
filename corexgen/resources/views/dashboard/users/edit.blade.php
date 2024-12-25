@@ -118,12 +118,8 @@
                                         </div>
                                     </div>
 
-                                    <div class="alert  alert-warning p-1 rounded border">
-                                        <div class="alert-warning">
-                                            <i class="fas fa-info-circle me-2 "></i> Please add Address details on <span
-                                                class="text-success">Address Tab</span>.
-                                        </div>
-                                    </div>
+                                    <hr>
+                                    <x-form-components.tab-guidebox :nextTab="'Address'" />
                                 </div>
 
                                 <!-- Addresses Tab -->
@@ -208,12 +204,16 @@
 
                                         </div>
                                     </div>
+                                    @if (isset($customFields) && $customFields->isNotEmpty())
+                                        <hr>
+                                        <x-form-components.tab-guidebox :nextTab="'Custom Fields'" />
+                                    @endif
                                 </div>
 
                                 <!-- Custom Fields Tab -->
                                 @if (isset($customFields) && $customFields->isNotEmpty())
                                     <x-form-components.custom-fields-edit :customFields="$customFields" :cfOldValues="$cfOldValues" />
-                                @endif
+                             
 
                             </div>
                         </div>
