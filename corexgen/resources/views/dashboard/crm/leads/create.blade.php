@@ -176,7 +176,9 @@
                                         <div class="col-lg-8">
                                             <select class="form-select" name="priority" id="priority" required>
                                                 @foreach (['Low', 'Medium', 'High'] as $pri)
-                                                    <option value="{{ $pri }}" {{ old('priority') == $pri ? 'selected' : '' }}> {{ $pri }}</option>
+                                                    <option value="{{ $pri }}"
+                                                        {{ old('priority') == $pri ? 'selected' : '' }}>
+                                                        {{ $pri }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -192,7 +194,9 @@
                                         <div class="col-lg-8">
                                             <select class="form-select" name="group_id" id="group_id">
                                                 @foreach ($leadsGroups as $lg)
-                                                    <option value="{{ $lg->id }}" {{ old('group_id') == $lg->id ? 'selected' : '' }}> {{ $lg->name }}</option>
+                                                    <option value="{{ $lg->id }}"
+                                                        {{ old('group_id') == $lg->id ? 'selected' : '' }}>
+                                                        {{ $lg->name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -207,7 +211,8 @@
                                         <div class="col-lg-8">
                                             <select class="form-select" name="source_id" id="source_id">
                                                 @foreach ($leadsSources as $ls)
-                                                    <option value="{{ $ls->id }}" {{ old('source_id') == $ls->id ? 'selected' : '' }}> <i
+                                                    <option value="{{ $ls->id }}"
+                                                        {{ old('source_id') == $ls->id ? 'selected' : '' }}> <i
                                                             class="fas fa-dot-circle"></i> {{ $ls->name }}</option>
                                                 @endforeach
                                             </select>
@@ -223,7 +228,8 @@
                                         <div class="col-lg-8">
                                             <select class="form-select" name="status_id" id="status_id" required>
                                                 @foreach ($leadsStatus as $lst)
-                                                    <option value="{{ $lst->id }}"   {{ old('status_id') == $lst->id ? 'selected' : '' }}> <i
+                                                    <option value="{{ $lst->id }}"
+                                                        {{ old('status_id') == $lst->id ? 'selected' : '' }}> <i
                                                             class="fas fa-dot-circle"></i> {{ $lst->name }}</option>
                                                 @endforeach
                                             </select>
@@ -239,15 +245,11 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <select class="form-select searchSelectBox" name="assign_to[]" id="assign_to[]"
-                                                multiple>
-                                                @foreach ($teamMates as $tm)
-                                                    <option value="{{ $tm->id }}"
-                                                        {{ is_array(old('assign_to')) && in_array($tm->id, old('assign_to')) ? 'selected' : '' }}>
-                                                        {{ $tm->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
+
+
+                                            <x-form-components.dropdown-with-profile :title="'Select Team Members'" :options="$teamMates"
+                                                :name="'assign_to'" :multiple="true" :selected="old('assign_to')" />
+
 
                                         </div>
                                     </div>
@@ -264,7 +266,7 @@
                                             <div class="form-check">
                                                 <input type="checkbox" class="form-check-input" name="is_converted"
                                                     id="isRequired_0"
-                                                    {{ old('is_converted.pcm') == 'on' ? 'checked' : '' }}>
+                                                    {{ old('is_converted') == 'on' ? 'checked' : '' }}>
                                                 <label class="form-check-label" for="is_converted">
                                                     {{ __('if checked, a client account will also created.') }}
                                                 </label>
@@ -286,8 +288,9 @@
                                         <div class="col-lg-8">
                                             <div id="emailContainer">
                                                 <div class="input-group mb-2">
-                                                    <input type="email" name="email" class="form-control"
-                                                        placeholder="Email Address">
+                                                    <x-form-components.input-group type="email" name="email"
+                                                        id="email" placeholder="{{ __('Email Address') }}"
+                                                        value="{{ old('email') }}" />
                                                 </div>
 
                                             </div>
@@ -303,9 +306,10 @@
                                         <div class="col-lg-8">
                                             <div id="phoneContainer">
                                                 <div class="input-group mb-2">
-                                                    <input type="tel" name="phone" class="form-control"
-                                                        placeholder="Phone Number">
 
+                                                    <x-form-components.input-group type="tel" name="phone"
+                                                        id="phone" placeholder="{{ __('Phone Number') }}"
+                                                        value="{{ old('phone') }}" />
                                                 </div>
 
                                             </div>
@@ -536,9 +540,9 @@
                         'wordcount'
                     ],
                     toolbar: 'undo redo | formatselect | bold italic backcolor | \
-                                                                                              alignleft aligncenter alignright alignjustify | \
-                                                                                              bullist numlist outdent indent | removeformat | help | \
-                                                                                              link image media preview codesample table'
+                                                                                                  alignleft aligncenter alignright alignjustify | \
+                                                                                                  bullist numlist outdent indent | removeformat | help | \
+                                                                                                  link image media preview codesample table'
                 });
             }
 

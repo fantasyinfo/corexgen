@@ -20,9 +20,9 @@ class UserSeeder extends Seeder
                 'name' => fake()->name(),
                 'email' => fake()->safeEmail(), // Use static emails for debugging
                 'password' => bcrypt('password'), // Hash passwords
-                'role_id' => '3',
-                'is_tenant' => true,
-                'tenant_id' => '1',
+                'role_id' => '18',
+                'is_tenant' => false,
+                'company_id' => '14',
             ];
         }
 

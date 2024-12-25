@@ -2,26 +2,25 @@
 
 @section('content')
     @php
-        //  prePrintR($client->toArray());
-        //  prePrintR($cfOldValues->toArray());
+        // prePrintR($lead->toArray());
     @endphp
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
                 <div class="card stretch stretch-full">
-                    <form id="clientForm" action="{{ route(getPanelRoutes('clients.update')) }}" method="POST">
+                    <form id="leadForm" action="{{ route(getPanelRoutes('leads.update')) }}" method="POST">
                         @csrf
                         @method('PUT')
-                        <input type="hidden" name="id" value="{{ $client->id }}" />
+                        <input type="hidden" name="id" value="{{ $lead->id }}" />
                         <div class="card-body">
                             <div class="mb-4 d-flex align-items-center justify-content-between">
                                 <p class="fw-bold mb-0 me-4">
-                                    <span class="d-block mb-2">{{ __('clients.Update Client') }}</span>
+                                    <span class="d-block mb-2">{{ __('leads.Update Lead') }}</span>
                                     <span
                                         class="fs-12 fw-normal text-muted text-truncate-1-line">{{ __('crud.Please add correct information') }}</span>
                                 </p>
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-plus"></i> <span>{{ __('clients.Update Client') }}</span>
+                                    <i class="fas fa-plus"></i> <span>{{ __('leads.Update Lead') }}</span>
                                 </button>
                             </div>
 
@@ -30,25 +29,31 @@
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link active" id="general-tab" data-bs-toggle="tab"
                                         data-bs-target="#general" type="button" role="tab">
-                                        {{ __('clients.General Information') }}
+                                        {{ __('leads.General Information') }}
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="leads-tab" data-bs-toggle="tab" data-bs-target="#leads"
+                                        type="button" role="tab">
+                                        {{ __('leads.Leads Information') }}
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact"
                                         type="button" role="tab">
-                                        {{ __('clients.Contact Details') }}
+                                        {{ __('leads.Contact Details') }}
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link" id="address-tab" data-bs-toggle="tab" data-bs-target="#address"
                                         type="button" role="tab">
-                                        {{ __('clients.Address') }}
+                                        {{ __('leads.Address') }}
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link" id="additional-tab" data-bs-toggle="tab"
                                         data-bs-target="#additional" type="button" role="tab">
-                                        {{ __('clients.Additional Information') }}
+                                        {{ __('leads.Additional Information') }}
                                     </button>
                                 </li>
                                 @if (isset($customFields) && $customFields->isNotEmpty())
@@ -63,19 +68,22 @@
 
                             <div class="tab-content mt-4" id="clientsTabsContent">
                                 <!-- General Information Tab -->
+
+
                                 <div class="tab-pane fade show active" id="general" role="tabpanel">
+
+
                                     <div class="row mb-4">
                                         <div class="col-lg-4">
                                             <x-form-components.input-label for="clientType" required>
-                                                {{ __('clients.Client Type') }}
+                                                {{ __('leads.Type') }}
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
                                             <select class="form-select" name="type" id="clientType" required>
                                                 <option value="Individual"
-                                                    {{ $client->type == 'Individual' ? 'selected' : '' }}>Individual
-                                                </option>
-                                                <option value="Company" {{ $client->type == 'Company' ? 'selected' : '' }}>
+                                                    {{ $lead->type == 'Company' ? 'selected' : '' }}>Individual</option>
+                                                <option value="Company" {{ $lead->type == 'Company' ? 'selected' : '' }}>
                                                     Company</option>
                                             </select>
                                         </div>
@@ -84,121 +92,214 @@
                                     <div class="row mb-4" id="company_name_div">
                                         <div class="col-lg-4">
                                             <x-form-components.input-label for="companyName" required>
-                                                {{ __('clients.Company Name') }}
+                                                {{ __('leads.Company Name') }}
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="text" name="company_name"
                                                 id="companyName" placeholder="{{ __('Abc Pvt Ltd') }}"
-                                                value="{{ old('company_name', $client->company_name) }}" />
+                                                value="{{ old('company_name', $lead->company_name) }}" />
                                         </div>
                                     </div>
 
-                                    <div class="row mb-4">
-                                        <div class="col-lg-4">
-                                            <x-form-components.input-label for="clientTitle">
-                                                {{ __('clients.Title') }}
-                                            </x-form-components.input-label>
-                                        </div>
-                                        <div class="col-lg-8">
-                                            <x-form-components.input-group type="text" name="title" id="clientTitle"
-                                                placeholder="{{ __('Mr./Mrs./Ms.') }}"
-                                                value="{{ old('title', $client->title) }}" />
-                                        </div>
-                                    </div>
+
 
                                     <div class="row mb-4">
                                         <div class="col-lg-4">
                                             <x-form-components.input-label for="firstName" required>
-                                                {{ __('clients.First Name') }}
+                                                {{ __('leads.First Name') }}
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="text" name="first_name" id="firstName"
                                                 placeholder="{{ __('First Name') }}"
-                                                value="{{ old('first_name', $client->first_name) }}" required />
+                                                value="{{ old('first_name', $lead->first_name) }}" required />
                                         </div>
                                     </div>
 
-                                    <div class="row mb-4">
-                                        <div class="col-lg-4">
-                                            <x-form-components.input-label for="middleName">
-                                                {{ __('clients.Middle Name') }}
-                                            </x-form-components.input-label>
-                                        </div>
-                                        <div class="col-lg-8">
-                                            <x-form-components.input-group type="text" name="middle_name"
-                                                id="middleName" placeholder="{{ __('Middle Name') }}"
-                                                value="{{ old('middle_name', $client->middle_name) }}" />
-                                        </div>
-                                    </div>
 
                                     <div class="row mb-4">
                                         <div class="col-lg-4">
                                             <x-form-components.input-label for="lastName" required>
-                                                {{ __('clients.Last Name') }}
+                                                {{ __('leads.Last Name') }}
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="text" name="last_name" id="lastName"
                                                 placeholder="{{ __('Last Name') }}"
-                                                value="{{ old('last_name', $client->last_name) }}" required />
+                                                value="{{ old('last_name', $lead->last_name) }}" required />
                                         </div>
                                     </div>
 
-                                    <div class="row mb-4">
-                                        <div class="col-lg-4">
-                                            <x-form-components.input-label for="birthdate">
-                                                {{ __('clients.Birth Date') }}
-                                            </x-form-components.input-label>
-                                        </div>
-                                        <div class="col-lg-8">
-                                            <x-form-components.input-group type="date" name="birthdate" id="birthdate"
-                                                value="{{ old('birthdate', $client->birthdate) }}" />
-                                        </div>
-                                    </div>
+
+
+
+                                    <hr>
+                                    <p class="alert alert-secondary"><i class="fas fa-info-circle me-2 "></i>
+                                        Please add / update <span class="text-success">Leads Details</span> on leads
+                                        details tabs.</p>
+                                </div>
+
+                                <div class="tab-pane fade" id="leads" role="tabpanel">
 
                                     <div class="row mb-4">
                                         <div class="col-lg-4">
-                                            <x-form-components.input-label for="category">
-                                                {{ __('clients.Category') }}
+                                            <x-form-components.input-label for="title" required>
+                                                {{ __('leads.Title') }}
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <select class="form-select searchSelectBox" name="cgt_id" id="cgt_id">
-                                                @foreach ($categories as $category)
-                                                    <option value="{{ $category->id }}"
-                                                        {{ $client->cgt_id == $category->id ? 'selected' : '' }}>
-                                                        {{ $category->name }}</option>
+                                            <x-form-components.input-group type="text" name="title" id="title"
+                                                placeholder="{{ __('New Development Project Lead') }}"
+                                                value="{{ old('title', $lead->title) }}" required />
+                                        </div>
+                                    </div>
+                                    <div class="row mb-4">
+                                        <div class="col-lg-4">
+                                            <x-form-components.input-label for="value">
+                                                {{ __('leads.Value') }}
+                                            </x-form-components.input-label>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <x-form-components.input-group-prepend-append prepend="$" append="USD"
+                                                type="number" name="value" id="value"
+                                                placeholder="{{ __('New Development Project Lead') }}"
+                                                value="{{ old('value', $lead->value) }}" />
+                                        </div>
+                                    </div>
+
+
+
+                                    <!-- priority -->
+                                    <div class="row mb-4">
+                                        <div class="col-lg-4">
+                                            <x-form-components.input-label for="priority" required>
+                                                {{ __('leads.Priority') }}
+                                            </x-form-components.input-label>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <select class="form-select" name="priority" id="priority" required>
+                                                @foreach (['Low', 'Medium', 'High'] as $pri)
+                                                    <option value="{{ $pri }}"
+                                                        {{ old('priority', $lead->priority) == $pri ? 'selected' : '' }}>
+                                                        {{ $pri }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
                                     </div>
-                                    <hr>
-                                    <p class="alert alert-secondary"><i class="fas fa-info-circle me-2 "></i>
-                                        Please add / update <span class="text-success">Contact Details</span> on contact
-                                        details tabs.</p>
-                                </div>
 
+                                    <!-- groups -->
+                                    <div class="row mb-4">
+                                        <div class="col-lg-4">
+                                            <x-form-components.input-label for="group_id">
+                                                {{ __('leads.Groups') }}
+                                            </x-form-components.input-label>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <select class="form-select" name="group_id" id="group_id">
+                                                @foreach ($leadsGroups as $lg)
+                                                    <option value="{{ $lg->id }}"
+                                                        {{ old('group_id', $lead->group_id) == $lg->id ? 'selected' : '' }}>
+                                                        {{ $lg->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <!-- sources -->
+                                    <div class="row mb-4">
+                                        <div class="col-lg-4">
+                                            <x-form-components.input-label for="source_id">
+                                                {{ __('leads.Sources') }}
+                                            </x-form-components.input-label>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <select class="form-select" name="source_id" id="source_id">
+                                                @foreach ($leadsSources as $ls)
+                                                    <option value="{{ $ls->id }}"
+                                                        {{ old('source_id', $lead->source_id) == $ls->id ? 'selected' : '' }}>
+                                                        <i class="fas fa-dot-circle"></i> {{ $ls->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <!-- stage -->
+                                    <div class="row mb-4">
+                                        <div class="col-lg-4">
+                                            <x-form-components.input-label for="status_id" required>
+                                                {{ __('leads.Stage') }}
+                                            </x-form-components.input-label>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <select class="form-select" name="status_id" id="status_id" required>
+                                                @foreach ($leadsStatus as $lst)
+                                                    <option value="{{ $lst->id }}"
+                                                        {{ old('status_id', $lead->status_id) == $lst->id ? 'selected' : '' }}>
+                                                        <i class="fas fa-dot-circle"></i> {{ $lst->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- assign to  -->
+
+                                    <div class="row mb-4">
+                                        <div class="col-lg-4">
+                                            <x-form-components.input-label for="assign_to[]">
+                                                {{ __('leads.Assign To') }}
+                                            </x-form-components.input-label>
+                                        </div>
+                                       
+                                        <div class="col-lg-8">
+                                            <x-form-components.dropdown-with-profile 
+                                            :title="'Select Team Members'" 
+                                            :options="$teamMates"
+                                            :name="'assign_to'" 
+                                            :multiple="true" 
+                                            
+                                            :selected="$lead->assignees->pluck('id')->toArray()" />
+                                        </div>
+                                    </div>
+
+                                    <!-- is Captured  -->
+
+                                    <div class="row mb-4">
+                                        <div class="col-lg-4">
+                                            <x-form-components.input-label for="is_converted">
+                                                {{ __('leads.Is Captured') }}
+                                            </x-form-components.input-label>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input" name="is_converted"
+                                                    id="isRequired_0"
+                                                    {{ old('is_converted.pcm', $lead->is_converted) == 'on' ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="is_converted">
+                                                    {{ __('if checked, a client account will also created.') }}
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <hr>
+                                    <x-form-components.tab-guidebox :nextTab="'Contact'" />
+                                </div>
                                 <!-- Contact Details Tab -->
                                 <div class="tab-pane fade" id="contact" role="tabpanel">
                                     <div class="row mb-4">
                                         <div class="col-lg-4">
                                             <x-form-components.input-label for="emails">
-                                                {{ __('clients.Email Addresses') }}
+                                                {{ __('leads.Email') }}
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
                                             <div id="emailContainer">
                                                 <div class="input-group mb-2">
-                                                    <input type="email" name="email[]" class="form-control"
-                                                        placeholder="Email Address">
-                                                    <button type="button" class="btn btn-outline-secondary add-email">
-                                                        <i class="fas fa-plus"></i>
-                                                    </button>
+
+                                                    <x-form-components.input-group type="email" name="email"
+                                                        id="email" placeholder="{{ __('Email Address') }}"
+                                                        value="{{ old('email', $lead->email) }}" required />
                                                 </div>
-                                                <p class="px-2 font-12 my-2 text-secondary">First email will be primary
-                                                    email for this client.</p>
+
                                             </div>
                                         </div>
                                     </div>
@@ -206,220 +307,158 @@
                                     <div class="row mb-4">
                                         <div class="col-lg-4">
                                             <x-form-components.input-label for="phones">
-                                                {{ __('clients.Phone Numbers') }}
+                                                {{ __('leads.Phone') }}
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
                                             <div id="phoneContainer">
                                                 <div class="input-group mb-2">
-                                                    <input type="tel" name="phone[]" class="form-control"
-                                                        placeholder="Phone Number">
-                                                    <button type="button" class="btn btn-outline-secondary add-phone">
-                                                        <i class="fas fa-plus"></i>
-                                                    </button>
+
+                                                    <x-form-components.input-group type="tel" name="phone"
+                                                        id="phone" placeholder="{{ __('Phone Number') }}"
+                                                        value="{{ old('phone', $lead->phone) }}" required />
                                                 </div>
-                                                <p class="px-2 font-12 my-2 text-secondary">First phone number will be
-                                                    primary phone number for this client.</p>
+
                                             </div>
                                         </div>
+
                                     </div>
 
+                                    <!-- preferred_contact_method -->
                                     <div class="row mb-4">
                                         <div class="col-lg-4">
-                                            <x-form-components.input-label for="socialMedia">
-                                                {{ __('clients.Social Media Facebook') }}
+                                            <x-form-components.input-label for="preferred_contact_method" required>
+                                                {{ __('leads.Prefferd Contact') }}
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <div id="socialMediaContainer">
-                                                <div class="input-group mb-2">
-                                                    <input type="url" name="social_media['fb']" class="form-control"
-                                                        placeholder="Facebook Profile URL">
-
-                                                </div>
-                                            </div>
+                                            <select class="form-select" name="preferred_contact_method"
+                                                id="preferred_contact_method" required>
+                                                @foreach (['Email', 'Phone', 'In-Person'] as $pcm)
+                                                    <option value="{{ $pcm }}"
+                                                        {{ old('preferred_contact_method', $lead->preferred_contact_method) == $pcm ? 'selected' : '' }}>
+                                                        {{ $pcm }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                     </div>
-                                    <div class="row mb-4">
-                                        <div class="col-lg-4">
-                                            <x-form-components.input-label for="socialMedia">
-                                                {{ __('clients.Social Media LinkedIn') }}
-                                            </x-form-components.input-label>
-                                        </div>
-                                        <div class="col-lg-8">
-                                            <div id="socialMediaContainer">
-                                                <div class="input-group mb-2">
-                                                    <input type="url" name="social_media['ln']" class="form-control"
-                                                        placeholder="LinkedIn Profile URL">
 
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row mb-4">
-                                        <div class="col-lg-4">
-                                            <x-form-components.input-label for="socialMedia">
-                                                {{ __('clients.Social Media Instagram') }}
-                                            </x-form-components.input-label>
-                                        </div>
-                                        <div class="col-lg-8">
-                                            <div id="socialMediaContainer">
-                                                <div class="input-group mb-2">
-                                                    <input type="url" name="social_media['in']" class="form-control"
-                                                        placeholder="Instragram Profile URL">
-
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row mb-4">
-                                        <div class="col-lg-4">
-                                            <x-form-components.input-label for="socialMedia">
-                                                {{ __('clients.Social Media X') }}
-                                            </x-form-components.input-label>
-                                        </div>
-                                        <div class="col-lg-8">
-                                            <div id="socialMediaContainer">
-                                                <div class="input-group mb-2">
-                                                    <input type="url" name="social_media['x']" class="form-control"
-                                                        placeholder="X (Twitter) Profile URL">
-
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                     <hr>
-                                    <p class="alert alert-secondary"><i class="fas fa-info-circle me-2 "></i>
-                                        Please add / update <span class="text-success">Address Details</span> on address
-                                        tabs.</p>
+                                    <x-form-components.tab-guidebox :nextTab="'Address'" />
                                 </div>
 
-                                <!-- Address Tab -->
+
+                                <!-- Addresses Tab -->
                                 <div class="tab-pane fade" id="address" role="tabpanel">
-                                    <div id="addressContainer">
-                                        <div class="address-block mb-4 p-3 border rounded">
-                                            <div class="row mb-3">
-                                                <div class="col-lg-4">
-                                                    <x-form-components.input-label for="addressType">
-                                                        {{ __('clients.Address Type') }}
-                                                    </x-form-components.input-label>
-                                                </div>
-                                                <div class="col-lg-8">
-                                                    <select name="addresses[0][type]" class="form-select searchSelectBox">
-                                                        <option value="home">Home</option>
-                                                        <option value="billing">Billing</option>
-                                                        <option value="shipping">Shipping</option>
-                                                        <option value="custom">Custom</option>
-                                                    </select>
-                                                </div>
-                                            </div>
+                                    <div class="row mb-4 align-items-center">
+                                        <div class="col-lg-4">
+                                            <x-form-components.input-label for="compnayAddressStreet"
+                                                class="custom-class">
+                                                {{ __('address.Address') }}
+                                            </x-form-components.input-label>
+                                        </div>
 
-                                            <div class="row mb-3">
-                                                <div class="col-lg-4">
-                                                    <x-form-components.input-label for="streetAddress">
-                                                        {{ __('address.Street Address') }}
-                                                    </x-form-components.input-label>
-                                                </div>
-                                                <div class="col-lg-8">
-                                                    <x-form-components.textarea-group name="addresses[0][street_address]"
-                                                        placeholder="Enter Street Address" rows="3" />
-                                                </div>
-                                            </div>
+                                        <div class="col-lg-8">
+                                            <x-form-components.textarea-group name="address.street_address"
+                                                id="compnayAddressStreet" placeholder="Enter Registered Street Address"
+                                                class="custom-class"
+                                                value="{{ old('address.street_address', $lead?->address?->street_address) }}" />
 
-                                            <div class="row mb-3">
-                                                <div class="col-lg-4">
-                                                    <x-form-components.input-label for="country">
-                                                        {{ __('address.Country') }}
-                                                    </x-form-components.input-label>
-                                                </div>
-                                                <div class="col-lg-8">
-                                                    <select name="addresses[0][country_id]"
-                                                        class="form-select searchSelectBox">
-                                                        <option value="">Select Country</option>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-4 align-items-center">
+                                        <div class="col-lg-4">
+                                            <x-form-components.input-label for="compnayAddressCountry"
+                                                class="custom-class">
+                                                {{ __('address.Country') }}
+                                            </x-form-components.input-label>
+
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <div class="input-group">
+
+                                                <select
+                                                    class="form-control searchSelectBox  @error('address.country_id') is-invalid @enderror"
+                                                    name="address.country_id" id="country_id">
+                                                    <option value="0" selected> ----- Select Country ----------
+                                                    </option>
+                                                    @if ($countries)
                                                         @foreach ($countries as $country)
-                                                            <option value="{{ $country->id }}">{{ $country->name }}
+                                                            <option value="{{ $country->id }}"
+                                                                {{ old('address.country_id', $lead?->address?->country_id) == $country->id ? 'selected' : '' }}>
+                                                                {{ $country->name }}
                                                             </option>
                                                         @endforeach
-                                                    </select>
+                                                    @else
+                                                        <option disabled>No country available</option>
+                                                    @endif
+                                                </select>
+                                                <div class="invalid-feedback" id="country_idError">
+                                                    @error('address.country_id')
+                                                        {{ $message }}
+                                                    @enderror
                                                 </div>
                                             </div>
 
-                                            <div class="row mb-3">
-                                                <div class="col-lg-4">
-                                                    <x-form-components.input-label for="city">
-                                                        {{ __('address.City') }}
-                                                    </x-form-components.input-label>
-                                                </div>
-                                                <div class="col-lg-8">
-                                                    <x-form-components.input-group type="text"
-                                                        name="addresses[0][city]" placeholder="Enter City" />
-                                                </div>
-                                            </div>
-
-                                            <div class="row mb-3">
-                                                <div class="col-lg-4">
-                                                    <x-form-components.input-label for="pincode">
-                                                        {{ __('address.Pincode') }}
-                                                    </x-form-components.input-label>
-                                                </div>
-                                                <div class="col-lg-8">
-                                                    <x-form-components.input-group type="text"
-                                                        name="addresses[0][pincode]" placeholder="Enter Pincode" />
-                                                </div>
-                                            </div>
                                         </div>
-                                        <button type="button" class="btn btn-outline-primary add-address">
-                                            <i class="fas fa-plus"></i> Add Another Address
-                                        </button>
+                                    </div>
+
+                                    <div class="row mb-4 align-items-center">
+                                        <div class="col-lg-4">
+                                            <x-form-components.input-label for="compnayAddressCity" class="custom-class">
+                                                {{ __('address.City') }}
+                                            </x-form-components.input-label>
+
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <x-form-components.input-group type="text" name="address.city_name"
+                                                id="compnayAddressCity" placeholder="{{ __('Enter City') }}"
+                                                value="{{ old('address.city_name', $lead?->address?->city?->name) }}"
+                                                class="custom-class" />
+                                        </div>
+                                    </div>
+                                    <div class="row mb-4 align-items-center">
+                                        <div class="col-lg-4">
+                                            <x-form-components.input-label for="compnayAddressPincode"
+                                                class="custom-class">
+                                                {{ __('address.Pincode') }}
+                                            </x-form-components.input-label>
+
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <x-form-components.input-group type="text" name="address.pincode"
+                                                id="compnayAddressPincode" placeholder="{{ __('Enter Pincode') }}"
+                                                value="{{ old('address.pincode', $lead?->address?->postal_code) }}"
+                                                class="custom-class" />
+
+                                        </div>
                                     </div>
                                     <hr>
-                                    <p class="alert alert-secondary"><i class="fas fa-info-circle me-2 "></i>
-                                        Please add / update <span class="text-success">Additional Details</span> on
-                                        additional details tabs.</p>
+                                    <x-form-components.tab-guidebox :nextTab="'Additional'" />
                                 </div>
 
                                 <!-- Additional Information Tab -->
                                 <div class="tab-pane fade" id="additional" role="tabpanel">
 
-
-                                    <div class="row mb-4">
-                                        <div class="col-lg-4">
-                                            <x-form-components.input-label for="tags">
-                                                {{ __('clients.Tags') }}
-                                            </x-form-components.input-label>
-                                        </div>
-                                        <div class="col-lg-8">
-                                            <select name="tags[]" id="tags" class="form-select" multiple>
-                                                @if ($client->tags && is_array($client->tags))
-                                                    @foreach ($client->tags as $tag)
-                                                        <option value="{{ $tag }}"
-                                                            {{ in_array($tag, old('tags', $client->tags ?? [])) ? 'selected' : '' }}>
-                                                            {{ $tag }}
-                                                        </option>
-                                                    @endforeach
-                                                @endif
-                                            </select>
-                                        </div>
-
-
-                                    </div>
-
                                     <div class="row mb-4">
                                         <div class="col-lg-4">
                                             <x-form-components.input-label for="details">
-                                                {{ __('clients.Additional Details') }}
+                                                {{ __('leads.Additional Details') }}
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <textarea name="details" id="details" class="form-control wysiwyg-editor" rows="5">{{ old('details', $client->details) }}</textarea>
+                                            <textarea name="details" id="details" class="form-control wysiwyg-editor" rows="5">{{ old('details') }}</textarea>
                                         </div>
                                     </div>
-
+                                    @if (isset($customFields) && $customFields->isNotEmpty())
+                                        <hr>
+                                        <x-form-components.tab-guidebox :nextTab="'Custom Fields'" />
+                                    @endif
                                 </div>
 
                                 <!-- Custom Fields Tab -->
                                 @if (isset($customFields) && $customFields->isNotEmpty())
-                                    <x-form-components.custom-fields-edit :customFields="$customFields" :cfOldValues="$cfOldValues" />
+                                    <x-form-components.custom-fields-create :customFields="$customFields" :cfOldValues="$cfOldValues" />
                                 @endif
                             </div>
                         </div>
@@ -450,6 +489,8 @@
 
 
 
+
+
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize Select2 for searchable dropdowns
             $('.searchSelectBox').select2({
@@ -457,29 +498,7 @@
                 placeholder: 'Select an option'
             });
 
-            // Initialize tags with old values
-            $('#tags').select2({
-                tags: true,
-                tokenSeparators: [',', ' '],
-                placeholder: 'Enter tags'
-            });
 
-            // Set old tags if they exist
-            if (@json($client->tags)) {
-                const oldTags = @json($client->tags);
-                $('#tags').val(oldTags).trigger('change');
-            }
-
-            // Initialize social media with old values
-            if (@json($client->social_media)) {
-                const oldSocialMedia = @json($client->social_media);
-                Object.keys(oldSocialMedia).forEach(platform => {
-                    const input = document.querySelector(`input[name="social_media[${platform}]"]`);
-                    if (input) {
-                        input.value = oldSocialMedia[platform];
-                    }
-                });
-            }
 
             const currentTheme = document.documentElement.getAttribute('data-bs-theme');
             // Initialize WYSIWYG editor
@@ -493,7 +512,7 @@
                     content_css: currentTheme === 'dark' ? 'dark' : 'default',
                     setup: function(editor) {
                         editor.on('init', function() {
-                            editor.setContent(`{!! $client->details !!}`);
+                            editor.setContent(`{!! $lead->details !!}`);
                         });
                     },
                     menubar: false,
@@ -531,241 +550,12 @@
                         'wordcount'
                     ],
                     toolbar: 'undo redo | formatselect | bold italic backcolor | \
-                                      alignleft aligncenter alignright alignjustify | \
-                                      bullist numlist outdent indent | removeformat | help | \
-                                      link image media preview codesample table'
+                                                                                                      alignleft aligncenter alignright alignjustify | \
+                                                                                                      bullist numlist outdent indent | removeformat | help | \
+                                                                                                      link image media preview codesample table'
                 });
             }
 
-            // Handle dynamic email fields
-            document.querySelector('.add-email').addEventListener('click', function() {
-                const container = document.getElementById('emailContainer');
-                const newGroup = document.createElement('div');
-                newGroup.className = 'input-group mb-2';
-                newGroup.innerHTML = `
-                    <input type="email" name="email[]" class="form-control" placeholder="Email Address">
-                    <button type="button" class="btn btn-outline-danger remove-field">
-                        <i class="fas fa-minus"></i>
-                    </button>
-                `;
-                container.appendChild(newGroup);
-                attachValidationListeners(newGroup.querySelector('input'));
-            });
-
-            // Handle dynamic phone fields
-            document.querySelector('.add-phone').addEventListener('click', function() {
-                const container = document.getElementById('phoneContainer');
-                const newGroup = document.createElement('div');
-                newGroup.className = 'input-group mb-2';
-                newGroup.innerHTML = `
-                    <input type="tel" name="phone[]" class="form-control" placeholder="Phone Number">
-                    <button type="button" class="btn btn-outline-danger remove-field">
-                        <i class="fas fa-minus"></i>
-                    </button>
-                `;
-                container.appendChild(newGroup);
-                attachValidationListeners(newGroup.querySelector('input'));
-            });
-
-
-            // Handle old email values
-            if (@json($client->email)) {
-                const oldEmails = @json($client->email);
-                oldEmails.forEach((email, index) => {
-                    if (index === 0) {
-                        // Set the value for the first input field
-                        const firstEmailField = document.querySelector('input[name="email[]"]');
-                        if (firstEmailField) {
-                            firstEmailField.value = email;
-                        }
-                    } else {
-                        // Create additional input fields for other emails
-                        const container = document.getElementById('emailContainer');
-                        const newGroup = document.createElement('div');
-                        newGroup.className = 'input-group mb-2';
-                        newGroup.innerHTML = `
-                <input type="email" name="email[]" class="form-control" value="${email}" placeholder="Email Address">
-                <button type="button" class="btn btn-outline-danger remove-field">
-                    <i class="fas fa-minus"></i>
-                </button>
-            `;
-                        container.appendChild(newGroup);
-                        attachValidationListeners(newGroup.querySelector('input'));
-                    }
-                });
-            }
-
-
-            // Handle old phone values
-
-            if (@json($client->phone)) {
-                const oldPhones = @json($client->phone);
-                oldPhones.forEach((phone, index) => {
-                    if (index === 0) {
-                        const firstPhoneField = document.querySelector('input[name="phone[]"]');
-                        if (firstPhoneField) {
-                            firstPhoneField.value = phone;
-                        }
-                    } else {
-                        const container = document.getElementById('phoneContainer');
-                        const newGroup = document.createElement('div');
-                        newGroup.className = 'input-group mb-2';
-                        newGroup.innerHTML = `
-                <input type="tel" name="phone[]" class="form-control" value="${phone}" placeholder="Phone Number">
-                <button type="button" class="btn btn-outline-danger remove-field">
-                    <i class="fas fa-minus"></i>
-                </button>
-            `;
-                        container.appendChild(newGroup);
-                        attachValidationListeners(newGroup.querySelector('input'));
-                    }
-                });
-            }
-
-
-            // Handle dynamic address blocks
-            let addressCount = 1;
-            document.querySelector('.add-address').addEventListener('click', function() {
-                const container = document.getElementById('addressContainer');
-                const newAddress = createAddressBlock(addressCount);
-                container.insertBefore(newAddress, this);
-
-                // Initialize Select2 for new address fields
-                $(newAddress).find('.searchSelectBox').select2({
-                    width: '100%',
-                    placeholder: 'Select an option'
-                });
-
-                // Attach validation listeners to new fields
-                newAddress.querySelectorAll('input, select, textarea').forEach(field => {
-                    attachValidationListeners(field);
-                });
-
-                addressCount++;
-            });
-
-            // Function to create address block
-            function createAddressBlock(index) {
-                const newAddress = document.createElement('div');
-                newAddress.className = 'address-block mb-4 p-3 border rounded';
-                newAddress.innerHTML = `
-                    <button type="button" class="btn btn-outline-danger btn-sm remove-block">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <div class="row mb-3">
-                        <div class="col-lg-4">
-                            <x-form-components.input-label>
-                                {{ __('clients.Address Type') }}
-                            </x-form-components.input-label>
-                        </div>
-                        <div class="col-lg-8">
-                            <select name="addresses[${index}][type]" class="form-select" required>
-                                <option value="">Select Type</option>
-                                <option value="home">Home</option>
-                                <option value="billing">Billing</option>
-                                <option value="shipping">Shipping</option>
-                                <option value="custom">Custom</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-lg-4">
-                            <x-form-components.input-label>
-                                {{ __('address.Street Address') }}
-                            </x-form-components.input-label>
-                        </div>
-                        <div class="col-lg-8">
-                            <textarea name="addresses[${index}][street_address]" class="form-control" rows="3" placeholder="Enter Street Address" required></textarea>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-lg-4">
-                            <x-form-components.input-label>
-                                {{ __('address.Country') }}
-                            </x-form-components.input-label>
-                        </div>
-                        <div class="col-lg-8">
-                            <select name="addresses[${index}][country_id]" class="form-select searchSelectBox" required>
-                                <option value="">Select Country</option>
-                                @foreach ($countries as $country)
-                                    <option value="{{ $country->id }}">{{ $country->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-lg-4">
-                            <x-form-components.input-label>
-                                {{ __('address.City') }}
-                            </x-form-components.input-label>
-                        </div>
-                        <div class="col-lg-8">
-                            <input type="text" name="addresses[${index}][city]" class="form-control" placeholder="Enter City" required>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-lg-4">
-                            <x-form-components.input-label>
-                                {{ __('address.Pincode') }}
-                            </x-form-components.input-label>
-                        </div>
-                        <div class="col-lg-8">
-                            <input type="text" name="addresses[${index}][pincode]" class="form-control" placeholder="Enter Pincode" required>
-                        </div>
-                    </div>
-                `;
-                return newAddress;
-            }
-
-            // Handle old addresses
-            if (@json($client->addresses)) {
-                const clientAddresses = @json($client->addresses);
-                clientAddresses.forEach((address, index) => {
-                    if (index === 0) {
-                        // Fill the first address block
-                        fillAddressBlock(document.querySelector('.address-block'), address, index);
-                    } else {
-                        // Create new address blocks for additional addresses
-                        const container = document.getElementById('addressContainer');
-                        const newAddress = createAddressBlock(index);
-                        container.insertBefore(newAddress, container.querySelector('.add-address'));
-                        fillAddressBlock(newAddress, address, index);
-
-                        // Initialize Select2 for the new address block
-                        $(newAddress).find('.searchSelectBox').select2({
-                            width: '100%',
-                            placeholder: 'Select an option'
-                        });
-                    }
-                });
-            }
-
-
-            // Function to fill an address block with client address data
-            function fillAddressBlock(block, address, index) {
-                block.querySelector(`select[name="addresses[${index}][type]"]`).value = address.pivot.type;
-                block.querySelector(`textarea[name="addresses[${index}][street_address]"]`).value = address
-                    .street_address;
-                block.querySelector(`select[name="addresses[${index}][country_id]"]`).value = address.country_id;
-                block.querySelector(`input[name="addresses[${index}][city]"]`).value = address
-                    .city_id; // Use city ID if applicable
-                block.querySelector(`input[name="addresses[${index}][pincode]"]`).value = address.postal_code;
-            }
-
-
-            // Handle removal of dynamic fields
-            document.addEventListener('click', function(e) {
-                if (e.target.classList.contains('remove-field') || e.target.closest('.remove-field')) {
-                    const button = e.target.classList.contains('remove-field') ? e.target : e.target
-                        .closest('.remove-field');
-                    button.closest('.input-group').remove();
-                }
-                if (e.target.classList.contains('remove-block') || e.target.closest('.remove-block')) {
-                    const button = e.target.classList.contains('remove-block') ? e.target : e.target
-                        .closest('.remove-block');
-                    button.closest('.address-block').remove();
-                }
-            });
 
             // Real-time validation function
             function validateField(field) {
@@ -817,7 +607,7 @@
             }
 
             // Initialize validation for all form fields
-            const form = document.getElementById('clientForm');
+            const form = document.getElementById('leadForm');
             form.querySelectorAll('input, select, textarea').forEach(field => {
                 attachValidationListeners(field);
             });

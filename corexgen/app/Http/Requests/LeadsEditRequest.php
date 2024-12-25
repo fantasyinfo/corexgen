@@ -3,15 +3,16 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class LeadsRequest extends FormRequest
+class LeadsEditRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        if (hasPermission('LEADS.CREATE')) {
+        if (hasPermission('LEADS.UPDATE')) {
             return true;
         }
         return false; // Allow all authenticated users to proceed
@@ -25,14 +26,23 @@ class LeadsRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'id' => 'required|exists:leads,id',
             'type' => 'required|in:Individual,Company',
             'company_name' => 'nullable|string|max:255',
             'title' => 'required|string|max:255',
             'value' => 'nullable|numeric|min:0|max:999999999999.99',
             'first_name' => 'nullable|string|max:255',
             'last_name' => 'nullable|string|max:255',
-            'email' => 'nullable|email|unique:leads,email',
-            'phone' => 'nullable|digits_between:7,15|unique:leads,phone',
+            'email' => [
+                'nullable',
+                'email',
+                Rule::unique('leads', 'email')->ignore($this->id), // Use $this->id to get the input value
+            ],
+            'phone' => [
+                'nullable',
+                'digits_between:7,15',
+                Rule::unique('leads', 'phone')->ignore($this->id), // Use $this->id to get the input value
+            ],
             'details' => 'nullable|string',
             'last_contacted_date' => 'nullable|date',
             'last_activity_date' => 'nullable|date',

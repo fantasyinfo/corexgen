@@ -7,6 +7,7 @@ use App\Helpers\PermissionsHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ClientRequest;
 use App\Http\Requests\ClientsEditRequest;
+use App\Http\Requests\LeadsEditRequest;
 use App\Http\Requests\LeadsRequest;
 use App\Models\Country;
 use App\Models\CRM\CRMClients;
@@ -138,7 +139,7 @@ class LeadsController extends Controller
     public function store(LeadsRequest $request)
     {
 
- 
+
 
         try {
 
@@ -202,19 +203,11 @@ class LeadsController extends Controller
         ]);
     }
 
-
-
-
-
-
-
-
-
-    public function update(ClientsEditRequest $request)
+    public function update(LeadsEditRequest $request)
     {
         $this->tenantRoute = $this->getTenantRoute();
 
-        // dd($request->all());
+       
 
         try {
 
@@ -227,12 +220,12 @@ class LeadsController extends Controller
 
 
 
-            $client = $this->leadsService->updateClient($request->validated());
+            $lead = $this->leadsService->updateLead($request->validated());
 
 
             // insert custom fields values to db
             if ($request->has('custom_fields') && !empty($validatedData) && count($validatedData) > 0 && !is_null(Auth::user()->company_id)) {
-                $this->customFieldService->saveValues($client['client'], $validatedData);
+                $this->customFieldService->saveValues($lead['lead'], $validatedData);
             }
 
 
@@ -248,23 +241,28 @@ class LeadsController extends Controller
 
             return redirect()
                 ->back()
-                ->with('error', 'An error occurred while updating the client. ' . $e->getMessage());
+                ->with('error', 'An error occurred while updating the lead. ' . $e->getMessage());
         }
 
     }
     public function edit($id)
     {
-        $query = CRMClients::query()->with([
-            'addresses' => function ($query) {
-                $query->select('addresses.id', 'addresses.street_address', 'addresses.postal_code', 'addresses.city_id', 'addresses.country_id')
-                    ->withPivot('type');
-            },
-            'customFields'
+        $query = CRMLeads::query()->with([
+            'address' => fn($q) => $q
+                ->select(['id', 'street_address', 'postal_code', 'city_id', 'country_id'])
+                ->with([
+                    'city:id,name',
+                    'country:id,name'
+                ]),
+            'customFields',
+            'assignees' => fn($q) => $q
+            ->select(['users.id', 'users.name'])
+            ->withOnly([])
         ])->where('id', $id);
 
         $query = $this->applyTenantFilter($query, 'leads');
 
-        $client = $query->firstOrFail();
+        $lead = $query->firstOrFail();
 
 
         // countries
@@ -279,7 +277,7 @@ class LeadsController extends Controller
 
             // fetch already existing values
 
-            $cfOldValues = $this->customFieldService->getValuesForEntity($client);
+            $cfOldValues = $this->customFieldService->getValuesForEntity($lead);
         }
 
 
@@ -287,13 +285,14 @@ class LeadsController extends Controller
         return view($this->getViewFilePath('edit'), [
 
             'title' => 'Edit Lead',
-            'client' => $client,
+            'lead' => $lead,
             'countries' => $countries,
             'module' => PANEL_MODULES[$this->getPanelModule()]['leads'],
             'leadsGroups' => $this->leadsService->getLeadsGroups(),
             'leadsSources' => $this->leadsService->getLeadsSources(),
             'leadsStatus' => $this->leadsService->getLeadsStatus(),
             'customFields' => $customFields,
+            'teamMates' => getTeamMates(),
             'cfOldValues' => $cfOldValues
         ]);
     }
@@ -303,14 +302,14 @@ class LeadsController extends Controller
     {
         try {
             // Delete the user
-            $client = CRMClients::find($id);
-            if ($client) {
+            $lead = CRMLeads::find($id);
+            if ($lead) {
 
                 // delete its custom fields also if any
-                $this->customFieldService->deleteEntityValues($client);
+                $this->customFieldService->deleteEntityValues($lead);
 
                 // delete  now
-                $client->delete();
+                $lead->delete();
 
                 // update the subscription usage
                 $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['LEADS']]), '-', '1');
@@ -624,28 +623,6 @@ class LeadsController extends Controller
     }
 
 
-    /**
-     * Parse social media links into key-value JSON
-     */
-    private function parseSocialMedia($links)
-    {
-        $result = [];
-        if (empty($links))
-            return $result; // Return empty array if no links provided
-        $pairs = explode(';', $links);
-
-        foreach ($pairs as $pair) {
-            $keyValue = explode("':", $pair);
-            if (count($keyValue) === 2) {
-                $key = trim($keyValue[0], " '");
-                $value = trim($keyValue[1]);
-                $result[$key] = $value;
-            }
-        }
-
-        return $result;
-    }
-
 
 
     public function bulkDelete(Request $request)
@@ -659,9 +636,10 @@ class LeadsController extends Controller
                     $this->customFieldService->bulkDeleteEntityValues(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['crmleads'], $ids);
 
                     // Then delete the leads
-                    CRMClients::whereIn('id', $ids)->delete();
+                    CRMLeads::whereIn('id', $ids)->delete();
 
                     $this->updateUsage(
+                        strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['LEADS']]),
                         '-',
                         count($ids)
                     );
@@ -697,7 +675,7 @@ class LeadsController extends Controller
     public function changeStatus($id, $status)
     {
         try {
-            CRMClients::query()->where('id', '=', $id)->update(['status' => $status]);
+            CRMLeads::query()->where('id', '=', $id)->update(['status' => $status]);
             // Return success response
             return redirect()->back()->with('success', 'Leads status changed successfully.');
         } catch (\Exception $e) {
