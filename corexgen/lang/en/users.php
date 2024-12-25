@@ -19,7 +19,11 @@ return [
     'General' =>'General',
     'Contact' => 'Contact',
     'Address' => 'Address',
-    'Profile Details' => 'Profile Details'
+    'Profile Details' => 'Profile Details',
+    'Change Password' => 'Change Password',
+    'Old Password' => 'Old Password',
+    'New Password' => 'New Password',
+    'Confirm Password' => 'Confirm Password',
 
 
 

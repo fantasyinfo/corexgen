@@ -47,7 +47,9 @@
                 <div class="dropdown mx-2">
                     <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle"
                         id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        {{ ucwords(auth()->user()->name) }}
+
+                        <x-form-components.profile-avatar :hw="40" :url="asset('storage/' . (auth()->user()->profile_photo_path ?? 'avatars/default.webp'))" />
+
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
                         <li>
@@ -59,7 +61,7 @@
                         </li>
                         <li><a class="dropdown-item" href="{{ route(getPanelRoutes('users.profile')) }}">
                                 <i class="fas fa-user me-2"></i> {{ __('general.Profile') }}</a></li>
-                        <li><a class="dropdown-item" href="#">
+                        <li><a class="dropdown-item" href="{{ route(getPanelRoutes('settings.general')) }}">
                                 <i class="fas fa-cog me-2"></i> {{ __('general.Settings') }}</a></li>
                         <li>
                             <hr class="dropdown-divider">
