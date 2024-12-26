@@ -12,22 +12,29 @@
 }
 
 .kanban-column {
-    min-width: 300px;
-    background: var(--card-bg);
+    min-width: 350px;
+    /* background: rgba(0, 0, 0, 0.1 ); */
     border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); */
     transition: all 0.3s ease;
-    border: 1px solid var(--border-color);
     min-height: 550px;
     max-height: 700px;
     height: 100%;
     overflow-y: scroll;
+    border-width: 1px;
+    border-style: solid;
+    border-image: initial;
+    border-color:  var(--task-columns-cards-border);
 }
 
 .kanban-column:hover {
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+    /* box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15); */
 }
-
+.drop-indicator {
+    height: 2px;
+    background-color: #2196F3;
+    margin: 8px 0;
+}
 .column-header {
     padding: 1rem;
 
@@ -63,8 +70,12 @@
     border-radius: 8px;
     padding: 1rem;
     margin-bottom: 1rem;
-    border-left: 4px solid var(--primary-color);
-    border-bottom: 1px solid var(--primary-color);
+    /* border-left: 4px solid var(--primary-color); */
+    border-width: 1px;
+    border-style: solid;
+    border-image: initial;
+    /* border-color:  #30363d; */
+    border-color:  var(--task-columns-cards-border);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     cursor: grab;
     transition: all 0.2s ease;
