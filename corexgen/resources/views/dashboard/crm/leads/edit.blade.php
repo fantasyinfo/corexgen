@@ -380,8 +380,7 @@
                                                 <select
                                                     class="form-control searchSelectBox  @error('address.country_id') is-invalid @enderror"
                                                     name="address.country_id" id="country_id">
-                                                    <option value="0" selected> ----- Select Country ----------
-                                                    </option>
+                                               
                                                     @if ($countries)
                                                         @foreach ($countries as $country)
                                                             <option value="{{ $country->id }}"

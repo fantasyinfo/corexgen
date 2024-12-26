@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\CategoryGroupTag;
 use App\Models\LeadUser;
 use App\Services\LeadsService;
 use Illuminate\Database\Seeder;
@@ -27,9 +28,14 @@ class LeadsSeeder extends Seeder
         $companyId = 14;    // Default company ID
 
         // Fetch all IDs for groups, sources, statuses, and users
-        $groupIds = $this->leadsService->getLeadsGroups()->pluck('id')->toArray();
-        $sourceIds = $this->leadsService->getLeadsSources()->pluck('id')->toArray();
-        $statusIds = $this->leadsService->getLeadsStatus()->pluck('id')->toArray();
+        $groupIds = CategoryGroupTag::where('type', CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_groups'])->where('relation_type', CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads'])->where('status', 'active')->where('company_id', $companyId)->pluck('id')->toArray();
+
+
+        $sourceIds = CategoryGroupTag::where('type', CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_sources'])->where('relation_type', CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads'])->where('status', 'active')->where('company_id', $companyId)->pluck('id')->toArray();
+
+        $statusIds = CategoryGroupTag::where('type', CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_status'])->where('relation_type', CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads'])->where('status', 'active')->where('company_id', $companyId)->pluck('id')->toArray();
+
+
         $userIds = DB::table('users')->where('company_id', $companyId)->pluck('id')->toArray(); // Fetch user IDs
 
         for ($i = 0; $i <= 100; $i++) {

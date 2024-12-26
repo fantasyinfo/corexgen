@@ -25,6 +25,7 @@ class LeadsEditRequest extends FormRequest
      */
     public function rules(): array
     {
+    
         return [
             'id' => 'required|exists:leads,id',
             'type' => 'required|in:Individual,Company',

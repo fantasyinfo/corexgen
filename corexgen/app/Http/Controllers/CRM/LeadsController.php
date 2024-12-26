@@ -137,46 +137,6 @@ class LeadsController extends Controller
         ]);
     }
 
-    public function kanban(Request $request)
-    {
-        $this->tenantRoute = $this->getTenantRoute();
-
-        $customFields = collect();
-        if (!is_null(Auth::user()->company_id)) {
-            $customFields = $this->customFieldService->getFieldsForEntity(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['crmleads'], Auth::user()->company_id);
-        }
-
-
-        return view($this->getViewFilePath('kanban'), [
-            'filters' => $request->all(),
-            'title' => 'Leads Management',
-            'permissions' => PermissionsHelper::getPermissionsArray('LEADS'),
-            'module' => PANEL_MODULES[$this->getPanelModule()]['leads'],
-            'type' => 'Leads',
-            'stages' => $this->leadsService->getKanbanBoardStages($request->all()),
-            'leadsGroups' => $this->leadsService->getLeadsGroups(),
-            'leadsSources' => $this->leadsService->getLeadsSources(),
-            'leadsStatus' => $this->leadsService->getLeadsStatus(),
-            'customFields' => $customFields,
-            'teamMates' => getTeamMates(),
-            'countries' => Country::all(),
-        ]);
-    }
-
-    public function kanbanLoad(Request $request)
-    {
-        $this->tenantRoute = $this->getTenantRoute();
-
-        $data = collect();
-        $data = $this->leadsService->getKanbanLoad($request->all());
-        return response()->json($data);
-    }
-
-
-
-
-
-
 
 
     public function store(LeadsRequest $request)
@@ -270,6 +230,13 @@ class LeadsController extends Controller
             }
 
 
+            // kanban board return....
+            if ($request->has('from_kanban') && $request->input('from_kanban')) {
+                return redirect()
+                    ->back()
+                    ->with('success', 'Lead updated successfully..');
+            }
+
             // If validation fails, it will throw an exception
             return redirect()
                 ->route($this->tenantRoute . 'leads.index')
@@ -323,57 +290,6 @@ class LeadsController extends Controller
 
 
         return view($this->getViewFilePath('edit'), [
-
-            'title' => 'Edit Lead',
-            'lead' => $lead,
-            'countries' => $countries,
-            'module' => PANEL_MODULES[$this->getPanelModule()]['leads'],
-            'leadsGroups' => $this->leadsService->getLeadsGroups(),
-            'leadsSources' => $this->leadsService->getLeadsSources(),
-            'leadsStatus' => $this->leadsService->getLeadsStatus(),
-            'customFields' => $customFields,
-            'teamMates' => getTeamMates(),
-            'cfOldValues' => $cfOldValues
-        ]);
-    }
-    public function kanbanEdit($id)
-    {
-        $query = CRMLeads::query()->with([
-            'address' => fn($q) => $q
-                ->select(['id', 'street_address', 'postal_code', 'city_id', 'country_id'])
-                ->with([
-                    'city:id,name',
-                    'country:id,name'
-                ]),
-            'customFields',
-            'assignees' => fn($q) => $q
-                ->select(['users.id', 'users.name'])
-                ->withOnly([])
-        ])->where('id', $id);
-
-        $query = $this->applyTenantFilter($query, 'leads');
-
-        $lead = $query->firstOrFail();
-
-
-        // countries
-        $countries = Country::all();
-
-
-        // custom fields
-        $customFields = collect();
-        $cfOldValues = collect();
-        if (!is_null(Auth::user()->company_id)) {
-            $customFields = $this->customFieldService->getFieldsForEntity(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['crmleads'], Auth::user()->company_id);
-
-            // fetch already existing values
-
-            $cfOldValues = $this->customFieldService->getValuesForEntity($lead);
-        }
-
-
-
-        return response()->json([
 
             'title' => 'Edit Lead',
             'lead' => $lead,
@@ -773,6 +689,8 @@ class LeadsController extends Controller
         }
     }
 
+
+    // kanban board stuff
     public function changeStage($leadid, $stageid)
     {
         try {
@@ -791,5 +709,78 @@ class LeadsController extends Controller
             ], 500); // Use HTTP status 500 for errors
         }
     }
+
+
+    public function kanban(Request $request)
+    {
+        $this->tenantRoute = $this->getTenantRoute();
+
+        $customFields = collect();
+        if (!is_null(Auth::user()->company_id)) {
+            $customFields = $this->customFieldService->getFieldsForEntity(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['crmleads'], Auth::user()->company_id);
+        }
+
+
+        return view($this->getViewFilePath('kanban'), [
+            'filters' => $request->all(),
+            'title' => 'Leads Management',
+            'permissions' => PermissionsHelper::getPermissionsArray('LEADS'),
+            'module' => PANEL_MODULES[$this->getPanelModule()]['leads'],
+            'type' => 'Leads',
+            'stages' => $this->leadsService->getKanbanBoardStages($request->all()),
+            'leadsGroups' => $this->leadsService->getLeadsGroups(),
+            'leadsSources' => $this->leadsService->getLeadsSources(),
+            'leadsStatus' => $this->leadsService->getLeadsStatus(),
+            'customFields' => $customFields,
+            'teamMates' => getTeamMates(),
+            'countries' => Country::all(),
+        ]);
+    }
+
+    public function kanbanLoad(Request $request)
+    {
+        $this->tenantRoute = $this->getTenantRoute();
+
+        $data = collect();
+        $data = $this->leadsService->getKanbanLoad($request->all());
+        return response()->json($data);
+    }
+
+    public function kanbanEdit($id)
+    {
+        $query = CRMLeads::query()->with([
+            'address' => fn($q) => $q
+                ->select(['id', 'street_address', 'postal_code', 'city_id', 'country_id'])
+                ->with([
+                    'city:id,name',
+                    'country:id,name'
+                ]),
+            'customFields',
+            'assignees' => fn($q) => $q
+                ->select(['users.id', 'users.name'])
+                ->withOnly([])
+        ])->where('id', $id);
+
+        $query = $this->applyTenantFilter($query, 'leads');
+
+        $lead = $query->firstOrFail();
+
+        // custom fields
+
+        $cfOldValues = collect();
+        if (!is_null(Auth::user()->company_id)) {
+
+            // fetch already existing values
+            $cfOldValues = $this->customFieldService->getValuesForEntity($lead);
+        }
+
+
+        return response()->json([
+            'lead' => $lead,
+            'module' => PANEL_MODULES[$this->getPanelModule()]['leads'],
+            'cfOldValues' => $cfOldValues
+        ]);
+    }
+
 
 }

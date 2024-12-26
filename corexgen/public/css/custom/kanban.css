@@ -6,9 +6,9 @@
 
 .kanban-board {
     display: flex;
-    gap: 1.5rem;
+    gap: .5rem;
     overflow-x: auto;
-    padding: 1rem;
+    /* padding: 1rem; */
 }
 
 .kanban-column {
@@ -18,9 +18,7 @@
     /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); */
     transition: all 0.3s ease;
     min-height: 550px;
-    max-height: 700px;
-    height: 100%;
-    overflow-y: scroll;
+  
     border-width: 1px;
     border-style: solid;
     border-image: initial;
@@ -63,6 +61,9 @@
 .kanban-tasks {
     padding: 1rem;
     min-height: 200px;
+    max-height: 700px;
+    height: 100%;
+    overflow-y: scroll;
 }
 
 .task-card {

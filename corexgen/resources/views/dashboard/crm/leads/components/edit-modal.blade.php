@@ -9,13 +9,15 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-0">
-                <form id="leadEditForm" method="POST">
+                <form id="leadEditForm" method="POST" action="{{ route(getPanelRoutes('leads.update')) }}">
+                    @csrf
+                    @method('PUT')
                     <input type="hidden" name="id" />
-
+                    <input type="hidden" name="from_kanban" value="true" />
                     <!-- Navigation Pills -->
                     <div class="row g-0">
                         <div class="col-md-3 border-end">
-                            <div class="nav flex-column nav-pills p-3" id="v-pills-tab" role="tablist">
+                            <div class="nav flex-column nav-pills p-3 text-left" id="v-pills-tab" role="tablist">
                                 <button type="button" class="nav-link active mb-2" data-bs-toggle="pill"
                                     data-bs-target="#v-general">
                                     <i class="fas fa-info-circle me-2"></i>General
@@ -37,6 +39,13 @@
                                     <i class="fas fa-plus-circle me-2"></i>Additional
                                 </button>
 
+                                @if (isset($customFields) && $customFields->isNotEmpty())
+                                    <button class="nav-link mb-2" data-bs-toggle="pill" data-bs-target="#custom-fields"
+                                        type="button">
+                                        <i class="fas fa-plus me-2"></i>Custom Fields
+                                    </button>
+                                @endif
+
                             </div>
                         </div>
 
@@ -47,26 +56,40 @@
                                 <!-- General Tab -->
                                 <div class="tab-pane fade show active" id="v-general">
                                     <div class="mb-3">
-                                        <label class="form-label">Type</label>
-                                        <select class="form-select" name="type" id="clientType">
+                                        <x-form-components.input-label for="clientType" required>
+                                            {{ __('leads.Type') }}
+                                        </x-form-components.input-label>
+                                        <select class="form-select" name="type" id="clientType" required>
                                             <option value="Individual">Individual</option>
                                             <option value="Company">Company</option>
                                         </select>
                                     </div>
 
                                     <div class="mb-3" id="company_name_div">
-                                        <label class="form-label">Company Name</label>
-                                        <input type="text" class="form-control" name="company_name">
+                                        <x-form-components.input-label for="companyName" required>
+                                            {{ __('leads.Company Name') }}
+                                        </x-form-components.input-label>
+                                        <x-form-components.input-group type="text" name="company_name"
+                                        id="companyName" placeholder="{{ __('Abc Pvt Ltd') }}"
+                                        value="{{ old('company_name') }}" />
                                     </div>
 
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label">First Name</label>
-                                            <input type="text" class="form-control" name="first_name" required>
+                                            <x-form-components.input-label for="firstName" required>
+                                                {{ __('leads.First Name') }}
+                                            </x-form-components.input-label>
+                                            <x-form-components.input-group type="text" name="first_name" id="firstName"
+                                            placeholder="{{ __('First Name') }}" value="{{ old('first_name') }}"
+                                            required />
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label">Last Name</label>
-                                            <input type="text" class="form-control" name="last_name" required>
+                                            <x-form-components.input-label for="lastName" required>
+                                                {{ __('leads.Last Name') }}
+                                            </x-form-components.input-label>
+                                            <x-form-components.input-group type="text" name="last_name" id="lastName"
+                                            placeholder="{{ __('Last Name') }}" value="{{ old('last_name') }}"
+                                            required />
                                         </div>
                                     </div>
                                 </div>
@@ -74,22 +97,31 @@
                                 <!-- Leads Tab -->
                                 <div class="tab-pane fade" id="v-leads">
                                     <div class="mb-3">
-                                        <label class="form-label">Title</label>
-                                        <input type="text" class="form-control" name="title" required>
+                                        <x-form-components.input-label for="title" required>
+                                            {{ __('leads.Title') }}
+                                        </x-form-components.input-label>
+                                        <x-form-components.input-group type="text" name="title" id="title"
+                                        placeholder="{{ __('New Development Project Lead') }}"
+                                        value="{{ old('title') }}" required />
                                     </div>
 
                                     <div class="mb-3">
-                                        <label class="form-label">Value</label>
+                                        <x-form-components.input-label for="value">
+                                            {{ __('leads.Value') }}
+                                        </x-form-components.input-label>
                                         <div class="input-group">
-                                            <span class="input-group-text">$</span>
-                                            <input type="number" class="form-control" name="value">
-                                            <span class="input-group-text">USD</span>
+                                            <x-form-components.input-group-prepend-append prepend="$" append="USD"
+                                            type="number" name="value" id="value"
+                                            placeholder="{{ __('New Development Project Lead') }}"
+                                            value="{{ old('value') }}" />
                                         </div>
                                     </div>
 
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label">Groups</label>
+                                            <x-form-components.input-label for="group_id">
+                                                {{ __('leads.Groups') }}
+                                            </x-form-components.input-label>
                                             <select class="form-select" name="group_id" id="group_id">
                                                 @foreach ($leadsGroups as $lg)
                                                     <option value="{{ $lg->id }}">
@@ -104,16 +136,19 @@
                                             <select class="form-select" name="source_id" id="source_id">
                                                 @foreach ($leadsSources as $ls)
                                                     <option value="{{ $ls->id }}">
-                                                        <i class="fas fa-dot-circle"></i> {{ $ls->name }}</option>
+                                                        <i class="fas fa-dot-circle"></i> {{ $ls->name }}
+                                                    </option>
                                                 @endforeach
                                             </select>
                                         </div>
-                                      
+
                                     </div>
 
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label">Priority</label>
+                                            <x-form-components.input-label for="priority" required>
+                                                {{ __('leads.Priority') }}
+                                            </x-form-components.input-label>
                                             <select class="form-select" name="priority">
                                                 <option value="Low">Low</option>
                                                 <option value="Medium">Medium</option>
@@ -121,12 +156,14 @@
                                             </select>
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label">Stage</label>
+                                            <x-form-components.input-label for="status_id" required>
+                                                {{ __('leads.Stage') }}
+                                            </x-form-components.input-label>
                                             <select class="form-select" name="status_id" id="status_id" required>
                                                 @foreach ($leadsStatus as $lst)
-                                                    <option value="{{ $lst->id }}" <i class="fas fa-dot-circle">
-                                                        </i> {{ $lst->name }}
-                                                    </option>
+                                                    <option value="{{ $lst->id }}"
+                                                        {{ old('status_id') == $lst->id ? 'selected' : '' }}> <i
+                                                            class="fas fa-dot-circle"></i> {{ $lst->name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -135,93 +172,142 @@
                                     <div class="row">
 
                                         <div class="mb-3">
-                                            <label class="form-label">Assign To</label>
-                                            <div class="col-lg-8">
-                                                <x-form-components.dropdown-with-profile :title="'Select Team Members'" :options="$teamMates"
-                                                    :name="'assign_to'" :multiple="true" />
-                                            </div>
-                                        </div>
-                                    </div>
+                                            <x-form-components.input-label for="assign_to[]">
+                                                {{ __('leads.Assign To') }}
+                                            </x-form-components.input-label>
+                                           
 
-                                </div>
-                                    <!-- Contact Tab -->
-                                    <div class="tab-pane fade" id="v-contact">
-                                        <div class="mb-3">
-                                            <label class="form-label">Email</label>
-                                            <input type="email" class="form-control" name="email" required>
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label class="form-label">Phone</label>
-                                            <input type="tel" class="form-control" name="phone" required>
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label class="form-label">Preferred Contact Method</label>
-                                            <select class="form-select" name="preferred_contact_method">
-                                                <option value="Email">Email</option>
-                                                <option value="Phone">Phone</option>
-                                                <option value="In-Person">In-Person</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <!-- Address Tab -->
-                                    <div class="tab-pane fade" id="v-address">
-                                        <div class="mb-3">
-                                            <label class="form-label">Street Address</label>
-                                            <textarea class="form-control" name="address[street_address]" rows="3"></textarea>
-                                        </div>
-
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label">Country</label>
-                                                <select class="form-control searchSelectBox "
-                                                    name="address.country_id" id="country_id">
-                                                    <option value="0" selected> ----- Select Country ----------
-                                                    </option>
-                                                    @if ($countries)
-                                                        @foreach ($countries as $country)
-                                                            <option value="{{ $country->id }}">
-                                                                {{ $country->name }}
+                                                <select class="form-control  searchSelectBoxKanban" multiple
+                                                    name="assign_to[]" id="assign_to">
+                                                    @if ($teamMates)
+                                                        @foreach ($teamMates as $tm)
+                                                            <option value="{{ $tm->id }}">
+                                                                {{ $tm->name }}
                                                             </option>
                                                         @endforeach
                                                     @else
-                                                        <option disabled>No country available</option>
+                                                        <option disabled>No team matest available</option>
                                                     @endif
                                                 </select>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label">City</label>
-                                                <input type="text" class="form-control" name="address[city_name]">
-                                            </div>
-                                        </div>
 
-                                        <div class="mb-3">
-                                            <label class="form-label">Postal Code</label>
-                                            <input type="text" class="form-control" name="address[pincode]">
+                                           
                                         </div>
                                     </div>
 
-                                    <!-- Additional Tab -->
-                                    <div class="tab-pane fade" id="v-additional">
-                                        <div class="mb-3">
-                                            <label class="form-label">Additional Details</label>
-                                            <textarea class="form-control wysiwyg-editor" name="details" rows="5"></textarea>
-                                        </div>
+                                </div>
+                                <!-- Contact Tab -->
+                                <div class="tab-pane fade" id="v-contact">
+                                    <div class="mb-3">
+                                        <x-form-components.input-label for="emails">
+                                            {{ __('leads.Email') }}
+                                        </x-form-components.input-label>
+                                        <x-form-components.input-group type="email" name="email"
+                                                        id="email" placeholder="{{ __('Email Address') }}"
+                                                        value="{{ old('email') }}" />
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <x-form-components.input-label for="phones">
+                                            {{ __('leads.Phone') }}
+                                        </x-form-components.input-label>
+                                        <x-form-components.input-group type="tel" name="phone"
+                                        id="phone" placeholder="{{ __('Phone Number') }}"
+                                        value="{{ old('phone') }}" />
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <x-form-components.input-label for="preferred_contact_method" required>
+                                            {{ __('leads.Prefferd Contact') }}
+                                        </x-form-components.input-label>
+                                        <select class="form-select" name="preferred_contact_method">
+                                            <option value="Email">Email</option>
+                                            <option value="Phone">Phone</option>
+                                            <option value="In-Person">In-Person</option>
+                                        </select>
                                     </div>
                                 </div>
+
+                                <!-- Address Tab -->
+                                <div class="tab-pane fade" id="v-address">
+                                    <x-form-components.input-label for="compnayAddressStreet"
+                                    class="custom-class">
+                                    {{ __('address.Address') }}
+                                </x-form-components.input-label>
+                                <x-form-components.textarea-group name="address.street_address"
+                                id="compnayAddressStreet" placeholder="Enter Registered Street Address"
+                                class="custom-class" value="{{ old('address.street_address') }}" />
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <x-form-components.input-label for="compnayAddressCountry"
+                                                class="custom-class">
+                                                {{ __('address.Country') }}
+                                            </x-form-components.input-label>
+
+                                            <select
+                                            class="form-control searchSelectBox  @error('address.country_id') is-invalid @enderror"
+                                            name="address.country_id" id="country_id">
+                                      
+                                            @if ($countries)
+                                                @foreach ($countries as $country)
+                                                    <option value="{{ $country->id }}"
+                                                        {{ old('address.country_id') == $country->id ? 'selected' : '' }}>
+                                                        {{ $country->name }}
+                                                    </option>
+                                                @endforeach
+                                            @else
+                                                <option disabled>No country available</option>
+                                            @endif
+                                        </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <x-form-components.input-label for="compnayAddressCity" class="custom-class">
+                                                {{ __('address.City') }}
+                                            </x-form-components.input-label>
+                                            <x-form-components.input-group type="text" name="address.city_name"
+                                            id="compnayAddressCity" placeholder="{{ __('Enter City') }}"
+                                            value="{{ old('address.city_name') }}" class="custom-class" />
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <x-form-components.input-label for="compnayAddressPincode"
+                                        class="custom-class">
+                                        {{ __('address.Pincode') }}
+                                    </x-form-components.input-label>
+                                    <x-form-components.input-group type="text" name="address.pincode"
+                                    id="compnayAddressPincode" placeholder="{{ __('Enter Pincode') }}"
+                                    value="{{ old('address.pincode') }}" class="custom-class" />
+                                    </div>
+                                </div>
+
+                                <!-- Additional Tab -->
+                                <div class="tab-pane fade" id="v-additional">
+                                    <div class="mb-3">
+                                        <x-form-components.input-label for="details">
+                                            {{ __('leads.Additional Details') }}
+                                        </x-form-components.input-label>
+                                        <textarea name="details" id="details" class="form-control wysiwyg-editor" rows="5">{{ old('details') }}</textarea>
+                                    </div>
+                                </div>
+
+                                <!-- Custom Fields Tab -->
+                                @if (isset($customFields) && $customFields->isNotEmpty())
+                                    <x-form-components.custom-fields-create :customFields="$customFields" />
+                                @endif
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Footer -->
-                        <div class="modal-footer card-bg">
+                    <!-- Footer -->
+                    <div class="modal-footer card-bg">
 
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-primary">
-                                <i class="fas fa-save me-2"></i>Save Changes
-                            </button>
-                        </div>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Save Changes
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -232,6 +318,7 @@
 
 
 @push('scripts')
+    <script src="{{ asset('js/tinymce/tinymce.min.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const navButtons = document.querySelectorAll('#v-pills-tab button');
@@ -240,6 +327,65 @@
                     event.preventDefault();
                 });
             });
+
+
+            if ($(".searchSelectBoxKanban").length > 0) {
+                $(".searchSelectBoxKanban").select2({
+                    'placeholder': 'Please select an option',
+                    'dropdownParent': $('#editLeadModal')
+                });
+            }
+
+
+
+            tinymce.init({
+                selector: '.wysiwyg-editor',
+                height: 300,
+                base_url: '/js/tinymce',
+                license_key: 'gpl',
+                skin: currentTheme === 'dark' ? 'oxide-dark' : 'oxide',
+                content_css: currentTheme === 'dark' ? 'dark' : 'default',
+                menubar: false,
+                plugins: [
+                    'accordion',
+                    'advlist',
+                    'anchor',
+                    'autolink',
+                    'autoresize',
+                    'autosave',
+                    'charmap',
+                    'code',
+                    'codesample',
+                    'directionality',
+                    'emoticons',
+                    'fullscreen',
+                    'help',
+                    'lists',
+                    'link',
+                    'image',
+
+
+                    'preview',
+                    'anchor',
+                    'searchreplace',
+                    'visualblocks',
+
+
+                    'insertdatetime',
+                    'media',
+                    'table',
+
+
+
+                    'wordcount'
+                ],
+                toolbar: 'undo redo | formatselect | bold italic backcolor | \
+                                                                                                                      alignleft aligncenter alignright alignjustify | \
+                                                                                                                      bullist numlist outdent indent | removeformat | help | \
+                                                                                                                      link image media preview codesample table'
+            });
+
+
         });
     </script>
 @endpush

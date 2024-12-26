@@ -2,7 +2,7 @@
 
 
 @push('style')
-<link rel="stylesheet" type="text/css" href="{{ asset('css/custom/kanban.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/custom/kanban.css') }}">
 @endpush
 
 @section('content')
@@ -25,11 +25,7 @@
                         <div class="kanban-tasks" ondrop="drop(event)" ondragover="dragover(event)">
                             <!-- Tasks will be dynamically added here -->
                         </div>
-                        <div class="p-3">
-                            <button class="add-task-btn" onclick="addTaskToColumn('{{ $st->name }}')">
-                                <i class="fas fa-plus"></i> Add Task
-                            </button>
-                        </div>
+
                     </div>
                 @endforeach
             @endif
@@ -40,12 +36,25 @@
 @endsection
 
 @push('scripts')
-<script src="{{ asset('js/tinymce/tinymce.min.js') }}"></script>
+
     <script>
         // Initialize the board
         $(document).ready(function() {
             loadTasks();
             updateTaskCounts();
+
+            $('#clientType').on('change', function() {
+                var selectedType = $(this).val();
+                if (selectedType === 'Company') {
+                    $('#company_name_div').show();
+                } else {
+                    $('#company_name_div').hide();
+                }
+            });
+
+            // Trigger change event on page load
+            $('#clientType').trigger('change');
+
         });
 
         // Load tasks into columns
@@ -61,14 +70,33 @@
                     // Clear existing tasks
                     $('.kanban-tasks').empty();
 
-                    // Loop through each stage and its leads
                     Object.entries(data).forEach(([stageName, leads]) => {
+                        // console.log(`Processing stage: ${stageName} with ${leads.length} leads.`);
                         leads.forEach(lead => {
+                            // console.log(`Processing lead: ${lead.id} - ${lead.company_name}`);
+
                             const taskElement = createLeadElement(lead);
-                            $(`.kanban-column[data-status="${lead.status_id}"] .kanban-tasks`)
-                                .append(taskElement);
+                            // console.log("Generated taskElement:", taskElement);
+
+                            let column = $(`.kanban-column[data-status="${lead.status_id}"]`);
+                            //                 if (!column.length) {
+                            //                     console.warn(
+                            //                         `Column not found for status_id: ${lead.status_id}. Creating it.`
+                            //                     );
+                            //                     column = $(`
+                        //     <div class="kanban-column" data-status="${lead.status_id}">
+                        //         <h3>Stage ${lead.status_id}</h3>
+                        //         <div class="kanban-tasks"></div>
+                        //     </div>
+                        // `);
+                            //                     $(".kanban-board").append(column);
+                            //                 }
+
+                            // console.log("Appending to column:", column);
+                            column.find(".kanban-tasks").append(taskElement);
                         });
                     });
+
 
                     updateTaskCounts();
                 },
@@ -80,6 +108,7 @@
 
         // Create a new function to generate lead cards
         function createLeadElement(lead) {
+            // console.log(lead)
             return `
         <div class="task-card" draggable="true" ondragstart="drag(event)" id="task-${lead.id}" 
              style="border-left: 1px solid ${lead.stage.color}">
@@ -98,12 +127,12 @@
                 </div>
                 <div class="assignees d-flex gap-1">
                     ${lead.assignees.map(assignee => `
-                                                                                                    <img src="${assignee.profile_photo_url}" 
-                                                                                                         alt="${assignee.name}" 
-                                                                                                         title="${assignee.name}"
-                                                                                                         class="rounded-circle"
-                                                                                                         style="width: 24px; height: 24px;">
-                                                                                                `).join('')}
+                                                                                                                <img src="${assignee.profile_photo_url}" 
+                                                                                                                     alt="${assignee.name}" 
+                                                                                                                     title="${assignee.name}"
+                                                                                                                     class="rounded-circle"
+                                                                                                                     style="width: 24px; height: 24px;">
+                                                                                                            `).join('')}
                 </div>
             </div>
             <div class="task-footer mt-2 d-flex justify-content-between align-items-center">
@@ -216,49 +245,7 @@
                 }
             }
         }
-        // Add new task
-        function addNewTask() {
-            const newTask = {
-                id: Date.now(),
-                title: 'New Task',
-                description: 'Task description',
-                status: 'todo',
-                priority: 'medium',
-                assignee: 'Unassigned',
-                dueDate: '2024-01-30'
-            };
 
-            const taskElement = createTaskElement(newTask);
-            $('.kanban-column[data-status="todo"] .kanban-tasks').prepend(taskElement);
-            updateTaskCounts();
-
-            // In real application, you would make an AJAX call here
-            // $.ajax({
-            //     url: '/api/tasks',
-            //     method: 'POST',
-            //     data: newTask,
-            //     success: function(response) {
-            //         console.log('Task created successfully');
-            //     }
-            // });
-        }
-
-        // Add task to specific column
-        function addTaskToColumn(status) {
-            const newTask = {
-                id: Date.now(),
-                title: 'New Task',
-                description: 'Task description',
-                status: status,
-                priority: 'medium',
-                assignee: 'Unassigned',
-                dueDate: '2024-01-30'
-            };
-
-            const taskElement = createTaskElement(newTask);
-            $(`.kanban-column[data-status="${status}"] .kanban-tasks`).prepend(taskElement);
-            updateTaskCounts();
-        }
 
         // Edit task
         function editTask(taskId) {
@@ -329,9 +316,12 @@
                 form.find('input[name="address[pincode]"]').val(lead.address.postal_code);
             }
 
+
             // Populate TinyMCE editor
             if (tinymce.get('details')) {
+
                 tinymce.get('details').setContent(lead.details || '');
+
             }
 
             // Populate custom fields if they exist
@@ -356,12 +346,61 @@
         }
 
 
+      
+          // Initialize WYSIWYG editor
+          if (typeof tinymce !== 'undefined') {
+                tinymce.init({
+                    selector: '.wysiwyg-editor',
+                    height: 300,
+                    base_url: '/js/tinymce',
+                    license_key: 'gpl',
+                    skin: currentTheme === 'dark' ? 'oxide-dark' : 'oxide',
+                    content_css: currentTheme === 'dark' ? 'dark' : 'default',
+                    setup: function(editor) {
+                        editor.on('init', function() {
+                            editor.setContent(`{!! old('details', '') !!}`);
+                        });
+                    },
+                    menubar: false,
+                    plugins: [
+                        'accordion',
+                        'advlist',
+                        'anchor',
+                        'autolink',
+                        'autoresize',
+                        'autosave',
+                        'charmap',
+                        'code',
+                        'codesample',
+                        'directionality',
+                        'emoticons',
+                        'fullscreen',
+                        'help',
+                        'lists',
+                        'link',
+                        'image',
+
+
+                        'preview',
+                        'anchor',
+                        'searchreplace',
+                        'visualblocks',
+
+
+                        'insertdatetime',
+                        'media',
+                        'table',
 
 
 
-
-
-
+                        'wordcount'
+                    ],
+                    toolbar: 'undo redo | formatselect | bold italic backcolor | \
+                                                                                                  alignleft aligncenter alignright alignjustify | \
+                                                                                                  bullist numlist outdent indent | removeformat | help | \
+                                                                                                  link image media preview codesample table'
+                });
+            }
 
 
         // Delete task
