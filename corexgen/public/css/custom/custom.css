@@ -66,12 +66,12 @@
 }
 
 .nav-pills .nav-link {
-    color: var(--primary-color);
+    color: var(--body-color);
 }
 
 .nav-pills .nav-link.active,
 .nav-pills .nav-link:hover {
-    background: var(--dark-black-001);
+    background: var(--secondary-color);
 }
 
 .tabSideBar {

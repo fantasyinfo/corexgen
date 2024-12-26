@@ -364,6 +364,7 @@ Route::middleware([
 
         Route::get('/kanban', [LeadsController::class, 'kanban'])->name('kanban')->middleware('check.permission:LEADS.KANBAN_BOARD');
 
+        Route::get('/kanbanEdit/{id}', [LeadsController::class, 'kanbanEdit'])->name('kanbanEdit')->middleware('check.permission:LEADS.UPDATE');
 
         Route::get('/kanbanLoad', [LeadsController::class, 'kanbanLoad'])->name('kanbanLoad')->middleware('check.permission:LEADS.KANBAN_BOARD');
 
