@@ -1,6 +1,6 @@
 <!-- Modal -->
 <div class="modal fade" id="editLeadModal" tabindex="-1" aria-labelledby="editLeadModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
         <div class="modal-content">
             <div class="modal-header card-bg border-b-1">
                 <h5 class="modal-title" id="editLeadModalLabel">
@@ -16,7 +16,7 @@
                     <input type="hidden" name="from_kanban" value="true" />
                     <!-- Navigation Pills -->
                     <div class="row g-0">
-                        <div class="col-md-3 border-end">
+                        <div class="col-md-3 kanban-border" >
                             <div class="nav flex-column nav-pills p-3 text-left" id="v-pills-tab" role="tablist">
                                 <button type="button" class="nav-link active mb-2" data-bs-toggle="pill"
                                     data-bs-target="#v-general">
@@ -51,10 +51,15 @@
 
 
                         <!-- Tab Content -->
-                        <div class="col-md-9">
+                        <div class="col-md-9 kanban-border">
                             <div class="tab-content p-4" id="v-pills-tabContent">
                                 <!-- General Tab -->
                                 <div class="tab-pane fade show active" id="v-general">
+
+                                    <x-form-components.modal-tabs-heading :type="'secondary'" :icon="'fa-info-circle'"
+                                        :title="'General'" />
+
+
                                     <div class="mb-3">
                                         <x-form-components.input-label for="clientType" required>
                                             {{ __('leads.Type') }}
@@ -70,8 +75,8 @@
                                             {{ __('leads.Company Name') }}
                                         </x-form-components.input-label>
                                         <x-form-components.input-group type="text" name="company_name"
-                                        id="companyName" placeholder="{{ __('Abc Pvt Ltd') }}"
-                                        value="{{ old('company_name') }}" />
+                                            id="companyName" placeholder="{{ __('Abc Pvt Ltd') }}"
+                                            value="{{ old('company_name') }}" />
                                     </div>
 
                                     <div class="row">
@@ -79,30 +84,33 @@
                                             <x-form-components.input-label for="firstName" required>
                                                 {{ __('leads.First Name') }}
                                             </x-form-components.input-label>
-                                            <x-form-components.input-group type="text" name="first_name" id="firstName"
-                                            placeholder="{{ __('First Name') }}" value="{{ old('first_name') }}"
-                                            required />
+                                            <x-form-components.input-group type="text" name="first_name"
+                                                id="firstName" placeholder="{{ __('First Name') }}"
+                                                value="{{ old('first_name') }}" required />
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <x-form-components.input-label for="lastName" required>
                                                 {{ __('leads.Last Name') }}
                                             </x-form-components.input-label>
-                                            <x-form-components.input-group type="text" name="last_name" id="lastName"
-                                            placeholder="{{ __('Last Name') }}" value="{{ old('last_name') }}"
-                                            required />
+                                            <x-form-components.input-group type="text" name="last_name"
+                                                id="lastName" placeholder="{{ __('Last Name') }}"
+                                                value="{{ old('last_name') }}" required />
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Leads Tab -->
                                 <div class="tab-pane fade" id="v-leads">
+                                    <x-form-components.modal-tabs-heading :type="'secondary'" :icon="'fa-chart-line'"
+                                    :title="'Lead Details'" />
+
                                     <div class="mb-3">
                                         <x-form-components.input-label for="title" required>
                                             {{ __('leads.Title') }}
                                         </x-form-components.input-label>
                                         <x-form-components.input-group type="text" name="title" id="title"
-                                        placeholder="{{ __('New Development Project Lead') }}"
-                                        value="{{ old('title') }}" required />
+                                            placeholder="{{ __('New Development Project Lead') }}"
+                                            value="{{ old('title') }}" required />
                                     </div>
 
                                     <div class="mb-3">
@@ -110,10 +118,10 @@
                                             {{ __('leads.Value') }}
                                         </x-form-components.input-label>
                                         <div class="input-group">
-                                            <x-form-components.input-group-prepend-append prepend="$" append="USD"
-                                            type="number" name="value" id="value"
-                                            placeholder="{{ __('New Development Project Lead') }}"
-                                            value="{{ old('value') }}" />
+                                            <x-form-components.input-group-prepend-append prepend="$"
+                                                append="USD" type="number" name="value" id="value"
+                                                placeholder="{{ __('New Development Project Lead') }}"
+                                                value="{{ old('value') }}" />
                                         </div>
                                     </div>
 
@@ -163,7 +171,8 @@
                                                 @foreach ($leadsStatus as $lst)
                                                     <option value="{{ $lst->id }}"
                                                         {{ old('status_id') == $lst->id ? 'selected' : '' }}> <i
-                                                            class="fas fa-dot-circle"></i> {{ $lst->name }}</option>
+                                                            class="fas fa-dot-circle"></i> {{ $lst->name }}
+                                                    </option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -175,44 +184,44 @@
                                             <x-form-components.input-label for="assign_to[]">
                                                 {{ __('leads.Assign To') }}
                                             </x-form-components.input-label>
-                                           
 
-                                                <select class="form-control  searchSelectBoxKanban" multiple
-                                                    name="assign_to[]" id="assign_to">
-                                                    @if ($teamMates)
-                                                        @foreach ($teamMates as $tm)
-                                                            <option value="{{ $tm->id }}">
-                                                                {{ $tm->name }}
-                                                            </option>
-                                                        @endforeach
-                                                    @else
-                                                        <option disabled>No team matest available</option>
-                                                    @endif
-                                                </select>
 
-                                           
+                                            <select class="form-control  searchSelectBoxKanban" multiple
+                                                name="assign_to[]" id="assign_to">
+                                                @if ($teamMates)
+                                                    @foreach ($teamMates as $tm)
+                                                        <option value="{{ $tm->id }}">
+                                                            {{ $tm->name }}
+                                                        </option>
+                                                    @endforeach
+                                                @else
+                                                    <option disabled>No team matest available</option>
+                                                @endif
+                                            </select>
+
+
                                         </div>
                                     </div>
 
                                 </div>
                                 <!-- Contact Tab -->
                                 <div class="tab-pane fade" id="v-contact">
+                                    <x-form-components.modal-tabs-heading :type="'secondary'" :icon="'fa-address-book'"
+                                    :title="'Contact'" />
                                     <div class="mb-3">
                                         <x-form-components.input-label for="emails">
                                             {{ __('leads.Email') }}
                                         </x-form-components.input-label>
-                                        <x-form-components.input-group type="email" name="email"
-                                                        id="email" placeholder="{{ __('Email Address') }}"
-                                                        value="{{ old('email') }}" />
+                                        <x-form-components.input-group type="email" name="email" id="email"
+                                            placeholder="{{ __('Email Address') }}" value="{{ old('email') }}" />
                                     </div>
 
                                     <div class="mb-3">
                                         <x-form-components.input-label for="phones">
                                             {{ __('leads.Phone') }}
                                         </x-form-components.input-label>
-                                        <x-form-components.input-group type="tel" name="phone"
-                                        id="phone" placeholder="{{ __('Phone Number') }}"
-                                        value="{{ old('phone') }}" />
+                                        <x-form-components.input-group type="tel" name="phone" id="phone"
+                                            placeholder="{{ __('Phone Number') }}" value="{{ old('phone') }}" />
                                     </div>
 
                                     <div class="mb-3">
@@ -229,14 +238,21 @@
 
                                 <!-- Address Tab -->
                                 <div class="tab-pane fade" id="v-address">
-                                    <x-form-components.input-label for="compnayAddressStreet"
-                                    class="custom-class">
-                                    {{ __('address.Address') }}
-                                </x-form-components.input-label>
-                                <x-form-components.textarea-group name="address.street_address"
-                                id="compnayAddressStreet" placeholder="Enter Registered Street Address"
-                                class="custom-class" value="{{ old('address.street_address') }}" />
+                                    <x-form-components.modal-tabs-heading :type="'secondary'" :icon="'fa-info-circle'"
+                                    :title="'Address'" />
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <x-form-components.input-label for="compnayAddressStreet"
+                                                class="custom-class">
+                                                {{ __('address.Address') }}
+                                            </x-form-components.input-label>
+                                            <x-form-components.textarea-group name="address.street_address"
+                                                id="compnayAddressStreet"
+                                                placeholder="Enter Registered Street Address" class="custom-class"
+                                                value="{{ old('address.street_address') }}" />
+                                        </div>
                                     </div>
+
 
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
@@ -246,44 +262,47 @@
                                             </x-form-components.input-label>
 
                                             <select
-                                            class="form-control searchSelectBox  @error('address.country_id') is-invalid @enderror"
-                                            name="address.country_id" id="country_id">
-                                      
-                                            @if ($countries)
-                                                @foreach ($countries as $country)
-                                                    <option value="{{ $country->id }}"
-                                                        {{ old('address.country_id') == $country->id ? 'selected' : '' }}>
-                                                        {{ $country->name }}
-                                                    </option>
-                                                @endforeach
-                                            @else
-                                                <option disabled>No country available</option>
-                                            @endif
-                                        </select>
+                                                class="form-control searchSelectBox  @error('address.country_id') is-invalid @enderror"
+                                                name="address.country_id" id="country_id">
+
+                                                @if ($countries)
+                                                    @foreach ($countries as $country)
+                                                        <option value="{{ $country->id }}"
+                                                            {{ old('address.country_id') == $country->id ? 'selected' : '' }}>
+                                                            {{ $country->name }}
+                                                        </option>
+                                                    @endforeach
+                                                @else
+                                                    <option disabled>No country available</option>
+                                                @endif
+                                            </select>
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <x-form-components.input-label for="compnayAddressCity" class="custom-class">
+                                            <x-form-components.input-label for="compnayAddressCity"
+                                                class="custom-class">
                                                 {{ __('address.City') }}
                                             </x-form-components.input-label>
                                             <x-form-components.input-group type="text" name="address.city_name"
-                                            id="compnayAddressCity" placeholder="{{ __('Enter City') }}"
-                                            value="{{ old('address.city_name') }}" class="custom-class" />
+                                                id="compnayAddressCity" placeholder="{{ __('Enter City') }}"
+                                                value="{{ old('address.city_name') }}" class="custom-class" />
                                         </div>
                                     </div>
 
                                     <div class="mb-3">
                                         <x-form-components.input-label for="compnayAddressPincode"
-                                        class="custom-class">
-                                        {{ __('address.Pincode') }}
-                                    </x-form-components.input-label>
-                                    <x-form-components.input-group type="text" name="address.pincode"
-                                    id="compnayAddressPincode" placeholder="{{ __('Enter Pincode') }}"
-                                    value="{{ old('address.pincode') }}" class="custom-class" />
+                                            class="custom-class">
+                                            {{ __('address.Pincode') }}
+                                        </x-form-components.input-label>
+                                        <x-form-components.input-group type="text" name="address.pincode"
+                                            id="compnayAddressPincode" placeholder="{{ __('Enter Pincode') }}"
+                                            value="{{ old('address.pincode') }}" class="custom-class" />
                                     </div>
                                 </div>
 
                                 <!-- Additional Tab -->
                                 <div class="tab-pane fade" id="v-additional">
+                                    <x-form-components.modal-tabs-heading :type="'secondary'" :icon="'fa-map-marker-alt'"
+                                    :title="'Additional'" />
                                     <div class="mb-3">
                                         <x-form-components.input-label for="details">
                                             {{ __('leads.Additional Details') }}
@@ -294,6 +313,7 @@
 
                                 <!-- Custom Fields Tab -->
                                 @if (isset($customFields) && $customFields->isNotEmpty())
+                            
                                     <x-form-components.custom-fields-create :customFields="$customFields" />
                                 @endif
                             </div>
@@ -380,9 +400,9 @@
                     'wordcount'
                 ],
                 toolbar: 'undo redo | formatselect | bold italic backcolor | \
-                                                                                                                      alignleft aligncenter alignright alignjustify | \
-                                                                                                                      bullist numlist outdent indent | removeformat | help | \
-                                                                                                                      link image media preview codesample table'
+                                                                                                                                  alignleft aligncenter alignright alignjustify | \
+                                                                                                                                  bullist numlist outdent indent | removeformat | help | \
+                                                                                                                                  link image media preview codesample table'
             });
 
 
