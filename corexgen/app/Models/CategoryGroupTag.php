@@ -3,10 +3,11 @@
 namespace App\Models;
 
 use App\Models\CRM\CRMClients;
+use App\Models\CRM\CRMLeads;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Database\Eloquent\Builder;
 class CategoryGroupTag extends Model
 {
     use HasFactory;
@@ -26,15 +27,15 @@ class CategoryGroupTag extends Model
 
     public function leadsGroups()
     {
-        return $this->hasMany(CRMClients::class, 'group_id');
+        return $this->hasMany(CRMLeads::class, 'group_id');
     }
     public function leadsSources()
     {
-        return $this->hasMany(CRMClients::class, 'source_id');
+        return $this->hasMany(CRMLeads::class, 'source_id');
     }
     public function leadsStatus()
     {
-        return $this->hasMany(CRMClients::class, 'status_id');
+        return $this->hasMany(CRMLeads::class, 'status_id');
     }
 
 
@@ -43,6 +44,11 @@ class CategoryGroupTag extends Model
     protected static function boot()
     {
         parent::boot();
+
+            // Add a global scope to filter by status = 'active'
+        static::addGlobalScope('active', function (Builder $builder) {
+                $builder->where('status', 'active');
+            });
 
         static::creating(function ($cgt) {
             // Set default values

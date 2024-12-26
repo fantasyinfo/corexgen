@@ -34,4 +34,6 @@ return [
     'Import Companies Lists' => 'Import Companies Lists',
     'Import Roles Lists' => 'Import Roles Lists',
     'Download Countries List for Country ID' => 'Download Countries List for Country ID',
+    'Kanban Board' => 'Kanban Board',
+    'Table View' => 'Table View'
 ];

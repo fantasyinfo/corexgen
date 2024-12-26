@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Helpers\PermissionsHelper;
 use App\Models\Address;
+use App\Models\CategoryGroupTag;
 use App\Models\City;
 use App\Models\CRM\CRMLeads;
 use App\Models\LeadUser;
@@ -388,5 +389,23 @@ class LeadsService
                 'bt_class' => CRM_STATUS_TYPES['LEADS']['BT_CLASSES'],
             ]
         ])->render();
+    }
+
+    public function getKanbanBoardStages($request)
+    {
+        $query = CategoryGroupTag::where('type', CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_status'])
+            ->where('relation_type', CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads']);
+
+        $query = $this->applyTenantFilter($query);
+
+        return $query->select(['id', 'name', 'color'])->get();
+
+    }
+
+    public function getKanbanLoad($request)
+    {
+        $query = $this->leadsRepository->getKanbanLoad($request);
+        $query = $this->applyTenantFilter($query, 'leads');
+        return $query->get()->groupBy('stage_name');
     }
 }
