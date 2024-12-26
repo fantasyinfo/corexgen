@@ -22,6 +22,8 @@
     --dark-black-001 : #1D1E20;
 
     --sidebar-diff-bg: rgba(237, 232, 252,0.9);
+
+    --task-columns-cards-border:#cfd3d7;
   }
   
   [data-bs-theme="dark"] {
@@ -44,6 +46,8 @@
     --neutral-gray: #A0A0A0;
 
     --sidebar-diff-bg:#0e0d0d;
+
+    --task-columns-cards-border:#30363d;
   }
   
   /* Global Styles */
