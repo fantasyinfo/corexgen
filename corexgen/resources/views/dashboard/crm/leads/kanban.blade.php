@@ -1,332 +1,256 @@
 @extends('layout.app')
 
-@section('style')
-    <style>
-        .kanban-board {
-            display: flex;
-            gap: 1.5rem;
-            padding: 1.5rem;
-            overflow-x: auto;
-            min-height: calc(100vh - 200px);
-            background: #f8fafc;
-        }
-
-        .kanban-column {
-            min-width: 350px;
-            background: #fff;
-            border-radius: 0.75rem;
-            padding: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-
-        .kanban-column-header {
-            padding: 1rem;
-            margin-bottom: 1rem;
-            border-bottom: 2px solid #f1f5f9;
-        }
-
-        .column-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1e293b;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .card-count {
-            background: #e2e8f0;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.875rem;
-            color: #475569;
-        }
-
-        .kanban-card {
-            background: white;
-            padding: 1.25rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e2e8f0;
-            cursor: move;
-            transition: all 0.2s ease;
-        }
-
-        .kanban-card:hover {
-            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1rem;
-        }
-
-        .card-company {
-            font-weight: 600;
-            color: #1e293b;
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .card-type {
-            font-size: 0.75rem;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            background: #f1f5f9;
-            color: #475569;
-        }
-
-        .card-details {
-            display: grid;
-            gap: 0.75rem;
-        }
-
-        .detail-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #64748b;
-            font-size: 0.9rem;
-        }
-
-        .detail-item i {
-            width: 16px;
-            color: #94a3b8;
-        }
-
-        .card-footer {
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid #f1f5f9;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .card-date {
-            font-size: 0.8rem;
-            color: #94a3b8;
-        }
-
-        .card-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .card-action-btn {
-            padding: 0.25rem;
-            border-radius: 0.375rem;
-            color: #64748b;
-            transition: all 0.2s;
-        }
-
-        .card-action-btn:hover {
-            background: #f1f5f9;
-            color: #1e293b;
-        }
-
-        .stage-indicator {
-            width: 3px;
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            border-radius: 9999px;
-        }
-
-        .dragging {
-            opacity: 0.6;
-            transform: scale(1.02);
-        }
-
-        /* Custom scrollbar */
-        .kanban-board::-webkit-scrollbar {
-            height: 8px;
-        }
-
-        .kanban-board::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 4px;
-        }
-
-        .kanban-board::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-    </style>
-@endsection
+<link rel="stylesheet" type="text/css" href="{{ asset('css/custom/kanban.css') }}">
+@push('style')
+@endpush
 
 @section('content')
     @php
-      //  prePrintR($stages->toArray());
-        // die();
+        // prePrintR($stages->toArray());
     @endphp
-    <div class="container-fluid">
-        <div class="mb-4">
-            <div class="d-flex justify-content-between align-items-center">
-                <h4 class="mb-0">Leads Pipeline</h4>
+    <div class="kanban-wrapper">
 
-            </div>
-        </div>
-
-        @if (hasPermission('LEADS.READ_ALL') || hasPermission('LEADS.READ'))
-            <div class="kanban-board" id="kanbanBoard">
-                @foreach ($stages as $stage)
-                    <div class="kanban-column" data-stage-id="{{ $stage->id }}" ondrop="drop(event)"
-                        ondragover="allowDrop(event)">
-                        <div class="kanban-column-header">
-                            <div class="column-title">
-                                <i class="fas fa-{{ $stage->icon ?? 'circle' }}"></i>
-                                {{ $stage->name }}
-                                <span class="card-count">{{ $stage->leads_count }}</span>
-                            </div>
+        @include('layout.components.header-buttons')
+        @include('dashboard.crm.leads.components.leads-filters')
+        <div class="kanban-board">
+            @if (isset($stages) && $stages->isNotEmpty())
+                @foreach ($stages as $st)
+                    <div class="kanban-column" style="border: 1px solid {{ $st->color }}" data-status="{{ $st->id }}">
+                        <div class="column-header " style="border-bottom: 2px solid {{ $st->color }};">
+                            <h5 class="column-title" style="color:  {{ $st->color }};"> {{ $st->name }}<span
+                                    class="task-count">0</span>
+                            </h5>
                         </div>
-
-                        @foreach ($stage->leads as $lead)
-                            <div class="kanban-card position-relative" draggable="true" ondragstart="drag(event)"
-                                data-lead-id="{{ $lead->id }}">
-                                <div class="stage-indicator" style="background-color: {{ $stage->color ?? '#94a3b8' }}">
-                                </div>
-
-                                <div class="card-header">
-                                    <div>
-                                        <div class="card-company">{{ $lead->company_name }}</div>
-                                        <span class="card-type">{{ $lead->type }}</span>
-                                    </div>
-                                </div>
-
-                                <div class="card-details">
-                                    <div class="detail-item">
-                                        <i class="fas fa-user"></i>
-                                        <span>{{ $lead->title }} {{ $lead->first_name }} {{ $lead->last_name }}</span>
-                                    </div>
-
-                                    @if ($lead->email)
-                                        <div class="detail-item">
-                                            <i class="fas fa-envelope"></i>
-                                            <span>{{ $lead->email }}</span>
-                                        </div>
-                                    @endif
-
-                                    @if ($lead->phone)
-                                        <div class="detail-item">
-                                            <i class="fas fa-phone"></i>
-                                            <span>{{ $lead->phone }}</span>
-                                        </div>
-                                    @endif
-
-                                    @if ($lead->address)
-                                        <div class="detail-item">
-                                            <i class="fas fa-map-marker-alt"></i>
-                                            <span>{{ $lead->address }}</span>
-                                        </div>
-                                    @endif
-
-                                    @if ($lead->group)
-                                        <div class="detail-item">
-                                            <i class="fas fa-users"></i>
-                                            <span>{{ $lead->group->name }}</span>
-                                        </div>
-                                    @endif
-
-                                    @if ($lead->source)
-                                        <div class="detail-item">
-                                            <i class="fas fa-tag"></i>
-                                            <span>{{ $lead->source->name }}</span>
-                                        </div>
-                                    @endif
-                                </div>
-
-                                <div class="card-footer">
-                                    <div class="card-date">
-                                        <i class="far fa-clock me-1"></i>
-                                        {{ $lead->created_at->diffForHumans() }}
-                                    </div>
-                                    <div class="card-actions">
-                                        {{-- <a href="{{ route('leads.edit', $lead->id) }}" class="card-action-btn">
-                                <i class="fas fa-pencil-alt"></i>
-                            </a>
-                            <a href="{{ route('leads.show', $lead->id) }}" class="card-action-btn">
-                                <i class="fas fa-eye"></i>
-                            </a> --}}
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
+                        <div class="kanban-tasks" ondrop="drop(event)" ondragover="allowDrop(event)">
+                            <!-- Tasks will be dynamically added here -->
+                        </div>
+                        <div class="p-3">
+                            <button class="add-task-btn" onclick="addTaskToColumn('{{ $st->name }}')">
+                                <i class="fas fa-plus"></i> Add Task
+                            </button>
+                        </div>
                     </div>
                 @endforeach
-            </div>
-        @else
-            <div class="alert alert-warning">
-                <i class="fas fa-exclamation-triangle me-2"></i>
-                {{ __('crud.You do not have permission to view the board') }}
-            </div>
-        @endif
+            @endif
+        </div>
+
     </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
     <script>
+        // Initialize the board
+        $(document).ready(function() {
+            loadTasks();
+            updateTaskCounts();
+        });
+
+        // Load tasks into columns
+
+        function loadTasks() {
+            $.ajax({
+                url: "{{ route(getPanelRoutes($module . '.kanbanLoad')) }}",
+                method: "GET",
+                data: {
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(data) {
+                    // Clear existing tasks
+                    $('.kanban-tasks').empty();
+
+                    // Loop through each stage and its leads
+                    Object.entries(data).forEach(([stageName, leads]) => {
+                        leads.forEach(lead => {
+                            const taskElement = createLeadElement(lead);
+                            $(`.kanban-column[data-status="${lead.status_id}"] .kanban-tasks`)
+                                .append(taskElement);
+                        });
+                    });
+
+                    updateTaskCounts();
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error:", error);
+                }
+            });
+        }
+
+        // Create a new function to generate lead cards
+        function createLeadElement(lead) {
+            return `
+        <div class="task-card" draggable="true" ondragstart="drag(event)" id="task-${lead.id}" 
+             style="border-left: 4px solid ${lead.stage.color}">
+            <div class="task-header">
+                <h6 class="task-title">${lead.company_name}</h6>
+                <div class="task-actions">
+                    <i class="fas fa-edit" onclick="editTask(${lead.id})"></i>
+                    <i class="fas fa-trash-alt" onclick="deleteTask(${lead.id})"></i>
+                </div>
+            </div>
+            <p class="mb-2 text-muted small">${lead.first_name} ${lead.last_name}</p>
+            <div class="task-meta">
+                <div class="task-badges">
+                    <span class="badge" style="background-color: ${lead.group.color}">${lead.group.name}</span>
+                    <span class="badge" style="background-color: ${lead.source.color}">${lead.source.name}</span>
+                </div>
+                <div class="assignees d-flex gap-1">
+                    ${lead.assignees.map(assignee => `
+                                                                        <img src="${assignee.profile_photo_url}" 
+                                                                             alt="${assignee.name}" 
+                                                                             title="${assignee.name}"
+                                                                             class="rounded-circle"
+                                                                             style="width: 24px; height: 24px;">
+                                                                    `).join('')}
+                </div>
+            </div>
+            <div class="task-footer mt-2 d-flex justify-content-between align-items-center">
+                <small class="text-muted">
+                    <i class="far fa-calendar-alt"></i> 
+                    ${new Date(lead.created_at).toLocaleDateString()}
+                </small>
+                <small class="badge ${lead.status === 'ACTIVE' ? 'bg-success' : 'bg-danger'}">
+                    ${lead.status}
+                </small>
+            </div>
+        </div>
+    `;
+        }
+
+        // Drag and drop functionality
         function allowDrop(ev) {
             ev.preventDefault();
         }
 
         function drag(ev) {
-            const card = ev.target.closest('.kanban-card');
-            card.classList.add('dragging');
-            ev.dataTransfer.setData("leadId", card.dataset.leadId);
+            ev.dataTransfer.setData("text", ev.target.id);
+            ev.target.classList.add('dragging');
         }
 
         function drop(ev) {
             ev.preventDefault();
-            const card = document.querySelector('.dragging');
-            card.classList.remove('dragging');
+            const taskId = ev.dataTransfer.getData("text");
+            const taskElement = document.getElementById(taskId);
+            const targetColumn = ev.target.closest('.kanban-tasks');
 
-            const leadId = ev.dataTransfer.getData("leadId");
-            const newStageId = ev.target.closest('.kanban-column').dataset.stageId;
+            console.log(targetColumn);
+            if (targetColumn) {
+                taskElement.classList.remove('dragging');
+                targetColumn.appendChild(taskElement);
 
-            fetch(`/`, {
-                    // leads.updateStage
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        lead_id: leadId,
-                        stage_id: newStageId
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const targetColumn = ev.target.closest('.kanban-column');
-                        const header = targetColumn.querySelector('.kanban-column-header');
-                        header.after(card);
-                        updateColumnCounts();
+                // Update task status
+                const newStatus = targetColumn.closest('.kanban-column').dataset.status;
 
-                        // Show success toast
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Stage Updated',
-                            toast: true,
-                            position: 'top-end',
-                            showConfirmButton: false,
-                            timer: 3000
-                        });
-                    }
-                });
+                updateTaskStatus(taskId.replace('task-', ''), newStatus);
+                updateTaskCounts();
+            }
         }
 
-        function updateColumnCounts() {
-            document.querySelectorAll('.kanban-column').forEach(column => {
-                const count = column.querySelectorAll('.kanban-card').length;
-                column.querySelector('.card-count').textContent = count;
+        // Update task counts in column headers
+        function updateTaskCounts() {
+            $('.kanban-column').each(function() {
+                const count = $(this).find('.task-card').length;
+                $(this).find('.task-count').text(count);
+            });
+        }
+
+        // Add new task
+        function addNewTask() {
+            const newTask = {
+                id: Date.now(),
+                title: 'New Task',
+                description: 'Task description',
+                status: 'todo',
+                priority: 'medium',
+                assignee: 'Unassigned',
+                dueDate: '2024-01-30'
+            };
+
+            const taskElement = createTaskElement(newTask);
+            $('.kanban-column[data-status="todo"] .kanban-tasks').append(taskElement);
+            updateTaskCounts();
+
+            // In real application, you would make an AJAX call here
+            // $.ajax({
+            //     url: '/api/tasks',
+            //     method: 'POST',
+            //     data: newTask,
+            //     success: function(response) {
+            //         console.log('Task created successfully');
+            //     }
+            // });
+        }
+
+        // Add task to specific column
+        function addTaskToColumn(status) {
+            const newTask = {
+                id: Date.now(),
+                title: 'New Task',
+                description: 'Task description',
+                status: status,
+                priority: 'medium',
+                assignee: 'Unassigned',
+                dueDate: '2024-01-30'
+            };
+
+            const taskElement = createTaskElement(newTask);
+            $(`.kanban-column[data-status="${status}"] .kanban-tasks`).append(taskElement);
+            updateTaskCounts();
+        }
+
+        // Edit task
+        function editTask(taskId) {
+            // In real application, you would show a modal here
+            console.log('Editing task:', taskId);
+
+            // $.ajax({
+            //     url: `/api/tasks/${taskId}`,
+            //     method: 'PUT',
+            //     data: updatedTask,
+            //     success: function(response) {
+            //         console.log('Task updated successfully');
+            //     }
+            // });
+        }
+
+        // Delete task
+        function deleteTask(taskId) {
+            if (confirm('Are you sure you want to delete this task?')) {
+                $(`#task-${taskId}`).remove();
+                updateTaskCounts();
+
+                // In real application, you would make an AJAX call here
+                // $.ajax({
+                //     url: `/api/tasks/${taskId}`,
+                //     method: 'DELETE',
+                //     success: function(response) {
+                //         console.log('Task deleted successfully');
+                //     }
+                // });
+            }
+        }
+
+        // Update task status
+        function updateTaskStatus(leadid, stageid) {
+            let baseUrl =
+                "{{ route(getPanelRoutes($module . '.changeStage'), ['leadid' => ':leadid', 'stageid' => ':stageid']) }}";
+            let url = baseUrl.replace(':leadid', leadid).replace(':stageid', stageid);
+
+        
+            $.ajax({
+                url: url,
+                method: "POST",
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    _method: 'PUT'
+                },
+                success: function(response) {
+                    console.log(response);
+                    console.log('Task status updated successfully');
+                },
+                error: function(xhr) {
+                    console.error('Error updating task status:', xhr.responseText);
+                }
             });
         }
     </script>
-@endsection
+@endpush

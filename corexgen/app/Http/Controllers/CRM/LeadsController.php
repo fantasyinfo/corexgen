@@ -141,17 +141,32 @@ class LeadsController extends Controller
     {
         $this->tenantRoute = $this->getTenantRoute();
 
-
-
         return view($this->getViewFilePath('kanban'), [
             'filters' => $request->all(),
             'title' => 'Leads Management',
             'permissions' => PermissionsHelper::getPermissionsArray('LEADS'),
             'module' => PANEL_MODULES[$this->getPanelModule()]['leads'],
             'type' => 'Leads',
-            'stages' => $this->leadsService->getKanbanLeadsResponse($request->all())
+            'stages' => $this->leadsService->getKanbanBoardStages($request->all())
         ]);
     }
+
+    public function kanbanLoad(Request $request)
+    {
+        $this->tenantRoute = $this->getTenantRoute();
+
+        $data = collect();
+        $data = $this->leadsService->getKanbanLoad($request->all());
+        return response()->json($data);
+    }
+
+
+
+
+
+
+
+
     public function store(LeadsRequest $request)
     {
 
@@ -181,7 +196,6 @@ class LeadsController extends Controller
             return redirect()
                 ->route($this->getTenantRoute() . 'leads.index')
                 ->with('success', 'Lead created successfully.');
-
         } catch (\Exception $e) {
             \Log::error('Lead creation failed', [
                 'error' => $e->getMessage(),
@@ -193,7 +207,6 @@ class LeadsController extends Controller
                 ->with('active_tab', $request->input('active_tab', 'general'))
                 ->with('error', $e->getMessage());
         }
-
     }
     public function create()
     {
@@ -259,7 +272,6 @@ class LeadsController extends Controller
                 ->back()
                 ->with('error', 'An error occurred while updating the lead. ' . $e->getMessage());
         }
-
     }
     public function edit($id)
     {
@@ -334,7 +346,6 @@ class LeadsController extends Controller
             } else {
                 return redirect()->back()->with('error', 'Failed to delete the client: client not found with this id.');
             }
-
         } catch (\Exception $e) {
             // Handle any exceptions
             return redirect()->back()->with('error', 'Failed to delete the client: ' . $e->getMessage());
@@ -665,7 +676,6 @@ class LeadsController extends Controller
             }
 
             return response()->json(['message' => 'No leads selected for deletion.'], 400);
-
         } catch (\Exception $e) {
             \Log::error('Bulk deletion failed', [
                 'error' => $e->getMessage(),
@@ -681,11 +691,9 @@ class LeadsController extends Controller
     }
     public function view()
     {
-
     }
     public function profile()
     {
-
     }
 
     public function changeStatus($id, $status)
@@ -700,8 +708,23 @@ class LeadsController extends Controller
         }
     }
 
+    public function changeStage($leadid, $stageid)
+    {
+        try {
+            CRMLeads::query()->where('id', '=', $leadid)->update(['status_id' => $stageid]);
 
-
+            // Return success response as JSON
+            return response()->json([
+                'success' => true,
+                'message' => 'Leads status changed successfully.',
+            ]);
+        } catch (\Exception $e) {
+            // Handle any exceptions and return error as JSON
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to change the leads status: ' . $e->getMessage(),
+            ], 500); // Use HTTP status 500 for errors
+        }
+    }
 
 }
-

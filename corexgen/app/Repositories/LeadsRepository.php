@@ -4,6 +4,8 @@ namespace App\Repositories;
 use App\Models\CategoryGroupTag;
 use App\Models\CRM\CRMClients;
 use App\Models\CRM\CRMLeads;
+
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class LeadsRepository
@@ -125,53 +127,44 @@ class LeadsRepository
             );
     }
 
-    public function getKanbanLeads($request)
+
+    public function getKanbanLoad($request)
     {
-        // Fetch leads with related data
-        $leads = CRMLeads::query()->select(
-            'leads.id',
-            'leads.type',
-            'leads.company_name',
-            'leads.title',
-            'leads.first_name',
-            'leads.last_name',
-            'leads.email',
-            'leads.phone',
-            'leads.status',
-            'leads.created_at',
-            'leads.group_id',
-            'leads.source_id',
-            'leads.status_id',
-            'leads.address_id',
-            'leads.assign_by'
-        )
+        return CRMLeads::query()
+            ->select([
+                'leads.id',  // Specify table name to avoid ambiguity
+                'leads.type',
+                'leads.company_name',
+                'leads.title',
+                'leads.first_name',
+                'leads.last_name',
+                'leads.email',
+                'leads.phone',
+                'leads.status',
+                'leads.created_at',
+                'leads.group_id',
+                'leads.source_id',
+                'leads.status_id',
+                'leads.address_id',
+                'leads.assign_by',
+                'category_group_tag.name as stage_name'
+            ])
+            ->join('category_group_tag', 'leads.status_id', '=', 'category_group_tag.id')
             ->with([
                 'group:id,name,color',
                 'source:id,name,color',
                 'stage:id,name,color',
-                'address' => fn($q) => $q->select(['id', 'street_address', 'postal_code', 'city_id', 'country_id'])
-                    ->with(['city:id,name', 'country:id,name']),
+                'address' => fn($q) => $q
+                    ->select(['id', 'street_address', 'postal_code', 'city_id', 'country_id'])
+                    ->with([
+                        'city:id,name',
+                        'country:id,name'
+                    ]),
                 'assignedBy:id,name',
-                'assignees:id,name'
-            ])
-            ->where('company_id', Auth::user()->company_id)
-            ->get();
-    
-        // Group leads by their stage (status_id)
-        $groupedLeads = $leads->groupBy('status_id');
-    
-        // Fetch all stages
-        $stages = CategoryGroupTag::where('type', 'leads_status')
-            ->withCount(['leadsStatus' => fn($query) => $query->where('company_id', Auth::user()->company_id)])
-            ->get();
-    
-        // Attach leads to their respective stages
-        foreach ($stages as $stage) {
-            $stage->leads = $groupedLeads->get($stage->id, collect());
-        }
-    
-        return $stages;
+                'assignees' => fn($q) => $q
+                    ->select(['users.id', 'users.name'])
+                    ->withOnly([])
+            ]);
     }
-
 
 }

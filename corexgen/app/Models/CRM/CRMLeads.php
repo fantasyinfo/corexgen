@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use OwenIt\Auditing\Contracts\Auditable;
+use Illuminate\Database\Eloquent\Builder;
 
 class CRMLeads extends Model implements Auditable
 {
@@ -111,6 +112,13 @@ class CRMLeads extends Model implements Auditable
     protected static function boot()
     {
         parent::boot();
+
+
+            // Add a global scope to filter by status = 'active'
+            static::addGlobalScope('active', function (Builder $builder) {
+            $builder->where('leads.status', CRM_STATUS_TYPES['LEADS']['STATUS']['ACTIVE']);
+        });
+
 
         static::creating(function ($lead) {
             $lead->status = $lead->status ?? CRM_STATUS_TYPES['LEADS']['STATUS']['ACTIVE'];
