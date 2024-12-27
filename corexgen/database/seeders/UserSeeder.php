@@ -32,7 +32,9 @@ class UserSeeder extends Seeder
                 'role_id' => $rolesIds[array_rand($rolesIds)],
                 'is_tenant' => false,
                 'company_id' => $this->companyId,
-                'status' => CRM_STATUS_TYPES['USERS']['STATUS']['ACTIVE']
+                'status' => CRM_STATUS_TYPES['USERS']['STATUS']['ACTIVE'],
+                'updated_at' => now(),
+                'created_at' => now()
             ];
         }
 

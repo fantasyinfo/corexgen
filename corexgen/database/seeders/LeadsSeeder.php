@@ -64,6 +64,8 @@ class LeadsSeeder extends Seeder
                 'group_id' => $groupIds[array_rand($groupIds)],
                 'source_id' => $sourceIds[array_rand($sourceIds)],
                 'status_id' => $statusIds[array_rand($statusIds)],
+                'updated_at' => now(),
+                'created_at' => now()
             ];
 
             // Insert lead and get the inserted ID
@@ -80,6 +82,8 @@ class LeadsSeeder extends Seeder
                     'lead_id' => $leadId,
                     'user_id' => $userIds[$userKey],
                     'company_id' => $companyId,
+                    'updated_at' => now(),
+                    'created_at' => now()
                 ]);
             }
         }

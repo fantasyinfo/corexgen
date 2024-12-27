@@ -325,6 +325,8 @@ class LeadsService
 
         $module = PANEL_MODULES[$this->getPanelModule()]['leads'];
 
+        $stages = $this->getLeadsStatus();
+
         return DataTables::of($query)
             ->addColumn('actions', function ($lead) {
                 return $this->renderActionsColumn($lead);
@@ -338,8 +340,9 @@ class LeadsService
             ->editColumn('source', function ($lead) {
                 return "<span class='badge badge-pill bg-" . $lead->source->color . "'>{$lead->source->name}</span>";
             })
-            ->editColumn('stage', function ($lead) {
-                return "<span class='badge badge-pill bg-" . $lead->stage->color . "'>{$lead->stage->name}</span>";
+            ->editColumn('stage', function ($lead) use($stages) {
+                // return "<span class='badge badge-pill bg-" . $lead->stage->color . "'>{$lead->stage->name}</span>";
+                return $this->renderStageColumn($lead,$stages);
             })
             ->editColumn('assign_to', function ($lead) {
                 return "<span class='badge badge-pill bg-" . $lead->stage->color . "'>{$lead->stage->name}</span>";
@@ -376,17 +379,16 @@ class LeadsService
         ])->render();
     }
 
-    protected function renderStatusColumn($lead)
+    protected function renderStageColumn($lead,$stages)
     {
-        return View::make(getComponentsDirFilePath('dt-status'), [
+        return View::make(getComponentsDirFilePath('dt-leads-stage'), [
             'tenantRoute' => $this->tenantRoute,
             'permissions' => PermissionsHelper::getPermissionsArray('LEADS'),
             'module' => PANEL_MODULES[$this->getPanelModule()]['leads'],
             'id' => $lead->id,
             'status' => [
-                'current_status' => $lead->status,
-                'available_status' => CRM_STATUS_TYPES['LEADS']['STATUS'],
-                'bt_class' => CRM_STATUS_TYPES['LEADS']['BT_CLASSES'],
+                'current_status' => $lead->status_id,
+                'available_status' => $stages
             ]
         ])->render();
     }

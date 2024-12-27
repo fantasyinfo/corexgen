@@ -368,7 +368,7 @@ Route::middleware([
 
         Route::get('/kanbanLoad', [LeadsController::class, 'kanbanLoad'])->name('kanbanLoad')->middleware('check.permission:LEADS.KANBAN_BOARD');
 
-        Route::put('/changeStage/{leadid}/{stageid}', [LeadsController::class, 'changeStage'])->name('changeStage')->middleware('check.permission:LEADS.CHANGE_STATUS');
+        Route::get('/changeStage/{leadid}/{stageid}', [LeadsController::class, 'changeStage'])->name('changeStage')->middleware('check.permission:LEADS.CHANGE_STATUS');
 
 
 

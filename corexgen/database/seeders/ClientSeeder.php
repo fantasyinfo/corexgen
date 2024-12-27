@@ -49,7 +49,9 @@ class ClientSeeder extends Seeder
                 'primary_phone' => fake()->phoneNumber(),
                 'cgt_id' => $categoryIds[array_rand($categoryIds)],
                 'company_id' => $companyId, // Generate random company_id
-                'status' => CRM_STATUS_TYPES['CLIENTS']['STATUS']['ACTIVE']
+                'status' => CRM_STATUS_TYPES['CLIENTS']['STATUS']['ACTIVE'],
+                'updated_at' => now(),
+                'created_at' => now()
             ];
         }
 

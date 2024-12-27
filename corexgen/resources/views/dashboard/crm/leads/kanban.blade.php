@@ -18,8 +18,9 @@
             @if (isset($stages) && $stages->isNotEmpty())
                 @foreach ($stages as $st)
                     <div class="kanban-column" data-status="{{ $st->id }}">
-                        <div class="column-header border-bottom border-{{ $st->color }}" >
-                            <h5 class="column-title"> {{ $st->name }}<span class="task-count bg-{{ $st->color }} text-white">0</span>
+                        <div class="column-header border-bottom border-{{ $st->color }}">
+                            <h5 class="column-title"> {{ $st->name }}<span
+                                    class="task-count bg-{{ $st->color }} text-white">0</span>
                             </h5>
                         </div>
                         <div class="kanban-tasks" ondrop="drop(event)" ondragover="dragover(event)">
@@ -36,7 +37,6 @@
 @endsection
 
 @push('scripts')
-
     <script>
         // Initialize the board
         $(document).ready(function() {
@@ -126,12 +126,12 @@
                 </div>
                 <div class="assignees d-flex gap-1">
                     ${lead.assignees.map(assignee => `
-                                                                                                                <img src="${assignee.profile_photo_url}" 
-                                                                                                                     alt="${assignee.name}" 
-                                                                                                                     title="${assignee.name}"
-                                                                                                                     class="rounded-circle"
-                                                                                                                     style="width: 24px; height: 24px;">
-                                                                                                            `).join('')}
+                                                                                                                    <img src="${assignee.profile_photo_url}" 
+                                                                                                                         alt="${assignee.name}" 
+                                                                                                                         title="${assignee.name}"
+                                                                                                                         class="rounded-circle"
+                                                                                                                         style="width: 24px; height: 24px;">
+                                                                                                                `).join('')}
                 </div>
             </div>
             <div class="task-footer mt-2 d-flex justify-content-between align-items-center">
@@ -316,9 +316,10 @@
             }
 
 
-            // Populate TinyMCE editor
-            if (tinymce.get('details')) {
 
+
+            // Populate TinyMCE editor
+            if (lead.details != null) {
                 tinymce.get('details').setContent(lead.details || '');
 
             }
@@ -345,7 +346,7 @@
         }
 
 
-      
+
         // Delete task
         function deleteTask(taskId) {
             if (confirm('Are you sure you want to delete this task?')) {
@@ -388,10 +389,11 @@
 
             $.ajax({
                 url: url,
-                method: "POST",
+                method: "GET",
                 data: {
                     _token: '{{ csrf_token() }}',
-                    _method: 'PUT'
+                    _method: 'GET',
+                    from_kanban:true,
                 },
                 success: function(response) {
                     console.log(response);

@@ -16,7 +16,7 @@
                     <input type="hidden" name="from_kanban" value="true" />
                     <!-- Navigation Pills -->
                     <div class="row g-0">
-                        <div class="col-md-3 kanban-border" >
+                        <div class="col-md-3 kanban-border">
                             <div class="nav flex-column nav-pills p-3 text-left" id="v-pills-tab" role="tablist">
                                 <button type="button" class="nav-link active mb-2" data-bs-toggle="pill"
                                     data-bs-target="#v-general">
@@ -102,7 +102,7 @@
                                 <!-- Leads Tab -->
                                 <div class="tab-pane fade" id="v-leads">
                                     <x-form-components.modal-tabs-heading :type="'secondary'" :icon="'fa-chart-line'"
-                                    :title="'Lead Details'" />
+                                        :title="'Lead Details'" />
 
                                     <div class="mb-3">
                                         <x-form-components.input-label for="title" required>
@@ -207,7 +207,7 @@
                                 <!-- Contact Tab -->
                                 <div class="tab-pane fade" id="v-contact">
                                     <x-form-components.modal-tabs-heading :type="'secondary'" :icon="'fa-address-book'"
-                                    :title="'Contact'" />
+                                        :title="'Contact'" />
                                     <div class="mb-3">
                                         <x-form-components.input-label for="emails">
                                             {{ __('leads.Email') }}
@@ -238,8 +238,8 @@
 
                                 <!-- Address Tab -->
                                 <div class="tab-pane fade" id="v-address">
-                                    <x-form-components.modal-tabs-heading :type="'secondary'" :icon="'fa-info-circle'"
-                                    :title="'Address'" />
+                                    <x-form-components.modal-tabs-heading :type="'secondary'" :icon="'fa-map-marker-alt'"
+                                        :title="'Address'" />
                                     <div class="row">
                                         <div class="col-md-12">
                                             <x-form-components.input-label for="compnayAddressStreet"
@@ -261,9 +261,7 @@
                                                 {{ __('address.Country') }}
                                             </x-form-components.input-label>
 
-                                            <select
-                                                class="form-control searchSelectBox  @error('address.country_id') is-invalid @enderror"
-                                                name="address.country_id" id="country_id">
+                                            <select class="form-control" name="address.country_id" id="country_id">
 
                                                 @if ($countries)
                                                     @foreach ($countries as $country)
@@ -301,8 +299,8 @@
 
                                 <!-- Additional Tab -->
                                 <div class="tab-pane fade" id="v-additional">
-                                    <x-form-components.modal-tabs-heading :type="'secondary'" :icon="'fa-map-marker-alt'"
-                                    :title="'Additional'" />
+                                    <x-form-components.modal-tabs-heading :type="'secondary'" :icon="'fa-plus-circle'"
+                                        :title="'Additional'" />
                                     <div class="mb-3">
                                         <x-form-components.input-label for="details">
                                             {{ __('leads.Additional Details') }}
@@ -313,7 +311,6 @@
 
                                 <!-- Custom Fields Tab -->
                                 @if (isset($customFields) && $customFields->isNotEmpty())
-                            
                                     <x-form-components.custom-fields-create :customFields="$customFields" />
                                 @endif
                             </div>
@@ -357,6 +354,7 @@
             }
 
 
+            const currentTheme = document.documentElement.getAttribute('data-bs-theme');
 
             tinymce.init({
                 selector: '.wysiwyg-editor',
@@ -383,27 +381,26 @@
                     'lists',
                     'link',
                     'image',
-
-
                     'preview',
                     'anchor',
                     'searchreplace',
                     'visualblocks',
-
-
                     'insertdatetime',
                     'media',
                     'table',
-
-
-
                     'wordcount'
                 ],
                 toolbar: 'undo redo | formatselect | bold italic backcolor | \
-                                                                                                                                  alignleft aligncenter alignright alignjustify | \
-                                                                                                                                  bullist numlist outdent indent | removeformat | help | \
-                                                                                                                                  link image media preview codesample table'
+                                      alignleft aligncenter alignright alignjustify | \
+                                      bullist numlist outdent indent | removeformat | help | \
+                                      link image media preview codesample table'
             });
+
+
+
+
+
+
 
 
         });

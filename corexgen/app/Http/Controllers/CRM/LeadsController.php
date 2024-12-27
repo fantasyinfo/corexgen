@@ -693,20 +693,34 @@ class LeadsController extends Controller
     // kanban board stuff
     public function changeStage($leadid, $stageid)
     {
+
         try {
             CRMLeads::query()->where('id', '=', $leadid)->update(['status_id' => $stageid]);
 
-            // Return success response as JSON
-            return response()->json([
-                'success' => true,
-                'message' => 'Leads status changed successfully.',
-            ]);
+            if (isset($_GET['from_kanban']) && $_GET['from_kanban']) {
+                // Return success response as JSON
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Leads status changed successfully.',
+                ]);
+            }
+
+            // for table view
+            return redirect()->back()->with('success', 'Leads stage changed successfully.');
+
         } catch (\Exception $e) {
-            // Handle any exceptions and return error as JSON
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to change the leads status: ' . $e->getMessage(),
-            ], 500); // Use HTTP status 500 for errors
+
+            if (isset($_GET['from_kanban']) && $_GET['from_kanban']) {
+                // Handle any exceptions and return error as JSON
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to change the leads stages: ' . $e->getMessage(),
+                ], 500); // Use HTTP stages 500 for errors
+            }
+
+            // for table view
+
+            return redirect()->back()->with('error', 'Failed to changed the leads stages: ' . $e->getMessage());
         }
     }
 

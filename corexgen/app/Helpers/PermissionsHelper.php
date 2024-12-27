@@ -94,7 +94,7 @@ class PermissionsHelper
 
             self::$plansPermissionsKeys['CUSTOM_FIELDS'] => [3051 => 'CREATE', 3052 => 'READ', 3053 => 'READ_ALL', 3054 => 'UPDATE', 3055 => 'DELETE', 3059 => 'CHANGE_STATUS', 3060 => 'BULK_DELETE'],
 
-            self::$plansPermissionsKeys['LEADS'] => [3101 => 'CREATE', 3102 => 'READ', 3103 => 'READ_ALL', 3104 => 'UPDATE', 3105 => 'DELETE', 3106 => 'IMPORT', 3107 => 'EXPORT', 3108 => 'FILTER', 3109 => 'CHANGE_STATUS', 3110 => 'BULK_DELETE', 3111 => 'VIEW', 3112 => 'KANBAN_BOARD'],
+            self::$plansPermissionsKeys['LEADS'] => [3101 => 'CREATE', 3102 => 'READ', 3103 => 'READ_ALL', 3104 => 'UPDATE', 3105 => 'DELETE', 3106 => 'IMPORT', 3107 => 'EXPORT', 3108 => 'FILTER', 3109 => 'CHANGE_STATUS', 3110 => 'BULK_DELETE', 3111 => 'VIEW', 3112 => 'KANBAN_BOARD', 3113 => 'CHANGE_STAGE'],
 
         ];
     }
