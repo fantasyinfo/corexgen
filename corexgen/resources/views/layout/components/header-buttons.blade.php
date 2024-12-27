@@ -6,6 +6,8 @@
         </ol>
     </nav>
     <div class="mb-3 d-flex flex-wrap justify-content-end">
+   
+
         @if (isset($permissions['CREATE']) && hasPermission(strtoupper($module) . '.' . $permissions['CREATE']['KEY']))
             <a href="{{ route(getPanelRoutes($module . '.create')) }}" class="btn btn-primary btn-xl me-2"
                 title="{{ __('crud.Create New') }}">
@@ -23,6 +25,10 @@
                     hasPermission(strtoupper($module) . '.' . $permissions['KANBAN_BOARD']['KEY'])))
             <div class="d-flex">
                 {{-- showing the table and kanban board view btn --}}
+
+            
+
+
                 @if (isset($permissions['KANBAN_BOARD']) &&
                         hasPermission(strtoupper($module) . '.' . $permissions['KANBAN_BOARD']['KEY']))
                     @if (Route::currentRouteName() === getPanelRoutes($module . '.kanban'))
@@ -79,26 +85,34 @@
                         <i class="fas fa-filter"></i>
                     </a>
                 @endif
-                @if (isset($permissions['EXPORT']) && hasPermission(strtoupper($module) . '.' . $permissions['EXPORT']['KEY']))
+
+                @if (isset($permissions['EXPORT']) &&
+                        hasPermission(strtoupper($module) . '.' . $permissions['EXPORT']['KEY']) &&
+                        Route::currentRouteName() !== getPanelRoutes($module . '.kanban'))
                     <a class="btn btn-outline-secondary btn-xl me-2"
                         href="{{ route(getPanelRoutes($module . '.export'), request()->all()) }}"
                         title="{{ __('crud.Export') }}">
                         <i class="fas fa-download"></i>
                     </a>
                 @endif
-                @if (isset($permissions['IMPORT']) && hasPermission(strtoupper($module) . '.' . $permissions['IMPORT']['KEY']))
+                @if (isset($permissions['IMPORT']) &&
+                        hasPermission(strtoupper($module) . '.' . $permissions['IMPORT']['KEY']) &&
+                        Route::currentRouteName() !== getPanelRoutes($module . '.kanban'))
                     <a class="btn btn-outline-secondary btn-xl me-2"
                         href="{{ route(getPanelRoutes($module . '.import'), request()->all()) }}"
                         title="{{ __('crud.Import') }}">
                         <i class="fas fa-upload"></i>
                     </a>
                 @endif
-                @if (isset($permissions['BULK_DELETE']) && hasPermission(strtoupper($module) . '.' . $permissions['BULK_DELETE']['KEY']))
+                @if (isset($permissions['BULK_DELETE']) &&
+                        hasPermission(strtoupper($module) . '.' . $permissions['BULK_DELETE']['KEY']) &&
+                        Route::currentRouteName() !== getPanelRoutes($module . '.kanban'))
                     <a class="btn btn-outline-danger btn-xl me-2" href="#" id="bulk-delete-btn"
                         title="{{ __('crud.Bulk Delete') }}">
                         <i class="fas fa-trash"></i>
                     </a>
                 @endif
+
             </div>
         @endif
     </div>
