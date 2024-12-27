@@ -14,6 +14,16 @@
         @include('layout.components.header-buttons')
         @include('dashboard.crm.leads.components.leads-filters')
 
+        <div class="row my-2">
+            <div class="w-100 mx-auto">
+                <x-form-components.input-group type="search" name="search" id="searchFilter"
+                    placeholder="{{ __('Search... type, name, company name, title, email, phone ... ') }}"
+                    value="{{ request('search') }}" required class="custom-class border-radius" />
+            </div>
+        </div>
+
+
+
         <div class="kanban-board">
             @if (isset($stages) && $stages->isNotEmpty())
                 @foreach ($stages as $st)
@@ -61,45 +71,88 @@
         // Load tasks into columns
 
 
+        // Handle filter button click
+        $(document).on("click", "#filterBtn", () => {
+            loadTasks();
+            // Close filter sidebar if exists
+            const filterSidebar = document.getElementById("filterSidebar");
+            if (filterSidebar) {
+                filterSidebar.classList.remove("show");
+            }
+        });
+
+        // Handle clear filter button click
+        $(document).on("click", "#clearFilter", () => {
+            // Reset all filter inputs
+            $("[data-filter]").each(function() {
+                $(this).val("");
+            });
+
+            // Reload table
+            loadTasks();
+        });
+
+        // Optional: Handle enter key on filter inputs
+        let debounceTimer;
+        $(document).on("keypress", "[data-filter]", (e) => {
+            if (e.which === 13) {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    loadTasks();
+                }, 300); // 300ms debounce
+            }
+        });
+
+        $(document).on("keypress", "#searchFilter", (e) => {
+            if (e.which === 13) {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    loadTasks();
+                }, 300); // 300ms debounce
+            }
+        });
+
+        $(document).on("input", "#searchFilter", (e) => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                loadTasks();
+            }, 300); // 300ms debounce
+        });
+
+
+
         function loadTasks() {
             const urlParams = new URLSearchParams(window.location.search);
             // Dynamically append all query parameters from the URL
             const queryParams = Object.fromEntries(urlParams.entries());
 
+            let d = {};
+            $("[data-filter]").each(function() {
+                d[$(this).data("filter")] = $(this).val();
+            });
+
+
+            d.search = $('#searchFilter').val();
+            
             $.ajax({
                 url: "{{ route(getPanelRoutes($module . '.kanbanLoad')) }}",
                 method: "GET",
                 data: {
                     _token: '{{ csrf_token() }}',
-                    query: queryParams
+                    query: queryParams,
+                    filters: d,
+
                 },
                 success: function(data) {
                     // Clear existing tasks
                     $('.kanban-tasks').empty();
 
                     Object.entries(data).forEach(([stageName, leads]) => {
-                        // console.log(`Processing stage: ${stageName} with ${leads.length} leads.`);
+
                         leads.forEach(lead => {
-                            // console.log(`Processing lead: ${lead.id} - ${lead.company_name}`);
 
                             const taskElement = createLeadElement(lead);
-                            // console.log("Generated taskElement:", taskElement);
-
                             let column = $(`.kanban-column[data-status="${lead.status_id}"]`);
-                            //                 if (!column.length) {
-                            //                     console.warn(
-                            //                         `Column not found for status_id: ${lead.status_id}. Creating it.`
-                            //                     );
-                            //                     column = $(`
-                        //     <div class="kanban-column" data-status="${lead.status_id}">
-                        //         <h3>Stage ${lead.status_id}</h3>
-                        //         <div class="kanban-tasks"></div>
-                        //     </div>
-                        // `);
-                            //                     $(".kanban-board").append(column);
-                            //                 }
-
-                            // console.log("Appending to column:", column);
                             column.find(".kanban-tasks").append(taskElement);
                         });
                     });

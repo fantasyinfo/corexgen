@@ -1,8 +1,8 @@
-<?php 
+<?php
 
 return [
 
-    'Leads'=> "Leads",
+    'Leads' => "Leads",
     'Leads Management' => 'Leads Management',
     'Create Lead' => 'Create Lead',
     'Full Name' => 'Full Name',
@@ -18,7 +18,7 @@ return [
     'Password' => 'Password',
     'Lead Name' => 'Lead Name',
     'No Leads Found' => 'No Leads Found',
-    'General' =>'General',
+    'General' => 'General',
     'Contact' => 'Contact',
     'Address' => 'Address',
     'Select Plan' => 'Select Plan',
@@ -63,5 +63,9 @@ return [
     'Is Captured' => 'Is Captured',
     'Leads Information' => 'Leads Information',
     'Assign To' => 'Assign To',
+    'Source' => 'Source',
+    'Group' => 'Group',
+    'Assigns To' => 'Assigns To',
+    'Assign By' => 'Assign By'
 
 ];

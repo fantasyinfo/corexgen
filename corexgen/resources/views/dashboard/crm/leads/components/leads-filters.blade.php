@@ -18,7 +18,7 @@
             <div class="mb-3">
                 <div class="form-group">
                     <x-form-components.input-label for="nameFilter" class="custom-class">
-                        {{ __('clients.Name') }}
+                        {{ __('leads.Name') }}
                     </x-form-components.input-label>
 
                     <x-form-components.input-group type="text" name="name" data-filter="name" id="nameFilter"
@@ -31,7 +31,7 @@
             <div class="mb-3">
                 <div class="form-group">
                     <x-form-components.input-label for="emailFilter" class="custom-class">
-                        {{ __('clients.Email') }}
+                        {{ __('leads.Email') }}
                     </x-form-components.input-label>
 
                     <x-form-components.input-group type="email" name="email" data-filter="email" id="emailFilter"
@@ -44,7 +44,7 @@
             <div class="mb-3">
                 <div class="form-group">
                     <x-form-components.input-label for="phoneFilter" class="custom-class">
-                        {{ __('clients.Phone') }}
+                        {{ __('leads.Phone') }}
                     </x-form-components.input-label>
 
                     <x-form-components.input-group type="tel" name="phone" data-filter="phone" id="phoneFilter"
@@ -59,38 +59,111 @@
             <div class="mb-3">
                 <div class="form-group">
                     <x-form-components.input-label for="startDateFilter" class="custom-class">
-                        {{ __('clients.Start Date') }}
+                        {{ __('leads.Start Date') }}
                     </x-form-components.input-label>
-                    <x-form-components.input-group type="date" data-filter="start_date"  name="start_date" id="startDateFilter"
-                        value="{{ request('start_date') }}" class="custom-class" />
+                    <x-form-components.input-group type="date" data-filter="start_date" name="start_date"
+                        id="startDateFilter" value="{{ request('start_date') }}" class="custom-class" />
                 </div>
             </div>
 
             <div class="mb-3">
                 <div class="form-group">
                     <x-form-components.input-label for="endDateFilter" class="custom-class">
-                        {{ __('clients.End Date') }}
+                        {{ __('leads.End Date') }}
                     </x-form-components.input-label>
-                    <x-form-components.input-group type="date" data-filter="end_date" name="end_date" id="endDateFilter"
-                        value="{{ request('end_date') }}" class="custom-class" />
+                    <x-form-components.input-group type="date" data-filter="end_date" name="end_date"
+                        id="endDateFilter" value="{{ request('end_date') }}" class="custom-class" />
                 </div>
             </div>
 
-            <!-- Status Dropdown -->
+            <!-- stage Dropdown -->
             <div class="mb-3">
                 <div class="form-group">
-                    <x-form-components.input-label for="statusFilter" class="custom-class">
-                        {{ __('clients.All Statuses') }}
+                    <x-form-components.input-label for="stageFilter" class="custom-class">
+                        {{ __('leads.Stage') }}
                     </x-form-components.input-label>
 
-                    <select name="status" class="form-select" id="statusFilter" data-filter="status">
-                        <option selected value="0">Select Status</option>
-                        <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>
-                            {{ __('Active') }}
-                        </option>
-                        <option value="deactive" {{ request('status') == 'deactive' ? 'selected' : '' }}>
-                            {{ __('Inactive') }}
-                        </option>
+                    <select name="status_id" class="form-select" id="stageFilter" data-filter="status_id">
+                        <option selected value="0">Select Stages</option>
+                        @foreach ($leadsStatus as $ls)
+                            <option value="{{ $ls->id }}"
+                                {{ request('status_id') == $ls->id ? 'selected' : '' }}>
+                                {{ $ls->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+            <!-- groups Dropdown -->
+            <div class="mb-3">
+                <div class="form-group">
+                    <x-form-components.input-label for="groupFilter" class="custom-class">
+                        {{ __('leads.Group') }}
+                    </x-form-components.input-label>
+
+                    <select name="group_id" class="form-select" id="groupFilter" data-filter="group_id">
+                        <option selected value="0">Select Group</option>
+                        @foreach ($leadsGroups as $ls)
+                            <option value="{{ $ls->id }}"
+                                {{ request('group_id') == $ls->id ? 'selected' : '' }}>
+                                {{ $ls->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <!-- sources Dropdown -->
+            <div class="mb-3">
+                <div class="form-group">
+                    <x-form-components.input-label for="sourceFilter" class="custom-class">
+                        {{ __('leads.Source') }}
+                    </x-form-components.input-label>
+
+                    <select name="status" class="form-select" id="sourceFilter" data-filter="source_id">
+                        <option selected value="0">Select Sources</option>
+                        @foreach ($leadsSources as $ls)
+                            <option value="{{ $ls->id }}"
+                                {{ request('source_id') == $ls->id ? 'selected' : '' }}>
+                                {{ $ls->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+            <!-- assign_to Dropdown -->
+            <div class="mb-3">
+                <div class="form-group">
+                    <x-form-components.input-label for="assignToFilter" class="custom-class">
+                        {{ __('leads.Assigns To') }}
+                    </x-form-components.input-label>
+
+                    <select name="assign_to[]" class="form-select searchSelectBox" id="assignToFilter" multiple="multiple" data-filter="assign_to">
+                        @foreach ($teamMates as $ls)
+                            <option value="{{ $ls->id }}"
+                                {{ request('assign_to') == $ls->id ? 'selected' : '' }}>
+                                {{ $ls->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <!-- assign_by Dropdown -->
+            <div class="mb-3">
+                <div class="form-group">
+                    <x-form-components.input-label for="assignByFilter" class="custom-class">
+                        {{ __('leads.Assign By') }}
+                    </x-form-components.input-label>
+
+                    <select name="status" class="form-selec searchSelectBox" id="assignByFilter" data-filter="assign_by">
+                        <option selected value="0">Select Assign By</option>
+                        @foreach ($teamMates as $ls)
+                            <option value="{{ $ls->id }}"
+                                {{ request('assign_by') == $ls->id ? 'selected' : '' }}>
+                                {{ $ls->name }}
+                            </option>
+                        @endforeach
                     </select>
                 </div>
             </div>

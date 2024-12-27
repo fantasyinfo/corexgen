@@ -3,7 +3,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if ($(".searchSelectBox").length > 0) {
         $(".searchSelectBox").select2({
-            'placeholder' : 'Please select an option'
+            placeholder : 'Please select an option',
+            minimumResultsForSearch: 5
         });
     }
 

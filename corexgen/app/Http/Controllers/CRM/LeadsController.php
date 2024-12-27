@@ -134,6 +134,10 @@ class LeadsController extends Controller
             'total_active' => $usersTotals->totalActive,
             'total_inactive' => $usersTotals->totalInactive,
             'total_ussers' => $usersTotals->totalUsers,
+            'leadsGroups' => $this->leadsService->getLeadsGroups(),
+            'leadsSources' => $this->leadsService->getLeadsSources(),
+            'leadsStatus' => $this->leadsService->getLeadsStatus(),
+            'teamMates' => getTeamMates(),
         ]);
     }
 
