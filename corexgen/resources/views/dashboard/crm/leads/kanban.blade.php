@@ -34,6 +34,7 @@
 
     </div>
     @include('dashboard.crm.leads.components.edit-modal')
+    @include('dashboard.crm.leads.components.view-modal')
 @endsection
 
 @push('scripts')
@@ -59,12 +60,18 @@
 
         // Load tasks into columns
 
+
         function loadTasks() {
+            const urlParams = new URLSearchParams(window.location.search);
+            // Dynamically append all query parameters from the URL
+            const queryParams = Object.fromEntries(urlParams.entries());
+
             $.ajax({
                 url: "{{ route(getPanelRoutes($module . '.kanbanLoad')) }}",
                 method: "GET",
                 data: {
-                    _token: '{{ csrf_token() }}'
+                    _token: '{{ csrf_token() }}',
+                    query: queryParams
                 },
                 success: function(data) {
                     // Clear existing tasks
@@ -108,14 +115,33 @@
 
         // Create a new function to generate lead cards
         function createLeadElement(lead) {
-            // console.log(lead)
+            const nameElement = lead.type === 'Company' ?
+                `<h6 class="task-title"> <span class="status-circle bg-success me-2"></span> ${lead.company_name}</h6>` :
+                `<h6 class="task-title"> <span class="status-circle bg-warning me-2"></span> ${lead.first_name}</h6>`;
+
+            const assigneeElements = lead.assignees.map(assignee =>
+                `<img src="${assignee.profile_photo_url}" 
+             alt="${assignee.name}" 
+             title="${assignee.name}"
+             class="rounded-circle"
+             style="width: 24px; height: 24px;">`
+            ).join('');
+
+            const statusClass = lead.status === 'ACTIVE' ? 'bg-success' : 'bg-danger';
+            const formattedDate = new Date(lead.created_at).toLocaleDateString();
+
             return `
-        <div class="task-card border-bottom border-${lead.stage.color}"  draggable="true" ondragstart="drag(event)" id="task-${lead.id}">
+        <div class="task-card border-bottom border-${lead.stage.color}" 
+             draggable="true" 
+             ondragstart="drag(event)" 
+             id="task-${lead.id}">
             <div class="task-header">
-                <h6 class="task-title ">${lead.company_name}</h6>
+                ${nameElement}
+   
                 <div class="task-actions">
-                    <i class="fas fa-edit" onclick="editTask(${lead.id})"></i>
-                    <i class="fas fa-trash-alt" onclick="deleteTask(${lead.id})"></i>
+                    <i class="fas fa-eye " onclick="viewTask(${lead.id})"></i>
+                    <i class="fas fa-edit " onclick="editTask(${lead.id})"></i>
+                    <i class="fas fa-trash-alt " onclick="deleteTask(${lead.id})"></i>
                 </div>
             </div>
             <p class="mb-2 text-muted small">${lead.first_name} ${lead.last_name}</p>
@@ -125,28 +151,18 @@
                     <span class="badge bg-${lead.source.color}">${lead.source.name}</span>
                 </div>
                 <div class="assignees d-flex gap-1">
-                    ${lead.assignees.map(assignee => `
-                                                                                                                    <img src="${assignee.profile_photo_url}" 
-                                                                                                                         alt="${assignee.name}" 
-                                                                                                                         title="${assignee.name}"
-                                                                                                                         class="rounded-circle"
-                                                                                                                         style="width: 24px; height: 24px;">
-                                                                                                                `).join('')}
+                    ${assigneeElements}
                 </div>
             </div>
             <div class="task-footer mt-2 d-flex justify-content-between align-items-center">
                 <small class="text-muted">
                     <i class="far fa-calendar-alt"></i> 
-                    ${new Date(lead.created_at).toLocaleDateString()}
-                </small>
-                <small class="badge ${lead.status === 'ACTIVE' ? 'bg-success' : 'bg-danger'}">
-                    ${lead.status}
+                    ${formattedDate}
                 </small>
             </div>
         </div>
     `;
         }
-
 
 
         function drag(ev) {
@@ -248,8 +264,7 @@
 
         // Edit task
         function editTask(taskId) {
-            // In real application, you would show a modal here
-            console.log('Editing task:', taskId);
+
             let baseUrl =
                 "{{ route(getPanelRoutes($module . '.kanbanEdit'), ['id' => ':id']) }}";
             let url = baseUrl.replace(':id', taskId);
@@ -274,6 +289,32 @@
         }
 
 
+        // view task 
+
+        function viewTask(taskId) {
+
+            let baseUrl =
+                "{{ route(getPanelRoutes($module . '.kanbanView'), ['id' => ':id']) }}";
+            let url = baseUrl.replace(':id', taskId);
+
+            $.ajax({
+                url: url,
+                method: "GET",
+                data: {
+                    _token: '{{ csrf_token() }}',
+                },
+                success: function(response) {
+                    console.log(response);
+                    populateViewModal(response);
+                    $('#viewLeadModal').modal('show');
+                },
+                error: function(xhr) {
+                    console.error('Error fetching  data:', xhr.responseText);
+                }
+            });
+
+
+        }
 
 
         function populateEditModal(data) {
@@ -345,6 +386,77 @@
 
         }
 
+        function populateViewModal(data) {
+            const lead = data.lead;
+
+            // Basic Information
+            $('#viewLeadModal #companyName').text(lead.company_name);
+            $('#viewLeadModal #contactName').text(`${lead.first_name} ${lead.last_name}`);
+            $('#viewLeadModal #title').text(lead.title);
+            $('#viewLeadModal #email').text(lead.email);
+            $('#viewLeadModal #phone').text(lead.phone);
+            $('#viewLeadModal #value').text(`$${parseFloat(lead.value).toLocaleString()}`);
+
+            // Status & Priority
+            $('#viewLeadModal #status').text(lead.status)
+                .removeClass()
+                .addClass(`badge ${lead.status === 'ACTIVE' ? 'bg-success' : 'bg-secondary'}`);
+            $('#viewLeadModal #priority').text(lead.priority)
+                .removeClass()
+                .addClass(`badge ${getPriorityClass(lead.priority)}`);
+            $('#viewLeadModal #score').text(lead.score);
+
+            // Dates
+            $('#viewLeadModal #lastContactedDate').text(formatDate(lead.last_contacted_date));
+            $('#viewLeadModal #lastActivityDate').text(formatDate(lead.last_activity_date));
+            $('#viewLeadModal #followUpDate').text(formatDate(lead.follow_up_date));
+
+            // Assignees
+            const assigneesContainer = $('#viewLeadModal #assigneesList');
+            assigneesContainer.empty();
+
+            lead.assignees.forEach(assignee => {
+                assigneesContainer.append(`
+            <div class="col-md-4 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <img src="${assignee.profile_photo_url}" 
+                             alt="${assignee.name}" 
+                             class="rounded-circle mb-2"
+                             style="width: 64px; height: 64px;">
+                        <h6 class="card-title mb-0">${assignee.name}</h6>
+                    </div>
+                </div>
+            </div>
+        `);
+            });
+        }
+
+        // Helper function to format dates
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            return new Date(dateString).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Helper function to get priority badge class
+        function getPriorityClass(priority) {
+            switch (priority.toLowerCase()) {
+                case 'high':
+                    return 'bg-danger';
+                case 'medium':
+                    return 'bg-warning';
+                case 'low':
+                    return 'bg-info';
+                default:
+                    return 'bg-secondary';
+            }
+        }
 
 
         // Delete task
@@ -393,7 +505,7 @@
                 data: {
                     _token: '{{ csrf_token() }}',
                     _method: 'GET',
-                    from_kanban:true,
+                    from_kanban: true,
                 },
                 success: function(response) {
                     console.log(response);

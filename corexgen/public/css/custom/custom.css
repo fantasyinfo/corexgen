@@ -85,6 +85,15 @@
 }
 
 .card {
+    border-width: 4px;
+    border-style: solid;
+    border-image: initial;
+    border-color: var(--task-columns-cards-border);
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
     /* border-top: 2px solid var(--primary-color); */
 }
 
@@ -671,3 +680,9 @@ table.celled {
     color: black !important;
 }
 
+.badge.bg-dark, .text-dark {
+    color: white !important;
+}
+.border-dark {
+    border-color: white !important;
+}

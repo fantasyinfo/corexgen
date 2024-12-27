@@ -795,6 +795,41 @@ class LeadsController extends Controller
             'cfOldValues' => $cfOldValues
         ]);
     }
+    public function kanbanView($id)
+    {
+        $query = CRMLeads::query()->with([
+            'address' => fn($q) => $q
+                ->select(['id', 'street_address', 'postal_code', 'city_id', 'country_id'])
+                ->with([
+                    'city:id,name',
+                    'country:id,name'
+                ]),
+            'customFields',
+            'assignees' => fn($q) => $q
+                ->select(['users.id', 'users.name'])
+                ->withOnly([])
+        ])->where('id', $id);
+
+        $query = $this->applyTenantFilter($query, 'leads');
+
+        $lead = $query->firstOrFail();
+
+        // custom fields
+
+        $cfOldValues = collect();
+        if (!is_null(Auth::user()->company_id)) {
+
+            // fetch already existing values
+            $cfOldValues = $this->customFieldService->getValuesForEntity($lead);
+        }
+
+
+        return response()->json([
+            'lead' => $lead,
+            'module' => PANEL_MODULES[$this->getPanelModule()]['leads'],
+            'cfOldValues' => $cfOldValues
+        ]);
+    }
 
 
 }
