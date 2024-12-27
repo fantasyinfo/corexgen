@@ -72,11 +72,11 @@
     padding: 1rem;
     margin-bottom: 1rem;
     /* border-left: 4px solid var(--primary-color); */
-    border-width: 1px;
+    /* border-width: 1px;
     border-style: solid;
-    border-image: initial;
+    border-image: initial; */
     /* border-color:  #30363d; */
-    border-color:  var(--task-columns-cards-border);
+    /* border-color:  var(--task-columns-cards-border); */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     cursor: grab;
     transition: all 0.2s ease;

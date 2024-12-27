@@ -72,6 +72,7 @@
 .nav-pills .nav-link.active,
 .nav-pills .nav-link:hover {
     background: var(--secondary-color);
+    color: var(--body-bg);
 }
 
 .tabSideBar {
@@ -242,7 +243,7 @@ table tr {
 .select2-dropdown {
     background-color: var(--card-bg);
     color: var(--body-color);
-    border-color: var(--border-color);
+    border-color: var(--body-color);
 }
 
 .select2-container .select2-search__field {
@@ -660,3 +661,13 @@ table.celled {
     -ms-border-radius: 10px;
     -o-border-radius: 10px;
 }
+
+.badge{
+    font-size:1rem;
+    /* color: var(--body-color) ; */
+}
+
+.badge.bg-light, .badge.bg-warning {
+    color: black !important;
+}
+

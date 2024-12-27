@@ -41,7 +41,8 @@ class LeadsEditRequest extends FormRequest
             ],
             'phone' => [
                 'nullable',
-                'digits_between:7,15',
+                'min:7',
+                'max:15',
                 Rule::unique('leads', 'phone')->ignore($this->id), // Use $this->id to get the input value
             ],
             'details' => 'nullable|string',

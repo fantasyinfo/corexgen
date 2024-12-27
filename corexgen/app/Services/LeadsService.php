@@ -333,19 +333,19 @@ class LeadsService
                 return Carbon::parse($lead->created_at)->format('d M Y');
             })
             ->editColumn('group', function ($lead) {
-                return "<span style='color:" . $lead->group->color . ";'>{$lead->group->name}</span>";
+                return "<span class='badge badge-pill bg-" . $lead->group->color . "'>{$lead->group->name}</span>";
             })
             ->editColumn('source', function ($lead) {
-                return "<span style='color:" . $lead->source->color . ";'>{$lead->source->name}</span>";
+                return "<span class='badge badge-pill bg-" . $lead->source->color . "'>{$lead->source->name}</span>";
             })
             ->editColumn('stage', function ($lead) {
-                return "<span style='color:" . $lead->stage->color . ";'>{$lead->stage->name}</span>";
+                return "<span class='badge badge-pill bg-" . $lead->stage->color . "'>{$lead->stage->name}</span>";
             })
             ->editColumn('assign_to', function ($lead) {
-                return "<span style='color:" . $lead->stage->color . ";'>{$lead->stage->name}</span>";
+                return "<span class='badge badge-pill bg-" . $lead->stage->color . "'>{$lead->stage->name}</span>";
             })
             ->editColumn('assign_by', function ($lead) {
-                return "<span style='color:" . $lead->stage->color . ";'>{$lead->stage->name}</span>";
+                return "<span class='badge badge-pill bg-" . $lead->stage->color . "'>{$lead->stage->name}</span>";
             })
             // ->editColumn('name', function ($lead) use ($module) {
             //     $fullName = trim("{$lead->title} {$lead->first_name} {$lead->middle_name} {$lead->last_name}");

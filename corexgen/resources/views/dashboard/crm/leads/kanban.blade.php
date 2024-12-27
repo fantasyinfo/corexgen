@@ -18,8 +18,8 @@
             @if (isset($stages) && $stages->isNotEmpty())
                 @foreach ($stages as $st)
                     <div class="kanban-column" data-status="{{ $st->id }}">
-                        <div class="column-header " style="border-bottom: 2px solid {{ $st->color }};">
-                            <h5 class="column-title"> {{ $st->name }}<span class="task-count">0</span>
+                        <div class="column-header border-bottom border-{{ $st->color }}" >
+                            <h5 class="column-title"> {{ $st->name }}<span class="task-count bg-{{ $st->color }} text-white">0</span>
                             </h5>
                         </div>
                         <div class="kanban-tasks" ondrop="drop(event)" ondragover="dragover(event)">
@@ -110,10 +110,9 @@
         function createLeadElement(lead) {
             // console.log(lead)
             return `
-        <div class="task-card" draggable="true" ondragstart="drag(event)" id="task-${lead.id}" 
-             style="border-left: 1px solid ${lead.stage.color}">
+        <div class="task-card border-bottom border-${lead.stage.color}"  draggable="true" ondragstart="drag(event)" id="task-${lead.id}">
             <div class="task-header">
-                <h6 class="task-title">${lead.company_name}</h6>
+                <h6 class="task-title ">${lead.company_name}</h6>
                 <div class="task-actions">
                     <i class="fas fa-edit" onclick="editTask(${lead.id})"></i>
                     <i class="fas fa-trash-alt" onclick="deleteTask(${lead.id})"></i>
@@ -122,8 +121,8 @@
             <p class="mb-2 text-muted small">${lead.first_name} ${lead.last_name}</p>
             <div class="task-meta">
                 <div class="task-badges">
-                    <span class="badge" style="background-color: ${lead.group.color}">${lead.group.name}</span>
-                    <span class="badge" style="background-color: ${lead.source.color}">${lead.source.name}</span>
+                    <span class="badge bg-${lead.group.color}">${lead.group.name}</span>
+                    <span class="badge bg-${lead.source.color}">${lead.source.name}</span>
                 </div>
                 <div class="assignees d-flex gap-1">
                     ${lead.assignees.map(assignee => `
