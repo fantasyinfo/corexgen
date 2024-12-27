@@ -20,8 +20,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
-use Yajra\DataTables\Facades\DataTables;
-use Illuminate\Support\Facades\View;
+
 use Illuminate\Support\Facades\Auth;
 use App\Models\Media;
 /**
@@ -130,6 +129,8 @@ class UserController extends Controller
             ))
         ])->first();
 
+        
+
         // fetch usage
 
         if (!$user->is_tenant && !is_null($user->company_id)) {
@@ -140,6 +141,7 @@ class UserController extends Controller
                 'currentUsage' => $usersTotals->totalUsers,
             ];
         }
+
 
 
         return view($this->getViewFilePath('index'), [

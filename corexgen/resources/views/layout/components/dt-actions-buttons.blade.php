@@ -3,6 +3,9 @@
         aria-expanded="false">
         <i class="fas fa-ellipsis-h"></i>
     </button>
+
+
+
     <ul class="dropdown-menu dropdown-menu-end">
         @if (isset($permissions['CHANGE_PASSWORD']) &&
                 hasPermission(strtoupper($module) . '.' . $permissions['CHANGE_PASSWORD']['KEY']))
@@ -16,7 +19,7 @@
                 data-bs-target="#changePasswordModal"
                 
                 >
-                    <i class="fas fa-unlock-alt me-2"></i> Change Password
+                       <span class="status-circle bg-dark me-2"></span> <i class="fas fa-unlock-alt me-2"></i> Change Password
                 </a>
             </li>
         @endif
@@ -24,7 +27,7 @@
             <li class="m-1 p-1">
                 <a class="dropdown-item" href="{{ route($tenantRoute . $module . '.loginas', $id) }}"
                     data-toggle="tooltip" title="Login to view">
-                    <i class="fas fa-sign-in-alt me-2"></i> Login as
+                    <span class="status-circle bg-info me-2"></span> <i class="fas fa-sign-in-alt me-2"></i> Login as
                 </a>
             </li>
         @endif
@@ -33,7 +36,7 @@
             <li class="m-1 p-1">
                 <a class="dropdown-item" href="{{ route($tenantRoute . $module . '.edit', $id) }}" data-toggle="tooltip"
                     title="Edit">
-                    <i class="fas fa-pencil-alt me-2"></i> Edit
+                    <span class="status-circle bg-warning me-2"></span> <i class="fas fa-pencil-alt me-2"></i> Edit
                 </a>
             </li>
         @endif
@@ -43,7 +46,7 @@
                 <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#deleteModal"
                     data-id="{{ $id }}" data-route="{{ route($tenantRoute . $module . '.destroy', $id) }}"
                     data-toggle="tooltip" title="Delete">
-                    <i class="fas fa-trash-alt me-2"></i> Delete
+                    <span class="status-circle bg-danger me-2"></span><i class="fas fa-trash-alt me-2"></i> Delete
                 </a>
             </li>
         @endif

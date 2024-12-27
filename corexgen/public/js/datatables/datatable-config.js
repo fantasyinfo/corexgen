@@ -43,6 +43,11 @@ class DataTableConfig {
             return column;
         });
 
+        const urlParams = new URLSearchParams(window.location.search);
+
+        // Dynamically append all query parameters from the URL
+        const queryParams = Object.fromEntries(urlParams.entries());
+
         return {
             ...this.defaultConfig,
             ...this.options,
@@ -50,6 +55,7 @@ class DataTableConfig {
             ajax: {
                 url: this.options.ajaxUrl,
                 data: (d) => {
+                    Object.assign(d, queryParams);
                     // Add all filter values
                     $("[data-filter]").each(function () {
                         d[$(this).data("filter")] = $(this).val();

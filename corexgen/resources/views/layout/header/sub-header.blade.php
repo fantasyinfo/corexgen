@@ -12,7 +12,7 @@
                     @elseif(Auth::user()->is_tenant && Auth::user()->role_id != null)
                         Super Employee
                     @elseif(!Auth::user()->is_tenant && Auth::user()->role_id == null)
-                        Company Admin
+                        Company Admin ['ci' => {{Auth::user()->company_id}}] & ['ui' => {{Auth::id()}}]
                     @elseif(!Auth::user()->is_tenant && Auth::user()->role_id != null)
                         Company Employee
                     @endif

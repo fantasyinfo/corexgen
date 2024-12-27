@@ -14,6 +14,9 @@ class LeadsRepository
 
     public function getLeadsQuery($request)
     {
+
+        $wantCurrentUserItems = filter_var($request->input('current_user'), FILTER_VALIDATE_BOOLEAN);
+
         $query = CRMLeads::query()
             ->select([
                 'leads.id',  // Specify table name to avoid ambiguity
@@ -47,6 +50,14 @@ class LeadsRepository
                     ->select(['users.id', 'users.name'])
                     ->withOnly([])
             ]);
+
+
+        // Apply filtering based on the current_user flag
+        if ($wantCurrentUserItems === true) {
+            $query->whereHas('assignees', function ($query) {
+                $query->where('users.id', Auth::id());
+            });
+        }
 
         return $this->applyFilters($query, $request);
     }
@@ -130,7 +141,11 @@ class LeadsRepository
 
     public function getKanbanLoad($request)
     {
-        return CRMLeads::query()
+    
+
+        $wantCurrentUserItems = filter_var($request['query']['current_user'], FILTER_VALIDATE_BOOLEAN);
+
+        $query = CRMLeads::query()
             ->select([
                 'leads.id',  // Specify table name to avoid ambiguity
                 'leads.type',
@@ -165,6 +180,17 @@ class LeadsRepository
                     ->select(['users.id', 'users.name'])
                     ->withOnly([])
             ]);
+
+
+
+        // Apply filtering based on the current_user flag
+        if ($wantCurrentUserItems === true) {
+            $query->whereHas('assignees', function ($query) {
+                $query->where('users.id', Auth::id());
+            });
+        }
+
+        return $query;
     }
 
 }

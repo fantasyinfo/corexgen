@@ -325,6 +325,8 @@ class LeadsService
 
         $module = PANEL_MODULES[$this->getPanelModule()]['leads'];
 
+        $stages = $this->getLeadsStatus();
+
         return DataTables::of($query)
             ->addColumn('actions', function ($lead) {
                 return $this->renderActionsColumn($lead);
@@ -333,19 +335,20 @@ class LeadsService
                 return Carbon::parse($lead->created_at)->format('d M Y');
             })
             ->editColumn('group', function ($lead) {
-                return "<span style='color:" . $lead->group->color . ";'>{$lead->group->name}</span>";
+                return "<span class='badge badge-pill bg-" . $lead->group->color . "'>{$lead->group->name}</span>";
             })
             ->editColumn('source', function ($lead) {
-                return "<span style='color:" . $lead->source->color . ";'>{$lead->source->name}</span>";
+                return "<span class='badge badge-pill bg-" . $lead->source->color . "'>{$lead->source->name}</span>";
             })
-            ->editColumn('stage', function ($lead) {
-                return "<span style='color:" . $lead->stage->color . ";'>{$lead->stage->name}</span>";
+            ->editColumn('stage', function ($lead) use($stages) {
+                // return "<span class='badge badge-pill bg-" . $lead->stage->color . "'>{$lead->stage->name}</span>";
+                return $this->renderStageColumn($lead,$stages);
             })
             ->editColumn('assign_to', function ($lead) {
-                return "<span style='color:" . $lead->stage->color . ";'>{$lead->stage->name}</span>";
+                return "<span class='badge badge-pill bg-" . $lead->stage->color . "'>{$lead->stage->name}</span>";
             })
             ->editColumn('assign_by', function ($lead) {
-                return "<span style='color:" . $lead->stage->color . ";'>{$lead->stage->name}</span>";
+                return "<span class='badge badge-pill bg-" . $lead->stage->color . "'>{$lead->stage->name}</span>";
             })
             // ->editColumn('name', function ($lead) use ($module) {
             //     $fullName = trim("{$lead->title} {$lead->first_name} {$lead->middle_name} {$lead->last_name}");
@@ -376,17 +379,16 @@ class LeadsService
         ])->render();
     }
 
-    protected function renderStatusColumn($lead)
+    protected function renderStageColumn($lead,$stages)
     {
-        return View::make(getComponentsDirFilePath('dt-status'), [
+        return View::make(getComponentsDirFilePath('dt-leads-stage'), [
             'tenantRoute' => $this->tenantRoute,
             'permissions' => PermissionsHelper::getPermissionsArray('LEADS'),
             'module' => PANEL_MODULES[$this->getPanelModule()]['leads'],
             'id' => $lead->id,
             'status' => [
-                'current_status' => $lead->status,
-                'available_status' => CRM_STATUS_TYPES['LEADS']['STATUS'],
-                'bt_class' => CRM_STATUS_TYPES['LEADS']['BT_CLASSES'],
+                'current_status' => $lead->status_id,
+                'available_status' => $stages
             ]
         ])->render();
     }

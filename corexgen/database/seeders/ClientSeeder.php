@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\CategoryGroupTag;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -15,9 +16,22 @@ class ClientSeeder extends Seeder
     {
         $clients = [];
 
+        $companyId = 17;
+
+        $categoryIds = CategoryGroupTag::where('type', CATEGORY_GROUP_TAGS_TYPES['KEY']['categories'])->where('relation_type', CATEGORY_GROUP_TAGS_RELATIONS['KEY']['clients'])->where('status', 'active')->where('company_id', $companyId)->pluck('id')->toArray();
+
+
+        $type = ['Individual', 'Company'];
+
+
+
         for ($i = 0; $i <= 100; $i++) {
+
+            $typeTo = $type[array_rand($type)];
+
             $clients[] = [
-                'type' => 'Individual',
+                'type' => $typeTo,
+                'company_name' => $typeTo == 'Company' ? fake()->company : null,
                 'uuid' => Str::uuid(),
                 'title' => ['Mr', 'Miss', 'Dr', 'Master'][array_rand(['Mr', 'Miss', 'Dr', 'Master'])], // Correct array_rand usage
                 'first_name' => fake()->firstName(),
@@ -33,8 +47,11 @@ class ClientSeeder extends Seeder
                 ]), // Multiple phone numbers as JSON
                 'primary_email' => fake()->safeEmail(),
                 'primary_phone' => fake()->phoneNumber(),
-              
-                'company_id' => 1, // Generate random company_id
+                'cgt_id' => $categoryIds[array_rand($categoryIds)],
+                'company_id' => $companyId, // Generate random company_id
+                'status' => CRM_STATUS_TYPES['CLIENTS']['STATUS']['ACTIVE'],
+                'updated_at' => now(),
+                'created_at' => now()
             ];
         }
 

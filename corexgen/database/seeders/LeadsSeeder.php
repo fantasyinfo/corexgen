@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\CategoryGroupTag;
 use App\Models\LeadUser;
 use App\Services\LeadsService;
 use Illuminate\Database\Seeder;
@@ -23,13 +24,18 @@ class LeadsSeeder extends Seeder
         $leads = [];
         $type = ['Individual', 'Company'];
 
-        $loginUserId = 45; // Default user ID
-        $companyId = 14;    // Default company ID
+        $loginUserId = 256; // Default user ID
+        $companyId = 17;    // Default company ID
 
         // Fetch all IDs for groups, sources, statuses, and users
-        $groupIds = $this->leadsService->getLeadsGroups()->pluck('id')->toArray();
-        $sourceIds = $this->leadsService->getLeadsSources()->pluck('id')->toArray();
-        $statusIds = $this->leadsService->getLeadsStatus()->pluck('id')->toArray();
+        $groupIds = CategoryGroupTag::where('type', CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_groups'])->where('relation_type', CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads'])->where('status', 'active')->where('company_id', $companyId)->pluck('id')->toArray();
+
+
+        $sourceIds = CategoryGroupTag::where('type', CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_sources'])->where('relation_type', CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads'])->where('status', 'active')->where('company_id', $companyId)->pluck('id')->toArray();
+
+        $statusIds = CategoryGroupTag::where('type', CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_status'])->where('relation_type', CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads'])->where('status', 'active')->where('company_id', $companyId)->pluck('id')->toArray();
+
+
         $userIds = DB::table('users')->where('company_id', $companyId)->pluck('id')->toArray(); // Fetch user IDs
 
         for ($i = 0; $i <= 100; $i++) {
@@ -58,6 +64,8 @@ class LeadsSeeder extends Seeder
                 'group_id' => $groupIds[array_rand($groupIds)],
                 'source_id' => $sourceIds[array_rand($sourceIds)],
                 'status_id' => $statusIds[array_rand($statusIds)],
+                'updated_at' => now(),
+                'created_at' => now()
             ];
 
             // Insert lead and get the inserted ID
@@ -74,6 +82,8 @@ class LeadsSeeder extends Seeder
                     'lead_id' => $leadId,
                     'user_id' => $userIds[$userKey],
                     'company_id' => $companyId,
+                    'updated_at' => now(),
+                    'created_at' => now()
                 ]);
             }
         }

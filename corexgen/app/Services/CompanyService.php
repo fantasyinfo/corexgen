@@ -150,25 +150,17 @@ class CompanyService
     public function generateCategoryGroupsTags($companyid)
     {
         $insertArray = [];
-        $clientsCategory = ['VIP', 'Normal', 'High Budget', 'Low Budget'];
-        $colors = [
-            '#3E92CC', // Soft Blue
-            '#F4A261', // Warm Orange
-            '#E76F51', // Soft Red
-            '#2A9D8F', // Teal
-            '#264653', // Deep Cyan
-            '#E9C46A', // Sand Yellow
-            '#8A9BA8', // Muted Grayish Blue
-            '#6A4C93', // Purple
+        $clientsCategory = [
+            'warning' => 'VIP',
+            'info' => 'Normal',
+            'success' => 'High Budget',
+            'primary' => 'Low Budget'
         ];
 
-
-        // clients category
-        shuffle($colors); // Shuffle colors for unique usage
-        foreach ($clientsCategory as $index => $cc) {
+        foreach ($clientsCategory as $color => $cc) {
             $insertArray[] = [
                 'name' => $cc,
-                'color' => $colors[$index % count($colors)], // Assign unique color
+                'color' => $color, // Assign unique color
                 'relation_type' => CATEGORY_GROUP_TAGS_RELATIONS['KEY']['clients'],
                 'type' => CATEGORY_GROUP_TAGS_TYPES['KEY']['categories'],
                 'status' => 'active',
@@ -178,13 +170,18 @@ class CompanyService
             ];
         }
 
+
         // leads groups
-        $leadsGroups = ['Hot', 'Warm', 'Cold'];
-        shuffle($colors); // Shuffle again for another group
-        foreach ($leadsGroups as $index => $cc) {
+        $leadsGroups = [
+            'danger' => 'Hot',
+            'warning' => 'Warm',
+            'light' => 'Cold'
+        ];
+
+        foreach ($leadsGroups as $color => $cc) {
             $insertArray[] = [
                 'name' => $cc,
-                'color' => $colors[$index % count($colors)],
+                'color' => $color,
                 'relation_type' => CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads'],
                 'type' => CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_groups'],
                 'status' => 'active',
@@ -194,13 +191,21 @@ class CompanyService
             ];
         }
 
+
         // leads status
-        $leadsStatus = ['New', 'Disqualified', 'Qualified', 'Contacted', 'Proposal Sent', 'Converted'];
-        shuffle($colors);
-        foreach ($leadsStatus as $index => $cc) {
+        $leadsStatus = [
+            'info' => 'New',
+            'secondary' => 'Qualified',
+            'dark' => 'Contacted',
+            'primary' => 'Proposal Sent',
+            'success' => 'Converted',
+            'danger' => 'Disqualified',
+        ];
+
+        foreach ($leadsStatus as $color => $cc) {
             $insertArray[] = [
                 'name' => $cc,
-                'color' => $colors[$index % count($colors)],
+                'color' => $color,
                 'relation_type' => CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads'],
                 'type' => CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_status'],
                 'status' => 'active',
@@ -211,12 +216,18 @@ class CompanyService
         }
 
         // leads sources
-        $leadsSources = ['Social Media', 'Website', 'Ads', 'Referral', 'Other'];
-        shuffle($colors);
-        foreach ($leadsSources as $index => $cc) {
+        $leadsSources = [
+            'info' => 'Social Media',
+            'primary' => 'Website',
+            'dark' => 'Ads',
+            'secondary' => 'Referral',
+            'light' => 'Other'
+        ];
+
+        foreach ($leadsSources as $color => $cc) {
             $insertArray[] = [
                 'name' => $cc,
-                'color' => $colors[$index % count($colors)],
+                'color' => $color,
                 'relation_type' => CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads'],
                 'type' => CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_sources'],
                 'status' => 'active',

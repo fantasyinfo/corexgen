@@ -32,7 +32,7 @@ class LeadsRequest extends FormRequest
             'first_name' => 'nullable|string|max:255',
             'last_name' => 'nullable|string|max:255',
             'email' => 'nullable|email|unique:leads,email',
-            'phone' => 'nullable|digits_between:7,15|unique:leads,phone',
+            'phone' => 'nullable|min:7|max:15|unique:leads,phone',
             'details' => 'nullable|string',
             'last_contacted_date' => 'nullable|date',
             'last_activity_date' => 'nullable|date',

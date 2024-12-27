@@ -190,7 +190,7 @@ class ClientService
                 return Carbon::parse($client->created_at)->format('d M Y');
             })
             ->editColumn('category_name', function ($client) {
-                return "<span style='color:" . $client->category_color . ";'>$client->category_name</span>";
+                return "<span class='badge badge-pill bg-" . $client->category_color . "'>$client->category_name</span>";
             })
             // ->editColumn('name', function ($client) use ($module) {
             //     $fullName = trim("{$client->title} {$client->first_name} {$client->middle_name} {$client->last_name}");

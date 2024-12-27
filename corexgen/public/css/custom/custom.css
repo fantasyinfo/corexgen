@@ -12,7 +12,6 @@
 
 .sidebar-brand {
     /* background-color: var(--dark-black-001); */
-   
 }
 
 .h-200 {
@@ -67,11 +66,13 @@
 
 .nav-pills .nav-link {
     color: var(--body-color);
+    text-align: left;
 }
 
 .nav-pills .nav-link.active,
 .nav-pills .nav-link:hover {
     background: var(--secondary-color);
+    color: var(--body-bg);
 }
 
 .tabSideBar {
@@ -84,6 +85,15 @@
 }
 
 .card {
+    border-width: 4px;
+    border-style: solid;
+    border-image: initial;
+    border-color: var(--task-columns-cards-border);
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
     /* border-top: 2px solid var(--primary-color); */
 }
 
@@ -242,7 +252,7 @@ table tr {
 .select2-dropdown {
     background-color: var(--card-bg);
     color: var(--body-color);
-    border-color: var(--border-color);
+    border-color: var(--body-color);
 }
 
 .select2-container .select2-search__field {
@@ -647,4 +657,32 @@ table.celled {
     background-color: var(--input-bg) !important;
     color: var(--body-color) !important;
     border: 1px solid var(--input-border) !important;
+}
+
+.kanban-border {
+    border-width: 1px;
+    border-style: solid;
+    border-image: initial;
+    border-color: var(--task-columns-cards-border);
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
+}
+
+.badge{
+    font-size:1rem;
+    /* color: var(--body-color) ; */
+}
+
+.badge.bg-light, .badge.bg-warning {
+    color: black !important;
+}
+
+.badge.bg-dark, .text-dark {
+    color: white !important;
+}
+.border-dark {
+    border-color: white !important;
 }

@@ -22,6 +22,7 @@
                 (isset($permissions['KANBAN_BOARD']) &&
                     hasPermission(strtoupper($module) . '.' . $permissions['KANBAN_BOARD']['KEY'])))
             <div class="d-flex">
+                {{-- showing the table and kanban board view btn --}}
                 @if (isset($permissions['KANBAN_BOARD']) &&
                         hasPermission(strtoupper($module) . '.' . $permissions['KANBAN_BOARD']['KEY']))
                     @if (Route::currentRouteName() === getPanelRoutes($module . '.kanban'))
@@ -37,6 +38,39 @@
                             title="{{ __('crud.Kanban Board') }}">
                             <i class="fas fa-columns"></i>
                         </a>
+                    @endif
+                @endif
+                {{-- showing current user board btn --}}
+                @if (isset($permissions['KANBAN_BOARD']) &&
+                        hasPermission(strtoupper($module) . '.' . $permissions['KANBAN_BOARD']['KEY']))
+                    @if (Route::currentRouteName() === getPanelRoutes($module . '.kanban'))
+                        {{-- Show the "Table View" button when on Kanban Board --}}
+                        @if (Request::get('current_user') == 'true')
+                            <a class="btn btn-outline-secondary btn-xl me-2 active" href="?current_user=false"
+                                title="{{ __('crud.My Results') }}">
+                                <i class="fas fa-user"></i>
+                            </a>
+                        @else
+                            <a class="btn btn-outline-secondary btn-xl me-2" href="?current_user=true"
+                                title="{{ __('crud.My Results') }}">
+                                <i class="fas fa-user"></i>
+                            </a>
+                        @endif
+                    @elseif (Route::currentRouteName() === getPanelRoutes($module . '.index'))
+                        {{-- Show the "Kanban Board" button when on Table View --}}
+
+                        @if (Request::get('current_user') == 'true')
+                            <a class="btn btn-outline-secondary btn-xl me-2 active" href="?current_user=false"
+                                title="{{ __('crud.My Results') }}">
+                                <i class="fas fa-user"></i>
+                            </a>
+                        @else
+                            <a class="btn btn-outline-secondary btn-xl me-2" href="?current_user=true"
+                                title="{{ __('crud.My Results') }}">
+                                <i class="fas fa-user"></i>
+                            </a>
+                        @endif
+
                     @endif
                 @endif
                 @if (isset($permissions['FILTER']) && hasPermission(strtoupper($module) . '.' . $permissions['FILTER']['KEY']))

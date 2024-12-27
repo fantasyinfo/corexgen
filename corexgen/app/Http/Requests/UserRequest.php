@@ -40,7 +40,7 @@ class UserRequest extends FormRequest
                 'required',
                 'email',
                 'string',
-                'max:1000',
+                'max:100',
                 Rule::unique('users')
                     ->where(function ($query) use ($companyId) {
                         return $query->where('company_id', $companyId);
@@ -48,8 +48,8 @@ class UserRequest extends FormRequest
                     ->ignore($userId), // Ignore current user for updates
             ],
             'password' => $this->isMethod('post') // Required for create, nullable for update
-                ? ['required', 'string']
-                : ['nullable', 'string'],
+                ? ['required', 'string','max:100']
+                : ['nullable', 'string','max:100'],
             'role_id' => [$isProfile ? 'nullable' : 'required', 'integer'],
             'address_street_address' => 'nullable|string|max:255',
             'address_country_id' => 'nullable',
