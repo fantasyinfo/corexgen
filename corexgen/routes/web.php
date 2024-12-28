@@ -253,6 +253,8 @@ Route::middleware([
 
         // login back
         Route::get('/login-back', [CompaniesController::class, 'loginback'])->name('loginback');
+
+        Route::get('/loginas/{userid}', [UserController::class, 'loginas'])->name('loginas')->middleware('check.permission:USERS.LOGIN_AS');
     });
 
 
@@ -463,6 +465,8 @@ Route::middleware([
         
         Route::get('/view/{id}', [UserController::class, 'view'])->name('view')->middleware('check.permission:USERS.VIEW');
         Route::get('/profile', [UserController::class, 'profile'])->name('profile');
+
+        Route::get('/loginas/{userid}', [UserController::class, 'loginas'])->name('loginas')->middleware('check.permission:USERS.LOGIN_AS');
     });
 
 

@@ -51,7 +51,7 @@
                                 'label' => __('leads.Title'),
                                 'searchable' => true,
                                 'orderable' => true,
-                                'width' => '40px',
+                                'width' => '200px',
                             ],
                             [
                                 'data' => 'first_name',
@@ -61,7 +61,7 @@
                                 'orderable' => true,
                                 'width' => '100px',
                             ],
-                          
+
                             [
                                 'data' => 'last_name',
                                 'name' => 'last_name',

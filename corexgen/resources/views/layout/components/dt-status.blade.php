@@ -1,7 +1,13 @@
 @if (isset($permissions['CHANGE_STATUS']) && hasPermission(strtoupper($module) . '.' . $permissions['CHANGE_STATUS']['KEY']))
     <div class="mx-1 dropdown">
-        <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle p-0"
-            id="statusDropDown" data-bs-toggle="dropdown" aria-expanded="true">
+        <a href="#" 
+        class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle p-0"
+            id="statusDropDown" 
+            data-bs-toggle="dropdown" 
+            aria-expanded="true"
+            data-toggle="tooltip"
+            title="Change Status"
+            >
 
             <span class="badge bg-{{ $status['bt_class'][$status['current_status']] }}">
                 {{ ucfirst($status['current_status']) }}

@@ -35,5 +35,6 @@ return [
     'Import Roles Lists' => 'Import Roles Lists',
     'Download Countries List for Country ID' => 'Download Countries List for Country ID',
     'Kanban Board' => 'Kanban Board',
-    'Table View' => 'Table View'
+    'Table View' => 'Table View',
+    'My Results' => 'My Results',
 ];
