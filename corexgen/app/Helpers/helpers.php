@@ -333,7 +333,7 @@ function hasPermission($permissionKey)
  */
 function hasMenuPermission($permissionId = null)
 {
-    //return true;
+    // Return true if permissions are not required
     $user = Auth::user();
 
     // Quick returns for admin users
@@ -349,20 +349,25 @@ function hasMenuPermission($permissionId = null)
         return false;
     }
 
-
-
-
     // Company admin case
     if ($user->role_id === null && $user->company_id !== null) {
         return true;
     }
 
-    // Regular role-based permission check
-    return DB::table('crm_role_permissions')
-        ->where('permission_id', $permissionId)
-        ->where('role_id', $user->role_id)
-        ->exists();
+    // Fetch and cache all permissions for the user's role
+    static $permissionsCache = null;
+
+    if ($permissionsCache === null) {
+        $permissionsCache = DB::table('crm_role_permissions')
+            ->where('role_id', $user->role_id)
+            ->pluck('permission_id')
+            ->toArray();
+    }
+
+    // Check if the requested permission exists in the cached permissions
+    return in_array($permissionId, $permissionsCache);
 }
+
 
 
 

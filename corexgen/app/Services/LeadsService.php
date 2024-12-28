@@ -173,9 +173,9 @@ class LeadsService
                         'updated_by' => Auth::id(),
                     ];
 
-                   $client =  $this->clientService->createClient($clientData);
-                //    \Log::info('client created,', $client);
-                }else {
+                    $client = $this->clientService->createClient($clientData);
+                    //    \Log::info('client created,', $client);
+                } else {
                     // \Log::info('client found, ' . $isClientAlreadyExists);
                 }
 
@@ -212,11 +212,44 @@ class LeadsService
                 ];
             })->toArray();
 
+
+            $existingAssignees = $lead->assignees()->pluck('lead_user.user_id')->toArray();
+
             // Sync user assignments, handling both insert and update scenarios
             $lead->assignees()->sync($assignToData);
+
+            $newAssignees = $lead->assignees()->pluck('lead_user.user_id')->toArray();
+
+            // Log the changes manually
+            $lead->audits()->create([
+                'old_values' => ['assignees' => $existingAssignees],
+                'new_values' => ['assignees' => $newAssignees],
+                'user_type' => 'App\Models\User',
+                'event' => 'updated',
+                'url' => request()->fullUrl(),
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->header('User-Agent'),
+            ]);
+
         } else {
             // If no assignees are provided, detach all existing ones
+            // Fetch existing assignees before detaching
+            $existingAssignees = $lead->assignees()->pluck('lead_user.user_id')->toArray();
+
+            // Detach all assignees
             $lead->assignees()->detach();
+
+            // Log the detach operation as an audit
+            $lead->audits()->create([
+                'old_values' => ['assignees' => $existingAssignees],
+                'new_values' => ['assignees' => []], // After detach, no assignees
+                'user_type' => 'App\Models\User',
+                'event' => 'updated',
+                'url' => request()->fullUrl(),
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->header('User-Agent'),
+            ]);
+
         }
     }
 
@@ -343,15 +376,18 @@ class LeadsService
             ->editColumn('created_at', function ($lead) {
                 return Carbon::parse($lead->created_at)->format('d M Y');
             })
+            ->editColumn('title', function ($lead) use ($module) {
+                return "<a  class='dt-link' href='" . route($this->tenantRoute . $module . '.view', $lead->id) . "' target='_blank'>$lead->title</a>";
+            })
             ->editColumn('group', function ($lead) {
                 return "<span class='badge badge-pill bg-" . $lead->group->color . "'>{$lead->group->name}</span>";
             })
             ->editColumn('source', function ($lead) {
                 return "<span class='badge badge-pill bg-" . $lead->source->color . "'>{$lead->source->name}</span>";
             })
-            ->editColumn('stage', function ($lead) use($stages) {
+            ->editColumn('stage', function ($lead) use ($stages) {
                 // return "<span class='badge badge-pill bg-" . $lead->stage->color . "'>{$lead->stage->name}</span>";
-                return $this->renderStageColumn($lead,$stages);
+                return $this->renderStageColumn($lead, $stages);
             })
             ->editColumn('assign_to', function ($lead) {
                 return "<span class='badge badge-pill bg-" . $lead->stage->color . "'>{$lead->stage->name}</span>";
@@ -372,7 +408,7 @@ class LeadsService
             // ->editColumn('status', function ($lead) {
             //     return $this->renderStatusColumn($lead);
             // })
-            ->rawColumns(['actions', 'group', 'source', 'stage', 'name']) // Include any HTML columns
+            ->rawColumns(['actions', 'title', 'group', 'source', 'stage', 'name']) // Include any HTML columns
             ->make(true);
     }
 
@@ -388,7 +424,7 @@ class LeadsService
         ])->render();
     }
 
-    protected function renderStageColumn($lead,$stages)
+    protected function renderStageColumn($lead, $stages)
     {
         return View::make(getComponentsDirFilePath('dt-leads-stage'), [
             'tenantRoute' => $this->tenantRoute,

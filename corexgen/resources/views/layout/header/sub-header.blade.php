@@ -28,12 +28,12 @@
                         </a>
                     </div>
                 @endif
-                <div class="theme-toggle mx-2" id="themeToggle">
+                <div class="theme-toggle mx-2" id="themeToggle" data-toggle="tooltip" title="Theme Toggle">
                     <i class="fas fa-sun fa-lg"></i>
                 </div>
                 <div class="dropdown mx-2">
                     <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle"
-                        id="langDropDown" data-bs-toggle="dropdown" aria-expanded="false">
+                        id="langDropDown" data-bs-toggle="dropdown" aria-expanded="false" data-toggle="tooltip" title="Change Language">
                         <i class="fas fa-language"></i>
                         <span class="badge text-success">{{ ucwords(App::getLocale()) }}</span>
                     </a>

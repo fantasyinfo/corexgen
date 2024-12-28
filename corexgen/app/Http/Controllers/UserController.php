@@ -842,4 +842,142 @@ class UserController extends Controller
     }
 
 
+
+
+    public function loginas($userid)
+    {
+        \DB::enableQueryLog();
+
+        $user = User::where('id', $userid)->first();
+
+        \Log::info('User Switching Debug', [
+            'query' => \DB::getQueryLog(),
+            'user_found' => $user ? true : false,
+            'user_details' => $user ? $user->toArray() : null
+        ]);
+
+        if (!$user) {
+            return redirect()->back()->with('error', 'User account not found.');
+        }
+
+        try {
+            $guard = Auth::guard('web');
+
+            // Store original user ID if needed for back-switching
+            $originalUserId = $guard->id();
+            session()->put('original_user_id', $originalUserId);
+
+            \Log::info('Active Guard Before Logout', ['guard' => get_class($guard)]);
+
+            if ($guard->check()) {
+                $guard->logout();
+            }
+
+            // Start new session
+            request()->session()->flush();
+            request()->session()->regenerate(true); // true parameter forces regeneration
+
+            // Login the new user
+            $guard->loginUsingId($user->id);
+
+            // Verify login
+            if (!$guard->check() || $guard->id() !== $user->id) {
+                throw new \Exception('Login verification failed.');
+            }
+
+            \Log::info('Successful User Switch', [
+                'new_user_id' => $user->id,
+                'authenticated_user_id' => $guard->id(),
+                'authenticated_user_email' => $user->email,
+                'guard' => Auth::getDefaultDriver()
+            ]);
+
+            session()->put('login_as_team_member', true);
+            session()->put('login_from_id', Auth::id());
+
+            // Regenerate CSRF token
+            session()->regenerateToken();
+
+            return redirect()->route(getPanelRoutes('home'))
+                ->with('success', 'Logged in as team member');
+
+        } catch (\Exception $e) {
+            \Log::error('User Switching Failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'attempted_user_id' => $user->id,
+                'current_user_id' => Auth::id() ?: 'Not authenticated'
+            ]);
+
+            return redirect()->back()->with('error', 'Failed to switch user account: ' . $e->getMessage());
+        }
+    }
+
+    public function loginback()
+    {
+        session()->remove('login_as_team_member');
+        \DB::enableQueryLog();
+
+        $user = User::where('is_tenant', '1')
+            ->where('role_id', null)
+            ->where('company_id', null)
+            ->first();
+
+        \Log::info('Tenant Switching back Debug', [
+            'tenant_id' => $user->id,
+            'query' => \DB::getQueryLog(),
+            'user_found' => $user ? true : false,
+            'user_details' => $user ? $user->toArray() : null
+        ]);
+
+        if (!$user) {
+            return redirect()->back()->with('error', 'Tenant account not found.');
+        }
+
+        try {
+            $guard = Auth::guard('web');
+
+            \Log::info('Active Guard Before Logout', ['guard' => get_class($guard)]);
+
+            if ($guard->check()) {
+                $guard->logout();
+            }
+
+            // Start new session
+            request()->session()->flush();
+            request()->session()->regenerate(true); // true parameter forces regeneration
+
+            // Login the user
+            $guard->loginUsingId($user->id);
+
+            // Verify login
+            if (!$guard->check() || $guard->id() !== $user->id) {
+                throw new \Exception('Login verification failed.');
+            }
+
+            \Log::info('Successful Tenant back ', [
+                'new_user_id' => $user->id,
+                'authenticated_user_id' => $guard->id(),
+                'authenticated_user_email' => $user->email,
+                'guard' => Auth::getDefaultDriver()
+            ]);
+
+            // Regenerate CSRF token
+            session()->regenerateToken();
+
+            return redirect()->route(getPanelUrl(PANEL_TYPES['SUPER_PANEL']) . '.home')
+                ->with('success', 'Logged back from company account to owner acc');
+
+        } catch (\Exception $e) {
+            \Log::error('User Switching Failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'attempted_user_id' => $user->id,
+                'current_user_id' => Auth::id() ?: 'Not authenticated'
+            ]);
+
+            return redirect()->back()->with('error', 'Failed to switch user account: ' . $e->getMessage());
+        }
+    }
+
 }

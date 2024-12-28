@@ -13,6 +13,7 @@ use App\Models\Country;
 use App\Models\CRM\CRMClients;
 use App\Repositories\LeadsRepository;
 use App\Services\Csv\ClientsCsvRowProcessor;
+use App\Traits\AuditFilter;
 use App\Traits\CategoryGroupTagsFilter;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
@@ -34,6 +35,7 @@ class LeadsController extends Controller
     use TenantFilter;
     use SubscriptionUsageFilter;
     use CategoryGroupTagsFilter;
+    use AuditFilter;
     //
     /**
      * Number of items per page for pagination
@@ -675,8 +677,57 @@ class LeadsController extends Controller
             );
         }
     }
-    public function view()
+    public function view($id)
     {
+        $query = CRMLeads::query()->with([
+            'address' => fn($q) => $q
+                ->select(['id', 'street_address', 'postal_code', 'city_id', 'country_id'])
+                ->with([
+
+                    'city:id,name',
+                    'country:id,name'
+                ]),
+            'group:id,name,color',
+            'source:id,name,color',
+            'stage:id,name,color',
+            'customFields',
+            'assignedBy:id,name',
+            'assignees' => fn($q) => $q
+                ->select(['users.id', 'users.name'])
+                ->withOnly([])
+        ])->where('id', $id);
+
+        $query = $this->applyTenantFilter($query, 'leads');
+
+        $lead = $query->firstOrFail();
+
+        // custom fields
+
+        $cfOldValues = collect();
+        if (!is_null(Auth::user()->company_id)) {
+
+            // fetch already existing values
+            $cfOldValues = $this->customFieldService->getValuesForEntity($lead);
+        }
+
+        // fetch teams actvities
+        $activitesQuery = $this->getActivites(\App\Models\CRM\CRMLeads::class, $id);
+        $activitesQuery = $this->applyTenantFilter($activitesQuery);
+        // $activities = $activitesQuery->get();
+
+        //  dd($activitesQuery->toArray());
+
+        return view($this->getViewFilePath('view'), [
+            'title' => 'View Lead',
+            'lead' => $lead,
+            'module' => PANEL_MODULES[$this->getPanelModule()]['leads'],
+            'leadsGroups' => $this->leadsService->getLeadsGroups(),
+            'leadsSources' => $this->leadsService->getLeadsSources(),
+            'leadsStatus' => $this->leadsService->getLeadsStatus(),
+            'teamMates' => getTeamMates(),
+            'cfOldValues' => $cfOldValues,
+            'activities' => $activitesQuery
+        ]);
     }
     public function profile()
     {
@@ -786,7 +837,7 @@ class LeadsController extends Controller
 
         // custom fields
 
-        $cfOldValues = collect();
+        $cfOldValues = [];
         if (!is_null(Auth::user()->company_id)) {
 
             // fetch already existing values
@@ -795,9 +846,9 @@ class LeadsController extends Controller
 
 
         return response()->json([
-            'lead' => $lead,
+            'lead' => $lead->toArray(),
             'module' => PANEL_MODULES[$this->getPanelModule()]['leads'],
-            'cfOldValues' => $cfOldValues
+            'cfOldValues' => $cfOldValues->toArray()
         ]);
     }
     public function kanbanView($id)
@@ -840,6 +891,8 @@ class LeadsController extends Controller
             'cfOldValues' => $cfOldValues
         ]);
     }
+
+
 
 
 }
