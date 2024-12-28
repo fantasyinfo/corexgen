@@ -786,7 +786,7 @@ class LeadsController extends Controller
 
         // custom fields
 
-        $cfOldValues = collect();
+        $cfOldValues = [];
         if (!is_null(Auth::user()->company_id)) {
 
             // fetch already existing values
@@ -795,9 +795,9 @@ class LeadsController extends Controller
 
 
         return response()->json([
-            'lead' => $lead,
+            'lead' => $lead->toArray(),
             'module' => PANEL_MODULES[$this->getPanelModule()]['leads'],
-            'cfOldValues' => $cfOldValues
+            'cfOldValues' => $cfOldValues->toArray()
         ]);
     }
     public function kanbanView($id)
@@ -840,6 +840,8 @@ class LeadsController extends Controller
             'cfOldValues' => $cfOldValues
         ]);
     }
+
+  
 
 
 }

@@ -45,6 +45,7 @@
     </div>
     @include('dashboard.crm.leads.components.edit-modal')
     @include('dashboard.crm.leads.components.view-modal')
+
 @endsection
 
 @push('scripts')
@@ -359,6 +360,7 @@
                 success: function(response) {
                     console.log(response);
                     populateViewModal(response);
+               
                     $('#viewLeadModal').modal('show');
                 },
                 error: function(xhr) {
@@ -449,11 +451,12 @@
             const lead = data.lead;
 
             // Basic Information
+            $('#viewLeadModal #type').text(lead.type);
             $('#viewLeadModal #companyName').text(lead.company_name);
             $('#viewLeadModal #contactName').text(`${lead.first_name} ${lead.last_name}`);
             $('#viewLeadModal #title').text(lead.title);
-            $('#viewLeadModal #email').text(lead.email);
-            $('#viewLeadModal #phone').text(lead.phone);
+            $('#viewLeadModal #email').html(`<a href="mailto:${lead.email}">${lead.email}</a>`);
+            $('#viewLeadModal #phone').html(`<a href="tel:${lead.phone}">${lead.phone}</a>`);
             $('#viewLeadModal #value').text(`$${parseFloat(lead.value).toLocaleString()}`);
             $('#viewLeadModal #pcm').text(lead.preferred_contact_method);
 
@@ -468,6 +471,19 @@
             $('#viewLeadModal #lastContactedDate').text(formatDate(lead.last_contacted_date));
             $('#viewLeadModal #lastActivityDate').text(formatDate(lead.last_activity_date));
             $('#viewLeadModal #followUpDate').text(formatDate(lead.follow_up_date));
+
+
+
+            // tabs
+
+            $('#viewLeadModal  #detailsShow #detailsView').html(lead.details);
+            
+
+
+
+
+
+
 
             // Assignees
             const assigneesContainer = $('#viewLeadModal #assigneesList');
