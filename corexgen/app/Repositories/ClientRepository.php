@@ -29,6 +29,8 @@ class ClientRepository
 
     protected function applyFilters($query, $request)
     {
+
+
         return $query
             ->when(
                 $request->filled('search'),
@@ -39,6 +41,8 @@ class ClientRepository
                         ->orWhere('clients.title', 'LIKE', "%{$searchTerm}%")
                         ->orWhere('clients.first_name', 'LIKE', "%{$searchTerm}%")
                         ->orWhere('category_group_tag.name', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('clients.primary_email', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('clients.primary_phone', 'LIKE', "%{$searchTerm}%")
                         ->orWhere('clients.created_at', 'LIKE', "%{$searchTerm}%");
                 })
             )
@@ -50,13 +54,21 @@ class ClientRepository
                         ->orWhere('clients.last_name', 'LIKE', "%{$request->name}%");
                 })
             )
+            // ->when(
+            //     $request->filled('email'),
+            //     fn($q) => $q->whereJsonContains('clients.email', $request->email)
+            // )
+            // ->when(
+            //     $request->filled('phone'),
+            //     fn($q) => $q->whereJsonContains('clients.phone', $request->phone)
+            // )
             ->when(
                 $request->filled('email'),
-                fn($q) => $q->whereJsonContains('clients.email', $request->email)
+                fn($q) => $q->where('clients.primary_email', 'LIKE', "%{$request->email}%")
             )
             ->when(
                 $request->filled('phone'),
-                fn($q) => $q->whereJsonContains('clients.phone', $request->phone)
+                fn($q) => $q->where('clients.primary_phone', 'LIKE', "%{$request->phone}%")
             )
             ->when(
                 $request->filled('status') && $request->status != 0,

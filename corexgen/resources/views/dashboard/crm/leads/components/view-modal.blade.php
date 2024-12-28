@@ -408,14 +408,6 @@
             });
 
 
-            // Checkbox completion effect
-            $(".form-check-input").change(function() {
-                if (this.checked) {
-                    $(this).next("label").addClass("text-decoration-line-through");
-                } else {
-                    $(this).next("label").removeClass("text-decoration-line-through");
-                }
-            });
         });
     </script>
 @endpush

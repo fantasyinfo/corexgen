@@ -143,18 +143,24 @@ class LeadsService
                 $validatedData['address_id'] = $address?->id;
             }
 
+            // \Log::info('Is_converted found ' .$validatedData['is_converted'] );
             // convert to boolean of checkbox
             if (isset($validatedData['is_converted']) && $validatedData['is_converted'] == 'on') {
                 $validatedData['is_converted'] = '1';
+
+                // \Log::info('Is_converted yes');
                 // create a client users now //todo::
                 // first ck if there is no client already created with the given email or phone
                 $isClientAlreadyExists = false;
                 if (isset($validatedData['email'])) {
                     $isClientAlreadyExists = $this->clientService->findClientWithType($validatedData['email'], 'email');
+                    // \Log::info('Client searching via email  '.$validatedData['email'].' =>  ' . $isClientAlreadyExists);
                 } else if (isset($validatedData['phone'])) {
                     $isClientAlreadyExists = $this->clientService->findClientWithType($validatedData['phone'], 'phone');
+                    // \Log::info('Client searching via phone  '.$validatedData['phone'].' =>  ' . $isClientAlreadyExists);
                 }
                 if (!$isClientAlreadyExists) {
+                    // \Log::info('Client not found via email or  phone');
                     $clientData = [
                         'type' => $validatedData['type'],
                         'company_name' => $validatedData['company_name'],
@@ -167,7 +173,10 @@ class LeadsService
                         'updated_by' => Auth::id(),
                     ];
 
-                    $this->clientService->createClient($clientData);
+                   $client =  $this->clientService->createClient($clientData);
+                //    \Log::info('client created,', $client);
+                }else {
+                    // \Log::info('client found, ' . $isClientAlreadyExists);
                 }
 
 
