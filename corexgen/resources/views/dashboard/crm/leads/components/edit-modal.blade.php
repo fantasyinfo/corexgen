@@ -182,7 +182,7 @@
                                     <div class="row">
 
 
-                                        <div class="col-md-3">
+                                        <div class="col-md-4">
                                             <div class="mb-3">
                                                 <x-form-components.input-label for="last_contacted_date">
                                                     {{ __('leads.Last Contacted') }}
@@ -192,7 +192,7 @@
                                                     value="{{ old('last_contacted_date') }}" />
                                             </div>
                                         </div>
-                                        <div class="col-md-3">
+                                        <div class="col-md-4">
                                             <div class="mb-3">
                                                 <x-form-components.input-label for="last_activity_date">
                                                     {{ __('leads.Last Activity') }}
@@ -202,7 +202,7 @@
                                                     value="{{ old('last_activity_date') }}" />
                                             </div>
                                         </div>
-                                        <div class="col-md-3">
+                                        <div class="col-md-4">
                                             <div class="mb-3">
                                                 <x-form-components.input-label for="follow_up_date">
                                                     {{ __('leads.Follow Up') }}
@@ -211,6 +211,7 @@
                                                     id="follow_up_date" value="{{ old('follow_up_date') }}" />
                                             </div>
                                         </div>
+                                     
 
 
                                     </div>
@@ -239,6 +240,22 @@
                                             </select>
 
 
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="mb-3">
+                                            <x-form-components.input-label for="is_converted">
+                                                {{ __('leads.Is Captured') }}
+                                            </x-form-components.input-label>
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input" name="is_converted"
+                                                    id="isRequired_0"
+                                                    {{ old('is_converted') == 'on' ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="is_converted">
+                                                    {{ __('if checked, a client account will also created.') }}
+                                                </label>
+                                            </div>
                                         </div>
                                     </div>
 

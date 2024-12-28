@@ -313,7 +313,7 @@
                                             <div class="form-check">
                                                 <input type="checkbox" class="form-check-input" name="is_converted"
                                                     id="isRequired_0"
-                                                    {{ old('is_converted.pcm', $lead->is_converted) == 'on' ? 'checked' : '' }}>
+                                                    {{ old('is_converted', $lead->is_converted) == 'on' ? 'checked' : '' }}>
                                                 <label class="form-check-label" for="is_converted">
                                                     {{ __('if checked, a client account will also created.') }}
                                                 </label>
