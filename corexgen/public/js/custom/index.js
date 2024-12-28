@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Apply Flatpickr to each date input
     dateInputs.forEach((input) => {
         flatpickr(input,{
+            enableTime: true,
             // altInput: true,
         });
     });

@@ -217,7 +217,8 @@
                                                 @foreach ($leadsSources as $ls)
                                                     <option value="{{ $ls->id }}"
                                                         {{ old('source_id', $lead->source_id) == $ls->id ? 'selected' : '' }}>
-                                                        <i class="fas fa-dot-circle"></i> {{ $ls->name }}</option>
+                                                        <i class="fas fa-dot-circle"></i> {{ $ls->name }}
+                                                    </option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -234,11 +235,56 @@
                                                 @foreach ($leadsStatus as $lst)
                                                     <option value="{{ $lst->id }}"
                                                         {{ old('status_id', $lead->status_id) == $lst->id ? 'selected' : '' }}>
-                                                        <i class="fas fa-dot-circle"></i> {{ $lst->name }}</option>
+                                                        <i class="fas fa-dot-circle"></i> {{ $lst->name }}
+                                                    </option>
                                                 @endforeach
                                             </select>
                                         </div>
                                     </div>
+
+
+
+
+
+                                    <div class="row mb-4">
+                                        <div class="col-lg-4">
+                                            <x-form-components.input-label for="last_contacted_date">
+                                                {{ __('leads.Last Contacted') }}
+                                            </x-form-components.input-label>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <x-form-components.input-group type="date" name="last_contacted_date"
+                                                id="last_contacted_date"
+                                                value="{{ old('last_contacted_date', $lead->last_contacted_date) }}" />
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-4">
+                                        <div class="col-lg-4">
+                                            <x-form-components.input-label for="last_activity_date">
+                                                {{ __('leads.Last Activity') }}
+                                            </x-form-components.input-label>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <x-form-components.input-group type="date" name="last_activity_date"
+                                                id="last_activity_date"
+                                                value="{{ old('last_activity_date', $lead->last_activity_date) }}" />
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-4">
+                                        <div class="col-lg-4">
+                                            <x-form-components.input-label for="follow_up_date">
+                                                {{ __('leads.Follow Up') }}
+                                            </x-form-components.input-label>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <x-form-components.input-group type="date" name="follow_up_date"
+                                                id="follow_up_date"
+                                                value="{{ old('follow_up_date', $lead->follow_up_date) }}" />
+                                        </div>
+                                    </div>
+
 
                                     <!-- assign to  -->
 
@@ -248,15 +294,10 @@
                                                 {{ __('leads.Assign To') }}
                                             </x-form-components.input-label>
                                         </div>
-                                       
+
                                         <div class="col-lg-8">
-                                            <x-form-components.dropdown-with-profile 
-                                            :title="'Select Team Members'" 
-                                            :options="$teamMates"
-                                            :name="'assign_to'" 
-                                            :multiple="true" 
-                                            
-                                            :selected="$lead->assignees->pluck('id')->toArray()" />
+                                            <x-form-components.dropdown-with-profile :title="'Select Team Members'" :options="$teamMates"
+                                                :name="'assign_to'" :multiple="true" :selected="$lead->assignees->pluck('id')->toArray()" />
                                         </div>
                                     </div>
 
@@ -282,6 +323,7 @@
                                     </div>
                                     <hr>
                                     <x-form-components.tab-guidebox :nextTab="'Contact'" />
+
                                 </div>
                                 <!-- Contact Details Tab -->
                                 <div class="tab-pane fade" id="contact" role="tabpanel">
@@ -380,7 +422,7 @@
                                                 <select
                                                     class="form-control searchSelectBox  @error('address.country_id') is-invalid @enderror"
                                                     name="address.country_id" id="country_id">
-                                               
+
                                                     @if ($countries)
                                                         @foreach ($countries as $country)
                                                             <option value="{{ $country->id }}"
@@ -549,9 +591,9 @@
                         'wordcount'
                     ],
                     toolbar: 'undo redo | formatselect | bold italic backcolor | \
-                                                                                                      alignleft aligncenter alignright alignjustify | \
-                                                                                                      bullist numlist outdent indent | removeformat | help | \
-                                                                                                      link image media preview codesample table'
+                                                                                                                              alignleft aligncenter alignright alignjustify | \
+                                                                                                                              bullist numlist outdent indent | removeformat | help | \
+                                                                                                                              link image media preview codesample table'
                 });
             }
 

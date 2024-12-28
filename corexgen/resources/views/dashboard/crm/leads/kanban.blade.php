@@ -133,7 +133,7 @@
 
 
             d.search = $('#searchFilter').val();
-            
+
             $.ajax({
                 url: "{{ route(getPanelRoutes($module . '.kanbanLoad')) }}",
                 method: "GET",
@@ -397,6 +397,12 @@
             form.find('select[name="group_id"]').val(lead.group_id);
             form.find('select[name="source_id"]').val(lead.source_id);
 
+            // popludate dates
+            form.find('input[name="last_contacted_date"]').val(lead.last_contacted_date);
+            form.find('input[name="last_activity_date"]').val(lead.last_activity_date);
+            form.find('input[name="follow_up_date"]').val(lead.follow_up_date);
+
+
             // Populate assignees (multi-select)
             const assigneeIds = lead.assignees.map(assignee => assignee.id);
             form.find('select[name="assign_to[]"]').val(assigneeIds).trigger('change');
@@ -449,15 +455,14 @@
             $('#viewLeadModal #email').text(lead.email);
             $('#viewLeadModal #phone').text(lead.phone);
             $('#viewLeadModal #value').text(`$${parseFloat(lead.value).toLocaleString()}`);
+            $('#viewLeadModal #pcm').text(lead.preferred_contact_method);
 
             // Status & Priority
-            $('#viewLeadModal #status').text(lead.status)
-                .removeClass()
-                .addClass(`badge ${lead.status === 'ACTIVE' ? 'bg-success' : 'bg-secondary'}`);
-            $('#viewLeadModal #priority').text(lead.priority)
-                .removeClass()
-                .addClass(`badge ${getPriorityClass(lead.priority)}`);
-            $('#viewLeadModal #score').text(lead.score);
+            $('#viewLeadModal #stage').html(`<span class="badge bg-${lead.stage.color}" >${lead.stage.name}</span>`);
+            $('#viewLeadModal #priority').html(`<span class="badge bg-${getPriorityClass(lead.priority)}" >${lead.priority}</span>`);
+            $('#viewLeadModal #source').html(`<span class="badge bg-${lead.source.color}" >${lead.source.name}</span>`);
+            $('#viewLeadModal #group').html(`<span class="badge bg-${lead.group.color}" >${lead.group.name}</span>`);
+            $('#viewLeadModal #score').html(lead.score);
 
             // Dates
             $('#viewLeadModal #lastContactedDate').text(formatDate(lead.last_contacted_date));
