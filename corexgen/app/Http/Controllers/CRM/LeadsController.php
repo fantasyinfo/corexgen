@@ -805,10 +805,15 @@ class LeadsController extends Controller
             'address' => fn($q) => $q
                 ->select(['id', 'street_address', 'postal_code', 'city_id', 'country_id'])
                 ->with([
+
                     'city:id,name',
                     'country:id,name'
                 ]),
+            'group:id,name,color',
+            'source:id,name,color',
+            'stage:id,name,color',
             'customFields',
+            'assignedBy:id,name',
             'assignees' => fn($q) => $q
                 ->select(['users.id', 'users.name'])
                 ->withOnly([])

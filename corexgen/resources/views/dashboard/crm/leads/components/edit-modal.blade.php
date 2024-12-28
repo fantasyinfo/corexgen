@@ -178,6 +178,45 @@
                                         </div>
                                     </div>
 
+
+                                    <div class="row">
+
+
+                                        <div class="col-md-3">
+                                            <div class="mb-3">
+                                                <x-form-components.input-label for="last_contacted_date">
+                                                    {{ __('leads.Last Contacted') }}
+                                                </x-form-components.input-label>
+                                                <x-form-components.input-group type="date"
+                                                    name="last_contacted_date" id="last_contacted_date"
+                                                    value="{{ old('last_contacted_date') }}" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="mb-3">
+                                                <x-form-components.input-label for="last_activity_date">
+                                                    {{ __('leads.Last Activity') }}
+                                                </x-form-components.input-label>
+                                                <x-form-components.input-group type="date"
+                                                    name="last_activity_date" id="last_activity_date"
+                                                    value="{{ old('last_activity_date') }}" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="mb-3">
+                                                <x-form-components.input-label for="follow_up_date">
+                                                    {{ __('leads.Follow Up') }}
+                                                </x-form-components.input-label>
+                                                <x-form-components.input-group type="date" name="follow_up_date"
+                                                    id="follow_up_date" value="{{ old('follow_up_date') }}" />
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+
+                                    
+
                                     <div class="row">
 
                                         <div class="mb-3">
@@ -202,6 +241,25 @@
 
                                         </div>
                                     </div>
+
+                                    {{-- 
+                                    Last Contacted	Sep 5, 2016, 12:00 AM
+                                    Last Activity	Jul 29, 2010, 12:00 AM
+                                    Follow Up --}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
                                 </div>
                                 <!-- Contact Tab -->
@@ -391,9 +449,9 @@
                     'wordcount'
                 ],
                 toolbar: 'undo redo | formatselect | bold italic backcolor | \
-                                      alignleft aligncenter alignright alignjustify | \
-                                      bullist numlist outdent indent | removeformat | help | \
-                                      link image media preview codesample table'
+                                          alignleft aligncenter alignright alignjustify | \
+                                          bullist numlist outdent indent | removeformat | help | \
+                                          link image media preview codesample table'
             });
 
 

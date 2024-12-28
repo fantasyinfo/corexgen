@@ -66,6 +66,9 @@ return [
     'Source' => 'Source',
     'Group' => 'Group',
     'Assigns To' => 'Assigns To',
-    'Assign By' => 'Assign By'
+    'Assign By' => 'Assign By',
+    'Last Contacted' => 'Last Contacted',
+    'Last Activity' => 'Last Activity',
+    'Follow Up' => 'Follow Up'
 
 ];
