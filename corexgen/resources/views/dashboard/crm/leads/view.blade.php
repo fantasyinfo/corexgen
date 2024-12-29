@@ -1,282 +1,13 @@
 @extends('layout.app')
-
-@section('content')
-    @php
-        // prePrintR($customFields->toArray());
-    @endphp
-
-
-
-
-
-
-    <div class="container-fluid ">
-        <!-- Lead Header -->
-        <div class="card mb-4 border-0 lead-header-card">
-            <div class="card-body">
-                @include('dashboard.crm.leads.components.viewpartials._header')
-            </div>
-        </div>
-
-        <div id="viewDiv">
-            <div class="row">
-                <!-- Main Content Column -->
-                <div class="col-lg-8">
-
-                    <!-- Lead Details Tabs -->
-                    <div class="card border-0 mb-4">
-                        <div class="card-header bg-transparent border-bottom-0">
-                            <ul class="nav nav-tabs card-header-tabs" role="tablist">
-                                <li class="nav-item">
-                                    <a class="nav-link active" data-bs-toggle="tab" href="#details">
-                                        <i class="fas fa-info-circle me-2"></i>Details
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="tab" href="#activities">
-                                        <i class="fas fa-history me-2"></i>Activities
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="tab" href="#notes">
-                                        <i class="fas fa-sticky-note me-2"></i>Notes
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="tab" href="#files">
-                                        <i class="fas fa-paperclip me-2"></i>Files
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="card-body">
-                            <div class="tab-content">
-                                <!-- Details Tab -->
-                                <div class="tab-pane fade show active" id="details">
-                                    <div class="row g-4">
-                                        @include('dashboard.crm.leads.components.viewpartials._basic')
-                                        @include('dashboard.crm.leads.components.viewpartials._additional')
-                                    </div>
-                                    <div class="mt-4">
-                                        <h6 class="detail-label">Address</h6>
-                                        <p class="lead-details">
-                                            {{ $lead?->address?->street_address }},
-                                            {{ $lead?->address?->city?->name }},
-                                            {{ $lead?->address?->country?->name }},
-                                            {{ $lead?->address?->postal_code }}
-                                        </p>
-                                    </div>
-                                    <div class="mt-4">
-                                        <h6 class="detail-label">Details</h6>
-                                        <p class="lead-details">{!! $lead->details !!}</p>
-                                    </div>
-                                </div>
-
-                                <div class="tab-pane fade" id="activities">
-                                    @include('dashboard.crm.leads.components.viewpartials._activity')
-                                </div>
-
-                                <!-- Notes Tab -->
-                                <div class="tab-pane fade" id="notes">
-                                    <div class="notes-section">
-                                        <div class="mb-3">
-                                            <textarea class="form-control" rows="3" placeholder="Add a note..."></textarea>
-                                            <button class="btn btn-primary mt-2">Add Note</button>
-                                        </div>
-                                        <div class="note-list">
-                                            <!-- Note items would go here -->
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Files Tab -->
-                                <div class="tab-pane fade" id="files">
-                                    <div class="files-section">
-                                        <div class="file-upload-area mb-3">
-                                            <input type="file" class="d-none" id="fileUpload">
-                                            <label for="fileUpload" class="file-upload-label">
-                                                <i class="fas fa-cloud-upload-alt"></i>
-                                                <span>Drop files here or click to upload</span>
-                                            </label>
-                                        </div>
-                                        <div class="file-list">
-                                            <!-- File items would go here -->
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Sidebar -->
-                <div class="col-lg-4">
-                    <!-- Quick Stats -->
-
-                    @include('dashboard.crm.leads.components.viewpartials._sidebar')
-
-                </div>
-            </div>
-        </div>
-
-
-        <div id="editDiv">
-            <form id="leadEditForm" method="POST" action="{{ route(getPanelRoutes('leads.update')) }}">
-                @csrf
-                @method('PUT')
-                <input type="hidden" name="id" value="{{$lead->id}}" />
-                <input type="hidden" name="from_kanban" value="true" />
-                <div class="row">
-                    <!-- Main Content Column -->
-                    <div class="col-lg-8">
-
-                        <!-- Lead Details Tabs -->
-                        <div class="card border-0 mb-4">
-                            <div class="card-header bg-transparent border-bottom-0">
-                                <ul class="nav nav-tabs card-header-tabs" role="tablist">
-                                    <li class="nav-item">
-                                        <a class="nav-link active" data-bs-toggle="tab" href="#edit-details">
-                                            <i class="fas fa-info-circle me-2"></i>Details
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" data-bs-toggle="tab" href="#edit-activities">
-                                            <i class="fas fa-history me-2"></i>Activities
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" data-bs-toggle="tab" href="#edit-notes">
-                                            <i class="fas fa-sticky-note me-2"></i>Notes
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" data-bs-toggle="tab" href="#edit-files">
-                                            <i class="fas fa-paperclip me-2"></i>Files
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="card-body">
-                                <div class="tab-content">
-                                    <!-- Details Tab -->
-                                    <div class="tab-pane fade show active" id="edit-details">
-                                        <div class="row g-4">
-                                            @include('dashboard.crm.leads.components.editpartials._basic')
-                                            @include('dashboard.crm.leads.components.editpartials._additional')
-                                        </div>
-                                        <div class="mt-4">
-                                            <h6 class="detail-label">Address</h6>
-                                            <p class="lead-details">
-                                            <p class="my-1">
-                                                <x-form-components.textarea-group name="address.street_address"
-                                                    id="compnayAddressStreet"
-                                                    placeholder="Enter Registered Street Address" class="custom-class"
-                                                    value="{{ old('address.street_address', $lead?->address?->street_address) }}" />
-                                            </p>
-                                            <h6 class="detail-label">Country</h6>
-                                            <p class="my-1">
-                                                <select
-                                                    class="form-control searchSelectBox  @error('address.country_id') is-invalid @enderror"
-                                                    name="address.country_id" id="country_id">
-
-                                                    @if ($countries)
-                                                        @foreach ($countries as $country)
-                                                            <option value="{{ $country->id }}"
-                                                                {{ old('address.country_id', $lead?->address?->country_id) == $country->id ? 'selected' : '' }}>
-                                                                {{ $country->name }}
-                                                            </option>
-                                                        @endforeach
-                                                    @else
-                                                        <option disabled>No country available</option>
-                                                    @endif
-                                                </select>
-                                            </p>
-                                            <h6 class="detail-label mt-4">City</h6>
-                                            <p class="my-1">
-                                                <x-form-components.input-group type="text" name="address.city_name"
-                                                    id="compnayAddressCity" placeholder="{{ __('Enter City') }}"
-                                                    value="{{ old('address.city_name', $lead?->address?->city?->name) }}"
-                                                    class="custom-class" />
-                                            </p>
-                                            <h6 class="detail-label">Pincode</h6>
-                                            <p class="my-1">
-                                                <x-form-components.input-group type="text" name="address.pincode"
-                                                    id="compnayAddressPincode" placeholder="{{ __('Enter Pincode') }}"
-                                                    value="{{ old('address.pincode', $lead?->address?->postal_code) }}"
-                                                    class="custom-class" />
-                                            </p>
-                                            </p>
-                                        </div>
-                                        <div class="mt-4">
-                                            <x-form-components.input-label for="details">
-                                                {{ __('leads.Additional Details') }}
-                                            </x-form-components.input-label>
-                                            <textarea name="details" id="details" class="form-control wysiwyg-editor" rows="5">{{ old('details') }}</textarea>
-                                        </div>
-                                    </div>
-
-                                    <div class="tab-pane fade" id="edit-activities">
-                                        @include('dashboard.crm.leads.components.editpartials._activity')
-                                    </div>
-
-                                    <!-- Notes Tab -->
-                                    <div class="tab-pane fade" id="edit-notes">
-                                        <div class="notes-section">
-                                            <div class="mb-3">
-                                                <textarea class="form-control" rows="3" placeholder="Add a note..."></textarea>
-                                                <button class="btn btn-primary mt-2">Add Note</button>
-                                            </div>
-                                            <div class="note-list">
-                                                <!-- Note items would go here -->
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Files Tab -->
-                                    <div class="tab-pane fade" id="edit-files">
-                                        <div class="files-section">
-                                            <div class="file-upload-area mb-3">
-                                                <input type="file" class="d-none" id="fileUpload">
-                                                <label for="fileUpload" class="file-upload-label">
-                                                    <i class="fas fa-cloud-upload-alt"></i>
-                                                    <span>Drop files here or click to upload</span>
-                                                </label>
-                                            </div>
-                                            <div class="file-list">
-                                                <!-- File items would go here -->
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Sidebar -->
-                    <div class="col-lg-4">
-                        <!-- Quick Stats -->
-
-                        @include('dashboard.crm.leads.components.editpartials._sidebar')
-
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> <span>{{ __('leads.Update Lead') }}</span>
-                </button>
-            </form>
-        </div>
-
-    </div>
-@endsection
-
 @push('style')
     <style>
-        #viewDiv {
-            display: block;
+        #editDetails,
+        #updateBtn {
+            display: none;
         }
 
-        #editDiv {
-            display: none;
+        .divider {
+            background-color: var(--body-bg);
         }
 
         .card {
@@ -557,26 +288,7 @@
             /* background: rgba(0, 0, 0, 0.2); */
         }
 
-        /* File Upload Styling */
-        .file-upload-label {
-            border: 2px dashed var(--border-color);
-            border-radius: 1rem;
-            padding: 2rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .file-upload-label:hover {
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-        }
-
-        .file-upload-label i {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-            display: block;
-        }
+       
 
         /* Task List Styling */
         .task-list {
@@ -665,91 +377,174 @@
             transition: all 0.3s ease;
         }
 
-        /* Custom Scrollbar */
-        /* ::-webkit-scrollbar {
-                                                            width: 8px;
-                                                            height: 8px;
-                                                        }
+        .divider-container {
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+        }
 
-                                                        ::-webkit-scrollbar-track {
-                                                            background: var(--body-bg);
-                                                        }
+        .divider {
+            width: 1px;
+            background-color: var(--body-bg);
+            /* Adjust color as per your theme */
+            height: 100%;
+        }
 
-                                                        ::-webkit-scrollbar-thumb {
-                                                            background: var(--neutral-gray);
-                                                            border-radius: 4px;
-                                                        }
+        .main-content-view {
+            padding-right: 1rem;
+            /* Add space near the divider */
+        }
 
-                                                        ::-webkit-scrollbar-thumb:hover {
-                                                            background: var(--primary-color);
-                                                        } */
+        .sidebar-view {
+            padding-left: 1rem;
+            /* Add space near the divider */
+        }
     </style>
 @endpush
-
 
 @push('scripts')
     <script src="{{ asset('js/tinymce/tinymce.min.js') }}"></script>
     <script>
+        let currentTheme = document.documentElement.getAttribute('data-bs-theme');
+    </script>
+@endpush
+@section('content')
+    @php
+        //  prePrintR($lead->attachments->toArray());
+    @endphp
+    <div class="container-fluid ">
+        <!-- Lead Header -->
+        <div class="card mb-4 border-0 lead-header-card">
+            <div class="card-body">
+                @include('dashboard.crm.leads.components._header')
+            </div>
+        </div>
+
+
+        <div class="row">
+            <!-- Main Content Column -->
+
+            <!-- Lead Details Tabs -->
+            <div class="card border-0 mb-4">
+                <div class="card-header bg-transparent border-bottom-0">
+                    <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#details" role="tab">
+                                <i class="fas fa-info-circle me-2"></i>Details
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#activities">
+                                <i class="fas fa-history me-2"></i>Activities
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#notes">
+                                <i class="fas fa-sticky-note me-2"></i>Notes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#files">
+                                <i class="fas fa-paperclip me-2"></i>Files
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content">
+                        <!-- Details View Tab -->
+                        <div class="tab-pane fade show active" id="details">
+                            @if (isset($permissions['UPDATE']) && hasPermission(strtoupper($module) . '.' . $permissions['UPDATE']['KEY']))
+                                <div class="d-flex my-3 justify-content-lg-end gap-2 ">
+                                    <button id='editToggle' class="btn btn-warning">
+                                        <i class="fas fa-pencil-alt me-2"></i> Edit
+                                    </button>
+                                    <button form="leadEditForm" type="submit" id="updateBtn" class="btn btn-primary">
+                                        <i class="fas fa-plus me-2"></i> <span>Update </span>
+                                    </button>
+                                </div>
+                            @endif
+                            <!-- View Details -->
+                            <div class="row g-4" id="viewDetails">
+                                <div class="col-lg-7 main-content-view">
+                                    <div class="row">
+                                        @include('dashboard.crm.leads.components.viewpartials._basic')
+                                        @include('dashboard.crm.leads.components.viewpartials._additional')
+                                    </div>
+                                    @include('dashboard.crm.leads.components.viewpartials._address')
+                                    @include('dashboard.crm.leads.components.viewpartials._details')
+                                </div>
+                                <div class="col-lg-1 divider-container">
+                                    <div class="divider"></div>
+                                </div>
+                                <div class="col-lg-4 sidebar-view">
+                                    @include('dashboard.crm.leads.components.viewpartials._sidebar')
+                                </div>
+                            </div>
+                            <!-- Edit Details -->
+                            <div class="row g-4" id="editDetails">
+                                <form id="leadEditForm" method="POST" action="{{ route(getPanelRoutes('leads.update')) }}">
+                                    @csrf
+                                    @method('PUT')
+                                    <input type="hidden" name="id" value="{{ $lead->id }}" />
+                                    <input type="hidden" name="from_view" value="true" />
+                                    <div class="row">
+                                        <div class="col-lg-7 main-content-view">
+                                            <div class="row">
+                                                @include('dashboard.crm.leads.components.editpartials._basic')
+                                                @include('dashboard.crm.leads.components.editpartials._additional')
+                                            </div>
+                                            @include('dashboard.crm.leads.components.editpartials._address')
+                                            @include('dashboard.crm.leads.components.editpartials._details')
+                                        </div>
+                                        <div class="col-lg-1 divider-container">
+                                            <div class="divider"></div>
+                                        </div>
+                                        <div class="col-lg-4 sidebar-view">
+                                            @include('dashboard.crm.leads.components.editpartials._sidebar')
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                        </div>
+
+
+                        <div class="tab-pane fade" id="activities">
+                            @include('dashboard.crm.leads.components.viewpartials._activity')
+                        </div>
+
+                        <!-- Notes Tab -->
+                        <div class="tab-pane fade" id="notes">
+                            @include('dashboard.crm.leads.components._notes')
+                        </div>
+
+                        <!-- Files Tab -->
+                        <div class="tab-pane fade" id="files">
+                            @include('dashboard.crm.leads.components._attachments')
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+
+    </div>
+@endsection
+
+
+
+
+@push('scripts')
+    <script>
         $("#editToggle").click(function(e) {
             e.preventDefault();
-            $("#viewDiv").toggle();
-            $("#editDiv").toggle();
+            $("#viewDetails").toggle();
+            $("#editDetails").toggle();
+            $("#updateBtn").toggle();
         })
-
-        const currentTheme = document.documentElement.getAttribute('data-bs-theme');
-        // Initialize WYSIWYG editor
-        if (typeof tinymce !== 'undefined') {
-            tinymce.init({
-                selector: '.wysiwyg-editor',
-                height: 300,
-                base_url: '/js/tinymce',
-                license_key: 'gpl',
-                skin: currentTheme === 'dark' ? 'oxide-dark' : 'oxide',
-                content_css: currentTheme === 'dark' ? 'dark' : 'default',
-                setup: function(editor) {
-                    editor.on('init', function() {
-                        editor.setContent(`{!! $lead->details !!}`);
-                    });
-                },
-                menubar: false,
-                plugins: [
-                    'accordion',
-                    'advlist',
-                    'anchor',
-                    'autolink',
-                    'autoresize',
-                    'autosave',
-                    'charmap',
-                    'code',
-                    'codesample',
-                    'directionality',
-                    'emoticons',
-                    'fullscreen',
-                    'help',
-                    'lists',
-                    'link',
-                    'image',
-
-
-                    'preview',
-                    'anchor',
-                    'searchreplace',
-                    'visualblocks',
-
-
-                    'insertdatetime',
-                    'media',
-                    'table',
-
-
-
-                    'wordcount'
-                ],
-                toolbar: 'undo redo | formatselect | bold italic backcolor | \
-                                                                                                                                      alignleft aligncenter alignright alignjustify | \
-                                                                                                                                      bullist numlist outdent indent | removeformat | help | \
-                                                                                                                                      link image media preview codesample table'
-            });
-        }
     </script>
 @endpush

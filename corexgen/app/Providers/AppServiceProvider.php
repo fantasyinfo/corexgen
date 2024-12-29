@@ -23,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Paginator::defaultView('layout.components.pagination');
+        // Paginator::defaultView('layout.components.pagination');
    
 
         Builder::macro('whereLower', function ($column, $operator, $value) {

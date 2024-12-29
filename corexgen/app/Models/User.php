@@ -42,7 +42,7 @@ class User extends Authenticatable implements Auditable
         'is_tenant',
         'tenant_id',
         'company_id',
-        'address_id'
+        'address_id',
     ];
 
     /**
@@ -56,6 +56,8 @@ class User extends Authenticatable implements Auditable
         'two_factor_recovery_codes',
         'two_factor_secret',
     ];
+
+   
 
     /**
      * The attributes that should be cast.
@@ -108,6 +110,9 @@ class User extends Authenticatable implements Auditable
             ->withTimestamps()
             ->withPivot('company_id');
     }
+
+
+
     protected static function boot()
     {
         parent::boot();

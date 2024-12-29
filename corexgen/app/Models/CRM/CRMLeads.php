@@ -2,7 +2,9 @@
 namespace App\Models\CRM;
 
 use App\Models\Address;
+use App\Models\Attachments;
 use App\Models\CategoryGroupTag;
+use App\Models\CommentNote;
 use App\Models\Company;
 use App\Models\User;
 use App\Traits\HasCustomFields;
@@ -106,6 +108,20 @@ class CRMLeads extends Model implements Auditable
             ->withPivot('company_id');
     }
 
+
+    public function comments()
+    {
+        return $this->morphMany(CommentNote::class, 'commentable')
+            ->with('user:id,name,profile_photo_path') // Eager load only needed user fields
+            ->latest('created_at');
+    }
+
+    public function attachments()
+    {
+        return $this->morphMany(Attachments::class, 'attachable')->latest('created_at');
+
+    }
+
     /**
      * Model boot method to set default values
      */
@@ -114,8 +130,8 @@ class CRMLeads extends Model implements Auditable
         parent::boot();
 
 
-            // Add a global scope to filter by status = 'active'
-            static::addGlobalScope('active', function (Builder $builder) {
+        // Add a global scope to filter by status = 'active'
+        static::addGlobalScope('active', function (Builder $builder) {
             $builder->where('leads.status', CRM_STATUS_TYPES['LEADS']['STATUS']['ACTIVE']);
         });
 
