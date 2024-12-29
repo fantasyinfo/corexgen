@@ -48,41 +48,29 @@
                                 </div>
                             </div>
 
-                            <!-- Activity Changes -->
-                            <!-- Activity Changes -->
+                            <!-- Human-Readable Changes -->
                             <div class="activity-changes">
                                 @foreach ($activity['new_values'] as $key => $newValue)
                                     @php
                                         $oldValue = $activity['old_values'][$key] ?? 'N/A';
                                         $fieldName = ucfirst(str_replace('_', ' ', $key));
+                                        $userName = $activity['user']['name'] ?? 'Someone';
 
-                                        // Format special values
+                                        // Handle array values
                                         $oldFormatted = is_array($oldValue) ? implode(', ', $oldValue) : $oldValue;
                                         $newFormatted = is_array($newValue) ? implode(', ', $newValue) : $newValue;
 
-                                        // Format boolean values
-                                        if (is_bool($oldValue) || $oldValue === '0' || $oldValue === '1') {
-                                            $oldFormatted = filter_var($oldValue, FILTER_VALIDATE_BOOLEAN)
-                                                ? 'Yes'
-                                                : 'No';
-                                        }
-                                        if (is_bool($newValue) || $newValue === '0' || $newValue === '1') {
-                                            $newFormatted = filter_var($newValue, FILTER_VALIDATE_BOOLEAN)
-                                                ? 'Yes'
-                                                : 'No';
+                                        // Human-readable sentences
+                                        $action = $oldFormatted === 'N/A' ? 'added' : 'updated';
+                                        $message = "{$userName} just {$action} the {$fieldName}";
+
+                                        if ($oldFormatted !== 'N/A') {
+                                            $message .= " from '{$oldFormatted}' to '{$newFormatted}'";
                                         }
                                     @endphp
-                                    <div class="change-item">
-                                        <span class="field-label">{{ $fieldName }}</span>
-                                        <div class="change-values">
-                                            <span class="old-value">{{ $oldFormatted }}</span>
-                                            <i class="fas fa-arrow-right mx-2"></i>
-                                            <span class="new-value">{{ $newFormatted }}</span>
-                                        </div>
-                                    </div>
+                                    <p class="change-item">{{ $message }}.</p>
                                 @endforeach
                             </div>
-
                         </div>
                     </div>
                 </div>

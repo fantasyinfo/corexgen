@@ -43,7 +43,7 @@
         </div>
 
     </div>
-    @include('dashboard.crm.leads.components.edit-modal')
+
     @include('dashboard.crm.leads.components.view-modal')
 
 @endsection
@@ -169,9 +169,15 @@
 
         // Create a new function to generate lead cards
         function createLeadElement(lead) {
+
+            let baseUrl =
+                "{{ route(getPanelRoutes($module . '.view'), ['id' => ':id']) }}";
+            let url = baseUrl.replace(':id', lead.id);
+
+
             const nameElement = lead.type === 'Company' ?
-                `<h6 class="task-title"> <span class="status-circle bg-success me-2"></span> ${lead.company_name}</h6>` :
-                `<h6 class="task-title"> <span class="status-circle bg-warning me-2"></span> ${lead.first_name}</h6>`;
+                `<a href='${url}'><h6 class="task-title"> <span class="status-circle bg-success me-2"></span> ${lead.company_name}</h6></a>` :
+                `<a href='${url}'><h6 class="task-title"> <span class="status-circle bg-warning me-2"></span> ${lead.first_name}</h6></a>`;
 
             const assigneeElements = lead.assignees.map(assignee =>
                 `<img src="${assignee.profile_photo_url}" 
@@ -184,6 +190,8 @@
             const statusClass = lead.status === 'ACTIVE' ? 'bg-success' : 'bg-danger';
             const formattedDate = new Date(lead.created_at).toLocaleDateString();
 
+         
+
             return `
         <div class="task-card border-bottom border-${lead.stage.color}" 
              draggable="true" 
@@ -193,8 +201,7 @@
                 ${nameElement}
    
                 <div class="task-actions">
-                    <i class="fas fa-eye " onclick="viewTask(${lead.id})"></i>
-                    <i class="fas fa-edit " onclick="editTask(${lead.id})"></i>
+                 
                     <i class="fas fa-trash-alt " onclick="deleteTask(${lead.id})"></i>
                 </div>
             </div>
@@ -316,221 +323,6 @@
         }
 
 
-        // Edit task
-        function editTask(taskId) {
-
-            let baseUrl =
-                "{{ route(getPanelRoutes($module . '.kanbanEdit'), ['id' => ':id']) }}";
-            let url = baseUrl.replace(':id', taskId);
-
-            $.ajax({
-                url: url,
-                method: "GET",
-                data: {
-                    _token: '{{ csrf_token() }}',
-                },
-                success: function(response) {
-                    console.log(response);
-                    populateEditModal(response);
-                    $('#editLeadModal').modal('show');
-                },
-                error: function(xhr) {
-                    console.error('Error fetching  data:', xhr.responseText);
-                }
-            });
-
-
-        }
-
-
-        // view task 
-
-        function viewTask(taskId) {
-
-            let baseUrl =
-                "{{ route(getPanelRoutes($module . '.kanbanView'), ['id' => ':id']) }}";
-            let url = baseUrl.replace(':id', taskId);
-
-            $.ajax({
-                url: url,
-                method: "GET",
-                data: {
-                    _token: '{{ csrf_token() }}',
-                },
-                success: function(response) {
-                    console.log(response);
-                    populateViewModal(response);
-               
-                    $('#viewLeadModal').modal('show');
-                },
-                error: function(xhr) {
-                    console.error('Error fetching  data:', xhr.responseText);
-                }
-            });
-
-
-        }
-
-
-        function populateEditModal(data) {
-            const lead = data.lead;
-            const form = $('#leadEditForm');
-
-            // Reset form
-            form[0].reset();
-
-            // Set hidden ID field
-            form.find('input[name="id"]').val(lead.id);
-
-            // Populate basic fields
-            form.find('select[name="type"]').val(lead.type).trigger('change');
-            form.find('input[name="company_name"]').val(lead.company_name);
-            form.find('input[name="first_name"]').val(lead.first_name);
-            form.find('input[name="last_name"]').val(lead.last_name);
-            form.find('input[name="title"]').val(lead.title);
-            form.find('input[name="value"]').val(lead.value);
-            form.find('select[name="priority"]').val(lead.priority);
-            form.find('input[name="email"]').val(lead.email);
-            form.find('input[name="phone"]').val(lead.phone);
-            form.find('select[name="preferred_contact_method"]').val(lead.preferred_contact_method);
-
-            // Populate dropdowns
-            form.find('select[name="status_id"]').val(lead.status_id);
-            form.find('select[name="group_id"]').val(lead.group_id);
-            form.find('select[name="source_id"]').val(lead.source_id);
-
-            // popludate dates
-            form.find('input[name="last_contacted_date"]').val(lead.last_contacted_date);
-            form.find('input[name="last_activity_date"]').val(lead.last_activity_date);
-            form.find('input[name="follow_up_date"]').val(lead.follow_up_date);
-
-
-            // Populate assignees (multi-select)
-            const assigneeIds = lead.assignees.map(assignee => assignee.id);
-            form.find('select[name="assign_to[]"]').val(assigneeIds).trigger('change');
-
-            // Populate address fields if exists
-            if (lead.address) {
-                form.find('textarea[name="address[street_address]"]').val(lead.address.street_address);
-                form.find('select[name="address[country_id]"]').val(lead.address.country_id).trigger('change');
-                form.find('input[name="address[city_name]"]').val(lead.address.city?.name);
-                form.find('input[name="address[pincode]"]').val(lead.address.postal_code);
-            }
-
-
-
-
-            // Populate TinyMCE editor
-            if (lead.details != null) {
-                tinymce.get('details').setContent(lead.details || '');
-
-            }
-
-            // Populate custom fields if they exist
-            if (data.customFields && data.customFields.length > 0) {
-                data.customFields.forEach(field => {
-                    const fieldValue = data.cfOldValues[field.field_name] || '';
-                    const fieldElement = form.find(`[name="custom_fields[${field.field_name}]"]`);
-
-                    if (fieldElement.length) {
-                        if (field.field_type === 'checkbox') {
-                            fieldElement.prop('checked', fieldValue === '1');
-                        } else if (field.field_type === 'select' && fieldElement.hasClass('select2')) {
-                            fieldElement.val(fieldValue).trigger('change');
-                        } else {
-                            fieldElement.val(fieldValue);
-                        }
-                    }
-                });
-            }
-
-
-        }
-
-        function populateViewModal(data) {
-            const lead = data.lead;
-
-            // Basic Information
-            $('#viewLeadModal #type').text(lead.type);
-            $('#viewLeadModal #companyName').text(lead.company_name);
-            $('#viewLeadModal #contactName').text(`${lead.first_name} ${lead.last_name}`);
-            $('#viewLeadModal #title').text(lead.title);
-            $('#viewLeadModal #email').html(`<a href="mailto:${lead.email}">${lead.email}</a>`);
-            $('#viewLeadModal #phone').html(`<a href="tel:${lead.phone}">${lead.phone}</a>`);
-            $('#viewLeadModal #value').text(`$${parseFloat(lead.value).toLocaleString()}`);
-            $('#viewLeadModal #pcm').text(lead.preferred_contact_method);
-
-            // Status & Priority
-            $('#viewLeadModal #stage').html(`<span class="badge bg-${lead.stage.color}" >${lead.stage.name}</span>`);
-            $('#viewLeadModal #priority').html(`<span class="badge bg-${getPriorityClass(lead.priority)}" >${lead.priority}</span>`);
-            $('#viewLeadModal #source').html(`<span class="badge bg-${lead.source.color}" >${lead.source.name}</span>`);
-            $('#viewLeadModal #group').html(`<span class="badge bg-${lead.group.color}" >${lead.group.name}</span>`);
-            $('#viewLeadModal #score').html(lead.score);
-
-            // Dates
-            $('#viewLeadModal #lastContactedDate').text(formatDate(lead.last_contacted_date));
-            $('#viewLeadModal #lastActivityDate').text(formatDate(lead.last_activity_date));
-            $('#viewLeadModal #followUpDate').text(formatDate(lead.follow_up_date));
-
-
-
-            // tabs
-
-            $('#viewLeadModal  #detailsShow #detailsView').html(lead.details);
-            
-
-
-
-
-
-
-
-            // Assignees
-            const assigneesContainer = $('#viewLeadModal #assigneesList');
-            assigneesContainer.empty();
-
-            lead.assignees.forEach(assignee => {
-                assigneesContainer.append(`
-            <div class="col-md-4 col-lg-3">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body text-center">
-                        <img src="${assignee.profile_photo_url}" 
-                             alt="${assignee.name}" 
-                             class="rounded-circle mb-2"
-                             style="width: 64px; height: 64px;">
-                        <h6 class="card-title mb-0">${assignee.name}</h6>
-                    </div>
-                </div>
-            </div>
-        `);
-            });
-        }
-
-        // Helper function to format dates
-        function formatDate(dateString) {
-            if (!dateString) return 'N/A';
-            return new Date(dateString).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        }
-
-        // Helper function to get priority badge class
-        function getPriorityClass(priority) {
-            switch (priority.toLowerCase()) {
-                case 'high':
-                    return 'bg-danger';
-                case 'medium':
-                    return 'bg-warning';
-                case 'low':
-                    return 'bg-info';
-                default:
-                    return 'bg-secondary';
-            }
-        }
 
 
         // Delete task
