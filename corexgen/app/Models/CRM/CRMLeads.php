@@ -2,6 +2,7 @@
 namespace App\Models\CRM;
 
 use App\Models\Address;
+use App\Models\Attachments;
 use App\Models\CategoryGroupTag;
 use App\Models\CommentNote;
 use App\Models\Company;
@@ -110,7 +111,15 @@ class CRMLeads extends Model implements Auditable
 
     public function comments()
     {
-        return $this->morphMany(CommentNote::class, 'commentable')->latest('created_at');;
+        return $this->morphMany(CommentNote::class, 'commentable')
+            ->with('user:id,name,profile_photo_path') // Eager load only needed user fields
+            ->latest('created_at');
+    }
+
+    public function attachments()
+    {
+        return $this->morphMany(Attachments::class, 'attachable')->latest('created_at');
+
     }
 
     /**

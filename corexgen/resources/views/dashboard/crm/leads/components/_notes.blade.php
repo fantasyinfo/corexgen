@@ -1,15 +1,29 @@
+@php
+    // prePrintR($comments);
+@endphp
+
 <div class="notes-section">
     <div class="mb-3">
         <form id="commentForm" method="POST" action="{{ route(getPanelRoutes('leads.comment.create')) }}">
             @csrf
             <input type="hidden" name="id" value="{{ $lead->id }}" />
             <textarea name='comment' class="form-control wysiwyg-editor-comment" rows="3" placeholder="Add a note..."></textarea>
-            <button form="commentForm" class="btn btn-primary mt-2" type="submit">Add
-                Note</button>
+            <div class="d-flex justify-content-center my-2">
+                <button form="commentForm" class="btn btn-primary mt-2" type="submit">Add Note</button>
+            </div>
         </form>
     </div>
     <div class="note-list">
-        @if ($lead->comments)
+        @php
+            $deletePermission = false;
+            if (
+                isset($permissions['DELETE']) &&
+                hasPermission(strtoupper($module) . '.' . $permissions['DELETE']['KEY'])
+            ) {
+                $deletePermission = true;
+            }
+        @endphp
+        @if ($lead->comments->count() > 0)
             @foreach ($lead->comments as $comment)
                 <div class="comment-item mb-4">
                     <div class="d-flex">
@@ -34,16 +48,17 @@
                                         <i class="far fa-clock"></i>
                                         {{ \Carbon\Carbon::parse($comment->created_at)->diffForHumans() }}
                                     </small>
-
                                 </h6>
-                                @if (isset($permissions['DELETE']) && hasPermission(strtoupper($module) . '.' . $permissions['DELETE']['KEY']))
-                                    <form id='deleteComment' method="POST"
+                                @if ($deletePermission)
+                                    <form id="deleteComment{{ $comment->id }}" method="POST"
                                         action="{{ route(getPanelRoutes('leads.comment.destroy'), ['id' => $comment->id]) }}">
                                         @csrf
                                         @method('DELETE')
                                         <button title="Delete Comment" data-toggle="tooltip"
-                                            class="btn btn-danger btn-sm" type='submit' form="deleteComment"><i
-                                                class="fas fa-trash"></i></button>
+                                            class="btn btn-danger btn-sm confirm-delete-note" type="submit"
+                                            form="deleteComment{{ $comment->id }}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
                                     </form>
                                 @endif
                             </div>
@@ -143,8 +158,18 @@
 
 
 @push('scripts')
-
     <script>
+        document.querySelectorAll('.confirm-delete-note').forEach((button) => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault(); // Prevent form submission
+                const form = e.target.closest('form'); // Get the form element
+                const confirmation = confirm(
+                    'Are you sure you want to delete this note?');
+                if (confirmation) {
+                    form.submit(); // Submit the form if confirmed
+                }
+            });
+        });
         // Initialize WYSIWYG editor
         if (typeof tinymce !== 'undefined') {
             tinymce.init({
@@ -189,9 +214,9 @@
                     'wordcount'
                 ],
                 toolbar: 'undo redo | formatselect | bold italic backcolor | \
-                                                                                                                                                                              alignleft aligncenter alignright alignjustify | \
-                                                                                                                                                                              bullist numlist outdent indent | removeformat | help | \
-                                                                                                                                                                              link image media preview codesample table'
+                                                                                                                                                                                              alignleft aligncenter alignright alignjustify | \
+                                                                                                                                                                                              bullist numlist outdent indent | removeformat | help | \
+                                                                                                                                                                                              link image media preview codesample table'
             });
         }
     </script>

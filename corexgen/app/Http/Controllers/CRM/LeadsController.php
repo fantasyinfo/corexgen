@@ -721,6 +721,8 @@ class LeadsController extends Controller
 
         //  dd($activitesQuery->toArray());
 
+   
+
         return view($this->getViewFilePath('view'), [
             'title' => 'View Lead',
             'lead' => $lead,

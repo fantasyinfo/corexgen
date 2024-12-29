@@ -288,26 +288,7 @@
             /* background: rgba(0, 0, 0, 0.2); */
         }
 
-        /* File Upload Styling */
-        .file-upload-label {
-            border: 2px dashed var(--border-color);
-            border-radius: 1rem;
-            padding: 2rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .file-upload-label:hover {
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-        }
-
-        .file-upload-label i {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-            display: block;
-        }
+       
 
         /* Task List Styling */
         .task-list {
@@ -422,14 +403,14 @@
 @endpush
 
 @push('scripts')
-<script src="{{ asset('js/tinymce/tinymce.min.js') }}"></script>
-<script>
-    let currentTheme = document.documentElement.getAttribute('data-bs-theme');
-</script>
+    <script src="{{ asset('js/tinymce/tinymce.min.js') }}"></script>
+    <script>
+        let currentTheme = document.documentElement.getAttribute('data-bs-theme');
+    </script>
 @endpush
 @section('content')
     @php
-        // prePrintR($lead->comments->toArray());
+        //  prePrintR($lead->attachments->toArray());
     @endphp
     <div class="container-fluid ">
         <!-- Lead Header -->
@@ -541,18 +522,7 @@
 
                         <!-- Files Tab -->
                         <div class="tab-pane fade" id="files">
-                            <div class="files-section">
-                                <div class="file-upload-area mb-3">
-                                    <input type="file" class="d-none" id="fileUpload">
-                                    <label for="fileUpload" class="file-upload-label">
-                                        <i class="fas fa-cloud-upload-alt"></i>
-                                        <span>Drop files here or click to upload</span>
-                                    </label>
-                                </div>
-                                <div class="file-list">
-                                    <!-- File items would go here -->
-                                </div>
-                            </div>
+                            @include('dashboard.crm.leads.components._attachments')
                         </div>
                     </div>
                 </div>
@@ -569,7 +539,6 @@
 
 
 @push('scripts')
-
     <script>
         $("#editToggle").click(function(e) {
             e.preventDefault();
