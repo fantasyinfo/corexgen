@@ -238,7 +238,7 @@ class LeadsController extends Controller
 
 
             // kanban board return....
-            if ($request->has('from_kanban') && $request->input('from_kanban')) {
+            if ($request->has('from_view') && $request->input('from_view')) {
                 return redirect()
                     ->back()
                     ->with('success', 'Lead updated successfully..');
@@ -733,6 +733,7 @@ class LeadsController extends Controller
             'customFields' => $customFields,
             'activities' => $activitesQuery,
             'countries' => Country::all(),
+            'permissions' => PermissionsHelper::getPermissionsArray('LEADS'),
         ]);
     }
     public function profile()

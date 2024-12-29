@@ -4,6 +4,7 @@
 use App\Http\Controllers\AppUpdateController;
 use App\Http\Controllers\AuditController;
 use App\Http\Controllers\BackupController;
+use App\Http\Controllers\CommentsController;
 use App\Http\Controllers\CompanyOnboardingController;
 use App\Http\Controllers\CompanyRegisterController;
 use App\Http\Controllers\CountryCitySeederController;
@@ -376,6 +377,9 @@ Route::middleware([
 
 
 
+        // comments routes...
+        Route::post('/comment', [CommentsController::class, 'addLeadsComment'])->name('comment.create')->middleware('check.permission:LEADS.CREATE');
+        Route::delete('/comment/destroy/{id}', [CommentsController::class, 'destroyLeadsComment'])->name('comment.destroy')->middleware('check.permission:LEADS.DELETE');
 
     });
 

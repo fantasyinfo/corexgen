@@ -198,10 +198,17 @@ class LeadsService
     private function assignLeadsToUserIfProvided(array $validatedData, CRMLeads $lead)
     {
         if (!empty($validatedData['assign_to']) && is_array($validatedData['assign_to'])) {
-            // Retrieve the current company ID for the authenticated user
-            $companyId = Auth::user()->company_id;
-
+            // Retrieve current assignees from the database
+            $existingAssignees = $lead->assignees()->pluck('lead_user.user_id')->sort()->values()->toArray();
+            $newAssignees = collect($validatedData['assign_to'])->sort()->values()->toArray();
+    
+            // Skip if assignees are identical - NO NEED TO CREATE AUDIT
+            if ($existingAssignees === $newAssignees) {
+                return;
+            }
+    
             // Prepare data for pivot table
+            $companyId = Auth::user()->company_id;
             $assignToData = collect($validatedData['assign_to'])->mapWithKeys(function ($userId) use ($companyId) {
                 return [
                     $userId => [
@@ -211,47 +218,25 @@ class LeadsService
                     ],
                 ];
             })->toArray();
-
-
-            $existingAssignees = $lead->assignees()->pluck('lead_user.user_id')->toArray();
-
-            // Sync user assignments, handling both insert and update scenarios
+    
+            // Sync assignments
             $lead->assignees()->sync($assignToData);
-
-            $newAssignees = $lead->assignees()->pluck('lead_user.user_id')->toArray();
-
-            // Log the changes manually
-            $lead->audits()->create([
-                'old_values' => ['assignees' => $existingAssignees],
-                'new_values' => ['assignees' => $newAssignees],
-                'user_type' => 'App\Models\User',
-                'event' => 'updated',
-                'url' => request()->fullUrl(),
-                'ip_address' => request()->ip(),
-                'user_agent' => request()->header('User-Agent'),
-            ]);
-
+    
         } else {
-            // If no assignees are provided, detach all existing ones
-            // Fetch existing assignees before detaching
+            // Handle detachment of assignees
             $existingAssignees = $lead->assignees()->pluck('lead_user.user_id')->toArray();
-
-            // Detach all assignees
+    
+            if (empty($existingAssignees)) {
+                return; // No existing assignees, skip detachment and logging
+            }
+    
             $lead->assignees()->detach();
-
-            // Log the detach operation as an audit
-            $lead->audits()->create([
-                'old_values' => ['assignees' => $existingAssignees],
-                'new_values' => ['assignees' => []], // After detach, no assignees
-                'user_type' => 'App\Models\User',
-                'event' => 'updated',
-                'url' => request()->fullUrl(),
-                'ip_address' => request()->ip(),
-                'user_agent' => request()->header('User-Agent'),
-            ]);
-
+    
+         
         }
     }
+    
+
 
 
     private function createAddressIfProvided(array $data): ?Address

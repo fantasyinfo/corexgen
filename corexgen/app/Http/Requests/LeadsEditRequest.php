@@ -60,7 +60,7 @@ class LeadsEditRequest extends FormRequest
             'address_country_id' => 'nullable|exists:countries,id',
             'address_city_name' => 'nullable|string|max:255',
             'address_pincode' => 'nullable|string|max:20',
-            'assign_to' => 'array|nullable|exists:users,id'
+            'assign_to' => 'array|nullable|exists:users,id',
         ];
     }
 

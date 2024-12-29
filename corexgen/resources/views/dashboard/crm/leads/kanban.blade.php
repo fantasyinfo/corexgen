@@ -44,7 +44,7 @@
 
     </div>
 
-    @include('dashboard.crm.leads.components.view-modal')
+
 
 @endsection
 

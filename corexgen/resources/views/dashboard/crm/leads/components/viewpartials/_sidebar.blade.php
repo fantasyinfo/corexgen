@@ -1,4 +1,5 @@
-<div class="card  border-0  mb-4">
+<h6 class="detail-label">Sidebar</h6>
+<div class="card  border-2  mb-4">
     <div class="card-body d-flex gap-2">
         <div class="stat-icon">
             <i class="fas fa-dollar-sign"></i>
@@ -12,7 +13,7 @@
 </div>
 
 
-<div class="card   border-0  mb-4">
+<div class="card   border-2 mb-4">
     <div class="card-body d-flex gap-2">
         <div class="stat-icon">
             <i class="fas fa-clock"></i>
@@ -28,7 +29,7 @@
 </div>
 
 
-<div class="card  border-0  mb-4">
+<div class="card  border-2 mb-4">
 
     <div class="card-body d-flex gap-2">
         <div class="stat-icon">
@@ -43,7 +44,7 @@
 </div>
 
 
-<div class="card  border-0  mb-4">
+<div class="card  border-2 mb-4">
     <div class="card-body d-flex gap-2">
         <div class="stat-icon">
             <i class="fas fa-chart-line"></i>
@@ -58,7 +59,7 @@
 
 @if (isset($customFields) && $customFields->isNotEmpty())
 
-    <div class="card  border-0  mb-4">
+    <div class="card  border-2 mb-4">
         <div class="card-header">
             <h6 class="stat-label">Custom Fields</h6>
         </div>

@@ -1,5 +1,5 @@
 <div class="row align-items-center">
-    <div class="col-lg-8">
+    <div class="col-lg-12">
         <div class="d-flex align-items-center gap-3">
             <div class="lead-avatar">
                 @if ($lead->type == 'Company')
@@ -36,22 +36,5 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-4">
-        <div class="d-flex justify-content-lg-end gap-2 mt-3 mt-lg-0">
-
-            @if (!empty($lead->phone))
-                <a href="tel:{{ $lead->phone }}" class="btn btn-primary">
-                    <i class="fas fa-phone-alt me-2"></i> Call
-                </a>
-            @endif
-            @if (!empty($lead->email))
-                <a href="mailto:{{ $lead->email }}" class="btn btn-secondary">
-                    <i class="fas fa-envelope me-2"></i> Email
-                </a>
-            @endif
-            <button id='editToggle' class="btn btn-warning" data-toggle="tooltip" title="Edit">
-                <i class="fas fa-pencil-alt me-2"></i>
-            </button>
-        </div>
-    </div>
+ 
 </div>
