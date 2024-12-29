@@ -703,10 +703,14 @@ class LeadsController extends Controller
 
         // custom fields
 
+        // custom fields
+        $customFields = collect();
         $cfOldValues = collect();
         if (!is_null(Auth::user()->company_id)) {
+            $customFields = $this->customFieldService->getFieldsForEntity(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['crmleads'], Auth::user()->company_id);
 
             // fetch already existing values
+
             $cfOldValues = $this->customFieldService->getValuesForEntity($lead);
         }
 
@@ -726,7 +730,9 @@ class LeadsController extends Controller
             'leadsStatus' => $this->leadsService->getLeadsStatus(),
             'teamMates' => getTeamMates(),
             'cfOldValues' => $cfOldValues,
-            'activities' => $activitesQuery
+            'customFields' => $customFields,
+            'activities' => $activitesQuery,
+            'countries' => Country::all(),
         ]);
     }
     public function profile()

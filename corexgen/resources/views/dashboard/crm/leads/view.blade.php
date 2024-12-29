@@ -2,292 +2,283 @@
 
 @section('content')
     @php
-        // prePrintR($activities->toArray());
+        // prePrintR($customFields->toArray());
     @endphp
-    <div class="container-fluid py-4">
+
+
+
+
+
+
+    <div class="container-fluid ">
         <!-- Lead Header -->
         <div class="card mb-4 border-0 lead-header-card">
             <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col-lg-8">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="lead-avatar">
-                                @if ($lead->type == 'Company')
-                                    <div class="company-avatar">{{ substr($lead->company_name, 0, 2) }}</div>
-                                @else
-                                    <div class="individual-avatar">
-                                        {{ substr($lead->first_name, 0, 1) }}{{ substr($lead->last_name, 0, 1) }}</div>
-                                @endif
-                            </div>
-                            <div>
-                                <h1 class="mb-1">
-                                    @if ($lead->type == 'Company')
-                                        {{ $lead->company_name }}
-                                    @else
-                                        {{ $lead->first_name }} {{ $lead->last_name }}
-                                    @endif
-                                </h1>
-                                <div class="d-flex align-items-center gap-3">
-                                    <span class="badge bg-info">
-                                        <i class="fas fa-flag me-1"></i> {{ $lead->priority }} Priority
-                                    </span>
-                                    <span class="badge bg-{{ $lead->stage->color }}">
-                                        {{ $lead->stage->name }}
-                                    </span>
-                                    @if ($lead->is_converted)
-                                        <span class="badge bg-success">
-                                            <i class="fas fa-check-circle me-1"></i> Converted
-                                        </span>
-                                    @endif
-                                    <span class="lead-score" data-bs-toggle="tooltip" title="Lead Score">
-                                        {{ $lead->score ?? 0 }} <i class="fas fa-star text-warning"></i>
-                                    </span>
+                @include('dashboard.crm.leads.components.viewpartials._header')
+            </div>
+        </div>
+
+        <div id="viewDiv">
+            <div class="row">
+                <!-- Main Content Column -->
+                <div class="col-lg-8">
+
+                    <!-- Lead Details Tabs -->
+                    <div class="card border-0 mb-4">
+                        <div class="card-header bg-transparent border-bottom-0">
+                            <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" data-bs-toggle="tab" href="#details">
+                                        <i class="fas fa-info-circle me-2"></i>Details
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-bs-toggle="tab" href="#activities">
+                                        <i class="fas fa-history me-2"></i>Activities
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-bs-toggle="tab" href="#notes">
+                                        <i class="fas fa-sticky-note me-2"></i>Notes
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-bs-toggle="tab" href="#files">
+                                        <i class="fas fa-paperclip me-2"></i>Files
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="card-body">
+                            <div class="tab-content">
+                                <!-- Details Tab -->
+                                <div class="tab-pane fade show active" id="details">
+                                    <div class="row g-4">
+                                        @include('dashboard.crm.leads.components.viewpartials._basic')
+                                        @include('dashboard.crm.leads.components.viewpartials._additional')
+                                    </div>
+                                    <div class="mt-4">
+                                        <h6 class="detail-label">Address</h6>
+                                        <p class="lead-details">
+                                            {{ $lead?->address?->street_address }},
+                                            {{ $lead?->address?->city?->name }},
+                                            {{ $lead?->address?->country?->name }},
+                                            {{ $lead?->address?->postal_code }}
+                                        </p>
+                                    </div>
+                                    <div class="mt-4">
+                                        <h6 class="detail-label">Details</h6>
+                                        <p class="lead-details">{!! $lead->details !!}</p>
+                                    </div>
+                                </div>
+
+                                <div class="tab-pane fade" id="activities">
+                                    @include('dashboard.crm.leads.components.viewpartials._activity')
+                                </div>
+
+                                <!-- Notes Tab -->
+                                <div class="tab-pane fade" id="notes">
+                                    <div class="notes-section">
+                                        <div class="mb-3">
+                                            <textarea class="form-control" rows="3" placeholder="Add a note..."></textarea>
+                                            <button class="btn btn-primary mt-2">Add Note</button>
+                                        </div>
+                                        <div class="note-list">
+                                            <!-- Note items would go here -->
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Files Tab -->
+                                <div class="tab-pane fade" id="files">
+                                    <div class="files-section">
+                                        <div class="file-upload-area mb-3">
+                                            <input type="file" class="d-none" id="fileUpload">
+                                            <label for="fileUpload" class="file-upload-label">
+                                                <i class="fas fa-cloud-upload-alt"></i>
+                                                <span>Drop files here or click to upload</span>
+                                            </label>
+                                        </div>
+                                        <div class="file-list">
+                                            <!-- File items would go here -->
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4">
-                        <div class="d-flex justify-content-lg-end gap-2 mt-3 mt-lg-0">
+                </div>
 
-                            @if (!empty($lead->phone))
-                                <a href="tel:{{ $lead->phone }}" class="btn btn-primary">
-                                    <i class="fas fa-phone-alt me-2"></i> Call
-                                </a>
-                            @endif
-                            @if (!empty($lead->email))
-                                <a href="mailto:{{ $lead->email }}" class="btn btn-secondary">
-                                    <i class="fas fa-envelope me-2"></i> Email
-                                </a>
-                            @endif
+                <!-- Sidebar -->
+                <div class="col-lg-4">
+                    <!-- Quick Stats -->
 
-                            <a class="btn btn-warning" href="{{ route(getPanelRoutes($module) . '.edit', $lead->id) }}"
-                                data-toggle="tooltip" title="Edit">
-                                <i class="fas fa-pencil-alt me-2"></i>
+                    @include('dashboard.crm.leads.components.viewpartials._sidebar')
 
-                            </a>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="row">
-            <!-- Main Content Column -->
-            <div class="col-lg-8">
 
+        <div id="editDiv">
+            <form id="leadEditForm" method="POST" action="{{ route(getPanelRoutes('leads.update')) }}">
+                @csrf
+                @method('PUT')
+                <input type="hidden" name="id" value="{{$lead->id}}" />
+                <input type="hidden" name="from_kanban" value="true" />
+                <div class="row">
+                    <!-- Main Content Column -->
+                    <div class="col-lg-8">
 
-                <!-- Lead Details Tabs -->
-                <div class="card border-0 mb-4">
-                    <div class="card-header bg-transparent border-bottom-0">
-                        <ul class="nav nav-tabs card-header-tabs" role="tablist">
-                            <li class="nav-item">
-                                <a class="nav-link active" data-bs-toggle="tab" href="#details">
-                                    <i class="fas fa-info-circle me-2"></i>Details
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="tab" href="#activities">
-                                    <i class="fas fa-history me-2"></i>Activities
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="tab" href="#notes">
-                                    <i class="fas fa-sticky-note me-2"></i>Notes
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="tab" href="#files">
-                                    <i class="fas fa-paperclip me-2"></i>Files
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="card-body">
-                        <div class="tab-content">
-                            <!-- Details Tab -->
-                            <div class="tab-pane fade show active" id="details">
-                                <div class="row g-4">
-                                    <div class="col-md-6">
-                                        <h6 class="detail-label">Basic Information</h6>
-                                        <div class="detail-group">
-                                            <label>Type</label>
-                                            <p>{{ $lead->type }}</p>
+                        <!-- Lead Details Tabs -->
+                        <div class="card border-0 mb-4">
+                            <div class="card-header bg-transparent border-bottom-0">
+                                <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" data-bs-toggle="tab" href="#edit-details">
+                                            <i class="fas fa-info-circle me-2"></i>Details
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" data-bs-toggle="tab" href="#edit-activities">
+                                            <i class="fas fa-history me-2"></i>Activities
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" data-bs-toggle="tab" href="#edit-notes">
+                                            <i class="fas fa-sticky-note me-2"></i>Notes
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" data-bs-toggle="tab" href="#edit-files">
+                                            <i class="fas fa-paperclip me-2"></i>Files
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="card-body">
+                                <div class="tab-content">
+                                    <!-- Details Tab -->
+                                    <div class="tab-pane fade show active" id="edit-details">
+                                        <div class="row g-4">
+                                            @include('dashboard.crm.leads.components.editpartials._basic')
+                                            @include('dashboard.crm.leads.components.editpartials._additional')
                                         </div>
-                                        <div class="detail-group">
-                                            <label>Title</label>
-                                            <p>{{ $lead->title }}</p>
-                                        </div>
-                                        <div class="detail-group">
-                                            <label>Email</label>
-                                            <p><a href="mailto:{{ $lead->email }}">{{ $lead->email }}</a></p>
-                                        </div>
-                                        <div class="detail-group">
-                                            <label>Phone</label>
-                                            <p><a href="tel:{{ $lead->phone }}">{{ $lead->phone }}</a></p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <h6 class="detail-label">Additional Information</h6>
-                                        <div class="detail-group">
-                                            <label>Source</label>
-                                            <p>{{ $lead->source->name ?? 'N/A' }}</p>
-                                        </div>
-                                        <div class="detail-group">
-                                            <label>Group</label>
-                                            <p>{{ $lead->group->name ?? 'N/A' }}</p>
-                                        </div>
-                                        <div class="detail-group">
-                                            <label>Preferred Contact</label>
-                                            <p>{{ $lead->preferred_contact_method }}</p>
-                                        </div>
-                                        <div class="detail-group">
-                                            <label>Assigned To</label>
-                                            <p>
-                                                @foreach ($lead->assignees as $user)
-                                                    <a
-                                                        href="{{ route(getPanelRoutes('users.view'), ['id' => $user->id]) }}">
-                                                        <x-form-components.profile-avatar :hw="40"
-                                                            :url="asset(
-                                                                'storage/' .
-                                                                    ($user->profile_photo_path ??
-                                                                        'avatars/default.webp'),
-                                                            )" :title="$user->name" />
-                                                    </a>
-                                                @endforeach
+                                        <div class="mt-4">
+                                            <h6 class="detail-label">Address</h6>
+                                            <p class="lead-details">
+                                            <p class="my-1">
+                                                <x-form-components.textarea-group name="address.street_address"
+                                                    id="compnayAddressStreet"
+                                                    placeholder="Enter Registered Street Address" class="custom-class"
+                                                    value="{{ old('address.street_address', $lead?->address?->street_address) }}" />
+                                            </p>
+                                            <h6 class="detail-label">Country</h6>
+                                            <p class="my-1">
+                                                <select
+                                                    class="form-control searchSelectBox  @error('address.country_id') is-invalid @enderror"
+                                                    name="address.country_id" id="country_id">
+
+                                                    @if ($countries)
+                                                        @foreach ($countries as $country)
+                                                            <option value="{{ $country->id }}"
+                                                                {{ old('address.country_id', $lead?->address?->country_id) == $country->id ? 'selected' : '' }}>
+                                                                {{ $country->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    @else
+                                                        <option disabled>No country available</option>
+                                                    @endif
+                                                </select>
+                                            </p>
+                                            <h6 class="detail-label mt-4">City</h6>
+                                            <p class="my-1">
+                                                <x-form-components.input-group type="text" name="address.city_name"
+                                                    id="compnayAddressCity" placeholder="{{ __('Enter City') }}"
+                                                    value="{{ old('address.city_name', $lead?->address?->city?->name) }}"
+                                                    class="custom-class" />
+                                            </p>
+                                            <h6 class="detail-label">Pincode</h6>
+                                            <p class="my-1">
+                                                <x-form-components.input-group type="text" name="address.pincode"
+                                                    id="compnayAddressPincode" placeholder="{{ __('Enter Pincode') }}"
+                                                    value="{{ old('address.pincode', $lead?->address?->postal_code) }}"
+                                                    class="custom-class" />
+                                            </p>
                                             </p>
                                         </div>
+                                        <div class="mt-4">
+                                            <x-form-components.input-label for="details">
+                                                {{ __('leads.Additional Details') }}
+                                            </x-form-components.input-label>
+                                            <textarea name="details" id="details" class="form-control wysiwyg-editor" rows="5">{{ old('details') }}</textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="tab-pane fade" id="edit-activities">
+                                        @include('dashboard.crm.leads.components.editpartials._activity')
+                                    </div>
+
+                                    <!-- Notes Tab -->
+                                    <div class="tab-pane fade" id="edit-notes">
+                                        <div class="notes-section">
+                                            <div class="mb-3">
+                                                <textarea class="form-control" rows="3" placeholder="Add a note..."></textarea>
+                                                <button class="btn btn-primary mt-2">Add Note</button>
+                                            </div>
+                                            <div class="note-list">
+                                                <!-- Note items would go here -->
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Files Tab -->
+                                    <div class="tab-pane fade" id="edit-files">
+                                        <div class="files-section">
+                                            <div class="file-upload-area mb-3">
+                                                <input type="file" class="d-none" id="fileUpload">
+                                                <label for="fileUpload" class="file-upload-label">
+                                                    <i class="fas fa-cloud-upload-alt"></i>
+                                                    <span>Drop files here or click to upload</span>
+                                                </label>
+                                            </div>
+                                            <div class="file-list">
+                                                <!-- File items would go here -->
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="mt-4">
-                                    <h6 class="detail-label">Details</h6>
-                                    <p class="lead-details">{!! $lead->details !!}</p>
-                                </div>
-                            </div>
-
-                            <div class="tab-pane fade" id="activities">
-                                @include('dashboard.crm.leads.components._activity')
-                            </div>
-
-                            <!-- Notes Tab -->
-                            <div class="tab-pane fade" id="notes">
-                                <div class="notes-section">
-                                    <div class="mb-3">
-                                        <textarea class="form-control" rows="3" placeholder="Add a note..."></textarea>
-                                        <button class="btn btn-primary mt-2">Add Note</button>
-                                    </div>
-                                    <div class="note-list">
-                                        <!-- Note items would go here -->
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Files Tab -->
-                            <div class="tab-pane fade" id="files">
-                                <div class="files-section">
-                                    <div class="file-upload-area mb-3">
-                                        <input type="file" class="d-none" id="fileUpload">
-                                        <label for="fileUpload" class="file-upload-label">
-                                            <i class="fas fa-cloud-upload-alt"></i>
-                                            <span>Drop files here or click to upload</span>
-                                        </label>
-                                    </div>
-                                    <div class="file-list">
-                                        <!-- File items would go here -->
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Sidebar -->
-            <div class="col-lg-4">
-                <!-- Quick Stats -->
+                    <!-- Sidebar -->
+                    <div class="col-lg-4">
+                        <!-- Quick Stats -->
 
+                        @include('dashboard.crm.leads.components.editpartials._sidebar')
 
-                <div class="card border-0  mb-4">
-                    <div class="card-body">
-                        <div class="stat-icon">
-                            <i class="fas fa-dollar-sign"></i>
-                        </div>
-                        <h6 class="stat-label">Deal Value</h6>
-                        <h3 class="stat-value">${{ number_format($lead->value, 2) }}</h3>
                     </div>
                 </div>
-
-
-                <div class="card border-0  mb-4">
-                    <div class="card-body">
-                        <div class="stat-icon">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <h6 class="stat-label">Last Contact</h6>
-                        <h3 class="stat-value">
-                            {{ $lead->last_contacted_date ? $lead->last_contacted_date->diffForHumans() : 'Never' }}
-                        </h3>
-                    </div>
-                </div>
-
-
-                <div class="card border-0  mb-4">
-                    <div class="stat-icon">
-                        <i class="fas fa-calendar-check"></i>
-                    </div>
-                    <div class="card-body">
-                        <h6 class="stat-label">Follow Up</h6>
-                        <h3 class="stat-value">
-                            {{ $lead->follow_up_date ? $lead->follow_up_date->format('M d, Y') : 'Not Set' }}</h3>
-                    </div>
-                </div>
-
-
-                <div class="card border-0  mb-4">
-                    <div class="card-body">
-                        <div class="stat-icon">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <h6 class="stat-label">Activities</h6>
-                        <h3 class="stat-value">{{ count($activities) ?? 0 }}</h3>
-                    </div>
-                </div>
-
-
-                <!-- Next Actions -->
-                <div class="card border-0 mb-4">
-                    <div class="card-header bg-transparent">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">Next Actions</h5>
-                            <button class="btn btn-sm btn-primary">
-                                <i class="fas fa-plus me-1"></i> Add Task
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="task-list">
-                            <!-- Task items would go here -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Related Contacts -->
-                <div class="card border-0 mb-4">
-                    <div class="card-header bg-transparent">
-                        <h5 class="mb-0">Related Contacts</h5>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="related-contacts-list">
-                            <!-- Contact items would go here -->
-                        </div>
-                    </div>
-                </div>
-            </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> <span>{{ __('leads.Update Lead') }}</span>
+                </button>
+            </form>
         </div>
+
     </div>
 @endsection
 
 @push('style')
     <style>
+        #viewDiv {
+            display: block;
+        }
+
+        #editDiv {
+            display: none;
+        }
+
         .card {
             background-color: var(--card-bg);
             box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
@@ -447,7 +438,7 @@
             top: 0;
             height: 100%;
             width: 2px;
-            background: var(--border-color);
+            background: var(--body-bg);
         }
 
         .timeline-item {
@@ -474,7 +465,7 @@
         }
 
         .timeline-content-wrapper {
-            background: var(--body-bg);
+            /* background: var(--body-bg); */
             border-radius: 0.75rem;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             overflow: hidden;
@@ -509,14 +500,15 @@
         .activity-changes {
             background: var(--input-bg);
             border-radius: 0.5rem;
-            padding: 0.75rem;
+            /* padding: 0.75rem; */
         }
 
         .change-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.5rem 0;
+            /* padding: 0.5rem 0; */
+            font-size: 0.875rem;
             border-bottom: 1px solid var(--border-color);
         }
 
@@ -557,12 +549,12 @@
 
         /* Dark mode adjustments */
         [data-bs-theme="dark"] .timeline-content-wrapper {
-            background: var(--card-bg);
+            /* background: var(--card-bg); */
             border: 1px solid var(--border-color);
         }
 
         [data-bs-theme="dark"] .activity-changes {
-            background: rgba(0, 0, 0, 0.2);
+            /* background: rgba(0, 0, 0, 0.2); */
         }
 
         /* File Upload Styling */
@@ -675,21 +667,89 @@
 
         /* Custom Scrollbar */
         /* ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
+                                                            width: 8px;
+                                                            height: 8px;
+                                                        }
 
-        ::-webkit-scrollbar-track {
-            background: var(--body-bg);
-        }
+                                                        ::-webkit-scrollbar-track {
+                                                            background: var(--body-bg);
+                                                        }
 
-        ::-webkit-scrollbar-thumb {
-            background: var(--neutral-gray);
-            border-radius: 4px;
-        }
+                                                        ::-webkit-scrollbar-thumb {
+                                                            background: var(--neutral-gray);
+                                                            border-radius: 4px;
+                                                        }
 
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary-color);
-        } */
+                                                        ::-webkit-scrollbar-thumb:hover {
+                                                            background: var(--primary-color);
+                                                        } */
     </style>
+@endpush
+
+
+@push('scripts')
+    <script src="{{ asset('js/tinymce/tinymce.min.js') }}"></script>
+    <script>
+        $("#editToggle").click(function(e) {
+            e.preventDefault();
+            $("#viewDiv").toggle();
+            $("#editDiv").toggle();
+        })
+
+        const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+        // Initialize WYSIWYG editor
+        if (typeof tinymce !== 'undefined') {
+            tinymce.init({
+                selector: '.wysiwyg-editor',
+                height: 300,
+                base_url: '/js/tinymce',
+                license_key: 'gpl',
+                skin: currentTheme === 'dark' ? 'oxide-dark' : 'oxide',
+                content_css: currentTheme === 'dark' ? 'dark' : 'default',
+                setup: function(editor) {
+                    editor.on('init', function() {
+                        editor.setContent(`{!! $lead->details !!}`);
+                    });
+                },
+                menubar: false,
+                plugins: [
+                    'accordion',
+                    'advlist',
+                    'anchor',
+                    'autolink',
+                    'autoresize',
+                    'autosave',
+                    'charmap',
+                    'code',
+                    'codesample',
+                    'directionality',
+                    'emoticons',
+                    'fullscreen',
+                    'help',
+                    'lists',
+                    'link',
+                    'image',
+
+
+                    'preview',
+                    'anchor',
+                    'searchreplace',
+                    'visualblocks',
+
+
+                    'insertdatetime',
+                    'media',
+                    'table',
+
+
+
+                    'wordcount'
+                ],
+                toolbar: 'undo redo | formatselect | bold italic backcolor | \
+                                                                                                                                      alignleft aligncenter alignright alignjustify | \
+                                                                                                                                      bullist numlist outdent indent | removeformat | help | \
+                                                                                                                                      link image media preview codesample table'
+            });
+        }
+    </script>
 @endpush
