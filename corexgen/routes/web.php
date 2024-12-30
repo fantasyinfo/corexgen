@@ -354,10 +354,6 @@ Route::middleware([
         Route::get('/changeStatus/{id}/{status}', [ProposalController::class, 'changeStatus'])->name('changeStatus')->middleware('check.permission:PROPOSALS.CHANGE_STATUS');
         Route::delete('/destroy/{id}', [ProposalController::class, 'destroy'])->name('destroy')->middleware('check.permission:PROPOSALS.DELETE');
 
-        // validate, export, import
-        Route::get('/export', [ProposalController::class, 'export'])->name('export')->middleware('check.permission:PROPOSALS.EXPORT');
-        Route::get('/import', [ProposalController::class, 'importView'])->name('importView')->middleware('check.permission:PROPOSALS.IMPORT');
-        Route::post('/import', [ProposalController::class, 'import'])->name('import')->middleware('check.permission:PROPOSALS.IMPORT');
 
         Route::post('/bulkDelete', [ProposalController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:PROPOSALS.BULK_DELETE');
 
