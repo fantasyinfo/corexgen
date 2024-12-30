@@ -414,7 +414,7 @@
     @endphp
     <div class="container-fluid ">
         <!-- Lead Header -->
-        <div class="card mb-4 border-0 lead-header-card">
+        <div class="card mb-4 border-0 pb-0 lead-header-card">
             <div class="card-body">
                 @include('dashboard.crm.leads.components._header')
             </div>
@@ -425,8 +425,8 @@
             <!-- Main Content Column -->
 
             <!-- Lead Details Tabs -->
-            <div class="card border-0 mb-4">
-                <div class="card-header bg-transparent border-bottom-0">
+            <div class="card border-0 ">
+                <div class="card-header bg-transparent border-bottom-0 pb-0">
                     <ul class="nav nav-tabs card-header-tabs" role="tablist">
                         <li class="nav-item">
                             <a class="nav-link active" data-bs-toggle="tab" href="#details" role="tab">
@@ -451,16 +451,16 @@
                         </li>
                     </ul>
                 </div>
-                <div class="card-body">
+                <div class="card-body mt-0 pt-0">
                     <div class="tab-content">
                         <!-- Details View Tab -->
                         <div class="tab-pane fade show active" id="details">
                             @if (isset($permissions['UPDATE']) && hasPermission(strtoupper($module) . '.' . $permissions['UPDATE']['KEY']))
                                 <div class="d-flex my-3 justify-content-lg-end gap-2 ">
-                                    <button id='editToggle' class="btn btn-warning">
-                                        <i class="fas fa-pencil-alt me-2"></i> Edit
+                                    <button id='editToggle' title="Edit" data-toggle="tooltip" class="btn btn-outline-secondary">
+                                        <i class="fas fa-pencil-alt me-2"></i>
                                     </button>
-                                    <button form="leadEditForm" type="submit" id="updateBtn" class="btn btn-primary">
+                                    <button form="leadEditForm" title="Update" data-toggle="tooltip" type="submit" id="updateBtn" class="btn btn-primary">
                                         <i class="fas fa-plus me-2"></i> <span>Update </span>
                                     </button>
                                 </div>

@@ -174,6 +174,20 @@ PermissionsHelper::initializePermissions();
         'for' => 'company',
         'is_feature' => true,
     ],
+    PermissionsHelper::$plansPermissionsKeys['PROPOSALS'] => [
+        'name' => 'PROPOSALS',
+        'id' => PermissionsHelper::getParentPermissionId('103'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['PROPOSALS'],
+        'for' => 'company',
+        'is_feature' => true,
+    ],
+    PermissionsHelper::$plansPermissionsKeys['PROPOSALS_TEMPLATES'] => [
+        'name' => 'PROPOSALS_TEMPLATES',
+        'id' => PermissionsHelper::getParentPermissionId('104'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['PROPOSALS_TEMPLATES'],
+        'for' => 'company',
+        'is_feature' => false,
+    ],
 ]);
 
 // super panel menus
@@ -338,6 +352,16 @@ PermissionsHelper::initializePermissions();
             'Leads' => ['menu_url' => 'leads.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['LEADS'], 'READ_ALL')],
         ]
     ],
+    'Proposals' => [
+        'menu_icon' => 'fa-flag',
+        'feature_type' => PermissionsHelper::$plansPermissionsKeys['PROPOSALS'], // this need to match the PLANS_FEATURES key
+        'permission_plan' => PermissionsHelper::$plansPermissionsKeys['PROPOSALS'],
+        'permission_id' => PermissionsHelper::getParentPermissionId('103'),
+        'children' => [
+            'Proposals' => ['menu_url' => 'proposals.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PROPOSALS'], 'READ_ALL')],
+            'Templates' => ['menu_url' => 'proposals.indexProposals', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PROPOSALS_TEMPLATES'], 'READ_ALL')],
+        ]
+    ],
     'Custom Fields' => [
         'menu_icon' => 'fa-plus-square',
         'feature_type' => PermissionsHelper::$plansPermissionsKeys['CUSTOM_FIELDS'], // this need to match the PLANS_FEATURES key
@@ -391,6 +415,11 @@ PermissionsHelper::initializePermissions();
         'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE', 'BANNED'],
         'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE', 'BANNED' => 'BANNED'],
         'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger', 'BANNED' => 'warning'],
+    ],
+    'PROPOSALS' => [
+        'TABLE_STATUS' => ['DRAFT', 'SENT', 'OPEN', 'DECLINED', 'ACCEPTED', 'EXPIRED','REVISED'],
+        'STATUS' => ['DRAFT' => 'DRAFT', 'SENT' => 'SENT', 'OPEN' => 'OPEN', 'DECLINED' => 'DECLINED', 'ACCEPTED' => 'ACCEPTED', 'EXPIRED' => 'EXPIRED','REVISED' => 'REVISED'],
+        'BT_CLASSES' => ['DRAFT' => 'dark', 'SENT' => 'info', 'OPEN' => 'light', 'ACCEPTED' => 'success', 'DECLINED' => 'danger', 'EXPIRED' => 'warning','REVISED' => 'info'],
     ],
     'CRM_ROLES' => [
         'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE'],
@@ -458,6 +487,7 @@ PermissionsHelper::initializePermissions();
         'clients' => 'clients',
         'customfields' => 'customfields',
         'leads' => 'leads',
+        'proposals' => 'proposals',
 
     ]
 ]);
@@ -483,6 +513,7 @@ PermissionsHelper::initializePermissions();
     PermissionsHelper::$plansPermissionsKeys['CLIENTS'] => PermissionsHelper::$plansPermissionsKeys['CLIENTS'],
     PermissionsHelper::$plansPermissionsKeys['CUSTOM_FIELDS'] => PermissionsHelper::$plansPermissionsKeys['CUSTOM_FIELDS'],
     PermissionsHelper::$plansPermissionsKeys['LEADS'] => PermissionsHelper::$plansPermissionsKeys['LEADS'],
+    PermissionsHelper::$plansPermissionsKeys['PROPOSALS'] => PermissionsHelper::$plansPermissionsKeys['PROPOSALS'],
 ]);
 
 
@@ -901,8 +932,8 @@ PermissionsHelper::initializePermissions();
 
 // kyes must match the model name in lowercase
 !defined('CUSTOM_FIELDS_RELATION_TYPES') && define('CUSTOM_FIELDS_RELATION_TYPES', [
-    'KEYS' => ['crmclients' => 'crmclients', 'user' => 'user','crmleads' => 'crmleads'],
-    'VALUES' => ['crmclients' => 'Clients', 'user' => 'Users & Employees','crmleads' => 'Leads'],
+    'KEYS' => ['crmclients' => 'crmclients', 'user' => 'user', 'crmleads' => 'crmleads'],
+    'VALUES' => ['crmclients' => 'Clients', 'user' => 'Users & Employees', 'crmleads' => 'Leads'],
 ]);
 
 

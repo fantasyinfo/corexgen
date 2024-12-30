@@ -44,7 +44,7 @@
 
     </div>
 
-
+    @include('dashboard.crm.leads.components.view-modal')
 
 @endsection
 
@@ -176,8 +176,8 @@
 
 
             const nameElement = lead.type === 'Company' ?
-                `<a href='${url}'><h6 class="task-title"> <span class="status-circle bg-success me-2"></span> ${lead.company_name}</h6></a>` :
-                `<a href='${url}'><h6 class="task-title"> <span class="status-circle bg-warning me-2"></span> ${lead.first_name}</h6></a>`;
+                `<h6 class="task-title"> <span class="status-circle bg-success me-2"></span> ${lead.company_name}</h6>` :
+                `<h6 class="task-title"> <span class="status-circle bg-warning me-2"></span> ${lead.first_name}</h6>`;
 
             const assigneeElements = lead.assignees.map(assignee =>
                 `<img src="${assignee.profile_photo_url}" 
@@ -190,7 +190,7 @@
             const statusClass = lead.status === 'ACTIVE' ? 'bg-success' : 'bg-danger';
             const formattedDate = new Date(lead.created_at).toLocaleDateString();
 
-         
+
 
             return `
         <div class="task-card border-bottom border-${lead.stage.color}" 
@@ -202,6 +202,7 @@
    
                 <div class="task-actions">
                  
+                    <i class="fas fa-eye " onclick="viewTask(${lead.id})"></i>
                     <i class="fas fa-trash-alt " onclick="deleteTask(${lead.id})"></i>
                 </div>
             </div>
@@ -383,6 +384,122 @@
             });
 
             //loadTasks();
+        }
+
+        function viewTask(taskId) {
+
+            let baseUrl =
+                "{{ route(getPanelRoutes($module . '.kanbanView'), ['id' => ':id']) }}";
+            let url = baseUrl.replace(':id', taskId);
+
+            $.ajax({
+                url: url,
+                method: "GET",
+                data: {
+                    _token: '{{ csrf_token() }}',
+                },
+                success: function(response) {
+                    console.log(response);
+                    populateViewModal(response);
+
+                    $('#viewLeadModal').modal('show');
+                },
+                error: function(xhr) {
+                    console.error('Error fetching  data:', xhr.responseText);
+                }
+            });
+
+
+        }
+
+        function populateViewModal(data) {
+            const lead = data.lead;
+
+            // Basic Information
+            $('#viewLeadModal #type').text(lead.type);
+            $('#viewLeadModal #companyName').text(lead.company_name);
+            $('#viewLeadModal #contactName').text(`${lead.first_name} ${lead.last_name}`);
+            $('#viewLeadModal #title').text(lead.title);
+            $('#viewLeadModal #email').html(`<a href="mailto:${lead.email}">${lead.email}</a>`);
+            $('#viewLeadModal #phone').html(`<a href="tel:${lead.phone}">${lead.phone}</a>`);
+            $('#viewLeadModal #value').text(`$${parseFloat(lead.value).toLocaleString()}`);
+            $('#viewLeadModal #pcm').text(lead.preferred_contact_method);
+
+            // Status & Priority
+            $('#viewLeadModal #stage').html(`<span class="badge bg-${lead.stage.color}" >${lead.stage.name}</span>`);
+            $('#viewLeadModal #priority').html(
+                `<span class="badge bg-${getPriorityClass(lead.priority)}" >${lead.priority}</span>`);
+            $('#viewLeadModal #source').html(`<span class="badge bg-${lead.source.color}" >${lead.source.name}</span>`);
+            $('#viewLeadModal #group').html(`<span class="badge bg-${lead.group.color}" >${lead.group.name}</span>`);
+            $('#viewLeadModal #score').html(lead.score);
+
+            // Dates
+            $('#viewLeadModal #lastContactedDate').text(formatDate(lead.last_contacted_date));
+            $('#viewLeadModal #lastActivityDate').text(formatDate(lead.last_activity_date));
+            $('#viewLeadModal #followUpDate').text(formatDate(lead.follow_up_date));
+
+
+
+            // tabs
+
+            $('#viewLeadModal  #detailsShow #detailsView').html(lead.details);
+
+
+
+
+
+            let baseUrl =
+                "{{ route(getPanelRoutes($module . '.view'), ['id' => ':id']) }}";
+            let url = baseUrl.replace(':id', lead.id);
+
+            $("#details_view_link").attr('href', url);
+
+
+            // Assignees
+            const assigneesContainer = $('#viewLeadModal #assigneesList');
+            assigneesContainer.empty();
+
+            lead.assignees.forEach(assignee => {
+                assigneesContainer.append(`
+            <div class="col-md-4 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <img src="${assignee.profile_photo_url}" 
+                             alt="${assignee.name}" 
+                             class="rounded-circle mb-2"
+                             style="width: 64px; height: 64px;">
+                        <h6 class="card-title mb-0">${assignee.name}</h6>
+                    </div>
+                </div>
+            </div>
+        `);
+            });
+        }
+
+        // Helper function to format dates
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            return new Date(dateString).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Helper function to get priority badge class
+        function getPriorityClass(priority) {
+            switch (priority.toLowerCase()) {
+                case 'high':
+                    return 'bg-danger';
+                case 'medium':
+                    return 'bg-warning';
+                case 'low':
+                    return 'bg-info';
+                default:
+                    return 'bg-secondary';
+            }
         }
     </script>
 @endpush
