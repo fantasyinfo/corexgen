@@ -31,7 +31,10 @@ class PermissionsHelper
         'CLIENTS' => 'CLIENTS',
         'BULK_IMPORT_STATUS' => 'BULK_IMPORT_STATUS',
         'CUSTOM_FIELDS' => 'CUSTOM_FIELDS',
-        'LEADS' => 'LEADS'
+        'LEADS' => 'LEADS',
+        'PROPOSALS' => 'PROPOSALS',
+        'PROPOSALS_TEMPLATES' => 'PROPOSALS_TEMPLATES',
+
     ];
 
 
@@ -54,7 +57,7 @@ class PermissionsHelper
 
             self::$plansPermissionsKeys['ROLE'] => [551 => 'CREATE', 552 => 'READ', 553 => 'READ_ALL', 554 => 'UPDATE', 555 => 'DELETE', 556 => 'IMPORT', 557 => 'EXPORT', 558 => 'FILTER', 559 => 'CHANGE_STATUS', 560 => 'BULK_DELETE'],
 
-            self::$plansPermissionsKeys['USERS'] => [601 => 'CREATE', 602 => 'READ', 603 => 'READ_ALL', 604 => 'UPDATE', 605 => 'DELETE', 606 => 'IMPORT', 607 => 'EXPORT', 608 => 'FILTER', 609 => 'CHANGE_STATUS', 610 => 'BULK_DELETE', 611 => 'CHANGE_PASSWORD', 612 => 'VIEW',613 => 'LOGIN_AS'],
+            self::$plansPermissionsKeys['USERS'] => [601 => 'CREATE', 602 => 'READ', 603 => 'READ_ALL', 604 => 'UPDATE', 605 => 'DELETE', 606 => 'IMPORT', 607 => 'EXPORT', 608 => 'FILTER', 609 => 'CHANGE_STATUS', 610 => 'BULK_DELETE', 611 => 'CHANGE_PASSWORD', 612 => 'VIEW', 613 => 'LOGIN_AS'],
 
 
             self::$plansPermissionsKeys['PERMISSIONS'] => [651 => 'CREATE', 652 => 'READ', 653 => 'READ_ALL', 654 => 'UPDATE', 655 => 'DELETE'],
@@ -94,7 +97,15 @@ class PermissionsHelper
 
             self::$plansPermissionsKeys['CUSTOM_FIELDS'] => [3051 => 'CREATE', 3052 => 'READ', 3053 => 'READ_ALL', 3054 => 'UPDATE', 3055 => 'DELETE', 3059 => 'CHANGE_STATUS', 3060 => 'BULK_DELETE'],
 
+
             self::$plansPermissionsKeys['LEADS'] => [3101 => 'CREATE', 3102 => 'READ', 3103 => 'READ_ALL', 3104 => 'UPDATE', 3105 => 'DELETE', 3106 => 'IMPORT', 3107 => 'EXPORT', 3108 => 'FILTER', 3109 => 'CHANGE_STATUS', 3110 => 'BULK_DELETE', 3111 => 'VIEW', 3112 => 'KANBAN_BOARD', 3113 => 'CHANGE_STAGE'],
+
+     
+
+
+            self::$plansPermissionsKeys['PROPOSALS'] => [3151 => 'CREATE', 3152 => 'READ', 3153 => 'READ_ALL', 3154 => 'UPDATE', 3155 => 'DELETE', 3156 => 'IMPORT', 3157 => 'EXPORT', 3158 => 'FILTER', 3159 => 'CHANGE_STATUS', 3160 => 'BULK_DELETE', 3161 => 'VIEW'],
+
+            self::$plansPermissionsKeys['PROPOSALS_TEMPLATES'] => [3201 => 'CREATE', 3202 => 'READ', 3203 => 'READ_ALL', 3204 => 'UPDATE', 3205 => 'DELETE', 3206 => 'CHANGE_STATUS'],
 
         ];
     }
@@ -111,6 +122,7 @@ class PermissionsHelper
             'EVENTS_AUDIT_LOG' => 'EVENTS_AUDIT_LOG',
             'PLANUPGRADE' => 'PLANUPGRADE',
             'BULK_IMPORT_STATUS' => 'BULK_IMPORT_STATUS',
+            'PROPOSALS_TEMPLATES' => 'PROPOSALS_TEMPLATES',
         ];
     }
 

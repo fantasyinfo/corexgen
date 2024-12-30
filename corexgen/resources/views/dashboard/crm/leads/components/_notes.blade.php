@@ -213,10 +213,7 @@
 
                     'wordcount'
                 ],
-                toolbar: 'undo redo | formatselect | bold italic backcolor | \
-                                                                                                                                                                                              alignleft aligncenter alignright alignjustify | \
-                                                                                                                                                                                              bullist numlist outdent indent | removeformat | help | \
-                                                                                                                                                                                              link image media preview codesample table'
+                toolbar: 'undo redo | formatselect | bold italic backcolor | \alignleft aligncenter alignright alignjustify | \bullist numlist outdent indent | removeformat | help | \link image media preview codesample table code'
             });
         }
     </script>

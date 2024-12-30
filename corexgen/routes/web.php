@@ -14,6 +14,7 @@ use App\Http\Controllers\CRM\ClientsController;
 use App\Http\Controllers\CRM\LeadsController;
 use App\Http\Controllers\CustomFieldController;
 use App\Http\Controllers\DownloadController;
+use App\Http\Controllers\ProposalController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RolePermissionsController;
 use App\Http\Controllers\SettingsController;
@@ -24,6 +25,7 @@ use App\Http\Controllers\PlansController;
 use App\Http\Controllers\PlansPaymentTransaction;
 use App\Http\Controllers\PlanUpgrade;
 use App\Http\Controllers\SystemInstallerController;
+use App\Http\Controllers\TemplatesController;
 use App\Http\Controllers\UserController;
 use App\Models\City;
 
@@ -338,6 +340,48 @@ Route::middleware([
         Route::get('/view/{id}', [ClientsController::class, 'view'])->name('view')->middleware('check.permission:CLIENTS.VIEW');
         Route::get('/profile', [ClientsController::class, 'profile'])->name('profile');
     });
+
+    //proposals
+    Route::prefix(PANEL_MODULES['COMPANY_PANEL']['proposals'])->as(PANEL_MODULES['COMPANY_PANEL']['proposals'] . '.')->group(function () {
+        // role for fetch, store, update
+        Route::get('/', [ProposalController::class, 'index'])->name('index')->middleware('check.permission:PROPOSALS.READ_ALL');
+        Route::post('/', [ProposalController::class, 'store'])->name('store')->middleware('check.permission:PROPOSALS.CREATE');
+        Route::put('/', [ProposalController::class, 'update'])->name('update')->middleware('check.permission:PROPOSALS.UPDATE');
+
+        // create, edit, change status, delete
+        Route::get('/create', [ProposalController::class, 'create'])->name('create')->middleware('check.permission:PROPOSALS.CREATE');
+        Route::get('/edit/{id}', [ProposalController::class, 'edit'])->name('edit')->middleware('check.permission:PROPOSALS.UPDATE');
+        Route::get('/changeStatus/{id}/{status}', [ProposalController::class, 'changeStatus'])->name('changeStatus')->middleware('check.permission:PROPOSALS.CHANGE_STATUS');
+        Route::delete('/destroy/{id}', [ProposalController::class, 'destroy'])->name('destroy')->middleware('check.permission:PROPOSALS.DELETE');
+
+        // validate, export, import
+        Route::get('/export', [ProposalController::class, 'export'])->name('export')->middleware('check.permission:PROPOSALS.EXPORT');
+        Route::get('/import', [ProposalController::class, 'importView'])->name('importView')->middleware('check.permission:PROPOSALS.IMPORT');
+        Route::post('/import', [ProposalController::class, 'import'])->name('import')->middleware('check.permission:PROPOSALS.IMPORT');
+
+        Route::post('/bulkDelete', [ProposalController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:PROPOSALS.BULK_DELETE');
+
+        Route::get('/view/{id}', [ProposalController::class, 'view'])->name('view')->middleware('check.permission:PROPOSALS.VIEW');
+        Route::get('/profile', [ProposalController::class, 'profile'])->name('profile');
+
+
+
+        // template
+        Route::get('/templates', [TemplatesController::class, 'indexProposals'])->name('indexProposals')->middleware('check.permission:PROPOSALS.READ_ALL');
+        Route::post('/templates', [TemplatesController::class, 'storeProposals'])->name('storeProposals')->middleware('check.permission:PROPOSALS.CREATE');
+        Route::put('/templates', [TemplatesController::class, 'updateProposals'])->name('updateProposals')->middleware('check.permission:PROPOSALS.UPDATE');
+
+        // create, edit, change status, delete
+        Route::get('templates/create', [TemplatesController::class, 'createProposals'])->name('createProposals')->middleware('check.permission:PROPOSALS.CREATE');
+        Route::get('templates/edit/{id}', [TemplatesController::class, 'editProposals'])->name('editProposals')->middleware('check.permission:PROPOSALS.UPDATE');
+        Route::get('templates/changeStatus/{id}/{status}', [TemplatesController::class, 'changeStatusProposals'])->name('changeStatusProposals')->middleware('check.permission:PROPOSALS.CHANGE_STATUS');
+        Route::delete('templates/destroy/{id}', [TemplatesController::class, 'destroyProposals'])->name('destroyProposals')->middleware('check.permission:PROPOSALS.DELETE');
+
+    });
+
+
+
+
 
     // leads routes
     Route::prefix(PANEL_MODULES['COMPANY_PANEL']['leads'])->as(PANEL_MODULES['COMPANY_PANEL']['leads'] . '.')->group(function () {
