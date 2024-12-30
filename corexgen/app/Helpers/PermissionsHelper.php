@@ -103,7 +103,7 @@ class PermissionsHelper
      
 
 
-            self::$plansPermissionsKeys['PROPOSALS'] => [3151 => 'CREATE', 3152 => 'READ', 3153 => 'READ_ALL', 3154 => 'UPDATE', 3155 => 'DELETE', 3156 => 'IMPORT', 3157 => 'EXPORT', 3158 => 'FILTER', 3159 => 'CHANGE_STATUS', 3160 => 'BULK_DELETE', 3161 => 'VIEW'],
+            self::$plansPermissionsKeys['PROPOSALS'] => [3151 => 'CREATE', 3152 => 'READ', 3153 => 'READ_ALL', 3154 => 'UPDATE', 3155 => 'DELETE', 3158 => 'FILTER', 3159 => 'CHANGE_STATUS', 3160 => 'BULK_DELETE', 3161 => 'VIEW'],
 
             self::$plansPermissionsKeys['PROPOSALS_TEMPLATES'] => [3201 => 'CREATE', 3202 => 'READ', 3203 => 'READ_ALL', 3204 => 'UPDATE', 3205 => 'DELETE', 3206 => 'CHANGE_STATUS'],
 

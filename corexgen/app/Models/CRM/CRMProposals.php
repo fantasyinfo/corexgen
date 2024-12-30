@@ -44,10 +44,6 @@ class CRMProposals extends Model
         return $this->morphTo();
     }
 
-    public function template()
-    {
-        return $this->belongsTo(CRMTemplates::class);
-    }
 
     public function company()
     {
