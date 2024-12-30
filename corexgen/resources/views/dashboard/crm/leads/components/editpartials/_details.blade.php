@@ -23,7 +23,7 @@
                         editor.setContent(`{!! $lead->details !!}`);
                     });
                 },
-                menubar: false,
+                menubar: true,
                 plugins: [
                     'accordion',
                     'advlist',

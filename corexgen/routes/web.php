@@ -374,7 +374,6 @@ Route::middleware([
         // create, edit, change status, delete
         Route::get('templates/create', [TemplatesController::class, 'createProposals'])->name('createProposals')->middleware('check.permission:PROPOSALS.CREATE');
         Route::get('templates/edit/{id}', [TemplatesController::class, 'editProposals'])->name('editProposals')->middleware('check.permission:PROPOSALS.UPDATE');
-        Route::get('templates/changeStatus/{id}/{status}', [TemplatesController::class, 'changeStatusProposals'])->name('changeStatusProposals')->middleware('check.permission:PROPOSALS.CHANGE_STATUS');
         Route::delete('templates/destroy/{id}', [TemplatesController::class, 'destroyProposals'])->name('destroyProposals')->middleware('check.permission:PROPOSALS.DELETE');
 
     });

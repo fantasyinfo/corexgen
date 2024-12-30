@@ -19,7 +19,6 @@ class CRMTemplates extends Model
         'title',
         'template_details',
         'type',
-        'user_id',
         'company_id',
         'created_by'
     ];
