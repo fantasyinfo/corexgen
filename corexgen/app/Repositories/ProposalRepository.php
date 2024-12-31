@@ -2,8 +2,11 @@
 
 namespace App\Repositories;
 
+use App\Models\CRM\CRMClients;
+use App\Models\CRM\CRMLeads;
 use App\Models\CRM\CRMProposals;
 use App\Traits\TenantFilter;
+use Illuminate\Support\Carbon;
 
 class ProposalRepository
 {
@@ -24,28 +27,27 @@ class ProposalRepository
     {
         return $query
             ->when(
-                $request->filled('name'),
-                fn($q) => $q->where('name', 'LIKE', "%{$request->name}%")
+                $request->filled('title'),
+                fn($q) => $q->where('title', 'LIKE', "%{$request->title}%")
             )
             ->when(
-                $request->filled('email'),
-                fn($q) => $q->where('email', 'LIKE', "%{$request->email}%")
+                $request->filled('client_id') && $request->client_id != '0',
+                fn($q) => $q->where('typable_type', CRMClients::class)->where('typable_id', $request->client_id)
             )
             ->when(
-                $request->filled('role_id') && $request->role_id != '0',
-                fn($q) => $q->where('role_id', $request->role_id)
+                $request->filled('lead_id') && $request->client_id != '0',
+                fn($q) => $q->where('typable_type', CRMLeads::class)->where('typable_id', $request->lead_id)
             )
             ->when(
                 $request->filled('status'),
                 fn($q) => $q->where('status', $request->status)
             )
             ->when(
-                $request->filled('start_date'),
-                fn($q) => $q->whereDate('created_at', '>=', $request->start_date)
-            )
-            ->when(
-                $request->filled('end_date'),
-                fn($q) => $q->whereDate('created_at', '<=', $request->end_date)
+                $request->filled('creating_date'),
+                fn($q) => $q->whereDate('created_at', Carbon::parse($request->creating_date)->toDateString())
+            )->when(
+                $request->filled('valid_date'),
+                fn($q) => $q->whereDate('created_at', Carbon::parse($request->valid_date)->toDateString())
             );
     }
 }

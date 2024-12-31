@@ -1,23 +1,30 @@
 @extends('layout.app')
 
 @section('content')
+    @php
+        // prePrintR($proposal->toArray());
+        $type = $proposal->typable_type === App\Models\CRM\CRMClients::class ? 'client' : 'lead';
+    @endphp
+
     <div class="container-fluid">
         <div class="row">
             <div class="justify-content-md-center col-lg-9">
                 <div class="card stretch stretch-full">
-                    <form id="proposalsFieldsForm" action="{{ route(getPanelRoutes('proposals.store')) }}" method="POST">
+                    <form id="proposalsFieldsForm" action="{{ route(getPanelRoutes('proposals.update')) }}" method="POST">
                         @csrf
+                        @method('PUT')
+                        <input type="hidden" name="id" value="{{$proposal->id}}" />
                         <div class="card-body general-info">
                             <div class="mb-5 d-flex align-items-center justify-content-between">
                                 <p class="fw-bold mb-0 me-4">
-                                    <span class="d-block">{{ __('proposals.Create New Proposal') }}</span>
+                                    <span class="d-block">{{ __('proposals.Update Proposal') }}</span>
                                     <span class="fs-12 fw-normal text-muted text-truncate-1-line">
                                         {{ __('crud.Please add correct information') }}
                                     </span>
                                 </p>
                                 <div>
                                     <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-save"></i> {{ __('proposals.Create Proposal') }}
+                                        <i class="fas fa-save"></i> {{ __('proposals.Update Proposal') }}
                                     </button>
                                 </div>
                             </div>
@@ -30,14 +37,18 @@
                                 </div>
                                 <div class="col-lg-8">
                                     <select name="type" id="type" class="form-select">
-                                        <option value="client" {{ old('type') == 'client' ? 'selected' : '' }}>Client
+                                        <option value="client" {{ $type == 'client' ? 'selected' : '' }}>
+                                            Client
                                         </option>
-                                        <option value="lead" {{ old('type') == 'lead' ? 'selected' : '' }}>Lead</option>
+                                        <option value="lead" {{ $type == 'lead' ? 'selected' : '' }}>
+                                            Lead
+                                        </option>
                                     </select>
                                 </div>
                             </div>
 
-                            <div class="row mb-3 align-items-center" id="clientSection" style="display: none;">
+                            <div id="clientSection"
+                                style="display:  {{ old('type', $proposal->typable_type) === App\Models\CRM\CRMClients::class ? 'flex' : 'none' }};">
                                 <div class="col-lg-4">
                                     <x-form-components.input-label for="client_id" required>
                                         {{ __('proposals.Select Client') }}
@@ -56,14 +67,16 @@
                                                     : " [ $item->primary_email ]";
                                             @endphp
                                             <option value="{{ $item->id }}"
-                                                {{ old('client_id') == $item->id ? 'selected' : '' }}>{{ $nameAndEmail }}
+                                                {{ old('client_id', $proposal->typable_id) == $item->id ? 'selected' : '' }}>
+                                                {{ $nameAndEmail }}
                                             </option>
                                         @endforeach
                                     </select>
                                 </div>
                             </div>
 
-                            <div class="row mb-3 align-items-center" id="leadSection" style="display: none;">
+                            <div id="leadSection"
+                                style="display:  {{ old('type', $proposal->typable_type) === App\Models\CRM\CRMLeads::class ? 'flex' : 'none' }};">
                                 <div class="col-lg-4">
                                     <x-form-components.input-label for="lead_id" required>
                                         {{ __('proposals.Select Lead') }}
@@ -82,7 +95,8 @@
                                                     : " [ $item->email ]";
                                             @endphp
                                             <option value="{{ $item->id }}"
-                                                {{ old('lead_id') == $item->id ? 'selected' : '' }}>{{ $nameAndEmail }}
+                                                {{ old('lead_id', $proposal->typable_id) == $item->id ? 'selected' : '' }}>
+                                                {{ $nameAndEmail }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -99,7 +113,8 @@
                                 <div class="col-lg-8">
                                     <x-form-components.input-group type="text" class="custom-class" id="_prefix"
                                         name="_prefix" placeholder="{{ __('PRO-') }}"
-                                        value="{{ old('_prefix', 'PRO-') }}" required oninput="updateIdField()" />
+                                        value="{{ old('_prefix', $proposal->_prefix) }}" disabled="true" required
+                                        oninput="updateIdField()" />
                                 </div>
 
                             </div>
@@ -111,8 +126,8 @@
                                 </div>
                                 <div class="col-lg-8">
                                     <x-form-components.input-group type="text" class="custom-class" id="_id"
-                                        name="_id" placeholder="{{ __('0001') }}" value="{{ old('_id', $lastId) }}"
-                                        required />
+                                        name="_id" placeholder="{{ __('0001') }}" disabled="true"
+                                        value="{{ old('_id', $proposal->_id) }}" required />
                                 </div>
                                 <p class="offset-lg-4 font-12 my-2 text-secondary">
                                     <span class="text-success"> Auto-Increment (Last ID + 1)</span> by default. Can be
@@ -130,31 +145,31 @@
                                 </div>
                                 <div class="col-lg-8">
                                     <x-form-components.input-group type="text" class="custom-class" id="title"
-                                        name="title" placeholder="{{ __('Amazing title') }}" value="{{ old('title') }}"
-                                        required />
+                                        name="title" placeholder="{{ __('Amazing title') }}"
+                                        value="{{ old('title', $proposal->title) }}" required />
 
                                 </div>
                             </div>
                             <div class="row mb-4 align-items-center">
                                 <div class="col-lg-4">
 
-                                    <x-form-components.input-label for="value" class="custom-class" >
+                                    <x-form-components.input-label for="value" class="custom-class">
                                         {{ __('proposals.Value') }}
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
                                     <x-form-components.input-group-prepend-append type="number" class="custom-class"
                                         id="value" prepend="$" append="USD" name="value"
-                                        placeholder="{{ __('99999') }}" value="{{ old('value') }}"  />
+                                        placeholder="{{ __('99999') }}" value="{{ old('value', $proposal->value) }}" />
 
                                 </div>
                             </div>
-                         
+
                             <hr>
 
                             <div class="row mb-3 align-items-center">
                                 <div class="col-lg-4">
-                                    <x-form-components.input-label for="template_id" >
+                                    <x-form-components.input-label for="template_id">
                                         {{ __('proposals.Select Template') }}
                                     </x-form-components.input-label>
                                 </div>
@@ -163,7 +178,7 @@
                                         <option value="">Select Template (optional)</option>
                                         @foreach ($templates as $item)
                                             <option value="{{ $item->id }}"
-                                                {{ old('template_id') == $item->id ? 'selected' : '' }}>
+                                                {{ old('template_id', $proposal->template_id) == $item->id ? 'selected' : '' }}>
                                                 {{ $item->title }}
                                             </option>
                                         @endforeach
@@ -180,20 +195,21 @@
                                 </div>
                                 <div class="col-lg-8">
                                     <x-form-components.input-group type="date" class="custom-class" id="creating_date"
-                                        name="creating_date" value="{{ old('creating_date') }}" required />
+                                        name="creating_date" value="{{ old('creating_date', $proposal->creating_date) }}"
+                                        required />
 
                                 </div>
                             </div>
                             <div class="row mb-4 align-items-center">
                                 <div class="col-lg-4">
 
-                                    <x-form-components.input-label for="valid_date" class="custom-class" >
+                                    <x-form-components.input-label for="valid_date" class="custom-class">
                                         {{ __('proposals.Valid Till') }}
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
                                     <x-form-components.input-group type="date" class="custom-class" id="valid_date"
-                                        name="valid_date" value="{{ old('valid_date') }}"  />
+                                        name="valid_date" value="{{ old('valid_date', $proposal->valid_date) }}" />
                                 </div>
                             </div>
                             <div class="row mb-4 align-items-center">
@@ -206,7 +222,7 @@
 
                                 <x-form-components.textarea-group name="details" id="details"
                                     placeholder="Extra details, conditions, rules, commitments, products, services, discouts, tax ... if any"
-                                    value="{{ old('details') }}" class="custom-class details" />
+                                    value="{{ old('details', $proposal->details) }}" class="custom-class details" />
 
                             </div>
 
@@ -242,8 +258,13 @@
 
                     content_style: 'body { font-family: Arial, sans-serif; }', // Optional: add inline styling for the editor content
 
-                    // skin: currentTheme === 'dark' ? 'oxide-dark' : 'oxide',
-                    // content_css: currentTheme === 'dark' ? 'dark' : 'default',
+                    skin: currentTheme === 'dark' ? 'oxide-dark' : 'oxide',
+                    content_css: currentTheme === 'dark' ? 'dark' : 'default',
+                    setup: function(editor) {
+                        editor.on('init', function() {
+                            editor.setContent(`{!! $proposal->details !!}`);
+                        });
+                    },
                     menubar: true,
                     plugins: [
                         'accordion',
@@ -283,31 +304,37 @@
                 const leadSelect = document.getElementById('lead_id');
 
                 // Function to toggle sections and reset form fields
-                function toggleSections(type) {
+                function toggleSections(type, isInitialLoad = false) {
                     if (type === 'client') {
                         clientSection.style.display = 'flex';
                         leadSection.style.display = 'none';
-                        leadSelect.value = '';
+                        // Only clear lead value if not initial load
+                        if (!isInitialLoad) {
+                            leadSelect.value = '';
+                        }
                         clientSelect.required = true;
                         leadSelect.required = false;
-                    } else {
+                    } else if (type === 'lead') {
                         clientSection.style.display = 'none';
                         leadSection.style.display = 'flex';
-                        clientSelect.value = '';
+                        // Only clear client value if not initial load
+                        if (!isInitialLoad) {
+                            clientSelect.value = '';
+                        }
                         clientSelect.required = false;
                         leadSelect.required = true;
                     }
                 }
 
-                // Initial state
-                toggleSections(typeSelect.value);
+
+              
 
                 // Event listener for type change
                 typeSelect.addEventListener('change', function() {
-                    toggleSections(this.value);
+                    toggleSections(this.value, false);
                 });
 
-
+                // ID prefix handling
                 function updateIdField() {
                     const prefix = document.getElementById('_prefix').value;
                     const idField = document.getElementById('_id');
@@ -317,9 +344,12 @@
                 }
 
                 // Track manual changes to `_id`
-                document.getElementById('_id').addEventListener('input', function() {
-                    this.dataset.modified = true;
-                });
+                const idField = document.getElementById('_id');
+                if (idField) {
+                    idField.addEventListener('input', function() {
+                        this.dataset.modified = true;
+                    });
+                }
             });
         </script>
     @endpush

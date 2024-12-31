@@ -188,11 +188,24 @@
                                                                 <td>
                                                                     @php
                                                                         $type = class_basename($audit->auditable_type);
-                                                                        if ($type == 'CRMRole') {
-                                                                            $type = 'Role';
-                                                                        } elseif ($type == 'CRMSettings') {
-                                                                            $type = 'Settings';
+                                                                        switch ($type) {
+                                                                            case 'CRMRole':
+                                                                                $type = 'Role';
+                                                                                break;
+                                                                            case 'CRMSettings':
+                                                                                $type = 'Settings';
+                                                                                break;
+                                                                            case 'CRMLeads':
+                                                                                $type = 'Leads';
+                                                                                break;
+                                                                            case 'CRMProposals':
+                                                                                $type = 'Proposals';
+                                                                                break;
+                                                                            default:
+                                                                                $type = $type;
+                                                                                break;
                                                                         }
+
                                                                     @endphp
                                                                     {{ $type }}
                                                                 </td>
