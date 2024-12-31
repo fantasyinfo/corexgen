@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
+use SebastianBergmann\Template\Template;
 
 class CRMProposals extends Model  implements Auditable
 {
@@ -58,4 +59,12 @@ class CRMProposals extends Model  implements Auditable
     {
         return $this->belongsTo(User::class, 'assign_to');
     }
+
+
+    public function template()
+    {
+        return $this->belongsTo(CRMTemplates::class, 'template_id');
+    }
+
+
 }

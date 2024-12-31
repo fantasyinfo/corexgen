@@ -12,8 +12,10 @@ use App\Models\CRM\CRMClients;
 use App\Models\CRM\CRMLeads;
 use App\Models\CRM\CRMProposals;
 use App\Models\CRM\CRMRole;
+use App\Models\CRM\CRMSettings;
 use App\Models\CRM\CRMTemplates;
 use App\Services\UserService;
+use App\Traits\IsSMTPValid;
 use App\Traits\MediaTrait;
 use App\Traits\SubscriptionUsageFilter;
 use App\Traits\TenantFilter;
@@ -44,6 +46,7 @@ class ProposalController extends Controller
     use TenantFilter;
     use SubscriptionUsageFilter;
     use MediaTrait;
+    use IsSMTPValid;
 
     /**
      * Number of items per page for pagination
@@ -158,9 +161,9 @@ class ProposalController extends Controller
             'total_active' => $usersTotals->totalActive,
             'total_inactive' => $usersTotals->totalInactive,
             'total_ussers' => $usersTotals->totalUsers,
-            'clients' =>  $clients,
-            'leads' =>  $leads,
-            
+            'clients' => $clients,
+            'leads' => $leads,
+
         ]);
     }
 
@@ -265,7 +268,6 @@ class ProposalController extends Controller
      *
      * @param Request $request [explicite description]
      *
-     * @return void
      */
     public function update(ProposalEditRequest $request)
     {
@@ -326,21 +328,53 @@ class ProposalController extends Controller
      * @param $id $id [explicite id of user]
      * @param $status $status [explicite status to change]
      *
-     * @return void
      */
     public function changeStatusAction($id, $action)
     {
         try {
-            // Delete the role
 
-            $this->applyTenantFilter(CRMProposals::query()->where('id', '=', $id))->update(['status' => $status]);
-            // Return success response
+            $proposal = $this->applyTenantFilter(CRMProposals::query()->with(['typable', 'template'])->where('id', '=', $id))->first();
+
+            if ($proposal->typable_type === CRMLeads::class) {
+                $toEmail = $proposal->typable->email;
+            } else if ($proposal->typable_type === CRMClients::class) {
+                $toEmail = $proposal->typable->primary_email;
+            }
+
+
+            if ($action == 'SENT') {
+
+                if (empty($toEmail) || is_null($toEmail)) {
+                    return redirect()->back()->with('error', 'No Email found for this client/lead');
+                }
+                $mailSettings = $this->_getMailSettings();
+                // Validate SMTP settings
+                if ($this->_isSMTPValid($mailSettings)) {
+                    // Queue the email sending job
+                    $emailDetails = [
+                        'from' => $mailSettings['Mail From Address'],
+                        'to' => $toEmail, // Replace with actual recipient
+                        'subject' => $proposal?->title,
+                        'details' => $proposal?->details,
+                        'template' => $proposal?->template?->template_details
+                    ];
+
+                    // dd($emailDetails);
+
+                    // dispatch(new SendEmailJob($mailSettings, $emailDetails));
+                } else {
+                    return redirect()->back()->with('error', 'SMTP settings are invalid, Please add/update the correct Mail Settings.');
+                }
+            }
+
+            $proposal->update(['status' => $action]);
+
             return redirect()->back()->with('success', 'User status changed successfully.');
         } catch (\Exception $e) {
-            // Handle any exceptions
-            return redirect()->back()->with('error', 'Failed to changed the user status: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to change the user status: ' . $e->getMessage());
         }
     }
+
 
 
 
@@ -360,8 +394,8 @@ class ProposalController extends Controller
 
             if (is_array($ids) && count($ids) > 0) {
                 DB::transaction(function () use ($ids) {
-      
-                  
+
+
 
                     // Then delete the clients
                     CRMProposals::whereIn('id', $ids)->delete();
@@ -389,33 +423,109 @@ class ProposalController extends Controller
 
     public function view($id)
     {
-        $query = User::query()
-            ->with([
-                'addresses' => function ($query) {
-                    $query->with('country')
+        $proposalQuery = $this->applyTenantFilter(
+            CRMProposals::query()
+                ->with([
+                    'typable' => function ($query) {
+                        if (request('typable_type') === CRMClients::class) {
+                            // For Clients - many-to-many relationship
+                            $query->with([
+                                'addresses' => function ($addressQuery) {
+                                $addressQuery->select(
+                                    'addresses.id',
+                                    'addresses.street_address',
+                                    'addresses.postal_code',
+                                    'addresses.city_id',
+                                    'addresses.country_id'
+                                )
+                                    ->withPivot('type');
+                            }
+                            ]);
+                        } elseif (request('typable_type') === CRMLeads::class) {
+                            // For Leads - single address relationship
+                            $query->with([
+                                'address' => function ($addressQuery) {
+                                $addressQuery->with(['country', 'city'])
+                                    ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
+                            }
+                            ]);
+                        }
+                    },
+                    'template',
+                    'company.addresses' => function ($query) {
+                        $query->with(['country', 'city'])
+                            ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
+                    }
+                ])
+                ->where('id', '=', $id)
+        );
 
-                        ->with(['city' => fn($q) => $q->select('id', 'name as city_name')])
-                        ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
-                },
-                'role'
-            ])
-            ->where('id', $id)->get();
 
-        $query = $this->applyTenantFilter($query);
-        $user = $query->firstOrFail();
 
-        // dd($user);
+        $query = $this->applyTenantFilter($proposalQuery);
+        $proposal = $query->firstOrFail();
 
-        $customFields = $this->customFieldService->getValuesForEntity($user);
 
         return view($this->getViewFilePath('view'), [
-
-            'title' => 'View User',
-            'user' => $user,
-            'module' => PANEL_MODULES[$this->getPanelModule()]['users'],
-            'customFields' => $customFields
+            'title' => 'View Proposal',
+            'proposal' => $proposal,
+            'module' => PANEL_MODULES[$this->getPanelModule()]['proposals'],
 
         ]);
     }
+    public function print($id)
+    {
+        $proposalQuery = $this->applyTenantFilter(
+            CRMProposals::query()
+                ->with([
+                    'typable' => function ($query) {
+                        if (request('typable_type') === CRMClients::class) {
+                            // For Clients - many-to-many relationship
+                            $query->with([
+                                'addresses' => function ($addressQuery) {
+                                $addressQuery->select(
+                                    'addresses.id',
+                                    'addresses.street_address',
+                                    'addresses.postal_code',
+                                    'addresses.city_id',
+                                    'addresses.country_id'
+                                )
+                                    ->withPivot('type');
+                            }
+                            ]);
+                        } elseif (request('typable_type') === CRMLeads::class) {
+                            // For Leads - single address relationship
+                            $query->with([
+                                'address' => function ($addressQuery) {
+                                $addressQuery->with(['country', 'city'])
+                                    ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
+                            }
+                            ]);
+                        }
+                    },
+                    'template',
+                    'company.addresses' => function ($query) {
+                        $query->with(['country', 'city'])
+                            ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
+                    }
+                ])
+                ->where('id', '=', $id)
+        );
+
+
+
+        $query = $this->applyTenantFilter($proposalQuery);
+        $proposal = $query->firstOrFail();
+
+
+        return view($this->getViewFilePath('print'), [
+            'title' => 'Print Proposal',
+            'proposal' => $proposal,
+            'module' => PANEL_MODULES[$this->getPanelModule()]['proposals'],
+
+        ]);
+    }
+
+
 
 }
