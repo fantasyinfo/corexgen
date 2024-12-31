@@ -1,3 +1,131 @@
 remove that provider class from config/app.php providers array
 composer file remove the autoload of that module
 composer run dump-autoload
+
+<!-- About Us -->
+<section class="mb-5">
+<h2 class="section-title">About XYZ Company Name</h2>
+<div class="row align-items-center">
+<div class="col-md-6">
+<p>We are committed to delivering exceptional results and maintaining the highest standards of professional service. Our track record speaks for itself, and we're excited to potentially work with you.</p>
+</div>
+<div class="col-md-6">
+<div class="row g-3">
+<div class="col-6">
+<div class="highlight-box text-center">
+<div class="h3 mb-2">100+</div>
+<p class="mb-0">Projects Completed</p>
+</div>
+</div>
+<div class="col-6">
+<div class="highlight-box text-center">
+<div class="h3 mb-2">95%</div>
+<p class="mb-0">Client Satisfaction</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Scope of Work -->
+<section class="mb-5">
+<h2 class="section-title">Scope of Work</h2>
+<div class="timeline">
+<div class="timeline-item">
+<h4>Discovery &amp; Planning</h4>
+<p>Initial consultation and requirement gathering to ensure perfect alignment with your goals.</p>
+</div>
+<div class="timeline-item">
+<h4>Development &amp; Implementation</h4>
+<p>Execution of the project with regular updates and milestone achievements.</p>
+</div>
+<div class="timeline-item">
+<h4>Testing &amp; Quality Assurance</h4>
+<p>Rigorous testing and refinement to ensure the highest quality deliverables.</p>
+</div>
+<div class="timeline-item">
+<h4>Deployment &amp; Support</h4>
+<p>Smooth deployment and ongoing support to ensure long-term success.</p>
+</div>
+</div>
+</section>
+<!-- Investment Details -->
+<section class="mb-5">
+<h2 class="section-title">Investment Details</h2>
+<div class="table-responsive">
+<table class="price-table w-100">
+<thead>
+<tr>
+<th>Service Component</th>
+<th class="text-end">Investment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<h5 class="mb-1">Project Planning &amp; Analysis</h5>
+<p class="mb-0 text-muted">Initial consultation and requirement gathering</p>
+</td>
+<td class="text-end">$ 400</td>
+</tr>
+<tr>
+<td>
+<h5 class="mb-1">Development &amp; Implementation</h5>
+<p class="mb-0 text-muted">Core development and implementation work</p>
+</td>
+<td class="text-end">$ 1999</td>
+</tr>
+<tr>
+<td>
+<h5 class="mb-1">Testing &amp; Quality Assurance</h5>
+<p class="mb-0 text-muted">Comprehensive testing and refinement</p>
+</td>
+<td class="text-end">$ 2200</td>
+</tr>
+<tr>
+<td>
+<h5 class="mb-1">Training &amp; Support</h5>
+<p class="mb-0 text-muted">Knowledge transfer and initial support period</p>
+</td>
+<td class="text-end">$ 1000</td>
+</tr>
+<tr>
+<td>
+<h4 class="mb-0">Total Investment</h4>
+</td>
+<td class="text-end">
+<h4 class="mb-0">$ 9999</h4>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Terms & Conditions -->
+<section class="mb-5">
+<h2 class="section-title">Terms &amp; Conditions</h2>
+<div class="row">
+<div class="col-md-6">
+<h5>Payment Terms</h5>
+<ul class="list-unstyled">
+<li class="mb-2">✓ 40% upfront payment to commence work</li>
+<li class="mb-2">✓ 30% at project midpoint</li>
+<li class="mb-2">✓ 30% upon project completion</li>
+</ul>
+</div>
+<div class="col-md-6">
+<h5>Project Timeline</h5>
+<ul class="list-unstyled">
+<li class="mb-2">✓ Project Start: Upon proposal acceptance</li>
+<li class="mb-2">✓ Estimated Duration: 8-12 weeks</li>
+<li class="mb-2">✓ Regular progress updates every week</li>
+</ul>
+</div>
+</div>
+</section>
+<!-- Acceptance -->
+<section>
+<div class="row mt-4">
+<div class="col-md-6"></div>
+</div>
+</section>
