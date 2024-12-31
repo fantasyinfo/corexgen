@@ -8,6 +8,7 @@ use App\Models\Company;
 use App\Traits\HasCustomFields;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use OwenIt\Auditing\Contracts\Auditable;
 use Illuminate\Support\Str;
@@ -17,6 +18,7 @@ class CRMClients extends Model implements Auditable
     use HasFactory;
     use \OwenIt\Auditing\Auditable;
     use HasCustomFields;
+    use SoftDeletes;
 
     const table = 'clients';
 

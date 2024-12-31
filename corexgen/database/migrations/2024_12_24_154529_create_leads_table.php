@@ -40,7 +40,7 @@ return new class extends Migration {
             $table->foreignId('status_id')->nullable()->constrained('category_group_tag')->onDelete('set null');
             $table->foreignId('address_id')->nullable()->constrained('addresses')->onDelete('set null');
             $table->foreignId('company_id')->nullable()->constrained('companies')->onDelete('set null');
-
+            $table->softDeletes();
             $table->timestamps();
 
             // Indexes for frequently searched/filtered fields
@@ -69,6 +69,7 @@ return new class extends Migration {
             $table->foreignId('lead_id')->constrained('leads')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
+            $table->softDeletes();
             $table->timestamps();
             
             $table->unique(['lead_id', 'user_id', 'company_id']);

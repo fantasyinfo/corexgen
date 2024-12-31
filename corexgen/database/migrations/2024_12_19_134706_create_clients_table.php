@@ -32,7 +32,7 @@ return new class extends Migration {
             $table->foreignId('updated_by')->nullable()->constrained('users')->onDelete('set null');
             $table->json('tags')->nullable(); // Optional tagging system
             $table->date('birthdate')->nullable(); // Optional for individuals
-      
+            $table->softDeletes();
             $table->timestamps();
         });
     }

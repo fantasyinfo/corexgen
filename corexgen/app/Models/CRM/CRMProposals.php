@@ -6,10 +6,12 @@ use App\Models\Company;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CRMProposals extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
 
     const table = 'proposals';
