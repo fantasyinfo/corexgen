@@ -545,20 +545,22 @@ class CompaniesController extends Controller
      */
     public function destroy($id)
     {
-
         try {
-            // Delete the user
+            DB::beginTransaction();
 
-            Company::query()->where('id', '=', $id)->delete();
+            $company = Company::findOrFail($id);
+   
 
-            // Return success response
+            $company->delete();
+
+            DB::commit();
             return redirect()->back()->with('success', 'Company deleted successfully.');
         } catch (\Exception $e) {
-            // Handle any exceptions
+            DB::rollBack();
+          
             return redirect()->back()->with('error', 'Failed to delete the company: ' . $e->getMessage());
         }
     }
-
     /**
      * Bulk Delete the companies
      * Request $request
@@ -566,31 +568,27 @@ class CompaniesController extends Controller
      */
     public function bulkDelete(Request $request)
     {
-
-        $ids = $request->input('ids');
-
         try {
-            // Delete the companies
+            $ids = $request->input('ids');
 
-            if (is_array($ids) && count($ids) > 0) {
-                // Validate ownership/permissions if necessary
-                Company::query()->whereIn('id', $ids)->delete();
-
-                return response()->json(['message' => 'Selected companiess deleted successfully.'], 200);
+            if (!is_array($ids) || empty($ids)) {
+                return response()->json(['message' => 'No companies selected for deletion.'], 400);
             }
 
-            return response()->json(['message' => 'No companiess selected for deletion.'], 400);
+            DB::beginTransaction();
 
+            Company::whereIn('id', $ids)->each(function ($company) {
+                $company->delete();
+            });
 
-
-
-
+            DB::commit();
+            return response()->json(['message' => 'Selected companies deleted successfully.'], 200);
         } catch (\Exception $e) {
-            // Handle any exceptions
-            return redirect()->back()->with('error', 'Failed to delete the companies: ' . $e->getMessage());
+            DB::rollBack();
+            \Log::error('Bulk company deletion failed: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to delete companies: ' . $e->getMessage()], 500);
         }
     }
-
 
     /**
      * Method changeStatus (change company status)

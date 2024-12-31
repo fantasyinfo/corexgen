@@ -24,8 +24,8 @@ class LeadsSeeder extends Seeder
         $leads = [];
         $type = ['Individual', 'Company'];
 
-        $loginUserId = 256; // Default user ID
-        $companyId = 17;    // Default company ID
+        $loginUserId = 2; // Default user ID
+        $companyId = 1;    // Default company ID
 
         // Fetch all IDs for groups, sources, statuses, and users
         $groupIds = CategoryGroupTag::where('type', CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_groups'])->where('relation_type', CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads'])->where('status', 'active')->where('company_id', $companyId)->pluck('id')->toArray();

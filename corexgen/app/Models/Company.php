@@ -9,23 +9,32 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class Company extends Model implements Auditable
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes, \OwenIt\Auditing\Auditable;
 
+    const TABLE = 'companies';
 
-    use \OwenIt\Auditing\Auditable;
+    protected $table = self::TABLE;
 
-    const table = 'companies';
+    protected $fillable = [
+        'name',
+        'email',
+        'phone',
+        'status',
+        'tenant_id',
+        'address_id',
+        'plan_id',
+        'deleted_at',
+    ];
 
-    protected $table = self::table;
-
-    protected $fillable = ['name', 'email', 'phone', 'status', 'tenant_id', 'address_id', 'plan_id', 'deleted_at'];
-
+    /**
+     * Relationships
+     */
 
     public function tenant(): BelongsTo
     {
@@ -36,7 +45,6 @@ class Company extends Model implements Auditable
     {
         return $this->hasMany(User::class);
     }
-
 
     public function addresses(): BelongsTo
     {
@@ -53,7 +61,6 @@ class Company extends Model implements Auditable
         return $this->hasMany(Subscription::class);
     }
 
-
     public function paymentTransactions(): HasMany
     {
         return $this->hasMany(PaymentTransaction::class);
@@ -64,47 +71,59 @@ class Company extends Model implements Auditable
         return $this->hasOne(Subscription::class)->latestOfMany();
     }
 
-
     public function clients(): HasMany
     {
         return $this->hasMany(CRMClients::class, 'company_id');
     }
-
 
     public function leads(): HasMany
     {
         return $this->hasMany(CRMLeads::class, 'company_id');
     }
 
+    /**
+     * Boot method to handle model events
+     */
     protected static function boot()
     {
         parent::boot();
 
         static::creating(function ($company) {
-            // Set default values
             $company->status = $company->status ?? CRM_STATUS_TYPES['COMPANIES']['STATUS']['ONBOARDING'];
             $company->tenant_id = Auth::user()->tenant_id ?? '1';
         });
 
         static::deleting(function ($company) {
-            \Log::info('Deleting the company' . [$company]);
-            // If it's a force delete, let Laravel handle the cascading
-            if ($company->isForceDeleting()) {
-                return;
+            \Log::info('Deleting the company with ID: ' . $company->id);
+        
+            // Define all relationships that need cascading soft deletes
+            $relationships = [
+                'paymentTransactions' => 'Deleting payment transaction with ID: ',
+                'subscriptions' => 'Deleting subscription with ID: ',
+                'leads' => 'Deleting lead with ID: ',
+                'users' => 'Deleting user with ID: ',
+                'clients' => 'Deleting client with ID: ',
+                'addresses' => 'Deleting address with ID: ',
+            ];
+        
+            foreach ($relationships as $relation => $logMessage) {
+                // Check if the relationship exists and has entries
+                if ($company->$relation()->exists()) {
+                    $company->$relation()->each(function ($relatedRecord) use ($logMessage) {
+                        \Log::info($logMessage . $relatedRecord->id);
+                        $relatedRecord->delete();
+                    });
+                } else {
+                    \Log::info('No ' . $relation . ' associated with the company ID: ' . $company->id);
+                }
             }
-
-            // Soft delete associated records
-            $company->paymentTransactions()->get()->each(function ($transaction) {
-                \Log::info('Deleting its transaction' . [$transaction]);
-                $transaction->delete();
-            });
-
-            $company->subscriptions()->get()->each(function ($subscription) {
-                \Log::info('Deleting its transaction' . [$subscription]);
-                $subscription->delete();
-            });
         });
+        
+    }
 
-
+    // Helper method to check if a model should be force deleted
+    public function shouldForceDelete(): bool
+    {
+        return $this->isForceDeleting();
     }
 }

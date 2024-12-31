@@ -23,7 +23,7 @@ class RoleSeeder extends Seeder
     {
         //
 
-        $companyId = 17;
+        $companyId = 1;
 
         $rolesArray = [];
 

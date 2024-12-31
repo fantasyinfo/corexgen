@@ -16,7 +16,7 @@ class ClientSeeder extends Seeder
     {
         $clients = [];
 
-        $companyId = 17;
+        $companyId = 1;
 
         $categoryIds = CategoryGroupTag::where('type', CATEGORY_GROUP_TAGS_TYPES['KEY']['categories'])->where('relation_type', CATEGORY_GROUP_TAGS_RELATIONS['KEY']['clients'])->where('status', 'active')->where('company_id', $companyId)->pluck('id')->toArray();
 

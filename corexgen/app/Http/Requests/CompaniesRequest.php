@@ -35,8 +35,8 @@ class CompaniesRequest extends FormRequest
 
         return [
             'id' => [$isUpdate ? 'required' : 'nullable'],
-            'name' => ['required', 'string',],
-            'cname' => ['required', 'string',],
+            'name' => ['required', 'string','unique:companies,name','max:150'],
+            'cname' => ['required', 'string','max:150'],
             'email' => [
                 'required',
                 'email',
@@ -46,8 +46,8 @@ class CompaniesRequest extends FormRequest
             'password' => [$isUpdate ? 'nullable' : 'required', 'min:8'],
             'plan_id' => ['required', 'exists:plans,id'],
             'address_street_address' => 'nullable|string|max:255',
-            'address_country_id' => 'nullable',
-            'address_city_name' => 'nullable',
+            'address_country_id' => 'nullable|exists:countries,id',
+            'address_city_name' => 'nullable|max:100',
             'address_pincode' => 'nullable|string|max:10',
 
             // adding front parametwres
