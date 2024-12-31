@@ -124,6 +124,7 @@ class CRMLeads extends Model implements Auditable
 
     }
 
+
     /**
      * Model boot method to set default values
      */

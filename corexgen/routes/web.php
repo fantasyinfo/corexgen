@@ -358,7 +358,7 @@ Route::middleware([
         Route::post('/bulkDelete', [ProposalController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:PROPOSALS.BULK_DELETE');
 
         Route::get('/view/{id}', [ProposalController::class, 'view'])->name('view')->middleware('check.permission:PROPOSALS.VIEW');
-        Route::get('/profile', [ProposalController::class, 'profile'])->name('profile');
+        Route::get('/print/{id}', [ProposalController::class, 'print'])->name('print');
 
 
 

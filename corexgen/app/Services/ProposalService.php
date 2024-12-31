@@ -147,6 +147,10 @@ class ProposalService
         $id = $proposal->id;
         $tenantRoute = $this->tenantRoute;
 
+
+        // ['DRAFT', 'SENT', 'OPEN', 'DECLINED', 'ACCEPTED', 'EXPIRED','REVISED']
+
+
         $action = '<div class="dropdown text-end">
             <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="fas fa-ellipsis-h"></i>
@@ -156,22 +160,22 @@ class ProposalService
 
 
         $action .= '<li class="m-1 p-1">
-                <a class="dropdown-item" href="' . route($tenantRoute . $module . '.changeStatusAction', ['id' => $id, 'action' => 'send']) . '" data-toggle="tooltip" title="Edit">
+                <a class="dropdown-item" href="' . route($tenantRoute . $module . '.changeStatusAction', ['id' => $id, 'action' => 'SENT']) . '" data-toggle="tooltip" title="Edit">
                 <i class="fas fa-paper-plane me-2"></i> Send on Email
                 </a>
             </li>';
         $action .= '<li class="m-1 p-1">
-                <a class="dropdown-item" href="' . route($tenantRoute . $module . '.changeStatusAction', ['id' => $id, 'action' => 'accepted']) . '" data-toggle="tooltip" title="Edit">
+                <a class="dropdown-item" href="' . route($tenantRoute . $module . '.changeStatusAction', ['id' => $id, 'action' => 'ACCEPTED']) . '" data-toggle="tooltip" title="Edit">
                 <i class="fas fa-check me-2"></i> Mark Accepted
                 </a>
             </li>';
         $action .= '<li class="m-1 p-1">
-                <a class="dropdown-item" href="' . route($tenantRoute . $module . '.changeStatusAction', ['id' => $id, 'action' => 'decline']) . '" data-toggle="tooltip" title="Edit">
+                <a class="dropdown-item" href="' . route($tenantRoute . $module . '.changeStatusAction', ['id' => $id, 'action' => 'DECLINED']) . '" data-toggle="tooltip" title="Edit">
                 <i class="fas fa-times me-2"></i> Mark Decline
                 </a>
             </li>';
         $action .= '<li class="m-1 p-1">
-                <a class="dropdown-item" href="' . route($tenantRoute . $module . '.changeStatusAction', ['id' => $id, 'action' => 'revised']) . '" data-toggle="tooltip" title="Edit">
+                <a class="dropdown-item" href="' . route($tenantRoute . $module . '.changeStatusAction', ['id' => $id, 'action' => 'REVISED']) . '" data-toggle="tooltip" title="Edit">
                 <i class="fas fa-file-alt me-2"></i>Mark Revised
                 </a>
             </li>';
