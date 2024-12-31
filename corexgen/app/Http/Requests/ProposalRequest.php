@@ -34,8 +34,8 @@ class ProposalRequest extends FormRequest
             'value' => 'nullable|integer|min:0',
             'details' => 'nullable|string',
             'creating_date' => 'required|date',
-            'valid_date' => 'required|date|after_or_equal:today',
-            'template_id' => 'nullable|integer|exists:templates,id',
+            'valid_date' => 'nullable|date|after_or_equal:today',
+            'template_id' => 'nullable|exists:templates,id',
         ];
     }
 

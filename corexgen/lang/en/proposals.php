@@ -26,6 +26,9 @@ return [
     'Date' => 'Date',
     'Valid Till' => 'Valid Till',
     'Details' => 'Details',
-    'Value' => 'Value'
+    'Value' => 'Value',
+    'To' => 'To'
+
+
 
 ];

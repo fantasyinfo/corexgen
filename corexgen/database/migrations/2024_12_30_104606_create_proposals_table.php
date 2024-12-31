@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('proposals', function (Blueprint $table) {
             $table->id();
-            $table->string('_prefix')->default('PRO')->unique();
+            $table->string('_prefix')->default('PRO');
             $table->string('_id')->unique();
             $table->string('title');
             $table->string('url')->unique();
@@ -21,7 +21,7 @@ return new class extends Migration
             $table->text('details')->nullable();
             $table->morphs('typable'); // Adds `typable_id` and `typable_type`
             $table->date('creating_date')->default(now());
-            $table->date('valid_date')->default(now());
+            $table->date('valid_date')->default(now())->nullable();
             $table->json('accepted_details')->nullable();
             $table->enum('status', CRM_STATUS_TYPES['PROPOSALS']['TABLE_STATUS'])->default(CRM_STATUS_TYPES['PROPOSALS']['STATUS']['OPEN']);
 

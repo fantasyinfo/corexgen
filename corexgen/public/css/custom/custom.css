@@ -686,3 +686,8 @@ table.celled {
 .border-dark {
     border-color: white !important;
 }
+
+
+.dt-scroll-body{
+    min-height: 400px;
+}

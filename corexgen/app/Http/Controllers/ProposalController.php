@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\CustomFieldsValidation;
 use App\Helpers\PermissionsHelper;
+use App\Http\Requests\ProposalEditRequest;
 use App\Http\Requests\ProposalRequest;
 use App\Http\Requests\UserRequest;
 use App\Models\Country;
@@ -117,7 +118,7 @@ class ProposalController extends Controller
             DB::raw('COUNT(*) as totalUsers'),
             DB::raw(sprintf(
                 'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalActive',
-                CRM_STATUS_TYPES['PROPOSALS']['STATUS']['ACCEPTED']
+                CRM_STATUS_TYPES['PROPOSALS']['STATUS']['OPEN']
             )),
             DB::raw(sprintf(
                 'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalInactive',
@@ -140,6 +141,11 @@ class ProposalController extends Controller
 
         $templates = $this->applyTenantFilter(CRMTemplates::query()->where('type', 'Proposals'))->get();
 
+        $clients = $this->applyTenantFilter(CRMClients::query())->select('id', 'first_name', 'last_name', 'type', 'company_name', 'primary_email')->get();
+
+        $leads = $this->applyTenantFilter(CRMLeads::query())->select('id', 'first_name', 'last_name', 'type', 'company_name', 'email')->get();
+
+
         return view($this->getViewFilePath('index'), [
             'filters' => $request->all(),
             'title' => 'Proposals Management',
@@ -152,6 +158,9 @@ class ProposalController extends Controller
             'total_active' => $usersTotals->totalActive,
             'total_inactive' => $usersTotals->totalInactive,
             'total_ussers' => $usersTotals->totalUsers,
+            'clients' =>  $clients,
+            'leads' =>  $leads,
+            
         ]);
     }
 
@@ -168,17 +177,17 @@ class ProposalController extends Controller
 
         try {
 
-        
-            $proposal = $proposalService->createProposal($request->validated());
 
-       
+            $proposal = $this->proposalService->createProposal($request->validated());
+
+
             // update current usage
-            $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['PORPOSALS']]), '+', '1');
+            $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['PROPOSALS']]), '+', '1');
 
-            return redirect()->route($this->tenantRoute . 'propoals.index')
+            return redirect()->route($this->tenantRoute . 'proposals.index')
                 ->with('success', 'Proposals created successfully.');
         } catch (\Exception $e) {
-            return redirect()->back()
+            return redirect()->back()->withInput()
                 ->with('error', 'An error occurred while creating the Proposals: ' . $e->getMessage());
         }
     }
@@ -225,44 +234,27 @@ class ProposalController extends Controller
     public function edit($id)
     {
 
-
-        $query = User::query()
-            ->with([
-                'addresses' => function ($query) {
-                    $query->with('country')
-                        ->with('city')
-                        ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
-                }
-            ])
+        $query = CRMProposals::query()
             ->where('id', $id);
         $query = $this->applyTenantFilter($query);
-        $user = $query->firstOrFail();
-
-        $roles = $this->applyTenantFilter(CRMRole::query())->get();
-
-        $country = Country::all();
+        $proposal = $query->firstOrFail();
 
 
+        // Regular view rendering
+        $templates = $this->applyTenantFilter(CRMTemplates::query()->select('id', 'title')->where('type', 'Proposals'))->get();
 
-        // custom fields
-        $customFields = collect();
-        $cfOldValues = collect();
-        if (!is_null(Auth::user()->company_id)) {
-            $customFields = $this->customFieldService->getFieldsForEntity(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['user'], Auth::user()->company_id);
+        $clients = $this->applyTenantFilter(CRMClients::query())->select('id', 'first_name', 'last_name', 'type', 'company_name', 'primary_email')->get();
 
-            // fetch already existing values
-
-            $cfOldValues = $this->customFieldService->getValuesForEntity($user);
-        }
+        $leads = $this->applyTenantFilter(CRMLeads::query())->select('id', 'first_name', 'last_name', 'type', 'company_name', 'email')->get();
 
         return view($this->getViewFilePath('edit'), [
 
-            'title' => 'Edit User',
-            'user' => $user,
-            'roles' => $roles,
-            'country' => $country,
-            'customFields' => $customFields,
-            'cfOldValues' => $cfOldValues
+            'title' => 'Edit Proposal',
+            'proposal' => $proposal,
+            'templates' => $templates,
+            'clients' => $clients,
+            'leads' => $leads,
+
         ]);
     }
 
@@ -275,65 +267,21 @@ class ProposalController extends Controller
      *
      * @return void
      */
-    public function update(UserRequest $request, UserService $userService)
+    public function update(ProposalEditRequest $request)
     {
-
-
 
         $this->tenantRoute = $this->getTenantRoute();
 
         try {
 
-            // custom fields validation if any
-            $validatedData = [];
-            if ($request->has('custom_fields') && !is_null(Auth::user()->company_id)) {
-                $validator = new CustomFieldsValidation();
-                $validatedData = $validator->validate($request->input('custom_fields'), CUSTOM_FIELDS_RELATION_TYPES['KEYS']['user'], Auth::user()->company_id);
-            }
 
-            $user = $userService->updateUser($request->validated());
+            $proposal = $this->proposalService->updateProposal($request->validated());
 
-            // insert custom fields values to db
-            if ($request->has('custom_fields') && !empty($validatedData) && count($validatedData) > 0 && !is_null(Auth::user()->company_id)) {
-                $this->customFieldService->saveValues($user, $validatedData);
-            }
-
-
-            // Handle avatar upload
-            if ($request->hasFile('avatar')) {
-                $oldMedia = $user->profile_photo_path ? Media::where('file_path', $user->profile_photo_path)->first() : null;
-
-                $attributes = [
-                    'folder' => 'avatars',
-                    'company_id' => Auth::user()->company_id,
-                    'updated_by' => Auth::id(),
-                    'created_by' => Auth::id(),
-                ];
-
-                $media = $this->createMedia($request->file('avatar'), $attributes);
-
-                // Update the profile_photo_path column in the user's table
-                $user->profile_photo_path = $media->file_path;
-                $user->save();
-
-                // Optionally delete the old media record
-                if ($oldMedia) {
-                    $this->updateMedia($request->file('avatar'), $oldMedia, $attributes);
-                }
-            }
-
-
-
-            if ($request->boolean('is_profile')) {
-                return redirect()
-                    ->route($this->tenantRoute . 'users.profile')
-                    ->with('success', __('Profile updated successfully.'));
-            }
-            return redirect()->route($this->tenantRoute . 'users.index')
-                ->with('success', 'User updated successfully.');
+            return redirect()->route($this->tenantRoute . 'proposals.index')
+                ->with('success', 'proposal updated successfully.');
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'An error occurred while updating the user: ' . $e->getMessage());
+                ->with('error', 'An error occurred while updating the proposal: ' . $e->getMessage());
         }
     }
 
@@ -352,26 +300,22 @@ class ProposalController extends Controller
         try {
             // Delete the user
 
-            $user = User::find($id);
+            $user = CRMProposals::find($id);
             if ($user) {
-
-                // delete its custom fields also if any
-                $this->customFieldService->deleteEntityValues($user);
-
                 // delete  now
                 $user->delete();
 
                 // update the subscription usage
-                $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['USERS']]), '-', '1');
+                $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['PROPOSALS']]), '-', '1');
 
-                return redirect()->back()->with('success', 'User deleted successfully.');
+                return redirect()->back()->with('success', 'Proposal deleted successfully.');
             } else {
-                return redirect()->back()->with('error', 'Failed to delete the User: User not found with this id.');
+                return redirect()->back()->with('error', 'Failed to delete the Proposal: Proposal not found with this id.');
             }
 
         } catch (\Exception $e) {
             // Handle any exceptions
-            return redirect()->back()->with('error', 'Failed to delete the user: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to delete the proposal: ' . $e->getMessage());
         }
     }
 
@@ -384,12 +328,12 @@ class ProposalController extends Controller
      *
      * @return void
      */
-    public function changeStatus($id, $status)
+    public function changeStatusAction($id, $action)
     {
         try {
             // Delete the role
 
-            $this->applyTenantFilter(User::query()->where('id', '=', $id))->update(['status' => $status]);
+            $this->applyTenantFilter(CRMProposals::query()->where('id', '=', $id))->update(['status' => $status]);
             // Return success response
             return redirect()->back()->with('success', 'User status changed successfully.');
         } catch (\Exception $e) {
@@ -416,23 +360,23 @@ class ProposalController extends Controller
 
             if (is_array($ids) && count($ids) > 0) {
                 DB::transaction(function () use ($ids) {
-                    // First, delete custom field values
-                    $this->customFieldService->bulkDeleteEntityValues(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['user'], $ids);
+      
+                  
 
                     // Then delete the clients
-                    User::whereIn('id', $ids)->delete();
+                    CRMProposals::whereIn('id', $ids)->delete();
 
                     $this->updateUsage(
-                        strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['USERS']]),
+                        strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['PROPOSALS']]),
                         '-',
                         count($ids)
                     );
                 });
 
-                return response()->json(['message' => 'Selected users deleted successfully.'], 200);
+                return response()->json(['message' => 'Selected proposals deleted successfully.'], 200);
             }
 
-            return response()->json(['message' => 'No users selected for deletion.'], 400);
+            return response()->json(['message' => 'No proposals selected for deletion.'], 400);
 
         } catch (\Exception $e) {
             // Handle any exceptions
