@@ -178,6 +178,9 @@ class ProposalController extends Controller
      */
     public function store(ProposalRequest $request)
     {
+
+       
+
         $this->tenantRoute = $this->getTenantRoute();
 
         try {
@@ -188,6 +191,8 @@ class ProposalController extends Controller
 
             // update current usage
             $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['PROPOSALS']]), '+', '1');
+
+            
 
             return redirect()->route($this->tenantRoute . 'proposals.index')
                 ->with('success', 'Proposals created successfully.');
@@ -589,7 +594,10 @@ class ProposalController extends Controller
             $this->proposalService->sendProposalOnEmail($proposal, $this->getViewFilePath('print'));
 
             // Update proposal status
-            $proposal->update(['status' => 'SENT']);
+            // if($proposal->status != 'ACCEPTED'){
+
+            //     $proposal->update(['status' => 'SENT']);
+            // }
 
             $successResponse = ['success' => 'Proposal has been sent in the background job and will be delivered soon.'];
             return $fromAPI

@@ -26,7 +26,7 @@ class ProposalRequest extends FormRequest
     {
         return [
             '_prefix' => 'required|string|max:50',
-            '_id' => 'required|string|max:10|unique:proposals,_id',
+            '_id' => 'required|string|max:10',
             'type' => 'required|in:client,lead',
             'client_id' => 'required_if:type,client|exists:clients,id',
             'lead_id' => 'required_if:type,lead|exists:leads,id',

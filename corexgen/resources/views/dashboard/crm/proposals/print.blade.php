@@ -181,6 +181,7 @@
             </section>
         </div>
 
+        <div class="proposal-content">
         @if ($proposal->status === 'ACCEPTED')
             <div class="container mt-4">
                 <div class="card shadow-sm">
@@ -240,6 +241,7 @@
                 </div>
             </div>
         @endif
+        </div>
     </div>
 </body>
 

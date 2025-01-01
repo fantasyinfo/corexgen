@@ -164,16 +164,18 @@
 
 
                 <!-- Action Buttons -->
-                @if ($proposal->status !== 'ACCEPTED')
+         
                     <div class="d-flex justify-content-end mt-5 pt-4 border-top">
                         <button class="btn btn-outline-secondary me-2" onclick="printProposal()">
                             <i class="bi bi-download me-2"></i>Download PDF
                         </button>
+                        @if ($proposal->status !== 'ACCEPTED')
                         <button class="btn btn-primary" onclick="sendProposal('{{ $proposal->id }}')">
                             <i class="bi bi-send me-2"></i>Send Proposal
                         </button>
+                        @endif
                     </div>
-                @endif
+           
 
                 @if ($proposal->status === 'ACCEPTED')
                     <div class="container mt-4">

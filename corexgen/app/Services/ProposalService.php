@@ -81,6 +81,11 @@ class ProposalService
         return $proposal;
     }
 
+    public function getProposals($typable_type, $typable_id)
+    {
+        return $this->applyTenantFilter(CRMProposals::query()->where('typable_type', $typable_type)->where('typable_id', $typable_id)->latest()->get());
+    }
+
 
     public function sendProposalOnEmail(CRMProposals $proposal, $view = "dashboard.crm.proposals.print"): bool
     {
@@ -101,7 +106,7 @@ class ProposalService
             ];
 
             // Dispatch the job
-           SendProposal::dispatch(
+            SendProposal::dispatch(
                 $mailSettings,
                 $emailDetails,
                 $proposal,
@@ -208,25 +213,37 @@ class ProposalService
                 <i class="fas fa-paper-plane me-2"></i> Send on Email
                 </a>
             </li>';
-        $action .= '<li class="m-1 p-1">
-                <a class="dropdown-item" href="' . route($tenantRoute . $module . '.changeStatusAction', ['id' => $id, 'action' => 'ACCEPTED']) . '" data-toggle="tooltip" title="Edit">
-                <i class="fas fa-check me-2"></i> Mark Accepted
-                </a>
-            </li>';
-        $action .= '<li class="m-1 p-1">
-                <a class="dropdown-item" href="' . route($tenantRoute . $module . '.changeStatusAction', ['id' => $id, 'action' => 'DECLINED']) . '" data-toggle="tooltip" title="Edit">
-                <i class="fas fa-times me-2"></i> Mark Decline
-                </a>
-            </li>';
-        $action .= '<li class="m-1 p-1">
-                <a class="dropdown-item" href="' . route($tenantRoute . $module . '.changeStatusAction', ['id' => $id, 'action' => 'REVISED']) . '" data-toggle="tooltip" title="Edit">
-                <i class="fas fa-file-alt me-2"></i>Mark Revised
-                </a>
-            </li>';
+
+
+
+        if ($proposal->status !== 'ACCEPTED') {
+
+
+            $action .= '<li class="m-1 p-1">
+            <a class="dropdown-item" href="' . route($tenantRoute . $module . '.changeStatusAction', ['id' => $id, 'action' => 'ACCEPTED']) . '" data-toggle="tooltip" title="Edit">
+            <i class="fas fa-check me-2"></i> Mark Accepted
+            </a>
+        </li>';
+
+
+            $action .= '<li class="m-1 p-1">
+            <a class="dropdown-item" href="' . route($tenantRoute . $module . '.changeStatusAction', ['id' => $id, 'action' => 'DECLINED']) . '" data-toggle="tooltip" title="Edit">
+            <i class="fas fa-times me-2"></i> Mark Decline
+            </a>
+        </li>';
+
+
+            $action .= '<li class="m-1 p-1">
+            <a class="dropdown-item" href="' . route($tenantRoute . $module . '.changeStatusAction', ['id' => $id, 'action' => 'REVISED']) . '" data-toggle="tooltip" title="Edit">
+            <i class="fas fa-file-alt me-2"></i>Mark Revised
+            </a>
+        </li>';
+        }
+
 
 
         // Check if the user has permission to update
-        if (hasPermission(strtoupper($module) . '.' . $permissions['UPDATE']['KEY'])) {
+        if (hasPermission(strtoupper($module) . '.' . $permissions['UPDATE']['KEY']) && $proposal->status !== 'ACCEPTED') {
             $action .= '<li class="m-1 p-1">
                 <a class="dropdown-item" href="' . route($tenantRoute . $module . '.edit', $id) . '" data-toggle="tooltip" title="Edit">
                  <i class="fas fa-pencil-alt me-2"></i> Edit
