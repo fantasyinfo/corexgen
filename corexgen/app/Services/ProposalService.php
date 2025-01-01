@@ -2,10 +2,12 @@
 
 namespace App\Services;
 
+use App\Jobs\SendProposal;
 use App\Models\CRM\CRMClients;
 use App\Models\CRM\CRMLeads;
 use App\Models\CRM\CRMProposals;
 use App\Repositories\ProposalRepository;
+use App\Traits\IsSMTPValid;
 use App\Traits\TenantFilter;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\View;
@@ -19,6 +21,7 @@ class ProposalService
 
 
     use TenantFilter;
+    use IsSMTPValid;
 
     protected $proposalRepository;
 
@@ -76,6 +79,47 @@ class ProposalService
         $proposal = $proposal->update($data);
 
         return $proposal;
+    }
+
+
+    public function sendProposalOnEmail(CRMProposals $proposal, $view = "dashboard.crm.proposals.print"): bool
+    {
+        try {
+            $mailSettings = $this->_getMailSettings();
+
+            $toEmail = $proposal->typable_type === CRMLeads::class
+                ? $proposal->typable->email
+                : $proposal->typable->primary_email;
+
+            // Prepare email details
+            $emailDetails = [
+                'from' => $mailSettings['Mail From Address'],
+                'to' => $toEmail,
+                'subject' => $proposal->title,
+                'details' => $proposal->details,
+                'template' => $proposal->template?->template_details
+            ];
+
+            // Dispatch the job
+           SendProposal::dispatch(
+                $mailSettings,
+                $emailDetails,
+                $proposal,
+                $view
+            );
+            return true;
+        } catch (\Throwable $e) {
+            // Log the error or handle it as needed
+            \Log::error('Failed to send proposal email', [
+                'error' => $e->getMessage(),
+                'proposal_id' => $proposal->id ?? null,
+            ]);
+
+            // Optionally, you can rethrow the exception if needed
+            // throw $e;
+
+            return false; // Return false or a default response to indicate failure
+        }
     }
 
 

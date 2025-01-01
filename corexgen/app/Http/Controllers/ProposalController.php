@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Media;
 use App\Repositories\ProposalRepository;
 use App\Services\ProposalService;
+use Illuminate\Support\Str;
 
 /**
  * UserController handles CRUD operations for Proposals
@@ -303,7 +304,7 @@ class ProposalController extends Controller
         try {
             // Delete the user
 
-            $user = CRMProposals::find($id);
+            $user = $this->applyTenantFilter(CRMProposals::find($id));
             if ($user) {
                 // delete  now
                 $user->delete();
@@ -333,52 +334,10 @@ class ProposalController extends Controller
     public function changeStatusAction($id, $action)
     {
         try {
-            $proposal = $this->applyTenantFilter(
-                CRMProposals::query()
-                    ->with([
-                        'typable',
-                        'template',
-                        'company.addresses' => function ($query) {
-                            $query->with(['country', 'city'])
-                                ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
-                        }
-                    ])
-            )->findOrFail($id);
-
-            // Get recipient email based on typable type
-            $toEmail = $proposal->typable_type === CRMLeads::class
-                ? $proposal->typable->email
-                : $proposal->typable->primary_email;
+            $proposal = $this->applyTenantFilter(CRMProposals::find($id));
 
             if ($action === 'SENT') {
-                if (empty($toEmail)) {
-                    return redirect()->back()->with('error', 'No email found for this client/lead');
-                }
-
-                $mailSettings = $this->_getMailSettings();
-            
-
-                // Prepare email details
-                $emailDetails = [
-                    'from' => $mailSettings['Mail From Address'],
-                    'to' => $toEmail,
-                    'subject' => $proposal->title,
-                    'details' => $proposal->details,
-                    'template' => $proposal->template?->template_details
-                ];
-
-                // Dispatch the job
-                SendProposal::dispatch(
-                    $mailSettings,
-                    $emailDetails,
-                    $proposal,
-                    $this->getViewFilePath('print')
-                );
-
-                // Update proposal status
-                $proposal->update(['status' => $action]);
-
-                return redirect()->back()->with('success', 'Proposal has been queued for sending.');
+                return $this->sendProposal($id);
             }
 
             // Handle other status changes
@@ -593,6 +552,95 @@ class ProposalController extends Controller
         ]);
     }
 
+
+    public function sendProposal($id)
+    {
+        $fromAPI = false;
+        if (isset($_SERVER['QUERY_STRING']) && Str::contains($_SERVER['QUERY_STRING'], 'api=true')) {
+            $fromAPI = true;
+        }
+
+        try {
+            $proposal = $this->applyTenantFilter(
+                CRMProposals::query()
+                    ->with([
+                        'typable',
+                        'template',
+                        'company.addresses' => function ($query) {
+                            $query->with(['country', 'city'])
+                                ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
+                        }
+                    ])
+            )->findOrFail($id);
+
+            // Get recipient email based on typable type
+            $toEmail = $proposal->typable_type === CRMLeads::class
+                ? $proposal->typable->email
+                : $proposal->typable->primary_email;
+
+            if (empty($toEmail)) {
+                $errorResponse = ['error' => 'No email found for this client/lead'];
+                return $fromAPI
+                    ? response()->json($errorResponse)
+                    : redirect()->back()->with('error', $errorResponse['error']);
+            }
+
+            // Send proposal email
+            $this->proposalService->sendProposalOnEmail($proposal, $this->getViewFilePath('print'));
+
+            // Update proposal status
+            $proposal->update(['status' => 'SENT']);
+
+            $successResponse = ['success' => 'Proposal has been sent in the background job and will be delivered soon.'];
+            return $fromAPI
+                ? response()->json($successResponse)
+                : redirect()->back()->with('success', $successResponse['success']);
+        } catch (\Exception $e) {
+            $errorMessage = 'Something went wrong: ' . $e->getMessage();
+            return $fromAPI
+                ? response()->json(['error' => $errorMessage])
+                : redirect()->back()->with('error', $errorMessage);
+        }
+    }
+
+
+
+    public function accept(Request $request)
+    {
+        try {
+            // Validate the request data
+            $validatedData = $request->validate([
+                'id' => 'required|exists:proposals,id',
+                'first_name' => 'required|string|max:50',
+                'last_name' => 'required|string|max:50',
+                'email' => 'required|email|max:100',
+                'signature' => 'required|string',
+            ]);
+
+            // Find the proposal using the tenant filter
+            $proposal = $this->applyTenantFilter(CRMProposals::find($validatedData['id']));
+
+            if (!$proposal) {
+                throw new \Exception('Proposal not found.');
+            }
+
+            // Update the proposal status and acceptance details
+            $proposal->update([
+                'status' => 'ACCEPTED',
+                'accepted_details' => [
+                    'first_name' => $validatedData['first_name'],
+                    'last_name' => $validatedData['last_name'],
+                    'email' => $validatedData['email'],
+                    'signature' => $validatedData['signature'],
+                    'accepted_at' => now()
+                ],
+            ]);
+
+            return redirect()->back()->with('success', 'Proposal status updated successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to process the request: ' . $e->getMessage());
+        }
+    }
 
 
 }

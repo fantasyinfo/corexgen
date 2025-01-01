@@ -150,6 +150,7 @@ Route::prefix('payments')->group(function () {
 // proposal view and signed
 Route::get('/proposal/view/{id}', [ProposalController::class, 'viewOpen'])->name('proposal.viewOpen');
 Route::get('/proposal/print/{id}', [ProposalController::class, 'print'])->name('proposal.print');
+Route::post('/proposal/accept', [ProposalController::class, 'accept'])->name('proposal.accept');
 
 
 // register
@@ -355,14 +356,18 @@ Route::middleware([
         // create, edit, change status, delete
         Route::get('/create', [ProposalController::class, 'create'])->name('create')->middleware('check.permission:PROPOSALS.CREATE');
         Route::get('/edit/{id}', [ProposalController::class, 'edit'])->name('edit')->middleware('check.permission:PROPOSALS.UPDATE');
+
         Route::get('/changeStatusAction/{id}/{action}', [ProposalController::class, 'changeStatusAction'])->name('changeStatusAction')->middleware('check.permission:PROPOSALS.CHANGE_STATUS');
+
+        Route::get('/sendProposal/{id}', [ProposalController::class, 'sendProposal'])->name('sendProposal')->middleware('check.permission:PROPOSALS.CHANGE_STATUS');
+
         Route::delete('/destroy/{id}', [ProposalController::class, 'destroy'])->name('destroy')->middleware('check.permission:PROPOSALS.DELETE');
 
 
         Route::post('/bulkDelete', [ProposalController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:PROPOSALS.BULK_DELETE');
 
         Route::get('/view/{id}', [ProposalController::class, 'view'])->name('view')->middleware('check.permission:PROPOSALS.VIEW');
-      
+
 
 
 
