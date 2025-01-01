@@ -435,6 +435,11 @@
                         </li>
 
                         <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#proposals">
+                                <i class="fas fa-flag me-2"></i>Proposals
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" data-bs-toggle="tab" href="#activities">
                                 <i class="fas fa-history me-2"></i>Activities
                             </a>
@@ -511,8 +516,12 @@
                         </div>
 
 
+                        <div class="tab-pane fade" id="proposals">
+                            @include('dashboard.crm.leads.components._proposals')
+                        </div>
+
                         <div class="tab-pane fade" id="activities">
-                            @include('dashboard.crm.leads.components.viewpartials._activity')
+                            @include('dashboard.crm.leads.components._activity')
                         </div>
 
                         <!-- Notes Tab -->

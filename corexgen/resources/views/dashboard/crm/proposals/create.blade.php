@@ -1,12 +1,14 @@
 @extends('layout.app')
 
 @section('content')
+ 
     <div class="container-fluid">
         <div class="row">
             <div class="justify-content-md-center col-lg-9">
                 <div class="card stretch stretch-full">
                     <form id="proposalsFieldsForm" action="{{ route(getPanelRoutes('proposals.store')) }}" method="POST">
                         @csrf
+                      
                         <div class="card-body general-info">
                             <div class="mb-5 d-flex align-items-center justify-content-between">
                                 <p class="fw-bold mb-0 me-4">
@@ -30,9 +32,11 @@
                                 </div>
                                 <div class="col-lg-8">
                                     <select name="type" id="type" class="form-select">
-                                        <option value="client" {{ old('type') == 'client' ? 'selected' : '' }}>Client
+                                        <option value="client" {{ old('type') == 'client' ? 'selected' : '' }}
+                                          >Client
                                         </option>
-                                        <option value="lead" {{ old('type') == 'lead' ? 'selected' : '' }}>Lead</option>
+                                        <option value="lead" {{ old('type') == 'lead' ? 'selected' : '' }}
+                                           >Lead</option>
                                     </select>
                                 </div>
                             </div>
@@ -56,7 +60,8 @@
                                                     : " [ $item->primary_email ]";
                                             @endphp
                                             <option value="{{ $item->id }}"
-                                                {{ old('client_id') == $item->id ? 'selected' : '' }}>{{ $nameAndEmail }}
+                                                {{ old('client_id') == $item->id ? 'selected' : '' }}
+                                               >{{ $nameAndEmail }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -82,7 +87,8 @@
                                                     : " [ $item->email ]";
                                             @endphp
                                             <option value="{{ $item->id }}"
-                                                {{ old('lead_id') == $item->id ? 'selected' : '' }}>{{ $nameAndEmail }}
+                                                {{ old('lead_id') == $item->id ? 'selected' : '' }}
+                                             >{{ $nameAndEmail }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -138,23 +144,23 @@
                             <div class="row mb-4 align-items-center">
                                 <div class="col-lg-4">
 
-                                    <x-form-components.input-label for="value" class="custom-class" >
+                                    <x-form-components.input-label for="value" class="custom-class">
                                         {{ __('proposals.Value') }}
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
                                     <x-form-components.input-group-prepend-append type="number" class="custom-class"
                                         id="value" prepend="$" append="USD" name="value"
-                                        placeholder="{{ __('99999') }}" value="{{ old('value') }}"  />
+                                        placeholder="{{ __('99999') }}" value="{{ old('value') }}" />
 
                                 </div>
                             </div>
-                         
+
                             <hr>
 
                             <div class="row mb-3 align-items-center">
                                 <div class="col-lg-4">
-                                    <x-form-components.input-label for="template_id" >
+                                    <x-form-components.input-label for="template_id">
                                         {{ __('proposals.Select Template') }}
                                     </x-form-components.input-label>
                                 </div>
@@ -187,13 +193,13 @@
                             <div class="row mb-4 align-items-center">
                                 <div class="col-lg-4">
 
-                                    <x-form-components.input-label for="valid_date" class="custom-class" >
+                                    <x-form-components.input-label for="valid_date" class="custom-class">
                                         {{ __('proposals.Valid Till') }}
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
                                     <x-form-components.input-group type="date" class="custom-class" id="valid_date"
-                                        name="valid_date" value="{{ old('valid_date') }}"  />
+                                        name="valid_date" value="{{ old('valid_date') }}" />
                                 </div>
                             </div>
                             <div class="row mb-4 align-items-center">

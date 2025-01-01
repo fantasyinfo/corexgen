@@ -13,6 +13,7 @@ use App\Models\Country;
 use App\Models\CRM\CRMClients;
 use App\Repositories\LeadsRepository;
 use App\Services\Csv\ClientsCsvRowProcessor;
+use App\Services\ProposalService;
 use App\Traits\AuditFilter;
 use App\Traits\CategoryGroupTagsFilter;
 use App\Traits\TenantFilter;
@@ -71,15 +72,18 @@ class LeadsController extends Controller
     protected $leadsService;
 
     protected $customFieldService;
+    protected $proposalService;
 
     public function __construct(
         LeadsRepository $leadsRepository,
         LeadsService $leadsService,
+        ProposalService $proposalService,
         CustomFieldService $customFieldService
     ) {
         $this->leadsRepository = $leadsRepository;
         $this->leadsService = $leadsService;
         $this->customFieldService = $customFieldService;
+        $this->proposalService = $proposalService;
     }
 
 
@@ -721,7 +725,11 @@ class LeadsController extends Controller
 
         //  dd($activitesQuery->toArray());
 
-   
+
+        // get proposals
+        $proposals = collect();
+        $proposals = $this->proposalService->getProposals(\App\Models\CRM\CRMLeads::class, $id);
+
 
         return view($this->getViewFilePath('view'), [
             'title' => 'View Lead',
@@ -736,6 +744,7 @@ class LeadsController extends Controller
             'activities' => $activitesQuery,
             'countries' => Country::all(),
             'permissions' => PermissionsHelper::getPermissionsArray('LEADS'),
+            'proposals' => $proposals
         ]);
     }
     public function profile()
