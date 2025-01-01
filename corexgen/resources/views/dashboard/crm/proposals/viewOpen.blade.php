@@ -1,4 +1,4 @@
-@extends('layout.app')
+@extends('layout.guest')
 
 @push('style')
     <style>
@@ -129,7 +129,7 @@
                                 <p class="mb-0">Created:
                                     {{ \Carbon\Carbon::parse($proposal->creating_date)->format('F d, Y') }}</p>
 
-                                
+
                                 <p class="mb-3">Status: <span
                                         class="badge bg-{{ CRM_STATUS_TYPES['PROPOSALS']['BT_CLASSES'][$proposal->status] }} ms-2">{{ $proposal->status }}</span>
                                 </p>
@@ -169,9 +169,7 @@
                         <button class="btn btn-outline-secondary me-2" onclick="printProposal()">
                             <i class="bi bi-download me-2"></i>Download PDF
                         </button>
-                        <button class="btn btn-primary">
-                            <i class="bi bi-send me-2"></i>Send Proposal
-                        </button>
+                     
                     </div>
                 @endif
             </div>

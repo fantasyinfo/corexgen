@@ -10,7 +10,8 @@
 
     <div class="container-fluid">
         <h3 class="mb-4">Mail Settings</h3>
-        <form action="{{ route(getPanelRoutes('settings.mail')) }}" method="POST" enctype="multipart/form-data">
+        <form id="mailSettingsForm" action="{{ route(getPanelRoutes('settings.mail')) }}" method="POST"
+            enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <input type="hidden" name="is_tenant" value="{{ $is_tenant }}" />
@@ -44,7 +45,10 @@
 
                         @case('tenant_mail_username')
                             @php
-                                if (isset($defaultSettings) && isset($defaultSettings['smtp_details']['smtp_username'])) {
+                                if (
+                                    isset($defaultSettings) &&
+                                    isset($defaultSettings['smtp_details']['smtp_username'])
+                                ) {
                                     $item['value'] = $defaultSettings['smtp_details']['smtp_username'];
                                 }
                             @endphp
@@ -52,7 +56,10 @@
 
                         @case('tenant_mail_password')
                             @php
-                                if (isset($defaultSettings) && isset($defaultSettings['smtp_details']['smtp_password'])) {
+                                if (
+                                    isset($defaultSettings) &&
+                                    isset($defaultSettings['smtp_details']['smtp_password'])
+                                ) {
                                     $item['value'] = $defaultSettings['smtp_details']['smtp_password'];
                                 }
                             @endphp
@@ -60,7 +67,10 @@
 
                         @case('tenant_mail_encryption')
                             @php
-                                if (isset($defaultSettings) && isset($defaultSettings['smtp_details']['smtp_encryption'])) {
+                                if (
+                                    isset($defaultSettings) &&
+                                    isset($defaultSettings['smtp_details']['smtp_encryption'])
+                                ) {
                                     $item['value'] = $defaultSettings['smtp_details']['smtp_encryption'];
                                 }
                             @endphp
@@ -68,7 +78,10 @@
 
                         @case('tenant_mail_from_address')
                             @php
-                                if (isset($defaultSettings) && isset($defaultSettings['smtp_details']['mail_from_address'])) {
+                                if (
+                                    isset($defaultSettings) &&
+                                    isset($defaultSettings['smtp_details']['mail_from_address'])
+                                ) {
                                     $item['value'] = $defaultSettings['smtp_details']['mail_from_address'];
                                 }
                             @endphp
@@ -76,7 +89,10 @@
 
                         @case('tenant_mail_from_name')
                             @php
-                                if (isset($defaultSettings) && isset($defaultSettings['smtp_details']['mail_from_name'])) {
+                                if (
+                                    isset($defaultSettings) &&
+                                    isset($defaultSettings['smtp_details']['mail_from_name'])
+                                ) {
                                     $item['value'] = $defaultSettings['smtp_details']['mail_from_name'];
                                 }
                             @endphp
@@ -107,13 +123,13 @@
                             </x-form-components.input-label>
 
                             <select name="{{ $item['name'] }}" id="{{ $item['key'] }}"
-                                class="searchSelectBox form-control custom-class" required>
+                                class=" form-control custom-class" required>
                                 @if ($is_tenant)
                                     @switch($item['name'])
                                         @case('tenant_mail_encryption')
                                             @foreach ($encryption as $option)
                                                 <option value="{{ $option }}" {{ $option == $item['value'] ? 'selected' : '' }}>
-                                                    {{ $option }}
+                                                    {{ strtoupper($option) }}
                                                 </option>
                                             @endforeach
                                         @break
@@ -123,7 +139,7 @@
                                         @case('client_mail_encryption')
                                             @foreach ($encryption as $option)
                                                 <option value="{{ $option }}" {{ $option == $item['value'] ? 'selected' : '' }}>
-                                                    {{ $option }}
+                                                    {{ strtoupper($option) }}
                                                 </option>
                                             @endforeach
                                         @break
@@ -137,7 +153,77 @@
                 @endswitch
             @endforeach
 
-            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <div class="row">
+                <div class="col d-flex justify-content-end align-items-center">
+                    <button type="button" id="testMailConnection" class="btn btn-outline-primary me-2">Test Mail
+                        Connection</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </div>
+
+
         </form>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        document
+            .getElementById("testMailConnection")
+            .addEventListener("click", function() {
+                const form = document.getElementById("mailSettingsForm");
+                const formData = new FormData(form);
+                formData.append("_token", "{{ csrf_token() }}"); // Fix append
+                formData.append("_method", "POST"); // Fix append
+
+                // Show loader
+                const loader = document.getElementById("loadingSpinner");
+                loader.style.display = "flex";
+
+                const testConnectionUrl =
+                    "{{ route(getPanelRoutes($module . '.test-connection')) }}";
+
+                $.ajax({
+                    url: testConnectionUrl,
+                    method: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        // Hide loader
+                        loader.style.display = "none";
+
+                        if (response.success) {
+                            // Show success modal
+                            const successModal = new bootstrap.Modal(
+                                document.getElementById("successModal")
+                            );
+                            $("#successModal .modal-body").text(
+                                "Mail connection successful! Your SMTP settings are working."
+                            );
+                            successModal.show();
+                        } else {
+                            // Show alert modal
+                            const alertModal = new bootstrap.Modal(
+                                document.getElementById("alertModal")
+                            );
+                            $("#alertModal .modal-body").text(
+                                "Mail connection failed: " + response.message
+                            );
+                            alertModal.show();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        // Hide loader
+                        loader.style.display = "none";
+
+                        console.error("Error: ", error);
+
+                        alert(
+                            "An error occurred while testing the mail connection. Please check your settings and try again."
+                        );
+                    },
+                });
+            });
+    </script>
+@endpush

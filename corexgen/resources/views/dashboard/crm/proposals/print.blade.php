@@ -1,10 +1,11 @@
 <!-- File: resources/views/proposals/print.blade.php -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $proposal->title }} - Print View</title>
+    <title>{{ $proposal?->title }} - Print View</title>
     <style>
         /* Reset */
         * {
@@ -117,28 +118,29 @@
         }
     </style>
 </head>
+
 <body>
     <div class="proposal-container">
         <!-- Header Section -->
         <div class="proposal-header">
             <div class="proposal-id">
-                {{ $proposal->_prefix }}{{ $proposal->_id }}
+                {{ $proposal?->_prefix }}{{ $proposal?->_id }}
             </div>
-            
-            <h1 class="proposal-title">{{ $proposal->title }}</h1>
-            <p class="client-name">Prepared for {{ $proposal->typable->title }}.
-                {{ $proposal->typable->first_name }} {{ $proposal->typable->last_name }}</p>
+
+            <h1 class="proposal-title">{{ $proposal?->title }}</h1>
+            <p class="client-name">Prepared for {{ $proposal?->typable?->title }}.
+                {{ $proposal?->typable?->first_name }} {{ $proposal?->typable?->last_name }}</p>
 
             <!-- Info Section -->
             <div class="info-section">
                 <div class="info-box">
                     <div class="info-box-title">Prepared By</div>
                     <div class="info-box-content">
-                        <h4 class="mb-2">{{ $proposal->company->name }}</h4>
-                        <p class="mb-1">{{ $proposal->company->addresses->street_address }}</p>
-                        <p class="mb-1">{{ $proposal->company->addresses->city->name }},
-                            {{ $proposal->company->addresses->country->name }}</p>
-                        <p class="mb-0">{{ $proposal->company->phone }}</p>
+                        <h4 class="mb-2">{{ $proposal?->company?->name }}</h4>
+                        <p class="mb-1">{{ $proposal?->company?->addresses?->street_address }}</p>
+                        <p class="mb-1">{{ $proposal?->company?->addresses?->city?->name }},
+                            {{ $proposal?->company->addresses?->country?->name }}</p>
+                        <p class="mb-0">{{ $proposal?->company?->phone }}</p>
                     </div>
                 </div>
 
@@ -146,16 +148,16 @@
                     <div class="info-box-title">Proposal Details</div>
                     <div class="info-box-content">
                         <p class="mb-1">
-                            <strong>Valid Until:</strong> 
-                            {{ $proposal->valid_date ? \Carbon\Carbon::parse($proposal->valid_date)->format('F d, Y') : 'Not Specified' }}
+                            <strong>Valid Until:</strong>
+                            {{ $proposal?->valid_date ? \Carbon\Carbon::parse($proposal?->valid_date)->format('F d, Y') : 'Not Specified' }}
                         </p>
                         <p class="mb-0">
                             <strong>Created:</strong>
-                            {{ \Carbon\Carbon::parse($proposal->creating_date)->format('F d, Y') }}
+                            {{ \Carbon\Carbon::parse($proposal?->creating_date)->format('F d, Y') }}
                         </p>
                         <p class="mb-0">
                             <strong>Status:</strong>
-                            <span class="status-badge">{{ $proposal->status }}</span>
+                            <span class="status-badge">{{ $proposal?->status }}</span>
                         </p>
                     </div>
                 </div>
@@ -167,12 +169,12 @@
             <section>
                 <h2 class="section-title">Executive Summary</h2>
                 <div class="proposal-body">
-                    {!! $proposal->template->template_details !!}
-                    
-                    @if (!is_null(trim($proposal->details)))
+                    {!! $proposal?->template?->template_details !!}
+
+                    @if (!is_null(trim($proposal?->details)))
                         <h3 class="mt-4 mb-3">Additional Details</h3>
                         <div class="additional-details">
-                            {!! $proposal->details !!}
+                            {!! $proposal?->details !!}
                         </div>
                     @endif
                 </div>
@@ -180,4 +182,5 @@
         </div>
     </div>
 </body>
+
 </html>

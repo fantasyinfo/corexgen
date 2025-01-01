@@ -4,9 +4,8 @@ namespace App\Traits;
 
 use App\Models\CRM\CRMSettings;
 use Illuminate\Support\Facades\Auth;
-use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
-use Symfony\Component\Mailer\Mailer;
-use Symfony\Component\Mime\Email;
+use Exception;
+use Illuminate\Support\Facades\Mail;
 
 trait IsSMTPValid
 {
@@ -18,28 +17,39 @@ trait IsSMTPValid
     public function _isSMTPValid($mailSettings)
     {
         try {
-            // Create the SMTP transport
-            $transport = new EsmtpTransport(
-                $mailSettings['Mail Host'] ?? '',
-                $mailSettings['Mail Port'] ?? '',
-                $mailSettings['Mail Encryption'] ?? ''
-            );
-            $transport->setUsername($mailSettings['Mail Username'] ?? '');
-            $transport->setPassword($mailSettings['Mail Password'] ?? '');
+            // Configure mail settings for this specific email
+            config([
+                'mail.mailers.smtp.host' => $mailSettings['Mail Host'],
+                'mail.mailers.smtp.port' => $mailSettings['Mail Port'],
+                'mail.mailers.smtp.username' => $mailSettings['Mail Username'],
+                'mail.mailers.smtp.password' => $mailSettings['Mail Password'],
+                'mail.from.address' => $mailSettings['Mail From Address'],
+                'mail.from.name' => $mailSettings['Mail From Name'] ?? config('app.name'),
+            ]);
 
-            // Test the connection
-            $transport->start();
+            Mail::raw('This is a test email to verify SMTP settings.', function ($message) {
+                $message->to('test@example.com')
+                    ->subject('SMTP Configuration Test');
+            });
 
-            return true;
-        } catch (\Exception $e) {
+            return [
+                'status' => true,
+                'error' => null,
+            ];
+        } catch (Exception $e) {
+            // Log the error for debugging
             \Log::error('SMTP Validation Error: ' . $e->getMessage());
-            return false;
+
+            return [
+                'status' => false,
+                'error' => $e->getMessage(),
+            ];
         }
     }
 
     public function _getMailSettings($companyId = null)
     {
-        return CRMSettings::where('company_id', is_null($companyId) ?? Auth::user()->company_id)
+        return CRMSettings::where('company_id', is_null($companyId) ? Auth::user()->company_id : $companyId)
             ->where('type', 'Mail')
             ->select('key', 'value')
             ->pluck('value', 'key');
