@@ -9,6 +9,7 @@ use App\Models\CompanyOnboarding;
 use App\Models\CRM\CRMSettings;
 use App\Models\Media;
 use App\Models\Tenant;
+use App\Traits\IsSMTPValid;
 use App\Traits\MediaTrait;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
@@ -20,6 +21,7 @@ class SettingsController extends Controller
     //
     use TenantFilter;
     use MediaTrait;
+    use IsSMTPValid;
     /**
      * Display a listing of the resource.
      */
@@ -317,6 +319,124 @@ class SettingsController extends Controller
 
         return redirect()->back()->with('success', 'Settings updated successfully');
     }
+
+
+
+
+
+    public function testMailConnection(Request $request)
+    {
+        try {
+
+            if ($request->is_tenant) {
+
+                $validatedData = $request->validate([
+                    'tenant_mail_provider' => 'required|string|max:255',
+                    'tenant_mail_host' => 'required|string',
+                    'tenant_mail_port' => 'required|numeric',
+                    'tenant_mail_username' => 'required|string',
+                    'tenant_mail_password' => 'required|string',
+                    'tenant_mail_encryption' => 'required|string',
+                    'tenant_mail_from_address' => 'required|email',
+                    'tenant_mail_from_name' => 'required|string',
+                ]);
+
+                // Collect SMTP settings from the form
+                $mailSettings = $request->only([
+                    'tenant_mail_host',
+                    'tenant_mail_port',
+                    'tenant_mail_username',
+                    'tenant_mail_password',
+                    'tenant_mail_encryption',
+                    'tenant_mail_from_address',
+                    'tenant_mail_from_name'
+                ]);
+
+                // Validate SMTP settings using the trait
+                $isValid = $this->_isSMTPValid([
+                    'Mail Host' => $mailSettings['tenant_mail_host'],
+                    'Mail Port' => $mailSettings['tenant_mail_port'],
+                    'Mail Username' => $mailSettings['tenant_mail_username'],
+                    'Mail Password' => $mailSettings['tenant_mail_password'],
+                    'Mail Encryption' => $mailSettings['tenant_mail_encryption'],
+                    'Mail From Address' => $mailSettings['tenant_mail_from_address'],
+                    'Mail From Name' => $mailSettings['tenant_mail_from_name']
+                ]);
+
+                \Log::info("Tenant Mail Settings are Valid or Not:", [
+                    'Mail Host' => $mailSettings['tenant_mail_host'],
+                    'Mail Port' => $mailSettings['tenant_mail_port'],
+                    'Mail Username' => $mailSettings['tenant_mail_username'],
+                    'Mail Password' => $mailSettings['tenant_mail_password'],
+                    'Mail Encryption' => $mailSettings['tenant_mail_encryption'],
+                    'Mail From Address' => $mailSettings['tenant_mail_from_address'],
+                    'Mail From Name' => $mailSettings['tenant_mail_from_name'],
+                    'Data' => $isValid
+                ]);
+
+                if ($isValid['status']) {
+                    return response()->json(['success' => false, 'message' => 'SMTP settings are invalid.' . $isValid['error']]);
+                }
+
+            } else {
+                $validatedData = $request->validate([
+                    'client_mail_provider' => 'required|string|max:255',
+                    'client_mail_host' => 'required|string',
+                    'client_mail_port' => 'required|numeric',
+                    'client_mail_username' => 'required|string',
+                    'client_mail_password' => 'required|string',
+                    'client_mail_encryption' => 'required|string',
+                    'client_mail_from_address' => 'required|email',
+                    'client_mail_from_name' => 'required|string',
+                ]);
+
+                // Collect SMTP settings from the form
+                $mailSettings = $request->only([
+                    'client_mail_host',
+                    'client_mail_port',
+                    'client_mail_username',
+                    'client_mail_password',
+                    'client_mail_encryption',
+                    'client_mail_from_address',
+                    'client_mail_from_name'
+                ]);
+
+                // Validate SMTP settings using the trait
+                $isValid = $this->_isSMTPValid([
+                    'Mail Host' => $mailSettings['client_mail_host'],
+                    'Mail Port' => $mailSettings['client_mail_port'],
+                    'Mail Username' => $mailSettings['client_mail_username'],
+                    'Mail Password' => $mailSettings['client_mail_password'],
+                    'Mail Encryption' => $mailSettings['client_mail_encryption'],
+                    'Mail From Address' => $mailSettings['client_mail_from_address'],
+                    'Mail From Name' => $mailSettings['client_mail_from_name']
+                ]);
+
+                \Log::info("Company Mail Settings are Valid or Not:", [
+                    'Mail Host' => $mailSettings['client_mail_host'],
+                    'Mail Port' => $mailSettings['client_mail_port'],
+                    'Mail Username' => $mailSettings['client_mail_username'],
+                    'Mail Password' => $mailSettings['client_mail_password'],
+                    'Mail Encryption' => $mailSettings['client_mail_encryption'],
+                    'Mail From Address' => $mailSettings['client_mail_from_address'],
+                    'Mail From Name' => $mailSettings['client_mail_from_name'],
+                    'Data' => $isValid
+                ]);
+                if ($isValid['status']) {
+                    return response()->json(['success' => true, 'message' => 'SMTP settings are valid.']);
+                }
+
+            }
+
+
+            return response()->json(['success' => false, 'message' => 'SMTP settings are invalid.' . $isValid['error']]);
+        } catch (\Exception $e) {
+            \Log::error('Test Mail Connection Error: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
+
+
 
     public function cron()
     {

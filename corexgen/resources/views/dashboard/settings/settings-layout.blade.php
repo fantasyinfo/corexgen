@@ -127,11 +127,39 @@
                 padding-top: 60px;
             }
         }
+
+        #loadingSpinner {
+            position: fixed;
+            top: 0;
+            /* Changed from 50 to 0 */
+            left: 0;
+            /* Changed from 50 to 0 */
+            width: 100%;
+            height: 100%;
+            /* Changed from 100vh for better cross-browser support */
+            background-color: rgba(0, 0, 0, 0.5);
+            /* Changed to darker overlay for better visibility */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1050;
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
     </style>
 @endpush
 
 @section('content')
     <div class="container-fluid">
+        <div id="loadingSpinner" style="display:none;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-12">
                 <div class="card">
@@ -176,44 +204,44 @@
 
 @push('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const settingsSidebarToggle = document.getElementById('settingsSidebarToggle');
-            const settingsSidebar = document.getElementById('settingsSidebar');
-            const settingsSidebarOverlay = document.getElementById('settingsSidebarOverlay');
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     const settingsSidebarToggle = document.getElementById('settingsSidebarToggle');
+        //     const settingsSidebar = document.getElementById('settingsSidebar');
+        //     const settingsSidebarOverlay = document.getElementById('settingsSidebarOverlay');
 
-            // Toggle sidebar on mobile
-            settingsSidebarToggle.addEventListener('click', function() {
-                settingsSidebar.classList.toggle('show');
-                settingsSidebarOverlay.classList.toggle('show');
-            });
+        //     // Toggle sidebar on mobile
+        //     settingsSidebarToggle.addEventListener('click', function() {
+        //         settingsSidebar.classList.toggle('show');
+        //         settingsSidebarOverlay.classList.toggle('show');
+        //     });
 
-            // Close sidebar when clicking overlay
-            settingsSidebarOverlay.addEventListener('click', function() {
-                settingsSidebar.classList.remove('show');
-                settingsSidebarOverlay.classList.remove('show');
-            });
+        //     // Close sidebar when clicking overlay
+        //     settingsSidebarOverlay.addEventListener('click', function() {
+        //         settingsSidebar.classList.remove('show');
+        //         settingsSidebarOverlay.classList.remove('show');
+        //     });
 
-            // Close sidebar when a nav link is clicked
-            const sidebarLinks = settingsSidebar.querySelectorAll('.nav-link');
-            sidebarLinks.forEach(link => {
-                link.addEventListener('click', function() {
-                    if (window.innerWidth <= 768) {
-                        settingsSidebar.classList.remove('show');
-                        settingsSidebarOverlay.classList.remove('show');
-                    }
-                });
-            });
+        //     // Close sidebar when a nav link is clicked
+        //     const sidebarLinks = settingsSidebar.querySelectorAll('.nav-link');
+        //     sidebarLinks.forEach(link => {
+        //         link.addEventListener('click', function() {
+        //             if (window.innerWidth <= 768) {
+        //                 settingsSidebar.classList.remove('show');
+        //                 settingsSidebarOverlay.classList.remove('show');
+        //             }
+        //         });
+        //     });
 
-            // Responsive handling
-            function handleResponsiveSidebar() {
-                if (window.innerWidth > 768) {
-                    settingsSidebar.classList.remove('show');
-                    settingsSidebarOverlay.classList.remove('show');
-                }
-            }
+        //     // Responsive handling
+        //     function handleResponsiveSidebar() {
+        //         if (window.innerWidth > 768) {
+        //             settingsSidebar.classList.remove('show');
+        //             settingsSidebarOverlay.classList.remove('show');
+        //         }
+        //     }
 
-            // Check on resize
-            window.addEventListener('resize', handleResponsiveSidebar);
-        });
+        //     // Check on resize
+        //     window.addEventListener('resize', handleResponsiveSidebar);
+        // });
     </script>
 @endpush

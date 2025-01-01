@@ -147,7 +147,9 @@ Route::prefix('payments')->group(function () {
 });
 
 
-
+// proposal view and signed
+Route::get('/proposal/view/{id}', [ProposalController::class, 'viewOpen'])->name('proposal.viewOpen');
+Route::get('/proposal/print/{id}', [ProposalController::class, 'print'])->name('proposal.print');
 
 
 // register
@@ -290,6 +292,8 @@ Route::middleware([
 
         Route::get('/mail', [SettingsController::class, 'mail'])->name('mail')->middleware('check.permission:SETTINGS_MAIL.READ_ALL');
         Route::put('/mail', [SettingsController::class, 'mailUpdate'])->name('mailUpdate')->middleware('check.permission:SETTINGS_MAIL.UPDATE');
+        Route::post('/test-connection', [SettingsController::class, 'testMailConnection'])->name('test-connection')->middleware('check.permission:SETTINGS_MAIL.READ_ALL');
+
     });
     // upgrade routes
     Route::prefix(PANEL_MODULES['COMPANY_PANEL']['planupgrade'])->as(PANEL_MODULES['COMPANY_PANEL']['planupgrade'] . '.')->group(function () {
@@ -358,7 +362,7 @@ Route::middleware([
         Route::post('/bulkDelete', [ProposalController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:PROPOSALS.BULK_DELETE');
 
         Route::get('/view/{id}', [ProposalController::class, 'view'])->name('view')->middleware('check.permission:PROPOSALS.VIEW');
-        Route::get('/print/{id}', [ProposalController::class, 'print'])->name('print');
+      
 
 
 
@@ -633,6 +637,7 @@ Route::middleware([
 
         Route::get('/mail', [SettingsController::class, 'mail'])->name('mail')->middleware('check.permission:SETTINGS_MAIL.READ_ALL');
         Route::put('/mail', [SettingsController::class, 'mailUpdate'])->name('mailUpdate')->middleware('check.permission:SETTINGS_MAIL.UPDATE');
+        Route::post('/test-connection', [SettingsController::class, 'testMailConnection'])->name('test-connection')->middleware('check.permission:SETTINGS_MAIL.READ_ALL');
 
 
         Route::get('/cron', [SettingsController::class, 'cron'])->name('cron')->middleware('check.permission:SETTINGS_CRON.READ_ALL');

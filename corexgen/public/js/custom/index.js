@@ -3,18 +3,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if ($(".searchSelectBox").length > 0) {
         $(".searchSelectBox").select2({
-            placeholder : 'Please select an option',
-            minimumResultsForSearch: 5
+            placeholder: "Please select an option",
+            minimumResultsForSearch: 5,
         });
     }
 
     // date input
     const dateInputs = document.querySelectorAll('input[type="date"]');
 
-
     // Apply Flatpickr to each date input
     dateInputs.forEach((input) => {
-        flatpickr(input,{
+        flatpickr(input, {
             enableTime: true,
             altInput: true,
             defaultDate: input.value,
@@ -178,6 +177,4 @@ document.querySelectorAll(".toast").forEach((toastEl) => {
     const toast = new bootstrap.Toast(toastEl);
     toast.show();
 });
-
-
 
