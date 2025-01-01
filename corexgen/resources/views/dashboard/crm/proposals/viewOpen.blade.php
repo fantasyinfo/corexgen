@@ -164,12 +164,132 @@
 
 
                 <!-- Action Buttons -->
-                @if ($proposal->status !== 'ACCEPTED')
-                    <div class="d-flex justify-content-end mt-5 pt-4 border-top">
-                        <button class="btn btn-outline-secondary me-2" onclick="printProposal()">
-                            <i class="bi bi-download me-2"></i>Download PDF
+
+                <div class="d-flex justify-content-end mt-5 pt-4 border-top">
+                    <button class="btn btn-outline-secondary me-2" onclick="printProposal()">
+                        <i class="fas fa-down me-2"></i>Download PDF
+                    </button>
+                    @if ($proposal->status !== 'ACCEPTED')
+                        <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#signedModal">
+                            <i class="fas fa-check me-2"></i>Accept Proposal
                         </button>
-                     
+                    @endif
+                </div>
+
+
+                @if ($proposal->status !== 'ACCEPTED')
+                    <div class="modal fade" id="signedModal" tabindex="-1" aria-labelledby="signedModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered ">
+                            <form action="{{ route('proposal.accept') }}" method="POST" id="acceptProposalForm">
+                                @csrf
+                                <input type="hidden" name="id" value="{{ $proposal->id }}" />
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="signedModalLabel">Accept This Proposal</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="">
+                                            <div class="mb-3">
+                                                <label for="first_name" class="form-label">First Name</label>
+                                                <input type="text" id="first_name" name="first_name" class="form-control"
+                                                    placeholder="Enter your first name" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="last_name" class="form-label">Last Name</label>
+                                                <input type="text" id="last_name" name="last_name" class="form-control"
+                                                    placeholder="Enter your last name" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="client_email" class="form-label">Your Email</label>
+                                                <input type="email" id="client_email" name="email" class="form-control"
+                                                    placeholder="Enter your email" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="client_signature" class="form-label">Digital Signature</label>
+                                                <div>
+                                                    <canvas id="signaturePad" class="border" width="400px"
+                                                        height="200"></canvas>
+                                                </div>
+
+                                                <input type="hidden" id="client_signature" name="signature" required>
+                                                <button type="button" class="btn btn-sm btn-secondary mt-2"
+                                                    onclick="clearSignature()">Clear Signature</button>
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-primary">Accept Proposal</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                @endif
+
+                @if ($proposal->status === 'ACCEPTED')
+                    <div class="container mt-4">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-primary text-white">
+                                <h4 class="mb-0">Proposal Acceptance Details</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-4">
+                                            <h5 class="text-muted mb-3">Client Information</h5>
+                                            <div class="table-responsive">
+                                                <table class="table table-borderless">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td class="text-muted" style="width: 140px;">Name:</td>
+                                                            <td class="font-weight-bold">
+                                                                {{ $proposal->accepted_details['first_name'] }}
+                                                                {{ $proposal->accepted_details['last_name'] }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-muted">Email:</td>
+                                                            <td class="font-weight-bold">
+                                                                {{ $proposal->accepted_details['email'] }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-muted">Accepted On:</td>
+                                                            <td class="font-weight-bold">
+                                                                {{ \Carbon\Carbon::parse($proposal->accepted_details['accepted_at'])->format('M d, Y h:i A') }}
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-4">
+                                            <h5 class="text-muted mb-3">Digital Signature</h5>
+                                            <div class="border rounded p-3 bg-light">
+                                                <img src="{{ $proposal->accepted_details['signature'] }}"
+                                                    alt="Digital Signature" class="img-fluid" style="max-height: 150px;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-3">
+                                    <div class="alert alert-success d-flex align-items-center" role="alert">
+                                        <i class="fas fa-check-circle me-2"></i>
+                                        <div>
+                                            This proposal has been officially accepted and signed by the client.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 @endif
             </div>
@@ -198,6 +318,110 @@
                     // printWindow.close();
                 }, 500);
             };
+        }
+
+        // Initialize signature pad when document is loaded
+        let canvas;
+        let context;
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get canvas element
+            canvas = document.getElementById('signaturePad');
+            context = canvas.getContext('2d');
+
+            // Set canvas styling
+            context.strokeStyle = '#000000';
+            context.lineWidth = 2;
+            context.lineCap = 'round';
+
+            // Add event listeners for mouse/touch events
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+
+            // Touch events for mobile devices
+            canvas.addEventListener('touchstart', handleTouchStart);
+            canvas.addEventListener('touchmove', handleTouchMove);
+            canvas.addEventListener('touchend', stopDrawing);
+
+            // Handle form submission
+            const form = document.getElementById('acceptProposalForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    if (isCanvasEmpty()) {
+                        e.preventDefault();
+                        alert('Please provide your signature');
+                        return false;
+                    }
+                    // Convert signature to base64 and set hidden input value
+                    const signatureData = canvas.toDataURL();
+                    document.getElementById('client_signature').value = signatureData;
+                });
+            }
+        });
+
+        function startDrawing(e) {
+            isDrawing = true;
+            [lastX, lastY] = getCoordinates(e);
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+
+            e.preventDefault();
+
+            const [currentX, currentY] = getCoordinates(e);
+
+            context.beginPath();
+            context.moveTo(lastX, lastY);
+            context.lineTo(currentX, currentY);
+            context.stroke();
+
+            [lastX, lastY] = [currentX, currentY];
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        function getCoordinates(e) {
+            let x, y;
+
+            if (e.type.includes('touch')) {
+                const rect = canvas.getBoundingClientRect();
+                const touch = e.touches[0];
+                x = touch.clientX - rect.left;
+                y = touch.clientY - rect.top;
+            } else {
+                const rect = canvas.getBoundingClientRect();
+                x = e.clientX - rect.left;
+                y = e.clientY - rect.top;
+            }
+
+            return [x, y];
+        }
+
+        function handleTouchStart(e) {
+            e.preventDefault();
+            startDrawing(e);
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+            draw(e);
+        }
+
+        function clearSignature() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function isCanvasEmpty() {
+            const pixelData = context.getImageData(0, 0, canvas.width, canvas.height).data;
+            return !pixelData.some(channel => channel !== 0);
         }
     </script>
 @endpush

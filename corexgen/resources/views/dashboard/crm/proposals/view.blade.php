@@ -129,7 +129,7 @@
                                 <p class="mb-0">Created:
                                     {{ \Carbon\Carbon::parse($proposal->creating_date)->format('F d, Y') }}</p>
 
-                                
+
                                 <p class="mb-3">Status: <span
                                         class="badge bg-{{ CRM_STATUS_TYPES['PROPOSALS']['BT_CLASSES'][$proposal->status] }} ms-2">{{ $proposal->status }}</span>
                                 </p>
@@ -169,9 +169,69 @@
                         <button class="btn btn-outline-secondary me-2" onclick="printProposal()">
                             <i class="bi bi-download me-2"></i>Download PDF
                         </button>
-                        <button class="btn btn-primary">
+                        <button class="btn btn-primary" onclick="sendProposal('{{ $proposal->id }}')">
                             <i class="bi bi-send me-2"></i>Send Proposal
                         </button>
+                    </div>
+                @endif
+
+                @if ($proposal->status === 'ACCEPTED')
+                    <div class="container mt-4">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-primary text-white">
+                                <h4 class="mb-0">Proposal Acceptance Details</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-4">
+                                            <h5 class="text-muted mb-3">Client Information</h5>
+                                            <div class="table-responsive">
+                                                <table class="table table-borderless">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td class="text-muted" style="width: 140px;">Name:</td>
+                                                            <td class="font-weight-bold">
+                                                                {{ $proposal->accepted_details['first_name'] }}
+                                                                {{ $proposal->accepted_details['last_name'] }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-muted">Email:</td>
+                                                            <td class="font-weight-bold">
+                                                                {{ $proposal->accepted_details['email'] }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-muted">Accepted On:</td>
+                                                            <td class="font-weight-bold">
+                                                                {{ \Carbon\Carbon::parse($proposal->accepted_details['accepted_at'])->format('M d, Y h:i A') }}
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-4">
+                                            <h5 class="text-muted mb-3">Digital Signature</h5>
+                                            <div class="border rounded p-3 bg-light">
+                                                <img src="{{ $proposal->accepted_details['signature'] }}"
+                                                    alt="Digital Signature" class="img-fluid" style="max-height: 150px;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-3">
+                                    <div class="alert alert-success d-flex align-items-center" role="alert">
+                                        <i class="fas fa-check-circle me-2"></i>
+                                        <div>
+                                            This proposal has been officially accepted and signed by the client.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 @endif
             </div>
@@ -200,6 +260,40 @@
                     // printWindow.close();
                 }, 500);
             };
+        }
+
+        function sendProposal($id) {
+            // console.log($id)a
+            let baseUrl =
+                "{{ route(getPanelRoutes($module . '.sendProposal'), ['id' => ':id']) }}";
+            let url = baseUrl.replace(':id', $id);
+
+            console.log(url)
+            $.ajax({
+                url: url + '?api=true',
+                method: "GET",
+                data: {
+                    _token: '{{ csrf_token() }}',
+                },
+                success: function(response) {
+                    const successModal = new bootstrap.Modal(
+                        document.getElementById("successModal")
+                    );
+                    $("#successModal .modal-body").text(
+                        response.success
+                    );
+                    successModal.show();
+                },
+                error: function(xhr) {
+                    const alertModal = new bootstrap.Modal(
+                        document.getElementById("alertModal")
+                    );
+                    $("#alertModal .modal-body").text(
+                        "An error occurred."
+                    );
+                    alertModal.show();
+                }
+            });
         }
     </script>
 @endpush

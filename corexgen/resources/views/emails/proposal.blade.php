@@ -1,12 +1,12 @@
 @component('mail::message')
-    # Hi, {{ $proposal->typable->first_name . ' ' . $proposal->typable->last_name }}
+# Hello {{ $proposal->typable->first_name . ' ' . $proposal->typable->last_name }}
 
-    A new proposal has been sent to you. Please find the attachment below as a PDF.
+A new proposal has been sent to you. Please find the attachment below as a PDF.
 
-    @component('mail::button', ['url' => url('/proposal/view/' . $proposal->id)])
-    {{ __('View Proposal') }}
-    @endcomponent
+@component('mail::button', ['url' => url('/proposal/view/' . $proposal->id)])
+View Proposal
+@endcomponent
 
-    Thanks,
-    {{ config('app.name') }}
+Thanks,<br>
+{{ config('app.name') }}
 @endcomponent
