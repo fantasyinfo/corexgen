@@ -11,7 +11,7 @@ class ProductServicesRepository
     // Your repository methods
     public function getProductsQuery($request)
     {
-        $query = ProductsServices::query();
+        $query = ProductsServices::query()->with(['category','tax']);
 
         $query = $this->applyTenantFilter($query);
 

@@ -250,7 +250,7 @@ class CompanyService
             $insertArray[] = [
                 'name' => $cc,
                 'color' => $color, // Assign unique color
-                'relation_type' => CATEGORY_GROUP_TAGS_RELATIONS['KEY']['clients'],
+                'relation_type' => CATEGORY_GROUP_TAGS_RELATIONS['KEY']['products_services'],
                 'type' => CATEGORY_GROUP_TAGS_TYPES['KEY']['products_categories'],
                 'status' => 'active',
                 'company_id' => $companyid,
@@ -272,7 +272,7 @@ class CompanyService
             $insertArray[] = [
                 'name' => $cc,
                 'color' => $color, // Assign unique color
-                'relation_type' => CATEGORY_GROUP_TAGS_RELATIONS['KEY']['clients'],
+                'relation_type' => CATEGORY_GROUP_TAGS_RELATIONS['KEY']['products_services'],
                 'type' => CATEGORY_GROUP_TAGS_TYPES['KEY']['products_taxs'],
                 'status' => 'active',
                 'company_id' => $companyid,

@@ -42,7 +42,7 @@ class ClientService
         return DB::transaction(function () use ($validatedData) {
 
             if (isset($validatedData['cgt_id'])) {
-                $validCGTID = $this->checkIsValidCGTID($validatedData['cgt_id'], Auth::user()->company_id, 'categories', 'clients');
+                $validCGTID = $this->checkIsValidCGTID($validatedData['cgt_id'], Auth::user()->company_id, CATEGORY_GROUP_TAGS_TYPES['KEY']['categories'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['clients']);
 
 
                 if (!$validCGTID) {
@@ -215,7 +215,7 @@ class ClientService
             ->editColumn('status', function ($client) {
                 return $this->renderStatusColumn($client);
             })
-            ->rawColumns(['actions','title', 'category_name', 'name', 'status']) // Include any HTML columns
+            ->rawColumns(['actions', 'title', 'category_name', 'name', 'status']) // Include any HTML columns
             ->make(true);
     }
 

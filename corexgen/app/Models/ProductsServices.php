@@ -2,17 +2,20 @@
 
 namespace App\Models;
 
+use App\Traits\HasCustomFields;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use OwenIt\Auditing\Contracts\Auditable;
+use Illuminate\Support\Str;
 
 class ProductsServices extends Model implements Auditable
 {
     use HasFactory;
     use SoftDeletes;
     use \OwenIt\Auditing\Auditable;
+    use HasCustomFields;
 
     const table = 'products_services';
 
@@ -67,6 +70,7 @@ class ProductsServices extends Model implements Auditable
 
         static::creating(function ($products) {
             $products->status = $products->status ?? CRM_STATUS_TYPES['PRODUCTS_SERVICES']['STATUS']['ACTIVE'];
+            $products->slug = Str::slug($products->title,'-');
             $products->created_by = $products->created_by ?? Auth::id();
             $products->updated_by = $products->updated_by ?? Auth::id();
             $products->company_id = $products->company_id ?? Auth::user()->company_id;

@@ -159,8 +159,13 @@
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
-                                    <x-form-components.input-group-prepend-append type="number" class="custom-class"
-                                        id="value" prepend="$" append="USD" name="value"
+                                    <x-form-components.input-group-prepend-append 
+                                    type="number" class="custom-class"
+                                        id="value"
+                                        step="0.001"
+                                        prepend="{{ getSettingValue('Currency Symbol') }}"
+                                        append="{{ getSettingValue('Currency Code') }}"
+                                         name="value"
                                         placeholder="{{ __('99999') }}" value="{{ old('value') }}" />
 
                                 </div>

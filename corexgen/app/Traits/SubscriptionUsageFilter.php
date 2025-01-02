@@ -4,6 +4,7 @@ namespace App\Traits;
 use App\Models\Subscription;
 use App\Models\SubscriptionUsage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 trait SubscriptionUsageFilter
 {
@@ -104,25 +105,29 @@ trait SubscriptionUsageFilter
             return true;
         }
 
+        return Cache::remember('currentSubAllow', 60, function () use ($module) {
+            // Fetch the current subscription and related plan data
+            $currentSubscriptionsAllowed = Subscription::with([
+                'plans' => function ($q) use ($module) {
+                    $q->with([
+                        'planFeatures' => function ($q) use ($module) {
+                            $q->where('module_name', $module);
+                        }
+                    ]);
+                }
+            ])
+                ->where('company_id', $this->getCompanyId())
+                ->latest()
+                ->first();
 
-        $currentSubscriptionsAllowed = Subscription::with([
-            'plans' => function ($q) use ($module) {
-                $q->with([
-                    'planFeatures' => function ($q) use ($module) {
-                        $q->where('module_name', $module);
-                    }
-                ]);
-            }
-        ])
-            ->where('company_id', $this->getCompanyId())
-            ->latest()
-            ->first();
-        // dd($currentSubscriptionsAllowed->toSql());
+            // Return the result so that it's cached
+            return $currentSubscriptionsAllowed->plans->planFeatures[0]->value;
+        });
 
-        return $currentSubscriptionsAllowed->plans->planFeatures[0]->value;
-
-
+        // Access the cached data and return the plan feature value
+        //return $currentSubscriptionsAllowed->plans->planFeatures[0]->value;
     }
+
 
     private function getCurrentSubscriptionId()
     {
@@ -130,9 +135,13 @@ trait SubscriptionUsageFilter
             return;
         }
 
-        $subscription = Subscription::where('company_id', $this->getCompanyId())->latest()->first();
+        return Cache::remember('current_sub_id', 60, function () {
 
-        return $subscription->id;
+            $subscription = Subscription::where('company_id', $this->getCompanyId())->latest()->first();
+            return $subscription->id;
+        });
+
+
     }
 
     private function getCurrentUsage(int $subId, $module): int

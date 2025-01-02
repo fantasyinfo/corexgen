@@ -46,6 +46,14 @@
                                 'orderable' => true,
                                 'width' => '150px',
                             ],
+                            [
+                                'data' => 'category',
+                                'name' => 'category',
+                                'label' => __('products.Category'),
+                                'searchable' => false,
+                                'orderable' => false,
+                                'width' => '150px',
+                            ],
                          
                             [
                                 'data' => 'rate',
@@ -53,6 +61,23 @@
                                 'label' => __('products.Product Rate'),
                                 'searchable' => true,
                                 'orderable' => true,
+                                'width' => '100px',
+                            ],
+                            [
+                                'data' => 'unit',
+                                'name' => 'unit',
+                                'label' => __('products.Unit'),
+                                'searchable' => true,
+                                'orderable' => true,
+                                'width' => '100px',
+                            ],
+                         
+                            [
+                                'data' => 'tax',
+                                'name' => 'tax',
+                                'label' => __('products.Tax'),
+                                'searchable' => false,
+                                'orderable' => false,
                                 'width' => '100px',
                             ],
 
