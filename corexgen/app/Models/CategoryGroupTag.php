@@ -39,7 +39,16 @@ class CategoryGroupTag extends Model
     }
 
 
+    public function productsCategory()
+    {
+        return $this->hasMany(CRMLeads::class, 'cgt_id');
+    }
 
+
+    public function productsTax()
+    {
+        return $this->hasMany(CRMLeads::class, 'tax_id');
+    }
 
     protected static function boot()
     {

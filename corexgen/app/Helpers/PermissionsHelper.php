@@ -34,6 +34,7 @@ class PermissionsHelper
         'LEADS' => 'LEADS',
         'PROPOSALS' => 'PROPOSALS',
         'PROPOSALS_TEMPLATES' => 'PROPOSALS_TEMPLATES',
+        'PRODUCTS_SERVICES' => 'PRODUCTS_SERVICES',
 
     ];
 
@@ -106,6 +107,9 @@ class PermissionsHelper
             self::$plansPermissionsKeys['PROPOSALS'] => [3151 => 'CREATE', 3152 => 'READ', 3153 => 'READ_ALL', 3154 => 'UPDATE', 3155 => 'DELETE', 3158 => 'FILTER', 3159 => 'CHANGE_STATUS', 3160 => 'BULK_DELETE', 3161 => 'VIEW'],
 
             self::$plansPermissionsKeys['PROPOSALS_TEMPLATES'] => [3201 => 'CREATE', 3202 => 'READ', 3203 => 'READ_ALL', 3204 => 'UPDATE', 3205 => 'DELETE', 3206 => 'CHANGE_STATUS'],
+
+
+            self::$plansPermissionsKeys['PRODUCTS_SERVICES'] => [3251 => 'CREATE', 3252 => 'READ', 3253 => 'READ_ALL', 3254 => 'UPDATE', 3255 => 'DELETE', 3258 => 'FILTER', 3259 => 'CHANGE_STATUS', 3260 => 'BULK_DELETE', 3261 => 'VIEW'],
 
         ];
     }

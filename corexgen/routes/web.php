@@ -14,6 +14,7 @@ use App\Http\Controllers\CRM\ClientsController;
 use App\Http\Controllers\CRM\LeadsController;
 use App\Http\Controllers\CustomFieldController;
 use App\Http\Controllers\DownloadController;
+use App\Http\Controllers\ProductServicesController;
 use App\Http\Controllers\ProposalController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RolePermissionsController;
@@ -264,6 +265,26 @@ Route::middleware([
         Route::get('/loginas/{userid}', [UserController::class, 'loginas'])->name('loginas')->middleware('check.permission:USERS.LOGIN_AS');
     });
 
+    // products_services routes
+    Route::prefix(PANEL_MODULES['COMPANY_PANEL']['products_services'])->as(PANEL_MODULES['COMPANY_PANEL']['products_services'] . '.')->group(function () {
+        // role for fetch, store, update
+        Route::get('/', [ProductServicesController::class, 'index'])->name('index')->middleware('check.permission:PRODUCTS_SERVICES.READ_ALL');
+        Route::post('/', [ProductServicesController::class, 'store'])->name('store')->middleware('check.permission:PRODUCTS_SERVICES.CREATE');
+        Route::put('/', [ProductServicesController::class, 'update'])->name('update')->middleware('check.permission:PRODUCTS_SERVICES.UPDATE');
+
+        // create, edit, change status, delete
+        Route::get('/create', [ProductServicesController::class, 'create'])->name('create')->middleware('check.permission:PRODUCTS_SERVICES.CREATE');
+        Route::get('/edit/{id}', [ProductServicesController::class, 'edit'])->name('edit')->middleware('check.permission:PRODUCTS_SERVICES.UPDATE');
+        Route::get('/changeStatus/{id}/{status}', [ProductServicesController::class, 'changeStatus'])->name('changeStatus')->middleware('check.permission:PRODUCTS_SERVICES.CHANGE_STATUS');
+        Route::delete('/destroy/{id}', [ProductServicesController::class, 'destroy'])->name('destroy')->middleware('check.permission:PRODUCTS_SERVICES.DELETE');
+
+
+        Route::post('/bulkDelete', [ProductServicesController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:PRODUCTS_SERVICES.BULK_DELETE');
+
+        Route::get('/view/{id}', [ProductServicesController::class, 'view'])->name('view')->middleware('check.permission:PRODUCTS_SERVICES.VIEW');
+
+    });
+
 
 
     // permissions routes
@@ -345,16 +366,16 @@ Route::middleware([
         Route::get('/view/{id}', [ClientsController::class, 'view'])->name('view')->middleware('check.permission:CLIENTS.VIEW');
         Route::get('/profile', [ClientsController::class, 'profile'])->name('profile');
 
-         // comments routes...
-         Route::post('/comment', [CommentsController::class, 'addClientsComment'])->name('comment.create')->middleware('check.permission:CLIENTS.CREATE');
-         Route::delete('/comment/destroy/{id}', [CommentsController::class, 'destroyClientsComment'])->name('comment.destroy')->middleware('check.permission:CLIENTS.DELETE');
- 
- 
- 
-         // attachments routes
- 
-         Route::post('/attachment', [AttachmentController::class, 'addClientsAttachment'])->name('attachment.create')->middleware('check.permission:CLIENTS.CREATE');
-         Route::delete('/attachment/destroy/{id}', [AttachmentController::class, 'destroyClientsAttachment'])->name('attachment.destroy')->middleware('check.permission:CLIENTS.DELETE');
+        // comments routes...
+        Route::post('/comment', [CommentsController::class, 'addClientsComment'])->name('comment.create')->middleware('check.permission:CLIENTS.CREATE');
+        Route::delete('/comment/destroy/{id}', [CommentsController::class, 'destroyClientsComment'])->name('comment.destroy')->middleware('check.permission:CLIENTS.DELETE');
+
+
+
+        // attachments routes
+
+        Route::post('/attachment', [AttachmentController::class, 'addClientsAttachment'])->name('attachment.create')->middleware('check.permission:CLIENTS.CREATE');
+        Route::delete('/attachment/destroy/{id}', [AttachmentController::class, 'destroyClientsAttachment'])->name('attachment.destroy')->middleware('check.permission:CLIENTS.DELETE');
     });
 
     //proposals
