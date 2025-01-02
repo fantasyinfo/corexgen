@@ -170,7 +170,7 @@
                                                 <select
                                                     class="form-control searchSelectBox  @error('address.country_id') is-invalid @enderror"
                                                     name="address.country_id" id="country_id">
-                                                    <option value="0"> ----- Select Country ---------- </option>
+                                                    <option value=""> ----- Select Country ---------- </option>
                                                     @if ($country)
                                                         @foreach ($country as $country)
                                                             <option value="{{ $country->id }}"

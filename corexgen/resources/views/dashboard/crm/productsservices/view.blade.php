@@ -2,240 +2,186 @@
 
 @push('style')
     <style>
-        :root {
-            --proposal-primary: var(--primary-color);
-            --proposal-bg: var(--card-bg);
-            --proposal-text: var(--body-color);
-            --proposal-border: var(--border-color);
-        }
-
-        .proposal-container {
-            max-width: 1140px;
-            margin: 0 auto;
-            background: var(--proposal-bg);
-        }
-
-        .proposal-header {
-            position: relative;
-            padding: 2.5rem;
-            background: linear-gradient(45deg, var(--primary-color), var(--primary-hover));
-            color: white;
-        }
-
-        .watermark {
-            position: absolute;
-            right: 2rem;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 8rem;
-            opacity: 0.1;
-            font-weight: bold;
-            color: white;
+        .product-header {
+            /* background: #f8f9fa; */
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
         .status-badge {
-            padding: 0.5rem 1.5rem;
-            border-radius: 50px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            font-size: 0.875rem;
+            padding: 0.25rem 0.75rem;
         }
 
-        .section-title {
-            border-bottom: 2px solid var(--proposal-border);
-            padding-bottom: 1rem;
-            margin-bottom: 2rem;
-            color: var(--proposal-text);
+        .info-card {
+            transition: transform 0.2s;
         }
 
-        .highlight-box {
-            background: var(--sidebar-diff-bg);
-            border-radius: 0.5rem;
-            padding: 1.5rem;
-        }
-
-        .timeline-item {
-            padding-left: 2rem;
-            border-left: 2px solid var(--proposal-border);
-            margin-bottom: 1.5rem;
-            position: relative;
-        }
-
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -0.5rem;
-            top: 0;
-            width: 1rem;
-            height: 1rem;
-            border-radius: 50%;
-            background: var(--primary-color);
-        }
-
-        .price-table {
-            border-collapse: separate;
-            border-spacing: 0;
-        }
-
-        .price-table th {
-            background: var(--sidebar-diff-bg);
-            padding: 1rem;
-        }
-
-        .price-table td {
-            padding: 1rem;
-            border-bottom: 1px solid var(--proposal-border);
-        }
-
-        .signature-box {
-            border: 1px dashed var(--proposal-border);
-            padding: 2rem;
-            text-align: center;
-            margin-top: 2rem;
+        .info-card:hover {
+            transform: translateY(-5px);
         }
     </style>
 @endpush
 
 @section('content')
-    <div class="container-fluid py-5">
-        <div class="proposal-container shadow-lg rounded-lg overflow-hidden">
-            <!-- Cover Page -->
-            <div class="proposal-header">
-                <div class="watermark">PROPOSAL</div>
-                <div class="row">
-                    <div class="col-lg-8">
-                        <div class="mb-4">
-                            <span class="status-badge bg-secondary text-dark mb-3">
-                                {{ $proposal->_prefix }}{{ $proposal->_id }}
-                            </span>
-                            <h1 class="display-4 mb-2">{{ $proposal->title }}</h1>
-                            <p class="lead mb-0">Prepared for {{ $proposal->typable->title }}.
-                                {{ $proposal->typable->first_name }} {{ $proposal->typable->last_name }}</p>
+    @php
+        // prePrintR($product->toArray());
+        // die();
+    @endphp
+    <div class="container-fluid ">
+        <div class="row">
+            <!-- Product Header Section -->
+            <div class="col-12 mb-4">
+                <div class="card p-4">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="mb-2 text-muted ">{{ $product?->type }}</h6>
+                            <h1 class="h3 mb-2">{{ $product?->title }}</h1>
+                            <div class="d-flex align-items-center gap-3">
+                                <span
+                                    class="badge bg-{{ $product?->status === 'ACTIVE' ? 'success' : 'danger' }} status-badge">
+                                    <i class="fas fa-circle me-1"></i>
+                                    {{ $product?->status }}
+                                </span>
+                                <span class="text-muted">
+                                    <i class="fas fa-tag me-1"></i>
+                                    {{ $product?->category?->name }}
+                                </span>
+                            </div>
                         </div>
+                        <div class="text-end">
+                            <h2 class="h3 mb-1">
+                                <span class="text-success">{{ getSettingValue('Currency Symbol') }}</span>
+                                {{ number_format($product?->rate, 2) }} <span
+                                    class="text-muted text-sm">{{ getSettingValue('Currency Code') }}</span> /
+                                {{ $product?->unit }} Qty
+                            </h2>
+                            <span class="badge bg-primary">
 
-                        <div class="row mt-5">
+                                {{ $product?->tax?->name }} Tax
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Details Section -->
+            <div class="col-md-8">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Product Details
+                        </h4>
+                        <div class="row g-4">
+
+                            <div class="info-card  p-3 rounded">
+                                <small class="text-muted d-block mb-1">Description</small>
+                                <p class="mb-0">{{ $product?->description }}</p>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Information -->
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">
+                            <i class="fas fa-clipboard-list me-2"></i>
+                            Additional Information
+                        </h4>
+                        <div class="row g-4">
                             <div class="col-md-6">
-                                <small class="text-light opacity-75">Prepared By</small>
-                                <h4>{{ $proposal->company->name }}</h4>
-                                <p class="mb-0">{{ $proposal->company->addresses->street_address }}</p>
-                                <p class="mb-0">{{ $proposal->company->addresses->city->name }},
-                                    {{ $proposal->company->addresses->country->name }}</p>
-                                <p class="mb-0">{{ $proposal->company->phone }}</p>
+                                <div class="info-card  p-3 rounded">
+                                    <small class="text-muted d-block mb-1">Created Information</small>
+                                    <p class="mb-1">
+                                        <i class="fas fa-user me-2"></i>
+                                        User ID: {{ $product?->createdBy?->name }}
+                                    </p>
+                                    <p class="mb-0">
+                                        <i class="fas fa-calendar me-2"></i>
+                                        {{ \Carbon\Carbon::parse($product?->created_at)->format('M d, Y h:i A') }}
+                                    </p>
+                                </div>
                             </div>
                             <div class="col-md-6">
-                                <small class="text-light opacity-75">Valid Until</small>
-                                <h4>{{ $proposal->valid_date ? \Carbon\Carbon::parse($proposal->valid_date)->format('F d, Y') : 'Not Specified' }}
-                                </h4>
-                                <p class="mb-0">Created:
-                                    {{ \Carbon\Carbon::parse($proposal->creating_date)->format('F d, Y') }}</p>
-
-
-                                <p class="mb-3">Status: <span
-                                        class="badge bg-{{ CRM_STATUS_TYPES['PROPOSALS']['BT_CLASSES'][$proposal->status] }} ms-2">{{ $proposal->status }}</span>
-                                </p>
-
+                                <div class="info-card  p-3 rounded">
+                                    <small class="text-muted d-block mb-1">Last Updated</small>
+                                    <p class="mb-1">
+                                        <i class="fas fa-user-edit me-2"></i>
+                                        User ID: {{ $product?->updatedBy?->name }}
+                                    </p>
+                                    <p class="mb-0">
+                                        <i class="fas fa-clock me-2"></i>
+                                        {{ \Carbon\Carbon::parse($product?->updated_at)->format('M d, Y h:i A') }}
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Main Content -->
-            <div class="p-5">
-                <!-- Executive Summary -->
-                <section class="mb-5">
+            <!-- Sidebar Information -->
+            <div class="col-md-4">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">
+                            <i class="fas fa-bookmark me-2"></i>
+                            Quick Information
+                        </h4>
+                        <ul class="list-unstyled mb-0">
 
-                    <div class="row">
-                        @if (!is_null(trim($proposal?->template?->template_details)))
-                            <h2 class="section-title">Executive Summary</h2>
-                            <p class="lead">
-                                {!! $proposal?->template?->template_details !!}
-                            </p>
-                        @endif
-                        @if (!is_null(trim($proposal?->details)))
-                            <h3 class="mt-3">Extra Details</h3>
-                            <p>
-                                {!! $proposal?->details !!}
-                            </p>
-                        @endif
+                            <li class="mb-3">
+                                <small class="text-muted d-block">Category</small>
+                                <span class="badge bg-{{ $product?->category?->color }}">
+                                    {{ $product?->category?->name }}
+                                </span>
+                            </li>
+                            <li class="mb-3">
+                                <small class="text-muted d-block">Tax Rate</small>
+                                <span class="badge bg-{{ $product?->tax?->color }}">
+                                    {{ $product?->tax?->name }}
+                                </span>
+                            </li>
+                            <li>
+                                <small class="text-muted d-block">Slug</small>
+                                <code>{{ $product?->slug }}</code>
+                            </li>
+                        </ul>
                     </div>
-                </section>
+                </div>
 
+                @if (isset($customFields) && $customFields->isNotEmpty())
+                    <div class="card  shadow-sm mb-4">
 
-
-                <!-- Action Buttons -->
-         
-                    <div class="d-flex justify-content-end mt-5 pt-4 border-top">
-                        <button class="btn btn-outline-secondary me-2" onclick="printProposal()">
-                            <i class="bi bi-download me-2"></i>Download PDF
-                        </button>
-                        @if ($proposal->status !== 'ACCEPTED')
-                        <button class="btn btn-primary" onclick="sendProposal('{{ $proposal->id }}')">
-                            <i class="bi bi-send me-2"></i>Send Proposal
-                        </button>
-                        @endif
-                    </div>
-           
-
-                @if ($proposal->status === 'ACCEPTED')
-                    <div class="container mt-4">
-                        <div class="card shadow-sm">
-                            <div class="card-header bg-primary text-white">
-                                <h4 class="mb-0">Proposal Acceptance Details</h4>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-4">
-                                            <h5 class="text-muted mb-3">Client Information</h5>
-                                            <div class="table-responsive">
-                                                <table class="table table-borderless">
-                                                    <tbody>
-                                                        <tr>
-                                                            <td class="text-muted" style="width: 140px;">Name:</td>
-                                                            <td class="font-weight-bold">
-                                                                {{ $proposal->accepted_details['first_name'] }}
-                                                                {{ $proposal->accepted_details['last_name'] }}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="text-muted">Email:</td>
-                                                            <td class="font-weight-bold">
-                                                                {{ $proposal->accepted_details['email'] }}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="text-muted">Accepted On:</td>
-                                                            <td class="font-weight-bold">
-                                                                {{ \Carbon\Carbon::parse($proposal->accepted_details['accepted_at'])->format('M d, Y h:i A') }}
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-4">
-                                            <h5 class="text-muted mb-3">Digital Signature</h5>
-                                            <div class="border rounded p-3 bg-light">
-                                                <img src="{{ $proposal->accepted_details['signature'] }}"
-                                                    alt="Digital Signature" class="img-fluid" style="max-height: 150px;">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="mt-3">
-                                    <div class="alert alert-success d-flex align-items-center" role="alert">
-                                        <i class="fas fa-check-circle me-2"></i>
-                                        <div>
-                                            This proposal has been officially accepted and signed by the client.
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="card-body  gap-2">
+                            <h4 class="card-title mb-4">
+                                <i class="fas fa-plus me-2"></i>
+                                Custom Fields
+                            </h4>
+                            <ul class="list-unstyled mb-0">
+                                @foreach ($customFields as $cf)
+                                    @php
+                                        // Find the existing value for this custom field
+                                        $existingValue = $cfOldValues->firstWhere('definition_id', $cf['id']);
+                                        $fieldValue = $existingValue
+                                            ? $existingValue['field_value']
+                                            : old('custom_fields.' . $cf['id'], '');
+                                    @endphp
+                                    <li>
+                                        <small class="text-muted d-block">{{ ucfirst($cf['field_label']) }}</small>
+                                        <code>{{ trim($fieldValue) != '' || null ? $fieldValue : 'NA' }}</code>
+                                    </li>
+                                @endforeach
+                            </ul>
                         </div>
                     </div>
                 @endif
+
+
             </div>
         </div>
     </div>
@@ -243,59 +189,8 @@
 
 @push('scripts')
     <script>
-        function printProposal() {
-            // Open print view in a new window
-
-            let _id = "{{ $proposal->id }}";
-
-            const printWindow = window.open(
-                `/proposal/print/${_id}`,
-                'PrintProposal',
-                'width=1140,height=800'
-            );
-
-            // Wait for content to load then print
-            printWindow.onload = function() {
-                setTimeout(() => {
-                    printWindow.print();
-                    // Optional: Close the window after print dialog is closed
-                    // printWindow.close();
-                }, 500);
-            };
-        }
-
-        function sendProposal($id) {
-            // console.log($id)a
-            let baseUrl =
-                "{{ route(getPanelRoutes($module . '.sendProposal'), ['id' => ':id']) }}";
-            let url = baseUrl.replace(':id', $id);
-
-            console.log(url)
-            $.ajax({
-                url: url + '?api=true',
-                method: "GET",
-                data: {
-                    _token: '{{ csrf_token() }}',
-                },
-                success: function(response) {
-                    const successModal = new bootstrap.Modal(
-                        document.getElementById("successModal")
-                    );
-                    $("#successModal .modal-body").text(
-                        response.success
-                    );
-                    successModal.show();
-                },
-                error: function(xhr) {
-                    const alertModal = new bootstrap.Modal(
-                        document.getElementById("alertModal")
-                    );
-                    $("#alertModal .modal-body").text(
-                        "An error occurred."
-                    );
-                    alertModal.show();
-                }
-            });
-        }
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add any necessary JavaScript functionality here
+        });
     </script>
 @endpush

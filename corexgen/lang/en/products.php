@@ -18,7 +18,11 @@ return [
     'Title' => 'Title',
     'Select Category' => 'Select Category',
     'Select Tax' => 'Select Tax',
-    'General' => 'General'
+    'General' => 'General',
+    'Rate' => 'Rate',
+    'Unit' => 'Unit',
+    'Category' => 'Category',
+    'Tax' => 'Tax',
 
 
 

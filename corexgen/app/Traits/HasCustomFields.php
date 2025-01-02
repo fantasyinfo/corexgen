@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use App\Models\CustomFieldValue;
+use Illuminate\Support\Facades\Log;
 
 trait HasCustomFields
 {
@@ -17,6 +18,7 @@ trait HasCustomFields
     public function getCustomFieldEntityType(): string
     {
         $entityType = strtolower(class_basename($this));
+        // Log::info('Custom Field Entity Type : ' . $entityType);
         return $entityType;
     }
 }

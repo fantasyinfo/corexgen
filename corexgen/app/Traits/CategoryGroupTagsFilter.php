@@ -9,7 +9,7 @@ trait CategoryGroupTagsFilter
 {
     public function getCategoryGroupTags($type, $relation, $status = 'active')
     {
-        return CategoryGroupTag::where('type', $type)->where('relation_type', $relation)->where('status', $status);
+        return CategoryGroupTag::where('type', $type)->where('relation_type', $relation);
     }
 
     public function checkIsValidCGTID($id, $company_id, $type, $relation): bool

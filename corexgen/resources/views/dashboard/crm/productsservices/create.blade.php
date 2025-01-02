@@ -94,7 +94,7 @@
                                     <!-- Category Selection Field -->
                                     <div class="row mb-4 align-items-center">
                                         <div class="col-lg-4">
-                                            <x-form-components.input-label for="role_id" class="custom-class" required>
+                                            <x-form-components.input-label for="role_id" class="custom-class">
                                                 {{ __('products.Select Category') }}
                                             </x-form-components.input-label>
 
@@ -105,6 +105,7 @@
                                                 <select
                                                     class="form-control searchSelectBox  @error('cgt_id') is-invalid @enderror"
                                                     name="cgt_id" id="cgt_id">
+                                                    <option value="">No Category </option>
                                                     @if ($categories && $categories->isNotEmpty())
                                                         @foreach ($categories as $cat)
                                                             <option value="{{ $cat->id }}"
@@ -124,10 +125,60 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    <div class="row mb-4 align-items-center">
+                                        <div class="col-lg-4">
+                                            <x-form-components.input-label for="role_id" class="custom-class">
+                                                {{ __('products.Description') }}
+                                            </x-form-components.input-label>
+
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <div class="input-group">
+                                                <x-form-components.textarea-group class="custom-class" id="nameName"
+                                                    name="description" placeholder="{{ __('Product description...') }}"
+                                                    value="{{ old('description') }}" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Full Name Field -->
+                                    <div class="row mb-4 align-items-center">
+                                        <div class="col-lg-4">
+
+                                            <x-form-components.input-label for="nameName" class="custom-class" required>
+                                                {{ __('products.Rate') }}
+                                            </x-form-components.input-label>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <x-form-components.input-group-prepend-append type="number"
+                                                class="custom-class" prepend="{{ getSettingValue('Currency Symbol') }}"
+                                                append="{{ getSettingValue('Currency Code') }}" id="nameName"
+                                                name="rate" step="0.001" placeholder="{{ __('Product price...') }}"
+                                                value="{{ old('rate') }}" required />
+
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-4 align-items-center">
+                                        <div class="col-lg-4">
+
+                                            <x-form-components.input-label for="nameName" class="custom-class" required>
+                                                {{ __('products.Unit') }}
+                                            </x-form-components.input-label>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <x-form-components.input-group type="number" class="custom-class"
+                                                id="nameName" name="unit" placeholder="{{ __('Product qty...') }}"
+                                                value="{{ old('unit') }}" required />
+
+                                        </div>
+                                    </div>
+
                                     <!-- Tax Selection Field -->
                                     <div class="row mb-4 align-items-center">
                                         <div class="col-lg-4">
-                                            <x-form-components.input-label for="role_id" class="custom-class" required>
+                                            <x-form-components.input-label for="role_id" class="custom-class">
                                                 {{ __('products.Select Tax') }}
                                             </x-form-components.input-label>
 
@@ -138,6 +189,7 @@
                                                 <select
                                                     class="form-control searchSelectBox  @error('tax_id') is-invalid @enderror"
                                                     name="tax_id" id="tax_id">
+                                                    <option value="">No tax </option>
                                                     @if ($taxes && $taxes->isNotEmpty())
                                                         @foreach ($taxes as $tax)
                                                             <option value="{{ $tax->id }}"

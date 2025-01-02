@@ -31,7 +31,7 @@ class ProposalRequest extends FormRequest
             'client_id' => 'required_if:type,client|exists:clients,id',
             'lead_id' => 'required_if:type,lead|exists:leads,id',
             'title' => 'required|string|max:100',
-            'value' => 'nullable|integer|min:0',
+            'value' => 'nullable|numeric|min:0',
             'details' => 'nullable|string',
             'creating_date' => 'required|date',
             'valid_date' => 'nullable|date|after_or_equal:today',

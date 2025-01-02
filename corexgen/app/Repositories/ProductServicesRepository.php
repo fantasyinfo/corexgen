@@ -11,13 +11,13 @@ class ProductServicesRepository
     // Your repository methods
     public function getProductsQuery($request)
     {
-        $query = ProductsServices::query();
+        $query = ProductsServices::query()->with(['category', 'tax']);
 
         $query = $this->applyTenantFilter($query);
 
-        return $query;
+        //return $query;
         // Dynamic filters
-        //return $this->applyFilters($query, $request);
+        return $this->applyFilters($query, $request);
     }
 
     protected function applyFilters($query, $request)
@@ -28,23 +28,20 @@ class ProductServicesRepository
                 fn($q) => $q->where('title', 'LIKE', "%{$request->title}%")
             )
             ->when(
-                $request->filled('client_id') && $request->client_id != '0',
-                fn($q) => $q->where('typable_type', CRMClients::class)->where('typable_id', $request->client_id)
+                $request->filled('type'),
+                fn($q) => $q->where('type', "$request->type")
             )
             ->when(
-                $request->filled('lead_id') && $request->client_id != '0',
-                fn($q) => $q->where('typable_type', CRMLeads::class)->where('typable_id', $request->lead_id)
+                $request->filled('cgt_id'),
+                fn($q) => $q->where('cgt_id', "$request->cgt_id")
+            )
+            ->when(
+                $request->filled('tax_id'),
+                fn($q) => $q->where('tax_id', "$request->tax_id")
             )
             ->when(
                 $request->filled('status'),
                 fn($q) => $q->where('status', $request->status)
-            )
-            ->when(
-                $request->filled('creating_date'),
-                fn($q) => $q->whereDate('created_at', Carbon::parse($request->creating_date)->toDateString())
-            )->when(
-                $request->filled('valid_date'),
-                fn($q) => $q->whereDate('created_at', Carbon::parse($request->valid_date)->toDateString())
             );
     }
 }

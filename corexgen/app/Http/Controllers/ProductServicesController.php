@@ -4,47 +4,33 @@ namespace App\Http\Controllers;
 
 use App\Helpers\CustomFieldsValidation;
 use App\Helpers\PermissionsHelper;
-use App\Http\Requests\ProposalEditRequest;
-use App\Http\Requests\ProposalRequest;
-use App\Http\Requests\UserRequest;
-use App\Jobs\SendProposal;
-use App\Models\Country;
+use App\Http\Requests\ProductServicesEditRequest;
+use App\Http\Requests\ProductServicesRequest;
 use App\Models\CRM\CRMClients;
 use App\Models\CRM\CRMLeads;
 use App\Models\CRM\CRMProposals;
-use App\Models\CRM\CRMRole;
-use App\Models\CRM\CRMSettings;
-use App\Models\CRM\CRMTemplates;
 use App\Models\ProductsServices;
 use App\Repositories\ProductServicesRepository;
 use App\Services\CustomFieldService;
 use App\Services\ProductServicesService;
-use App\Services\UserService;
 use App\Traits\CategoryGroupTagsFilter;
 use App\Traits\IsSMTPValid;
 use App\Traits\MediaTrait;
 use App\Traits\SubscriptionUsageFilter;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
-use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Media;
-use App\Repositories\ProposalRepository;
-use App\Services\ProposalService;
-use Illuminate\Support\Str;
+
 
 /**
- * UserController handles CRUD operations for Proposals
+ * ProductServicesController handles CRUD operations for Products
  * 
- * This controller manages user-related functionality including:
- * - Listing User with server-side DataTables
- * - Creating new User
- * - Editing existing User
- * - Exporting User to CSV
- * - Importing User from CSV
- * - Changing user here status removed,
- *  - New VErsion Check
+ * This controller manages product-related functionality including:
+ * - Listing product with server-side DataTables
+ * - Creating new product
+ * - Editing existing product
+ * - Changing product here status removed,
  */
 
 class ProductServicesController extends Controller
@@ -52,8 +38,6 @@ class ProductServicesController extends Controller
 
     use TenantFilter;
     use SubscriptionUsageFilter;
-    use MediaTrait;
-    use IsSMTPValid;
     use CategoryGroupTagsFilter;
 
     /**
@@ -105,7 +89,7 @@ class ProductServicesController extends Controller
     }
 
     /**
-     * Display list of users with filtering and DataTables support
+     * Display list of product with filtering and DataTables support
      * 
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Contracts\View\View|\Illuminate\Http\JsonResponse
@@ -120,7 +104,7 @@ class ProductServicesController extends Controller
 
         // Fetch the totals in a single query
 
-        // Build base query for user totals
+
         $user = Auth::user();
         $proposalQuery = ProductsServices::query();
 
@@ -164,6 +148,8 @@ class ProductServicesController extends Controller
             'total_active' => $usersTotals->totalActive,
             'total_inactive' => $usersTotals->totalInactive,
             'total_ussers' => $usersTotals->totalUsers,
+            'taxes' =>  $this->productSercicesService->getProductTaxes(),
+            'categories' => $this->productSercicesService->getProductCategories(),
 
         ]);
     }
@@ -171,33 +157,43 @@ class ProductServicesController extends Controller
 
 
     /**
-     * Storing the data of user into db
+     * Storing the data of product into db
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(ProposalRequest $request)
+    public function store(ProductServicesRequest $request)
     {
-
-
 
         $this->tenantRoute = $this->getTenantRoute();
 
         try {
 
+            // custom fields validation if any
+            $validatedData = [];
+            if ($request->has('custom_fields') && !is_null(Auth::user()->company_id)) {
+                $validator = new CustomFieldsValidation();
+                $validatedData = $validator->validate($request->input('custom_fields'), CUSTOM_FIELDS_RELATION_TYPES['KEYS']['productsservices'], Auth::user()->company_id);
+            }
 
-            $proposal = $this->proposalService->createProposal($request->validated());
 
+            $product = $this->productSercicesService->createProduct($request->validated());
+
+
+            // insert custom fields values to db
+            if ($request->has('custom_fields') && !empty($validatedData) && count($validatedData) > 0 && !is_null(Auth::user()->company_id)) {
+                $this->customFieldService->saveValues($product, $validatedData);
+            }
 
             // update current usage
             $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['PRODUCTS_SERVICES']]), '+', '1');
 
 
 
-            return redirect()->route($this->tenantRoute . 'proposals.index')
-                ->with('success', 'Proposals created successfully.');
+            return redirect()->route($this->tenantRoute . 'products_services.index')
+                ->with('success', 'Products created successfully.');
         } catch (\Exception $e) {
             return redirect()->back()->withInput()
-                ->with('error', 'An error occurred while creating the Proposals: ' . $e->getMessage());
+                ->with('error', 'An error occurred while creating the Products: ' . $e->getMessage());
         }
     }
 
@@ -205,7 +201,7 @@ class ProductServicesController extends Controller
 
 
     /**
-     * Return the view for creating new user with roles
+     * Return the view for creating new product 
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function create()
@@ -213,64 +209,59 @@ class ProductServicesController extends Controller
 
         $this->checkCurrentUsage(strtolower(PLANS_FEATURES['PRODUCTS_SERVICES']));
 
-
-        // categories
-        $categoryQuery = $this->getCategoryGroupTags(CATEGORY_GROUP_TAGS_TYPES['KEY']['products_categories'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['products_services']);
-        $categoryQuery = $this->applyTenantFilter($categoryQuery);
-        $categories = $categoryQuery->get();
-
-
-        // taxes
-        $taxQuery = $this->getCategoryGroupTags(CATEGORY_GROUP_TAGS_TYPES['KEY']['products_taxs'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['products_services']);
-        $taxQuery = $this->applyTenantFilter($taxQuery);
-        // $taxes = $taxQuery->get();
-
-        dd($taxQuery->toSql());
+        // dd($taxQuery->toSql());
 
         $customFields = collect();
         if (!is_null(Auth::user()->company_id)) {
-            $customFields = $this->customFieldService->getFieldsForEntity(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['products'], Auth::user()->company_id);
+            $customFields = $this->customFieldService->getFieldsForEntity(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['productsservices'], Auth::user()->company_id);
         }
-
 
 
         return view($this->getViewFilePath('create'), [
             'title' => 'Create Product',
-            'taxes' => $taxes,
-            'module' => PANEL_MODULES[$this->getPanelModule()]['clients'],
-            'categories' => $categories,
+            'module' => PANEL_MODULES[$this->getPanelModule()]['products_services'],
+            'taxes' =>  $this->productSercicesService->getProductTaxes(),
+            'categories' => $this->productSercicesService->getProductCategories(),
             'customFields' => $customFields
         ]);
     }
 
     /**
-     * showing the edit user view
+     * showing the edit product view
      * @param mixed $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function edit($id)
     {
 
-        $query = CRMProposals::query()
+        $query = ProductsServices::query()
             ->where('id', $id);
         $query = $this->applyTenantFilter($query);
-        $proposal = $query->firstOrFail();
+        $product = $query->firstOrFail();
 
 
         // Regular view rendering
-        $templates = $this->applyTenantFilter(CRMTemplates::query()->select('id', 'title')->where('type', 'Proposals'))->get();
+       
 
-        $clients = $this->applyTenantFilter(CRMClients::query())->select('id', 'first_name', 'last_name', 'type', 'company_name', 'primary_email')->get();
 
-        $leads = $this->applyTenantFilter(CRMLeads::query())->select('id', 'first_name', 'last_name', 'type', 'company_name', 'email')->get();
+        $customFields = collect();
+        $cfOldValues = collect();
+        if (!is_null(Auth::user()->company_id)) {
+            $customFields = $this->customFieldService->getFieldsForEntity(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['productsservices'], Auth::user()->company_id);
+
+            $cfOldValues = $this->customFieldService->getValuesForEntity($product);
+        }
+
 
         return view($this->getViewFilePath('edit'), [
 
             'title' => 'Edit Product',
-            'proposal' => $proposal,
-            'templates' => $templates,
-            'clients' => $clients,
-            'leads' => $leads,
+            'product' => $product,
+            'customFields' => $customFields,
+            'cfOldValues' => $cfOldValues,
+            'module' => PANEL_MODULES[$this->getPanelModule()]['products_services'],
+            'taxes' =>  $this->productSercicesService->getProductTaxes(),
+            'categories' => $this->productSercicesService->getProductCategories(),
 
         ]);
     }
@@ -278,22 +269,32 @@ class ProductServicesController extends Controller
 
     /**
      * Method update 
-     * for updating the user
+     * for updating the product
      *
      * @param Request $request [explicite description]
      *
      */
-    public function update(ProposalEditRequest $request)
+    public function update(ProductServicesEditRequest $request)
     {
 
         $this->tenantRoute = $this->getTenantRoute();
 
         try {
+            // custom fields validation if any
+            $validatedData = [];
+            if ($request->has('custom_fields') && !is_null(Auth::user()->company_id)) {
+                $validator = new CustomFieldsValidation();
+                $validatedData = $validator->validate($request->input('custom_fields'), CUSTOM_FIELDS_RELATION_TYPES['KEYS']['productsservices'], Auth::user()->company_id);
+            }
 
+            $product = $this->productSercicesService->updateProduct($request->validated());
 
-            $proposal = $this->proposalService->updateProposal($request->validated());
+            // insert custom fields values to db
+            if ($request->has('custom_fields') && !empty($validatedData) && count($validatedData) > 0 && !is_null(Auth::user()->company_id)) {
+                $this->customFieldService->saveValues($product, $validatedData);
+            }
 
-            return redirect()->route($this->tenantRoute . 'proposals.index')
+            return redirect()->route($this->tenantRoute . 'products_services.index')
                 ->with('success', 'proposal updated successfully.');
         } catch (\Exception $e) {
             return redirect()->back()
@@ -306,7 +307,7 @@ class ProductServicesController extends Controller
 
 
     /**
-     * Deleting the user
+     * Deleting the product
      * @param mixed $id
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -316,10 +317,15 @@ class ProductServicesController extends Controller
         try {
             // Delete the user
 
-            $user = $this->applyTenantFilter(CRMProposals::find($id));
-            if ($user) {
+            $product = $this->applyTenantFilter(ProductsServices::find($id));
+            if ($product) {
                 // delete  now
-                $user->delete();
+
+                // delete its custom fields also if any
+                $this->customFieldService->deleteEntityValues($product);
+
+
+                $product->delete();
 
                 // update the subscription usage
                 $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['PRODUCTS_SERVICES']]), '-', '1');
@@ -341,7 +347,7 @@ class ProductServicesController extends Controller
 
 
     /**
-     * Bulk Delete the user
+     * Bulk Delete the product
      * Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -357,10 +363,11 @@ class ProductServicesController extends Controller
             if (is_array($ids) && count($ids) > 0) {
                 DB::transaction(function () use ($ids) {
 
-
+                    // First, delete custom field values
+                    $this->customFieldService->bulkDeleteEntityValues(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['products'], $ids);
 
                     // Then delete the clients
-                    CRMProposals::whereIn('id', $ids)->delete();
+                    ProductsServices::whereIn('id', $ids)->delete();
 
                     $this->updateUsage(
                         strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['PRODUCTS_SERVICES']]),
@@ -369,10 +376,10 @@ class ProductServicesController extends Controller
                     );
                 });
 
-                return response()->json(['message' => 'Selected proposals deleted successfully.'], 200);
+                return response()->json(['message' => 'Selected products_services deleted successfully.'], 200);
             }
 
-            return response()->json(['message' => 'No proposals selected for deletion.'], 400);
+            return response()->json(['message' => 'No products_services selected for deletion.'], 400);
 
         } catch (\Exception $e) {
             // Handle any exceptions
@@ -381,64 +388,66 @@ class ProductServicesController extends Controller
     }
 
 
+    /**
+     * changing the status 
+     * @param mixed $id
+     * @param mixed $status
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function changeStatus($id, $status)
+    {
+        try {
+            ProductsServices::query()->where('id', '=', $id)->update(['status' => $status]);
+            // Return success response
+            return redirect()->back()->with('success', 'Product status changed successfully.');
+        } catch (\Exception $e) {
+            // Handle any exceptions
+            return redirect()->back()->with('error', 'Failed to changed the product status: ' . $e->getMessage());
+        }
+    }
 
 
+    /**
+     * view product
+     * @param mixed $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     */
     public function view($id)
     {
-        $proposalQuery = $this->applyTenantFilter(
-            CRMProposals::query()
+        $productQuery = $this->applyTenantFilter(
+            ProductsServices::query()
                 ->with([
-                    'typable' => function ($query) {
-                        if (request('typable_type') === CRMClients::class) {
-                            // For Clients - many-to-many relationship
-                            $query->with([
-                                'addresses' => function ($addressQuery) {
-                                $addressQuery->select(
-                                    'addresses.id',
-                                    'addresses.street_address',
-                                    'addresses.postal_code',
-                                    'addresses.city_id',
-                                    'addresses.country_id'
-                                )
-                                    ->withPivot('type');
-                            }
-                            ]);
-                        } elseif (request('typable_type') === CRMLeads::class) {
-                            // For Leads - single address relationship
-                            $query->with([
-                                'address' => function ($addressQuery) {
-                                $addressQuery->with(['country', 'city'])
-                                    ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
-                            }
-                            ]);
-                        }
-                    },
-                    'template',
-                    'company.addresses' => function ($query) {
-                        $query->with(['country', 'city'])
-                            ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
-                    }
+                    'category',
+                    'tax',
+                    'createdBy',
+                    'updatedBy'
                 ])
                 ->where('id', '=', $id)
         );
 
+        $query = $this->applyTenantFilter($productQuery);
+        $product = $query->firstOrFail();
 
+        // custom fields
+        $customFields = collect();
+        $cfOldValues = collect();
+        if (!is_null(Auth::user()->company_id)) {
+            $customFields = $this->customFieldService->getFieldsForEntity(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['productsservices'], Auth::user()->company_id);
 
-        $query = $this->applyTenantFilter($proposalQuery);
-        $proposal = $query->firstOrFail();
+            // fetch already existing values
 
+            $cfOldValues = $this->customFieldService->getValuesForEntity($product);
+        }
 
         return view($this->getViewFilePath('view'), [
             'title' => 'View Product',
-            'proposal' => $proposal,
-            'module' => PANEL_MODULES[$this->getPanelModule()]['proposals'],
+            'product' => $product,
+            'module' => PANEL_MODULES[$this->getPanelModule()]['products_services'],
+            'cfOldValues' => $cfOldValues,
+            'customFields' => $customFields,
 
         ]);
     }
-
-
-
-
 
 
 

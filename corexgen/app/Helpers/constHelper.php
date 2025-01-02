@@ -423,19 +423,19 @@ PermissionsHelper::initializePermissions();
         'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger', 'BANNED' => 'warning'],
     ],
     'CLIENTS' => [
-        'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE', 'BANNED'],
-        'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE', 'BANNED' => 'BANNED'],
-        'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger', 'BANNED' => 'warning'],
+        'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE', ],
+        'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE',],
+        'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger', ],
     ],
     'LEADS' => [
-        'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE', 'BANNED'],
-        'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE', 'BANNED' => 'BANNED'],
-        'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger', 'BANNED' => 'warning'],
+        'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE',],
+        'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE',],
+        'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger', ],
     ],
     'PRODUCTS_SERVICES' => [
-        'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE', 'BANNED'],
-        'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE', 'BANNED' => 'BANNED'],
-        'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger', 'BANNED' => 'warning'],
+        'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE'],
+        'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE'],
+        'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger'],
     ],
     'PROPOSALS' => [
         'TABLE_STATUS' => ['DRAFT', 'SENT', 'OPEN', 'DECLINED', 'ACCEPTED', 'EXPIRED','REVISED'],
@@ -955,8 +955,8 @@ PermissionsHelper::initializePermissions();
 
 // kyes must match the model name in lowercase
 !defined('CUSTOM_FIELDS_RELATION_TYPES') && define('CUSTOM_FIELDS_RELATION_TYPES', [
-    'KEYS' => ['crmclients' => 'crmclients', 'user' => 'user', 'crmleads' => 'crmleads','products' => 'products'],
-    'VALUES' => ['crmclients' => 'Clients', 'user' => 'Users & Employees', 'crmleads' => 'Leads','products' => 'Products & Services'],
+    'KEYS' => ['crmclients' => 'crmclients', 'user' => 'user', 'crmleads' => 'crmleads','productsservices' => 'productsservices'],
+    'VALUES' => ['crmclients' => 'Clients', 'user' => 'Users & Employees', 'crmleads' => 'Leads','productsservices' => 'Products & Services'],
 ]);
 
 
