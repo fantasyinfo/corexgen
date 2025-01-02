@@ -32,7 +32,7 @@ class ProductServicesService
     public function createProduct($data)
     {
 
-        if (isset($validatedData['cgt_id'])) {
+        if (isset($data['cgt_id'])) {
             $validCGTID = $this->checkIsValidCGTID($data['cgt_id'], Auth::user()->company_id, CATEGORY_GROUP_TAGS_TYPES['KEY']['products_categories'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['products_services']);
 
 
@@ -41,7 +41,7 @@ class ProductServicesService
             }
         }
 
-        if (isset($validatedData['tax_id'])) {
+        if (isset($data['tax_id'])) {
             $validTaxID = $this->checkIsValidCGTID($data['tax_id'], Auth::user()->company_id, CATEGORY_GROUP_TAGS_TYPES['KEY']['products_taxs'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['products_services']);
 
 
@@ -51,6 +51,53 @@ class ProductServicesService
         }
 
         return ProductsServices::create($data);
+    }
+
+
+    public function updateProduct($data)
+    {
+
+        if (isset($data['cgt_id'])) {
+            $validCGTID = $this->checkIsValidCGTID($data['cgt_id'], Auth::user()->company_id, CATEGORY_GROUP_TAGS_TYPES['KEY']['products_categories'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['products_services']);
+
+
+            if (!$validCGTID) {
+                throw new \InvalidArgumentException("Failed to create product beacuse invalid CGT ID ");
+            }
+        }
+
+        if (isset($data['tax_id'])) {
+            $validTaxID = $this->checkIsValidCGTID($data['tax_id'], Auth::user()->company_id, CATEGORY_GROUP_TAGS_TYPES['KEY']['products_taxs'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['products_services']);
+
+
+            if (!$validTaxID) {
+                throw new \InvalidArgumentException("Failed to create product beacuse invalid TAX ID ");
+            }
+        }
+
+        // Retrieve the existing client
+        $product = ProductsServices::findOrFail($data['id']);
+
+        unset($data['id']);
+
+        $product->update($data);
+        return $product;
+    }
+
+
+    public function getProductCategories()
+    {
+        // categories
+        $categoryQuery = $this->getCategoryGroupTags(CATEGORY_GROUP_TAGS_TYPES['KEY']['products_categories'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['products_services']);
+        $categoryQuery = $this->applyTenantFilter($categoryQuery);
+        return $categoryQuery->get();
+    }
+
+    public function getProductTaxes()
+    {
+        $taxQuery = $this->getCategoryGroupTags(CATEGORY_GROUP_TAGS_TYPES['KEY']['products_taxs'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['products_services']);
+        $taxQuery = $this->applyTenantFilter($taxQuery);
+        return $taxQuery->get();
     }
 
     public function getDatatablesResponse($request)
@@ -73,10 +120,10 @@ class ProductServicesService
                 return number_format($product->rate);
             })
             ->editColumn('category', function ($product) {
-                return  $product?->category?->name ? "<span class='badge badge-pill bg-" . $product?->category?->color . "'>{$product?->category?->name}</span>" : 'N/A';
+                return $product?->category?->name ? "<span class='badge badge-pill bg-" . $product?->category?->color . "'>{$product?->category?->name}</span>" : 'N/A';
             })
             ->editColumn('tax', function ($product) {
-                return $product?->tax?->name ? "<span class='badge badge-pill bg-" . $product?->tax?->color . "'>{$product?->tax?->name}</span>": 'N/A';
+                return $product?->tax?->name ? "<span class='badge badge-pill bg-" . $product?->tax?->color . "'>{$product?->tax?->name}</span>" : 'N/A';
             })
             ->editColumn('title', function ($product) use ($module) {
                 return "<a  class='dt-link' href='" . route($this->tenantRoute . $module . '.view', $product->id) . "' target='_blank'>$product->title</a>";
@@ -84,7 +131,7 @@ class ProductServicesService
             ->editColumn('status', function ($product) {
                 return $this->renderStatusColumn($product);
             })
-            ->rawColumns(['actions','category','tax', 'status', 'title']) // Add 'status' to raw columns
+            ->rawColumns(['actions', 'category', 'tax', 'status', 'title']) // Add 'status' to raw columns
             ->make(true);
     }
 

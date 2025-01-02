@@ -1,7 +1,7 @@
 @extends('layout.app')
 
 @section('content')
-  
+
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
@@ -11,7 +11,7 @@
                     <form id="productsForm" action="{{ route(getPanelRoutes('products_services.update')) }}" method="POST">
                         @csrf
                         @method('PUT')
-                        <input type="hidden" name="id" value="{{$product->id}}" />
+                        <input type="hidden" name="id" value="{{ $product->id }}" />
                         <div class="card-body general-info">
                             <div class="mb-5 d-flex align-items-center justify-content-between">
                                 <p class="fw-bold mb-0 me-4">
@@ -56,11 +56,11 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <select name="type" id="type" class="form-select">
-                                                <option value="Product" {{ old('type') == 'Product' ? 'selected' : '' }}
-                                                    {{ $type == 'Product' ? 'selected' : '' }}>Product
+                                                <option value="Product" {{ old('type',$product->type) == 'Product' ? 'selected' : '' }}>
+                                                    Product
                                                 </option>
-                                                <option value="Service" {{ old('type') == 'Service' ? 'selected' : '' }}
-                                                    {{ $type == 'Service' ? 'selected' : '' }}>Services</option>
+                                                <option value="Service" {{ old('type',$product->type) == 'Service' ? 'selected' : '' }}>
+                                                    Services</option>
                                             </select>
                                         </div>
                                     </div>
@@ -76,7 +76,7 @@
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="text" class="custom-class"
                                                 id="nameName" name="title" placeholder="{{ __('Product title...') }}"
-                                                value="{{ old('title') }}" required />
+                                                value="{{ old('title',$product->title) }}" required />
 
                                         </div>
                                     </div>
@@ -101,7 +101,7 @@
                                                     @if ($categories && $categories->isNotEmpty())
                                                         @foreach ($categories as $cat)
                                                             <option value="{{ $cat->id }}"
-                                                                {{ old('cgt_id') == $cat->id ? 'selected' : '' }}>
+                                                                {{ old('cgt_id',$product->cgt_id) == $cat->id ? 'selected' : '' }}>
                                                                 {{ $cat->name }}
                                                             </option>
                                                         @endforeach
@@ -129,7 +129,7 @@
                                             <div class="input-group">
                                                 <x-form-components.textarea-group class="custom-class" id="nameName"
                                                     name="description" placeholder="{{ __('Product description...') }}"
-                                                    value="{{ old('description') }}" />
+                                                    value="{{ old('description',$product->description) }}" />
                                             </div>
                                         </div>
                                     </div>
@@ -147,7 +147,7 @@
                                                 class="custom-class" prepend="{{ getSettingValue('Currency Symbol') }}"
                                                 append="{{ getSettingValue('Currency Code') }}" id="nameName"
                                                 name="rate" step="0.001" placeholder="{{ __('Product price...') }}"
-                                                value="{{ old('rate') }}" required />
+                                                value="{{ old('rate',$product->rate) }}" required />
 
                                         </div>
                                     </div>
@@ -162,7 +162,7 @@
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="number" class="custom-class"
                                                 id="nameName" name="unit" placeholder="{{ __('Product qty...') }}"
-                                                value="{{ old('unit') }}" required />
+                                                value="{{ old('unit',$product->unit) }}" required />
 
                                         </div>
                                     </div>
@@ -185,7 +185,7 @@
                                                     @if ($taxes && $taxes->isNotEmpty())
                                                         @foreach ($taxes as $tax)
                                                             <option value="{{ $tax->id }}"
-                                                                {{ old('tax_id') == $tax->id ? 'selected' : '' }}>
+                                                                {{ old('tax_id',$product->tax_id) == $tax->id ? 'selected' : '' }}>
                                                                 {{ $tax->name }}
                                                             </option>
                                                         @endforeach
