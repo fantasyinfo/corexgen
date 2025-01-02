@@ -3,7 +3,9 @@
 namespace App\Models\CRM;
 
 use App\Models\Address;
+use App\Models\Attachments;
 use App\Models\CategoryGroupTag;
+use App\Models\CommentNote;
 use App\Models\Company;
 use App\Traits\HasCustomFields;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -77,6 +79,21 @@ class CRMClients extends Model implements Auditable
     {
         return $this->belongsTo(CategoryGroupTag::class, 'cgt_id');
     }
+
+
+    public function comments()
+    {
+        return $this->morphMany(CommentNote::class, 'commentable')
+            ->with('user:id,name,profile_photo_path') // Eager load only needed user fields
+            ->latest('created_at');
+    }
+
+    public function attachments()
+    {
+        return $this->morphMany(Attachments::class, 'attachable')->latest('created_at');
+
+    }
+
 
     protected static function boot()
     {

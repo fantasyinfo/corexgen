@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CommentRequest;
 use App\Models\CommentNote;
+use App\Models\CRM\CRMClients;
 use App\Models\CRM\CRMLeads;
 use App\Services\CommentService;
 use App\Traits\TenantFilter;
@@ -58,6 +59,58 @@ class CommentsController extends Controller
     }
 
     public function destroyLeadsComment($id)
+    {
+        try {
+            $this->applyTenantFilter(CommentNote::where('id', $id))->delete();
+            //code...
+            return redirect()
+                ->back()
+                ->with('success', 'comment  / note deleted.');
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'An error occurred while deleting the comment / notes. ' . $e->getMessage());
+        }
+
+    }
+
+    public function addClientsComment(CommentRequest $request)
+    {
+
+        try {
+            //code...
+            $requestData = $request->validated();
+            $query = CRMClients::where('id', $requestData['id']);
+            $query = $this->applyTenantFilter($query);
+            $client = $query->firstOrFail();
+
+            $this->commentService->add($client, $requestData);
+
+
+            // Log the detach operation as an audit
+            $client->audits()->create([
+                'old_values' => [],
+                'new_values' => ['comment' => $requestData['comment']],
+                'user_type' => 'App\Models\User',
+                'event' => 'created',
+                'url' => request()->fullUrl(),
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->header('User-Agent'),
+            ]);
+
+            return redirect()
+                ->back()
+                ->with('success', 'New comment  / note added.');
+        } catch (\Exception $e) {
+            //throw $th;
+            return redirect()
+                ->back()
+                ->with('error', 'An error occurred while adding the comment / notes. ' . $e->getMessage());
+        }
+
+    }
+
+    public function destroyClientsComment($id)
     {
         try {
             $this->applyTenantFilter(CommentNote::where('id', $id))->delete();
