@@ -26,22 +26,24 @@ trait AuditFilter
         $sourceIds = [];
         $groupIds = [];
         $assigneeIds = [];
+        $cgtIds = [];
 
         foreach ($query as $activity) {
-            $this->collectIds($activity->old_values, $statusIds, $sourceIds, $groupIds, $assigneeIds);
-            $this->collectIds($activity->new_values, $statusIds, $sourceIds, $groupIds, $assigneeIds);
+            $this->collectIds($activity->old_values, $statusIds, $sourceIds, $groupIds, $assigneeIds, $cgtIds);
+            $this->collectIds($activity->new_values, $statusIds, $sourceIds, $groupIds, $assigneeIds, $cgtIds);
         }
 
         // Batch query the required data
         $statuses = CategoryGroupTag::whereIn('id', $statusIds)->get()->keyBy('id');
         $sources = CategoryGroupTag::whereIn('id', $sourceIds)->get()->keyBy('id');
         $groups = CategoryGroupTag::whereIn('id', $groupIds)->get()->keyBy('id');
+        $cgts = CategoryGroupTag::whereIn('id', $cgtIds)->get()->keyBy('id');
         $assignees = User::whereIn('id', $assigneeIds)->get()->keyBy('id');
 
         // Enhance the activities
-        return $query->map(function ($activity) use ($statuses, $sources, $groups, $assignees) {
-            $activity->old_values = $this->enhanceValues($activity->old_values, $statuses, $sources, $groups, $assignees);
-            $activity->new_values = $this->enhanceValues($activity->new_values, $statuses, $sources, $groups, $assignees);
+        return $query->map(function ($activity) use ($statuses, $sources, $groups, $assignees, $cgts) {
+            $activity->old_values = $this->enhanceValues($activity->old_values, $statuses, $sources, $groups, $assignees, $cgts);
+            $activity->new_values = $this->enhanceValues($activity->new_values, $statuses, $sources, $groups, $assignees, $cgts);
             return $activity;
         });
     }
@@ -49,7 +51,7 @@ trait AuditFilter
     /**
      * Collect all IDs from the values to batch fetch data.
      */
-    private function collectIds($values, &$statusIds, &$sourceIds, &$groupIds, &$assigneeIds)
+    private function collectIds($values, &$statusIds, &$sourceIds, &$groupIds, &$assigneeIds, &$cgtIds)
     {
         foreach ($values as $key => $value) {
             if ($key === 'assignees' && is_array($value)) {
@@ -60,6 +62,8 @@ trait AuditFilter
                 $sourceIds[] = $value;
             } elseif ($key === 'group_id') {
                 $groupIds[] = $value;
+            } elseif ($key === 'cgt_id') {
+                $cgtIds[] = $value;
             }
         }
     }
@@ -67,7 +71,7 @@ trait AuditFilter
     /**
      * Enhance values using preloaded data.
      */
-    private function enhanceValues($values, $statuses, $sources, $groups, $assignees)
+    private function enhanceValues($values, $statuses, $sources, $groups, $assignees, $cgts)
     {
         $enhanced = [];
         foreach ($values as $key => $value) {
@@ -79,6 +83,8 @@ trait AuditFilter
                 $enhanced['Source'] = isset($sources[$value]) ? ['name' => $sources[$value]->name] : $value;
             } elseif ($key === 'group_id') {
                 $enhanced['Group'] = isset($groups[$value]) ? ['name' => $groups[$value]->name] : $value;
+            } elseif ($key === 'cgt_id') {
+                $enhanced['Category'] = isset($groups[$value]) ? ['name' => $cgts[$value]->name] : $value;
             } else {
                 $enhanced[$key] = $value;
             }

@@ -189,6 +189,9 @@ class ClientService
             ->editColumn('created_at', function ($client) {
                 return Carbon::parse($client->created_at)->format('d M Y');
             })
+            ->editColumn('title', function ($client) use ($module) {
+                return "<a class='dt-link' href='" . route($this->tenantRoute . $module . '.view', $client->id) . "' target='_blank'>$client->title</a>";
+            })
             ->editColumn('category_name', function ($client) {
                 return "<span class='badge badge-pill bg-" . $client->category_color . "'>$client->category_name</span>";
             })
@@ -212,7 +215,7 @@ class ClientService
             ->editColumn('status', function ($client) {
                 return $this->renderStatusColumn($client);
             })
-            ->rawColumns(['actions', 'category_name', 'name', 'status']) // Include any HTML columns
+            ->rawColumns(['actions','title', 'category_name', 'name', 'status']) // Include any HTML columns
             ->make(true);
     }
 

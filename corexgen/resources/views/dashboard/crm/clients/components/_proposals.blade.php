@@ -1,6 +1,6 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h5 class="mb-0">Proposals Lists</h5>
-    <a href="{{ route(getPanelRoutes('proposals.create')) }}?type=lead&id={{$lead->id}}&refrer=leads.view" class="btn btn-primary">Create Proposal</a>
+    <a href="{{ route(getPanelRoutes('proposals.create')) }}?type=client&id={{$client->id}}&refrer=clients.view" class="btn btn-primary">Create Proposal</a>
 </div>
 
 <div class="timeline-wrapper">

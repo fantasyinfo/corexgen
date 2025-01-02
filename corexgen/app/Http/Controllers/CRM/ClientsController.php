@@ -12,6 +12,8 @@ use App\Models\CRM\CRMClients;
 use App\Repositories\ClientRepository;
 use App\Services\Csv\ClientsCsvRowProcessor;
 use App\Services\ClientService;
+use App\Services\ProposalService;
+use App\Traits\AuditFilter;
 use App\Traits\CategoryGroupTagsFilter;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
@@ -31,6 +33,7 @@ class ClientsController extends Controller
     use TenantFilter;
     use SubscriptionUsageFilter;
     use CategoryGroupTagsFilter;
+    use AuditFilter;
     //
     /**
      * Number of items per page for pagination
@@ -66,15 +69,18 @@ class ClientsController extends Controller
     protected $clientService;
 
     protected $customFieldService;
+    protected $proposalService;
 
     public function __construct(
         ClientRepository $clientRepository,
         ClientService $clientService,
+        ProposalService $proposalService,
         CustomFieldService $customFieldService
     ) {
         $this->clientRepository = $clientRepository;
         $this->clientService = $clientService;
         $this->customFieldService = $customFieldService;
+        $this->proposalService = $proposalService;
     }
 
 
@@ -207,6 +213,7 @@ class ClientsController extends Controller
         $this->tenantRoute = $this->getTenantRoute();
 
         // dd($request->all());
+      
 
         try {
 
@@ -227,6 +234,12 @@ class ClientsController extends Controller
                 $this->customFieldService->saveValues($client['client'], $validatedData);
             }
 
+               // kanban board return....
+               if ($request->has('from_view') && $request->input('from_view')) {
+                return redirect()
+                    ->back()
+                    ->with('success', 'Client updated successfully..');
+            }
 
             // If validation fails, it will throw an exception
             return redirect()
@@ -680,9 +693,72 @@ class ClientsController extends Controller
             );
         }
     }
-    public function view()
+    public function view($id)
     {
+        $query = CRMClients::query()->with([
+            'categoryGroupTag' => function ($query) {
+                $query->where('status', 'active')
+                    ->select('id', 'name', 'color') // Include the primary key 'id'
+                    ->where('relation_type', CATEGORY_GROUP_TAGS_RELATIONS['STATUS']['clients'])
+                    ->where('type', CATEGORY_GROUP_TAGS_TYPES['STATUS']['categories']);
+            },
+            'addresses' => function ($query) {
+                $query->select('addresses.id', 'addresses.street_address', 'addresses.postal_code', 'addresses.city_id', 'addresses.country_id')
+                    ->with([
+                        'city:id,name',
+                        'country:id,name'
+                    ])->withPivot('type');
+            },
+            'customFields'
+        ])->where('id', $id);
+        
+        $query = $this->applyTenantFilter($query, 'clients');
+        
+        $client = $query->firstOrFail();
+        
 
+        // custom fields
+
+        // custom fields
+        $customFields = collect();
+        $cfOldValues = collect();
+        if (!is_null(Auth::user()->company_id)) {
+            $customFields = $this->customFieldService->getFieldsForEntity(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['crmclients'], Auth::user()->company_id);
+
+            // fetch already existing values
+
+            $cfOldValues = $this->customFieldService->getValuesForEntity($client);
+        }
+
+        // fetch teams actvities
+        $activitesQuery = $this->getActivites(\App\Models\CRM\CRMClients::class, $id);
+        $activitesQuery = $this->applyTenantFilter($activitesQuery);
+
+
+        // category
+        $categoryQuery = $this->getCategoryGroupTags(CATEGORY_GROUP_TAGS_TYPES['KEY']['categories'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['clients']);
+        $categoryQuery = $this->applyTenantFilter($categoryQuery);
+        $categories = $categoryQuery->get();
+
+        // dd($categories->toArray());
+
+        // get proposals
+        $proposals = collect();
+        $proposals = $this->proposalService->getProposals(\App\Models\CRM\CRMClients::class, $id);
+
+
+        return view($this->getViewFilePath('view'), [
+            'title' => 'View Client',
+            'client' => $client,
+            'module' => PANEL_MODULES[$this->getPanelModule()]['clients'],
+            'cfOldValues' => $cfOldValues,
+            'customFields' => $customFields,
+            'activities' => $activitesQuery,
+            'countries' => Country::all(),
+            'permissions' => PermissionsHelper::getPermissionsArray('CLIENTS'),
+            'proposals' => $proposals,
+            'categories' => $categories
+        ]);
     }
     public function profile()
     {

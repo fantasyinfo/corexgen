@@ -1,7 +1,17 @@
 @extends('layout.app')
 
 @section('content')
- 
+    @php
+
+        $type = null;
+        $id = null;
+        $refrer = null;
+        if (isset($_GET['type']) && isset($_GET['id']) && isset($_GET['refrer'])) {
+            $type = trim($_GET['type']);
+            $id = trim($_GET['id']);
+            $refrer = trim($_GET['refrer']);
+        }
+    @endphp
     <div class="container-fluid">
         <div class="row">
             <div class="justify-content-md-center col-lg-9">
@@ -33,10 +43,10 @@
                                 <div class="col-lg-8">
                                     <select name="type" id="type" class="form-select">
                                         <option value="client" {{ old('type') == 'client' ? 'selected' : '' }}
-                                          >Client
+                                            {{ $type == 'client' ? 'selected' : '' }}>Client
                                         </option>
                                         <option value="lead" {{ old('type') == 'lead' ? 'selected' : '' }}
-                                           >Lead</option>
+                                            {{ $type == 'lead' ? 'selected' : '' }}>Lead</option>
                                     </select>
                                 </div>
                             </div>
@@ -61,7 +71,7 @@
                                             @endphp
                                             <option value="{{ $item->id }}"
                                                 {{ old('client_id') == $item->id ? 'selected' : '' }}
-                                               >{{ $nameAndEmail }}
+                                                {{ $id == $item->id ? 'selected' : '' }}>{{ $nameAndEmail }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -88,7 +98,7 @@
                                             @endphp
                                             <option value="{{ $item->id }}"
                                                 {{ old('lead_id') == $item->id ? 'selected' : '' }}
-                                             >{{ $nameAndEmail }}
+                                                {{ $id == $item->id ? 'selected' : '' }}>{{ $nameAndEmail }}
                                             </option>
                                         @endforeach
                                     </select>
