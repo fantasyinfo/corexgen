@@ -237,6 +237,50 @@ class CompanyService
             ];
         }
 
+        // products categories
+
+        $productsCategories = [
+            'warning' => 'Electronics',
+            'info' => 'Cloths',
+            'success' => 'Development',
+            'primary' => 'Designing'
+        ];
+
+        foreach ($productsCategories as $color => $cc) {
+            $insertArray[] = [
+                'name' => $cc,
+                'color' => $color, // Assign unique color
+                'relation_type' => CATEGORY_GROUP_TAGS_RELATIONS['KEY']['clients'],
+                'type' => CATEGORY_GROUP_TAGS_TYPES['KEY']['products_categories'],
+                'status' => 'active',
+                'company_id' => $companyid,
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        }
+
+          // products taxes
+
+          $productTaxes = [
+            'warning' => '5%',
+            'info' => '12%',
+            'success' => '18%',
+            'primary' => '28%'
+        ];
+
+        foreach ($productTaxes as $color => $cc) {
+            $insertArray[] = [
+                'name' => $cc,
+                'color' => $color, // Assign unique color
+                'relation_type' => CATEGORY_GROUP_TAGS_RELATIONS['KEY']['clients'],
+                'type' => CATEGORY_GROUP_TAGS_TYPES['KEY']['products_taxs'],
+                'status' => 'active',
+                'company_id' => $companyid,
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        }
+
         CategoryGroupTag::insert($insertArray);
     }
 

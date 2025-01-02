@@ -201,6 +201,9 @@
                                                                             case 'CRMProposals':
                                                                                 $type = 'Proposals';
                                                                                 break;
+                                                                            case 'CRMClients':
+                                                                                $type = 'Clients';
+                                                                                break;
                                                                             default:
                                                                                 $type = $type;
                                                                                 break;

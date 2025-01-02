@@ -188,6 +188,13 @@ PermissionsHelper::initializePermissions();
         'for' => 'company',
         'is_feature' => false,
     ],
+    PermissionsHelper::$plansPermissionsKeys['PRODUCTS_SERVICES'] => [
+        'name' => 'PRODUCTS_SERVICES',
+        'id' => PermissionsHelper::getParentPermissionId('105'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['PRODUCTS_SERVICES'],
+        'for' => 'company',
+        'is_feature' => true,
+    ],
 ]);
 
 // super panel menus
@@ -362,6 +369,15 @@ PermissionsHelper::initializePermissions();
             'Templates' => ['menu_url' => 'proposals.indexProposals', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PROPOSALS_TEMPLATES'], 'READ_ALL')],
         ]
     ],
+    'Products & Services' => [
+        'menu_icon' => 'fa-boxes',
+        'feature_type' => PermissionsHelper::$plansPermissionsKeys['PRODUCTS_SERVICES'], // this need to match the PLANS_FEATURES key
+        'permission_plan' => PermissionsHelper::$plansPermissionsKeys['PRODUCTS_SERVICES'],
+        'permission_id' => PermissionsHelper::getParentPermissionId('104'),
+        'children' => [
+            'Products & Sercices' => ['menu_url' => 'products_services.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PRODUCTS_SERVICES'], 'READ_ALL')],
+        ]
+    ],
     'Custom Fields' => [
         'menu_icon' => 'fa-plus-square',
         'feature_type' => PermissionsHelper::$plansPermissionsKeys['CUSTOM_FIELDS'], // this need to match the PLANS_FEATURES key
@@ -412,6 +428,11 @@ PermissionsHelper::initializePermissions();
         'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger', 'BANNED' => 'warning'],
     ],
     'LEADS' => [
+        'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE', 'BANNED'],
+        'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE', 'BANNED' => 'BANNED'],
+        'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger', 'BANNED' => 'warning'],
+    ],
+    'PRODUCTS_SERVICES' => [
         'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE', 'BANNED'],
         'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE', 'BANNED' => 'BANNED'],
         'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger', 'BANNED' => 'warning'],
@@ -488,6 +509,7 @@ PermissionsHelper::initializePermissions();
         'customfields' => 'customfields',
         'leads' => 'leads',
         'proposals' => 'proposals',
+        'products_services' => 'products_services',
 
     ]
 ]);
@@ -514,6 +536,7 @@ PermissionsHelper::initializePermissions();
     PermissionsHelper::$plansPermissionsKeys['CUSTOM_FIELDS'] => PermissionsHelper::$plansPermissionsKeys['CUSTOM_FIELDS'],
     PermissionsHelper::$plansPermissionsKeys['LEADS'] => PermissionsHelper::$plansPermissionsKeys['LEADS'],
     PermissionsHelper::$plansPermissionsKeys['PROPOSALS'] => PermissionsHelper::$plansPermissionsKeys['PROPOSALS'],
+    PermissionsHelper::$plansPermissionsKeys['PRODUCTS_SERVICES'] => PermissionsHelper::$plansPermissionsKeys['PRODUCTS_SERVICES'],
 ]);
 
 
@@ -932,8 +955,8 @@ PermissionsHelper::initializePermissions();
 
 // kyes must match the model name in lowercase
 !defined('CUSTOM_FIELDS_RELATION_TYPES') && define('CUSTOM_FIELDS_RELATION_TYPES', [
-    'KEYS' => ['crmclients' => 'crmclients', 'user' => 'user', 'crmleads' => 'crmleads'],
-    'VALUES' => ['crmclients' => 'Clients', 'user' => 'Users & Employees', 'crmleads' => 'Leads'],
+    'KEYS' => ['crmclients' => 'crmclients', 'user' => 'user', 'crmleads' => 'crmleads','products' => 'products'],
+    'VALUES' => ['crmclients' => 'Clients', 'user' => 'Users & Employees', 'crmleads' => 'Leads','products' => 'Products & Services'],
 ]);
 
 
@@ -944,7 +967,9 @@ PermissionsHelper::initializePermissions();
         'tags',
         'leads_groups',
         'leads_sources',
-        'leads_status'
+        'leads_status',
+        'products_categories',
+        'products_taxs'
     ],
     'STATUS' => [
         'categories' => 'Categories',
@@ -953,6 +978,8 @@ PermissionsHelper::initializePermissions();
         'leads_groups' => 'Leads Groups',
         'leads_sources' => 'Leads Sources',
         'leads_status' => 'Leads Status',
+        'products_categories' => 'Products Categories',
+        'products_taxs' => 'Products Tags',
     ],
     'KEY' => [
         'categories' => 'categories',
@@ -961,6 +988,8 @@ PermissionsHelper::initializePermissions();
         'leads_groups' => 'leads_groups',
         'leads_sources' => 'leads_sources',
         'leads_status' => 'leads_status',
+        'products_categories' => 'products_categories',
+        'products_taxs' => 'products_taxs',
     ],
 ]);
 
@@ -968,13 +997,16 @@ PermissionsHelper::initializePermissions();
     'TABLE_STATUS' => [
         'clients',
         'leads',
+        'products_services',
     ],
     'STATUS' => [
         'clients' => 'Clients',
         'leads' => 'Leads',
+        'products_services' => 'Products & Services',
     ],
     'KEY' => [
         'clients' => 'clients',
         'leads' => 'leads',
+        'products_services' => 'products_services',
     ],
 ]);
