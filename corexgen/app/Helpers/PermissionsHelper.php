@@ -26,6 +26,7 @@ class PermissionsHelper
         'SETTINGS_GENERAL' => 'SETTINGS_GENERAL',
         'SETTINGS_MAIL' => 'SETTINGS_MAIL',
         'SETTINGS_CRON' => 'SETTINGS_CRON',
+        'SETTINGS_ONEWORD' => 'SETTINGS_ONEWORD',
         'EVENTS_AUDIT_LOG' => 'EVENTS_AUDIT_LOG',
         'DOWNLOAD_BACKUP' => 'DOWNLOAD_BACKUP',
         'CLIENTS' => 'CLIENTS',
@@ -84,6 +85,7 @@ class PermissionsHelper
 
             self::$plansPermissionsKeys['SETTINGS_GENERAL'] => [1151 => 'READ', 1152 => 'READ_ALL', 1153 => 'UPDATE'],
             self::$plansPermissionsKeys['SETTINGS_MAIL'] => [1201 => 'READ', 1202 => 'READ_ALL', 1203 => 'UPDATE'],
+            self::$plansPermissionsKeys['SETTINGS_ONEWORD'] => [1204 => 'READ', 1205 => 'READ_ALL', 1206 => 'UPDATE'],
 
             self::$plansPermissionsKeys['EVENTS_AUDIT_LOG'] => [1251 => 'READ', 1252 => 'READ_ALL'],
 
@@ -123,6 +125,7 @@ class PermissionsHelper
             'SETTINGS' => 'SETTINGS',
             'SETTINGS_GENERAL' => 'SETTINGS_GENERAL',
             'SETTINGS_MAIL' => 'SETTINGS_MAIL',
+            'SETTINGS_ONEWORD' => 'SETTINGS_ONEWORD',
             'EVENTS_AUDIT_LOG' => 'EVENTS_AUDIT_LOG',
             'PLANUPGRADE' => 'PLANUPGRADE',
             'BULK_IMPORT_STATUS' => 'BULK_IMPORT_STATUS',

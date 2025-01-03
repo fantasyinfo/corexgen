@@ -82,6 +82,7 @@ class CompanyService
     {
         $this->generateGeneralSettingsForCompany($companyid);
         $this->generateMailSettingsForCompany($companyid);
+        $this->generatezOneWordSettingsForCompany($companyid);
         $this->generateCategoryGroupsTags($companyid);
     }
     public function generateGeneralSettingsForCompany($companyid)
@@ -141,6 +142,28 @@ class CompanyService
                 'placeholder' => $setting['placeholder'] ?? '',
                 'is_tenant' => @$setting['is_tenant'] ?? false,
                 'type' => 'Mail',
+                'updated_by' => Auth::id() ?? '1', // Fixed admin ID
+                'created_by' => Auth::id() ?? '1',
+            ]);
+        }
+    }
+    
+    public function generatezOneWordSettingsForCompany($companyid)
+    {
+        foreach (CRM_COMPANY_ONE_WORD_SETTINGS as $setting) {
+            // Create CRM setting
+            CRMSettings::create([
+                'key' => $setting['key'],
+                'value' => $setting['value'],
+                'is_media_setting' => $setting['is_media_setting'],
+                'media_id' => null,
+                'input_type' => $setting['input_type'],
+                'value_type' => $setting['value_type'],
+                'name' => $setting['name'],
+                'company_id' => $companyid,
+                'placeholder' => $setting['placeholder'] ?? '',
+                'is_tenant' => @$setting['is_tenant'] ?? false,
+                'type' => 'OneWord',
                 'updated_by' => Auth::id() ?? '1', // Fixed admin ID
                 'created_by' => Auth::id() ?? '1',
             ]);
@@ -262,6 +285,7 @@ class CompanyService
           // products taxes
 
           $productTaxes = [
+            'dark' => '0%',
             'warning' => '5%',
             'info' => '12%',
             'success' => '18%',

@@ -2,53 +2,15 @@
 
 @section('settings_content')
     <div class="container-fluid">
-        <h3 class="mb-4">General Settings</h3>
-        <form action="{{ route(getPanelRoutes('settings.general')) }}" method="POST" enctype="multipart/form-data">
+        <h3 class="mb-4">One Word Settings</h3>
+        <form action="{{ route(getPanelRoutes('settings.oneWord')) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
-            <input type="hidden" name="is_tenant" value="{{$is_tenant}}" />
+
   
-            @foreach ($general_settings as $key => $item)
-                @if (($is_tenant && $item['is_tenant'] == '1') || (!$is_tenant && $item['is_tenant'] == '0'))
-                    @if ($item['value'] === 'default')
-                        @switch($item['name'])
-                            @case('tenant_company_time_zone')
-                                @php
-                                    $item['value'] = $defaultSettings->timezone ?? 'default';
-                                @endphp 
-                            @break
-                            @case('tenant_company_currency_symbol')
-                                @php
-                                    $item['value'] = $defaultSettings->currency_symbol ?? '$';
-                                @endphp 
-                            @break
-                            @case('tenant_company_currency_code')
-                                @php
-                                    $item['value'] = $defaultSettings->currency_code ?? 'USD';
-                                @endphp 
-                            @break
-                            @case('client_company_time_zone')
-                                @php
-                                    $item['value'] = $defaultSettings->timezone ?? 'default';
-                                @endphp 
-                            @break
-                            @case('client_company_currency_symbol')
-                                @php
-                                    $item['value'] = $defaultSettings->currency_symbol ?? '$';
-                                @endphp 
-                            @break
-                            @case('client_company_currency_code')
-                                @php
-                                    $item['value'] = $defaultSettings->currency_code ?? 'USD';
-                                @endphp 
-                            @break
-                            @case('client_company_name')
-                                @php
-                                    $item['value'] = $company->name ?? 'default';
-                                @endphp 
-                            @break
-                        @endswitch
-                    @endif
+            @foreach ($oneWordSettings as $key => $item)
+              
+                   
 
                     @switch($item['input_type'])
                         @case('text')
@@ -113,7 +75,7 @@
                             </div>
                         @break
                     @endswitch
-                @endif
+            
             @endforeach
 
             <button type="submit" class="btn btn-primary">Save Changes</button>

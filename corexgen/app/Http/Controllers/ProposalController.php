@@ -15,6 +15,7 @@ use App\Models\CRM\CRMProposals;
 use App\Models\CRM\CRMRole;
 use App\Models\CRM\CRMSettings;
 use App\Models\CRM\CRMTemplates;
+use App\Services\ProductServicesService;
 use App\Services\UserService;
 use App\Traits\IsSMTPValid;
 use App\Traits\MediaTrait;
@@ -84,15 +85,18 @@ class ProposalController extends Controller
     protected $proposalService;
 
     protected $customFieldService;
+    protected $productServicesService;
 
     public function __construct(
         ProposalRepository $proposalRepository,
         ProposalService $proposalService,
+        ProductServicesService $productServicesService
 
 
     ) {
         $this->proposalRepository = $proposalRepository;
         $this->proposalService = $proposalService;
+        $this->productServicesService = $productServicesService;
 
     }
 
@@ -179,7 +183,7 @@ class ProposalController extends Controller
     public function store(ProposalRequest $request)
     {
 
-       
+
 
         $this->tenantRoute = $this->getTenantRoute();
 
@@ -192,7 +196,7 @@ class ProposalController extends Controller
             // update current usage
             $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['PROPOSALS']]), '+', '1');
 
-            
+
 
             return redirect()->route($this->tenantRoute . 'proposals.index')
                 ->with('success', 'Proposals created successfully.');
@@ -222,9 +226,9 @@ class ProposalController extends Controller
 
 
         // Fetch the last `_id` from the database
-        $lastId = CRMProposals::latest('id')->value('id');
+        $lastId = CRMProposals::where('company_id', Auth::user()->company_id)->latest('id')->value('id');
         $incrementedId = $lastId ? (int) filter_var($lastId, FILTER_SANITIZE_NUMBER_INT) + 1 : 1;
-        $defaultId = 'PRO-' . str_pad($incrementedId, 4, '0', STR_PAD_LEFT);
+        $defaultId = str_pad($incrementedId, 4, '0', STR_PAD_LEFT);
 
 
         return view($this->getViewFilePath('create'), [
@@ -233,6 +237,8 @@ class ProposalController extends Controller
             'clients' => $clients,
             'leads' => $leads,
             'lastId' => old('_id', $defaultId),
+            'products' => $this->productServicesService->getAllProducts(),
+            'tax' => $this->productServicesService->getProductTaxes()
         ]);
     }
 
@@ -264,6 +270,8 @@ class ProposalController extends Controller
             'templates' => $templates,
             'clients' => $clients,
             'leads' => $leads,
+            'products' => $this->productServicesService->getAllProducts(),
+            'tax' => $this->productServicesService->getProductTaxes()
 
         ]);
     }

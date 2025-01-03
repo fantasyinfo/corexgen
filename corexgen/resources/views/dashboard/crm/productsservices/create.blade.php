@@ -154,7 +154,7 @@
                                             <x-form-components.input-group-prepend-append type="number"
                                                 class="custom-class" prepend="{{ getSettingValue('Currency Symbol') }}"
                                                 append="{{ getSettingValue('Currency Code') }}" id="nameName"
-                                                name="rate" step="0.001" placeholder="{{ __('Product price...') }}"
+                                                name="rate" step="0.001" placeholder="{{ __('Product price.. or per hour cost.') }}"
                                                 value="{{ old('rate') }}" required />
 
                                         </div>
@@ -169,7 +169,7 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="number" class="custom-class"
-                                                id="nameName" name="unit" placeholder="{{ __('Product qty...') }}"
+                                                id="nameName" name="unit" placeholder="{{ __('Product qty... or 1 hour for service') }}"
                                                 value="{{ old('unit') }}" required />
 
                                         </div>

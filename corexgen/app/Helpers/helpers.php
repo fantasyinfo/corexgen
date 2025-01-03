@@ -400,35 +400,75 @@ function getComponentsDirFilePath($filename)
 
 
 
-if (!function_exists('getSettingValue')) {
 
-    /**
-     * Retrieve the value of a setting by key.
-     *
-     * @param string $key The key of the setting.
-     * @return mixed|null The value of the setting or null if not found.
-     */
-    function getSettingValue(string $key, string $isTenantSetting = '0')
-    {
+const SETTINGS_CACHE_KEY = 'crm_settings';
+const SETTINGS_CACHE_TTL = 3600; // 1 hour in seconds
 
-        $query = CRMSettings::where('key', $key);
+/**
+ * Load all settings into cache
+ *
+ * @return array
+ */
+function loadAllSettings(): array
+{
+    $settings = [];
 
-        if ($user = Auth::user()) {
-            if ($user->is_tenant) {
-                $query->where('is_tenant', '1');
-            } elseif (!is_null($user->company_id)) {
-                if ($isTenantSetting == '1') {
-                    $query->where('is_tenant', 1);
-                } else {
+    if ($user = Auth::user()) {
+        $query = CRMSettings::query();
 
-                    $query->where('company_id', $user->company_id);
-                }
-            }
+        if ($user->is_tenant) {
+            $query->where('is_tenant', '1');
+        } elseif (!is_null($user->company_id)) {
+            $query->where(function ($q) use ($user) {
+                $q->where('company_id', $user->company_id)
+                    ->orWhere('is_tenant', '1');
+            });
         }
 
-        return $query->value('value'); // Return the value column directly
-
+        $settings = $query->get(['key', 'value', 'is_tenant'])
+            ->groupBy('key')
+            ->map(function ($group) {
+                // If multiple settings exist, prioritize company-specific over tenant
+                return $group->count() > 1
+                    ? $group->where('is_tenant', '0')->first()->value ?? $group->first()->value
+                    : $group->first()->value;
+            })
+            ->toArray();
     }
+
+    Cache::put(SETTINGS_CACHE_KEY . '_' . ($user->company_id ?? 'tenant'), $settings, SETTINGS_CACHE_TTL);
+
+    return $settings;
+}
+
+/**
+ * Retrieve the value of a setting by key using cache
+ *
+ * @param string $key The key of the setting
+ * @param string $isTenantSetting Whether to force tenant setting retrieval
+ * @return mixed|null The value of the setting or null if not found
+ */
+function getSettingValue(string $key, string $isTenantSetting = '0')
+{
+    $user = Auth::user();
+    $cacheKey = SETTINGS_CACHE_KEY . '_' . ($user->company_id ?? 'tenant');
+
+    $settings = Cache::remember($cacheKey, SETTINGS_CACHE_TTL, function () {
+        return loadAllSettings();
+    });
+
+    return $settings[$key] ?? null;
+}
+
+/**
+ * Clear settings cache
+ *
+ * @return void
+ */
+function clearSettingsCache(): void
+{
+    $user = Auth::user();
+    Cache::forget(SETTINGS_CACHE_KEY . '_' . ($user->company_id ?? 'tenant'));
 }
 
 

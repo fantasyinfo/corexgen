@@ -35,6 +35,15 @@ class ProposalEditRequest extends FormRequest
             'creating_date' => 'required|date',
             'valid_date' => 'nullable|date|after_or_equal:today',
             'template_id' => 'nullable|exists:templates,id',
+
+
+            'product_title.*' => 'required|string',
+            'product_description.*' => 'nullable|string',
+            'product_qty.*' => 'required|numeric|min:1',
+            'product_rate.*' => 'required|numeric|min:0',
+            'product_tax.*' => 'nullable|string',
+            'discount' => 'nullable|numeric',
+            'adjustment' => 'nullable|numeric',
         ];
     }
 }

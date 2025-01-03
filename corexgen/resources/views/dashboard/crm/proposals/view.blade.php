@@ -106,32 +106,32 @@
                     <div class="col-lg-8">
                         <div class="mb-4">
                             <span class="status-badge bg-secondary text-dark mb-3">
-                                {{ $proposal->_prefix }}{{ $proposal->_id }}
+                                {{ $proposal?->_prefix }}{{ $proposal?->_id }}
                             </span>
-                            <h1 class="display-4 mb-2">{{ $proposal->title }}</h1>
-                            <p class="lead mb-0">Prepared for {{ $proposal->typable->title }}.
-                                {{ $proposal->typable->first_name }} {{ $proposal->typable->last_name }}</p>
+                            <h1 class="display-4 mb-2">{{ $proposal?->title }}</h1>
+                            <p class="lead mb-0">Prepared for {{ $proposal?->typable?->title }}.
+                                {{ $proposal?->typable?->first_name }} {{ $proposal?->typable?->last_name }}</p>
                         </div>
 
                         <div class="row mt-5">
                             <div class="col-md-6">
                                 <small class="text-light opacity-75">Prepared By</small>
-                                <h4>{{ $proposal->company->name }}</h4>
-                                <p class="mb-0">{{ $proposal->company->addresses->street_address }}</p>
-                                <p class="mb-0">{{ $proposal->company->addresses->city->name }},
-                                    {{ $proposal->company->addresses->country->name }}</p>
-                                <p class="mb-0">{{ $proposal->company->phone }}</p>
+                                <h4>{{ $proposal?->company?->name }}</h4>
+                                <p class="mb-0">{{ $proposal?->company?->addresses?->street_address }}</p>
+                                <p class="mb-0">{{ $proposal?->company?->addresses?->city?->name }},
+                                    {{ $proposal?->company->addresses?->country?->name }}</p>
+                                <p class="mb-0">{{ $proposal?->company?->phone }}</p>
                             </div>
                             <div class="col-md-6">
                                 <small class="text-light opacity-75">Valid Until</small>
-                                <h4>{{ $proposal->valid_date ? \Carbon\Carbon::parse($proposal->valid_date)->format('F d, Y') : 'Not Specified' }}
+                                <h4>{{ $proposal?->valid_date ? \Carbon\Carbon::parse($proposal?->valid_date)->format('F d, Y') : 'Not Specified' }}
                                 </h4>
                                 <p class="mb-0">Created:
-                                    {{ \Carbon\Carbon::parse($proposal->creating_date)->format('F d, Y') }}</p>
+                                    {{ \Carbon\Carbon::parse($proposal?->creating_date)->format('F d, Y') }}</p>
 
 
                                 <p class="mb-3">Status: <span
-                                        class="badge bg-{{ CRM_STATUS_TYPES['PROPOSALS']['BT_CLASSES'][$proposal->status] }} ms-2">{{ $proposal->status }}</span>
+                                        class="badge bg-{{ CRM_STATUS_TYPES['PROPOSALS']['BT_CLASSES'][$proposal?->status] }} ms-2">{{ $proposal?->status }}</span>
                                 </p>
 
                             </div>
@@ -146,13 +146,146 @@
                 <section class="mb-5">
 
                     <div class="row">
-                        @if (!is_null(trim($proposal?->template?->template_details)))
+                
+                        @if (!empty($proposal?->product_details) && $proposal?->product_details != NULL)
+                            @php
+                                $details = json_decode($proposal->product_details, true);
+                                $products = $details['products'] ?? [];
+                                $additionalFields = $details['additional_fields'] ?? [];
+                            @endphp
+
+                            <div class="card mb-4">
+                                <div class="card-header table-bg">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-file-invoice me-2"></i>
+                                        Proposal Details
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-hover">
+                                            <thead class="table-primary">
+                                                <tr>
+                                                    <th>Title</th>
+                                                    <th>Description</th>
+                                                    <th class="text-center">Qty</th>
+                                                    <th class="text-end">Rate</th>
+                                                    <th class="text-end">Tax</th>
+                                                    <th class="text-end">Amount</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($products as $product)
+                                                    @php
+                                                        $qty = floatval($product['qty']);
+                                                        $rate = floatval($product['rate']);
+                                                        $tax = floatval($product['tax']);
+                                                        $amount = $qty * $rate;
+                                                        $taxAmount = ($amount * $tax) / 100;
+                                                    @endphp
+                                                    <tr>
+                                                        <td>
+                                                            <span class="fw-medium">{{ $product['title'] }}</span>
+                                                        </td>
+                                                        <td>
+                                                            <small class="text-muted">{{ $product['description'] }}</small>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <span class="badge bg-light text-dark">
+                                                                {{ number_format($qty) }}
+                                                            </span>
+                                                        </td>
+                                                        <td class="text-end">
+                                                            {{ number_format($rate, 2) }}
+                                                        </td>
+                                                        <td class="text-end">
+                                                            <span class="text-muted">
+                                                                {{ number_format($tax, 1) }}%
+                                                            </span>
+                                                        </td>
+                                                        <td class="text-end">
+                                                            {{ number_format($amount, 2) }}
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                            <tfoot class="table-bg">
+                                                @php
+                                                    $subTotal = array_reduce(
+                                                        $products,
+                                                        function ($carry, $product) {
+                                                            return $carry +
+                                                                floatval($product['qty']) * floatval($product['rate']);
+                                                        },
+                                                        0,
+                                                    );
+
+                                                    $totalTax = array_reduce(
+                                                        $products,
+                                                        function ($carry, $product) {
+                                                            $amount =
+                                                                floatval($product['qty']) * floatval($product['rate']);
+                                                            return $carry + ($amount * floatval($product['tax'])) / 100;
+                                                        },
+                                                        0,
+                                                    );
+
+                                                    $discount = floatval($additionalFields['discount'] ?? 0);
+                                                    $discountAmount = ($subTotal * $discount) / 100;
+
+                                                    $adjustment = floatval($additionalFields['adjustment'] ?? 0);
+                                                    $total = $subTotal - $discountAmount + $totalTax + $adjustment;
+                                                @endphp
+
+                                                <tr>
+                                                    <td colspan="5" class="text-end">Sub Total:</td>
+                                                    <td class="text-end">{{ number_format($subTotal, 2) }}</td>
+                                                </tr>
+                                                @if ($discount > 0)
+                                                    <tr>
+                                                        <td colspan="5" class="text-end text-danger">
+                                                            Discount ({{ number_format($discount, 1) }}%):
+                                                        </td>
+                                                        <td class="text-end text-danger">
+                                                            -{{ number_format($discountAmount, 2) }}
+                                                        </td>
+                                                    </tr>
+                                                @endif
+                                                @if ($totalTax > 0)
+                                                    <tr>
+                                                        <td colspan="5" class="text-end">Tax:</td>
+                                                        <td class="text-end">{{ number_format($totalTax, 2) }}</td>
+                                                    </tr>
+                                                @endif
+                                                @if ($adjustment != 0)
+                                                    <tr>
+                                                        <td colspan="5"
+                                                            class="text-end {{ $adjustment < 0 ? 'text-danger' : 'text-success' }}">
+                                                            Adjustment:
+                                                        </td>
+                                                        <td
+                                                            class="text-end {{ $adjustment < 0 ? 'text-danger' : 'text-success' }}">
+                                                            {{ $adjustment > 0 ? '+' : '' }}{{ number_format($adjustment, 2) }}
+                                                        </td>
+                                                    </tr>
+                                                @endif
+                                                <tr class="fw-bold">
+                                                    <td colspan="5" class="text-end">Total:</td>
+                                                    <td class="text-end">{{ number_format($total, 2) }}</td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                        @if (!is_null(trim($proposal?->template?->template_details)) && $proposal?->template?->template_details != NULL)
                             <h2 class="section-title">Executive Summary</h2>
                             <p class="lead">
                                 {!! $proposal?->template?->template_details !!}
                             </p>
                         @endif
-                        @if (!is_null(trim($proposal?->details)))
+                        @if (!is_null(trim($proposal?->details)) && $proposal?->details != NULL)
                             <h3 class="mt-3">Extra Details</h3>
                             <p>
                                 {!! $proposal?->details !!}
@@ -164,20 +297,20 @@
 
 
                 <!-- Action Buttons -->
-         
-                    <div class="d-flex justify-content-end mt-5 pt-4 border-top">
-                        <button class="btn btn-outline-secondary me-2" onclick="printProposal()">
-                            <i class="bi bi-download me-2"></i>Download PDF
-                        </button>
-                        @if ($proposal->status !== 'ACCEPTED')
-                        <button class="btn btn-primary" onclick="sendProposal('{{ $proposal->id }}')">
+
+                <div class="d-flex justify-content-end mt-5 pt-4 border-top">
+                    <button class="btn btn-outline-secondary me-2" onclick="printProposal()">
+                        <i class="bi bi-download me-2"></i>Download PDF
+                    </button>
+                    @if ($proposal?->status !== 'ACCEPTED')
+                        <button class="btn btn-primary" onclick="sendProposal('{{ $proposal?->id }}')">
                             <i class="bi bi-send me-2"></i>Send Proposal
                         </button>
-                        @endif
-                    </div>
-           
+                    @endif
+                </div>
 
-                @if ($proposal->status === 'ACCEPTED')
+
+                @if ($proposal?->status === 'ACCEPTED')
                     <div class="container mt-4">
                         <div class="card shadow-sm">
                             <div class="card-header bg-primary text-white">
@@ -194,18 +327,18 @@
                                                         <tr>
                                                             <td class="text-muted" style="width: 140px;">Name:</td>
                                                             <td class="font-weight-bold">
-                                                                {{ $proposal->accepted_details['first_name'] }}
-                                                                {{ $proposal->accepted_details['last_name'] }}</td>
+                                                                {{ $proposal?->accepted_details['first_name'] }}
+                                                                {{ $proposal?->accepted_details['last_name'] }}</td>
                                                         </tr>
                                                         <tr>
                                                             <td class="text-muted">Email:</td>
                                                             <td class="font-weight-bold">
-                                                                {{ $proposal->accepted_details['email'] }}</td>
+                                                                {{ $proposal?->accepted_details['email'] }}</td>
                                                         </tr>
                                                         <tr>
                                                             <td class="text-muted">Accepted On:</td>
                                                             <td class="font-weight-bold">
-                                                                {{ \Carbon\Carbon::parse($proposal->accepted_details['accepted_at'])->format('M d, Y h:i A') }}
+                                                                {{ \Carbon\Carbon::parse($proposal?->accepted_details['accepted_at'])->format('M d, Y h:i A') }}
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -217,7 +350,7 @@
                                         <div class="mb-4">
                                             <h5 class="text-muted mb-3">Digital Signature</h5>
                                             <div class="border rounded p-3 bg-light">
-                                                <img src="{{ $proposal->accepted_details['signature'] }}"
+                                                <img src="{{ $proposal?->accepted_details['signature'] }}"
                                                     alt="Digital Signature" class="img-fluid" style="max-height: 150px;">
                                             </div>
                                         </div>

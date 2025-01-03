@@ -28,7 +28,7 @@ class ProductServicesRepository
                 fn($q) => $q->where('title', 'LIKE', "%{$request->title}%")
             )
             ->when(
-                $request->filled('type'),
+                $request->filled('type') && $request->type != '0',
                 fn($q) => $q->where('type', "$request->type")
             )
             ->when(

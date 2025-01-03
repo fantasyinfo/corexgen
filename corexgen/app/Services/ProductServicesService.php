@@ -100,6 +100,11 @@ class ProductServicesService
         return $taxQuery->get();
     }
 
+    public function getAllProducts()
+    {
+        return $this->applyTenantFilter(ProductsServices::query())->get();
+    }
+
     public function getDatatablesResponse($request)
     {
         $this->tenantRoute = $this->getTenantRoute();
