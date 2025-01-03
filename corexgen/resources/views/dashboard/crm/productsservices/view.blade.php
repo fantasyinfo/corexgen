@@ -54,7 +54,7 @@
                                 <span class="text-success">{{ getSettingValue('Currency Symbol') }}</span>
                                 {{ number_format($product?->rate, 2) }} <span
                                     class="text-muted text-sm">{{ getSettingValue('Currency Code') }}</span> /
-                                {{ $product?->unit }} Qty
+                                {{ $product?->unit }} {{$product?->type == 'Service' ? 'Hr' : 'Qty'}}
                             </h2>
                             <span class="badge bg-primary">
 

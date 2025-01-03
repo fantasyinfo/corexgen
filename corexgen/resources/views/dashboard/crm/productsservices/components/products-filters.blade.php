@@ -21,6 +21,7 @@
                         {{ __('products.Product Type') }}
                     </x-form-components.input-label>
                     <select name="type" id="type" class="form-select"  data-filter="type">
+                        <option value="0" select</option>
                         <option value="Product" {{ request('type') == 'Product' ? 'selected' : '' }}
                             {{ $type == 'Product' ? 'selected' : '' }}>Product
                         </option>

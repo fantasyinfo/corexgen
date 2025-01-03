@@ -130,6 +130,13 @@ PermissionsHelper::initializePermissions();
         'for' => 'tenant',
         'is_feature' => false
     ],
+    PermissionsHelper::$plansPermissionsKeys['SETTINGS_ONEWORD'] => [
+        'name' => 'SETTINGS_ONEWORD',
+        'id' => PermissionsHelper::getParentPermissionId('20'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['SETTINGS_ONEWORD'],
+        'for' => 'company',
+        'is_feature' => false
+    ],
     PermissionsHelper::$plansPermissionsKeys['EVENTS_AUDIT_LOG'] => [
         'name' => 'EVENTS_AUDIT_LOG',
         'id' => PermissionsHelper::getParentPermissionId('16'),
@@ -300,6 +307,7 @@ PermissionsHelper::initializePermissions();
         'children' => [
             'General' => ['menu_url' => 'settings.general', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS'], 'READ')],
             'Mail' => ['menu_url' => 'settings.mail', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_MAIL'], 'READ')],
+            'One Word' => ['menu_url' => 'settings.oneWord', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_ONEWORD'], 'READ')],
         ]
     ],
     'Roles & Permissions' => [
@@ -423,14 +431,14 @@ PermissionsHelper::initializePermissions();
         'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger', 'BANNED' => 'warning'],
     ],
     'CLIENTS' => [
-        'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE', ],
+        'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE',],
         'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE',],
-        'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger', ],
+        'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger',],
     ],
     'LEADS' => [
         'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE',],
         'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE',],
-        'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger', ],
+        'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger',],
     ],
     'PRODUCTS_SERVICES' => [
         'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE'],
@@ -438,9 +446,9 @@ PermissionsHelper::initializePermissions();
         'BT_CLASSES' => ['ACTIVE' => 'success', 'DEACTIVE' => 'danger'],
     ],
     'PROPOSALS' => [
-        'TABLE_STATUS' => ['DRAFT', 'SENT', 'OPEN', 'DECLINED', 'ACCEPTED', 'EXPIRED','REVISED'],
-        'STATUS' => ['DRAFT' => 'DRAFT', 'SENT' => 'SENT', 'OPEN' => 'OPEN', 'DECLINED' => 'DECLINED', 'ACCEPTED' => 'ACCEPTED', 'EXPIRED' => 'EXPIRED','REVISED' => 'REVISED'],
-        'BT_CLASSES' => ['DRAFT' => 'dark', 'SENT' => 'info', 'OPEN' => 'light', 'ACCEPTED' => 'success', 'DECLINED' => 'danger', 'EXPIRED' => 'warning','REVISED' => 'info'],
+        'TABLE_STATUS' => ['DRAFT', 'SENT', 'OPEN', 'DECLINED', 'ACCEPTED', 'EXPIRED', 'REVISED'],
+        'STATUS' => ['DRAFT' => 'DRAFT', 'SENT' => 'SENT', 'OPEN' => 'OPEN', 'DECLINED' => 'DECLINED', 'ACCEPTED' => 'ACCEPTED', 'EXPIRED' => 'EXPIRED', 'REVISED' => 'REVISED'],
+        'BT_CLASSES' => ['DRAFT' => 'dark', 'SENT' => 'info', 'OPEN' => 'light', 'ACCEPTED' => 'success', 'DECLINED' => 'danger', 'EXPIRED' => 'warning', 'REVISED' => 'info'],
     ],
     'CRM_ROLES' => [
         'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE'],
@@ -583,6 +591,12 @@ PermissionsHelper::initializePermissions();
         'link' => 'cron',
         'icon' => 'fa-hourglass-half',
         'for' => 'tenant',
+    ],
+    'One Word' => [
+        'name' => 'One Word',
+        'link' => 'oneWord',
+        'icon' => 'fa-file-word',
+        'for' => 'company',
     ]
 ]);
 
@@ -855,7 +869,7 @@ PermissionsHelper::initializePermissions();
         'media_id' => null,
         'value_type' => 'string',
         'input_type' => 'text',
-        'is_tenant' => true,
+        'is_tenant' => false,
         'placeholder' => 'smtp',
         'name' => 'client_mail_provider'
     ],
@@ -866,7 +880,7 @@ PermissionsHelper::initializePermissions();
         'media_id' => null,
         'value_type' => 'string',
         'input_type' => 'text',
-        'is_tenant' => true,
+        'is_tenant' => false,
         'placeholder' => 'smtp.gmail.com',
         'name' => 'client_mail_host'
     ],
@@ -877,7 +891,7 @@ PermissionsHelper::initializePermissions();
         'media_id' => null,
         'value_type' => 'string',
         'input_type' => 'number',
-        'is_tenant' => true,
+        'is_tenant' => false,
         'placeholder' => '25,465,587',
         'name' => 'client_mail_port'
     ],
@@ -888,7 +902,7 @@ PermissionsHelper::initializePermissions();
         'media_id' => null,
         'value_type' => 'string',
         'input_type' => 'text',
-        'is_tenant' => true,
+        'is_tenant' => false,
         'placeholder' => 'admin / admin@gmail.com',
         'name' => 'client_mail_username'
     ],
@@ -899,7 +913,7 @@ PermissionsHelper::initializePermissions();
         'media_id' => null,
         'value_type' => 'string',
         'input_type' => 'password',
-        'is_tenant' => true,
+        'is_tenant' => false,
         'placeholder' => 'admin / admin@gmail.com',
         'name' => 'client_mail_password'
     ],
@@ -910,7 +924,7 @@ PermissionsHelper::initializePermissions();
         'media_id' => null,
         'value_type' => 'string',
         'input_type' => 'dropdown',
-        'is_tenant' => true,
+        'is_tenant' => false,
         'placeholder' => 'SSL / TLS / No / None',
         'name' => 'client_mail_encryption'
     ],
@@ -921,7 +935,7 @@ PermissionsHelper::initializePermissions();
         'media_id' => null,
         'value_type' => 'string',
         'input_type' => 'email',
-        'is_tenant' => true,
+        'is_tenant' => false,
         'placeholder' => 'sales@gmail.com',
         'name' => 'client_mail_from_address'
     ],
@@ -932,11 +946,69 @@ PermissionsHelper::initializePermissions();
         'media_id' => null,
         'value_type' => 'string',
         'input_type' => 'text',
-        'is_tenant' => true,
+        'is_tenant' => false,
         'placeholder' => 'Josh Doe',
         'name' => 'client_mail_from_name'
     ],
 ]);
+
+
+// One Word Settings
+
+!defined('CRM_COMPANY_ONE_WORD_SETTINGS') && define('CRM_COMPANY_ONE_WORD_SETTINGS', [
+
+    'PROPOSAL_PREFIX' => [
+        'key' => 'Proposal Prefix',
+        'value' => 'PRO',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'text',
+        'is_tenant' => false,
+        'placeholder' => 'PRO',
+        'name' => 'client_proposal_prefix'
+    ],
+    'CONTRACT_PREFIX' => [
+        'key' => 'Contract Prefix',
+        'value' => 'CONT',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'text',
+        'is_tenant' => false,
+        'placeholder' => 'CONT',
+        'name' => 'client_contract_prefix'
+    ],
+    'ESTIMATE_PREFIX' => [
+        'key' => 'Estimate Prefix',
+        'value' => 'EST',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'text',
+        'is_tenant' => false,
+        'placeholder' => 'EST',
+        'name' => 'client_estimate_prefix'
+    ],
+    'INVOICE_PREFIX' => [
+        'key' => 'Invoice Prefix',
+        'value' => 'INV',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'text',
+        'is_tenant' => false,
+        'placeholder' => 'INV',
+        'name' => 'client_invoice_prefix'
+    ],
+
+]);
+
+
+
+
+
+
 
 
 !defined('CUSTOM_FIELDS_INPUT_TYPES') && define('CUSTOM_FIELDS_INPUT_TYPES', [
@@ -955,8 +1027,8 @@ PermissionsHelper::initializePermissions();
 
 // kyes must match the model name in lowercase
 !defined('CUSTOM_FIELDS_RELATION_TYPES') && define('CUSTOM_FIELDS_RELATION_TYPES', [
-    'KEYS' => ['crmclients' => 'crmclients', 'user' => 'user', 'crmleads' => 'crmleads','productsservices' => 'productsservices'],
-    'VALUES' => ['crmclients' => 'Clients', 'user' => 'Users & Employees', 'crmleads' => 'Leads','productsservices' => 'Products & Services'],
+    'KEYS' => ['crmclients' => 'crmclients', 'user' => 'user', 'crmleads' => 'crmleads', 'productsservices' => 'productsservices'],
+    'VALUES' => ['crmclients' => 'Clients', 'user' => 'Users & Employees', 'crmleads' => 'Leads', 'productsservices' => 'Products & Services'],
 ]);
 
 

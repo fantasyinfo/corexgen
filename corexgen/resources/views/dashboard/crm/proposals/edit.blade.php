@@ -8,7 +8,7 @@
 
     <div class="container-fluid">
         <div class="row">
-            <div class="justify-content-md-center col-lg-9">
+            <div class="justify-content-md-center col-lg-12">
                 <div class="card stretch stretch-full">
                     <form id="proposalsFieldsForm" action="{{ route(getPanelRoutes('proposals.update')) }}" method="POST">
                         @csrf
@@ -125,7 +125,9 @@
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
-                                    <x-form-components.input-group type="text" class="custom-class" id="_id"
+                                    <x-form-components.input-group-prepend-append
+                                    prepend="{{getSettingValue('Proposal Prefix')}}-"
+                                    append="..." type="text" class="custom-class" id="_id"
                                         name="_id" placeholder="{{ __('0001') }}" disabled="true"
                                         value="{{ old('_id', $proposal->_id) }}" required />
                                 </div>
@@ -216,6 +218,7 @@
                                         name="valid_date" value="{{ old('valid_date', $proposal->valid_date) }}" />
                                 </div>
                             </div>
+                            <hr>
                             <div class="row mb-4 align-items-center">
 
 
@@ -230,6 +233,8 @@
 
                             </div>
 
+                            <hr>
+                            @include('dashboard.crm.proposals.components._itemUpdate')
                         </div>
                     </form>
                 </div>

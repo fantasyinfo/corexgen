@@ -375,7 +375,7 @@ class SettingsController extends Controller
                 ]);
 
                 if ($isValid['status']) {
-                    return response()->json(['success' => false, 'message' => 'SMTP settings are invalid.' . $isValid['error']]);
+                    return response()->json(['success' => true, 'message' => 'SMTP settings are valid.']);
                 }
 
             } else {
@@ -447,5 +447,59 @@ class SettingsController extends Controller
             'module' => PANEL_MODULES[$this->getPanelModule()]['settings'],
         ]);
     }
+
+    public function oneWord()
+    {
+        $this->tenantRoute = $this->getTenantRoute();
+
+        $oneWordSettings = $this->applyTenantFilter(CRMSettings::where('type', 'OneWord'))->get()->toArray();
+
+
+        return view($this->getViewFilePath('oneWord'), [
+            'title' => 'One Word Settings',
+            'permissions' => PermissionsHelper::getPermissionsArray('SETTINGS_ONEWORD'),
+            'module' => PANEL_MODULES[$this->getPanelModule()]['settings'],
+            'oneWordSettings' => $oneWordSettings
+        ]);
+    }
+
+    public function oneWordUpdate(Request $request)
+    {
+        $validatedData = $request->validate([
+            'client_proposal_prefix' => 'required|string|max:20',
+            'client_contract_prefix' => 'required|string|max:20',
+            'client_estimate_prefix' => 'required|string|max:20',
+            'client_invoice_prefix' => 'required|string|max:20',
+        ]);
+
+        $settings = [
+            'client_proposal_prefix' => $request->input('client_proposal_prefix'),
+            'client_contract_prefix' => $request->input('client_contract_prefix'),
+            'client_estimate_prefix' => $request->input('client_estimate_prefix'),
+            'client_invoice_prefix' => $request->input('client_invoice_prefix'),
+        ];
+
+        $companyId = Auth::user()->company_id;
+
+        $existingSettings = CRMSettings::where('company_id', $companyId)
+            ->whereIn('name', array_keys($settings))
+            ->get()
+            ->keyBy('name');
+
+        $updatedSettings = [];
+        foreach ($settings as $key => $value) {
+            if (isset($existingSettings[$key])) {
+                $existingSettings[$key]->update(['value' => $value]);
+                $updatedSettings[] = $key;
+            }
+        }
+
+        if (count($updatedSettings) > 0) {
+            return redirect()->back()->with('success', 'Settings updated: ' . implode(', ', $updatedSettings));
+        } else {
+            return redirect()->back()->withErrors('No settings were updated.');
+        }
+    }
+
 
 }

@@ -11,14 +11,17 @@
             $id = trim($_GET['id']);
             $refrer = trim($_GET['refrer']);
         }
+
+        // prePrintR($tax->toArray());
+
     @endphp
     <div class="container-fluid">
         <div class="row">
-            <div class="justify-content-md-center col-lg-9">
+            <div class="justify-content-md-center col-lg-12">
                 <div class="card stretch stretch-full">
                     <form id="proposalsFieldsForm" action="{{ route(getPanelRoutes('proposals.store')) }}" method="POST">
                         @csrf
-                      
+
                         <div class="card-body general-info">
                             <div class="mb-5 d-flex align-items-center justify-content-between">
                                 <p class="fw-bold mb-0 me-4">
@@ -114,9 +117,11 @@
                                 </div>
                                 <div class="col-lg-8">
                                     <x-form-components.input-group type="text" class="custom-class" id="_prefix"
-                                        name="_prefix" placeholder="{{ __('PRO-') }}"
-                                        value="{{ old('_prefix', 'PRO-') }}" required oninput="updateIdField()" />
+                                        name="_prefix" placeholder="{{ getSettingValue('Proposal Prefix') }}"
+                                        value="{{ old('_prefix', getSettingValue('Proposal Prefix')) }}" disabled />
                                 </div>
+                                <p class="offset-lg-4 font-12 my-2 text-secondary"> Can be modify under one word settings.
+                                </p>
 
                             </div>
                             <div class="row mb-4 align-items-center">
@@ -126,9 +131,10 @@
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
-                                    <x-form-components.input-group type="text" class="custom-class" id="_id"
-                                        name="_id" placeholder="{{ __('0001') }}" value="{{ old('_id', $lastId) }}"
-                                        required />
+                                    <x-form-components.input-group-prepend-append
+                                        prepend="{{ getSettingValue('Proposal Prefix') }}-" append="..." type="text"
+                                        class="custom-class" id="_id" name="_id"
+                                        placeholder="{{ __('0001') }}" value="{{ old('_id', $lastId) }}" required />
                                 </div>
                                 <p class="offset-lg-4 font-12 my-2 text-secondary">
                                     <span class="text-success"> Auto-Increment (Last ID + 1)</span> by default. Can be
@@ -159,13 +165,9 @@
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
-                                    <x-form-components.input-group-prepend-append 
-                                    type="number" class="custom-class"
-                                        id="value"
-                                        step="0.001"
-                                        prepend="{{ getSettingValue('Currency Symbol') }}"
-                                        append="{{ getSettingValue('Currency Code') }}"
-                                         name="value"
+                                    <x-form-components.input-group-prepend-append type="number" class="custom-class"
+                                        id="value" step="0.001" prepend="{{ getSettingValue('Currency Symbol') }}"
+                                        append="{{ getSettingValue('Currency Code') }}" name="value"
                                         placeholder="{{ __('99999') }}" value="{{ old('value') }}" />
 
                                 </div>
@@ -217,6 +219,13 @@
                                         name="valid_date" value="{{ old('valid_date') }}" />
                                 </div>
                             </div>
+
+
+                            <hr>
+
+                        
+                           
+
                             <div class="row mb-4 align-items-center">
 
 
@@ -230,7 +239,8 @@
                                     value="{{ old('details') }}" class="custom-class details" />
 
                             </div>
-
+                            <hr>
+                            @include('dashboard.crm.proposals.components._itemCreate')
                         </div>
                     </form>
                 </div>
@@ -342,6 +352,9 @@
                     this.dataset.modified = true;
                 });
             });
+
+
+         
         </script>
     @endpush
 @endsection

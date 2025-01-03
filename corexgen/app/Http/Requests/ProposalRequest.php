@@ -25,7 +25,6 @@ class ProposalRequest extends FormRequest
     public function rules(): array
     {
         return [
-            '_prefix' => 'required|string|max:50',
             '_id' => 'required|string|max:10',
             'type' => 'required|in:client,lead',
             'client_id' => 'required_if:type,client|exists:clients,id',
@@ -36,6 +35,14 @@ class ProposalRequest extends FormRequest
             'creating_date' => 'required|date',
             'valid_date' => 'nullable|date|after_or_equal:today',
             'template_id' => 'nullable|exists:templates,id',
+
+            'product_title.*' => 'required|string',
+            'product_description.*' => 'nullable|string',
+            'product_qty.*' => 'required|numeric|min:1',
+            'product_rate.*' => 'required|numeric|min:0',
+            'product_tax.*' => 'nullable|string',
+            'discount' => 'nullable|numeric',
+            'adjustment' => 'nullable|numeric',
         ];
     }
 
@@ -48,7 +55,7 @@ class ProposalRequest extends FormRequest
             '_prefix.required' => 'The proposal prefix is required.',
             '_prefix.string' => 'The proposal prefix must be a string.',
             '_prefix.max' => 'The proposal prefix must not exceed 50 characters.',
-            
+
             '_id.required' => 'The proposal ID is required.',
             '_id.string' => 'The proposal ID must be a string.',
             '_id.max' => 'The proposal ID must not exceed 10 characters.',
@@ -81,6 +88,21 @@ class ProposalRequest extends FormRequest
 
             'template_id.integer' => 'The template ID must be an integer.',
             'template_id.exists' => 'The selected template ID does not exist.',
+
+            'product_title.*.required' => 'Each product title is required.',
+            'product_title.*.string' => 'Each product title must be a string.',
+
+            'product_description.*.string' => 'Each product description must be a string.',
+
+            'product_qty.*.required' => 'Each product quantity is required.',
+            'product_qty.*.numeric' => 'Each product quantity must be a number.',
+            'product_qty.*.min' => 'Each product quantity must be at least 1.',
+
+            'product_rate.*.required' => 'Each product rate is required.',
+            'product_rate.*.numeric' => 'Each product rate must be a number.',
+            'product_rate.*.min' => 'Each product rate must be at least 0.',
+
+            'product_tax.*.string' => 'Each product tax must be a string.',
         ];
     }
 }
