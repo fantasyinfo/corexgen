@@ -9,7 +9,7 @@
 
             <div class="shadow-sm rounded">
 
-                @include('dashboard.crm.estimates.components.proposal-filters')
+                @include('dashboard.crm.estimates.components.estimate-filters')
 
                 @include('layout.components.header-stats')
 
