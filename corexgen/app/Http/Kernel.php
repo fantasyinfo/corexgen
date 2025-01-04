@@ -37,6 +37,7 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\SetLocale::class,
+           
         ],
 
         'api' => [
@@ -74,5 +75,6 @@ class Kernel extends HttpKernel
         'check.installation' => \App\Http\Middleware\CheckInstallation::class,
         'payment.debug' => \App\Http\Middleware\DebugPaymentCallback::class,
         'company.onboarding' => \App\Http\Middleware\CompanyOnboarding::class,
+        'company.timezone' =>  \App\Http\Middleware\CompanyTimezoneMiddleware::class,
     ];
 }

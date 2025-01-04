@@ -365,7 +365,8 @@
                                                         <tr>
                                                             <td class="text-muted">Accepted On:</td>
                                                             <td class="font-weight-bold">
-                                                                {{ \Carbon\Carbon::parse($estimate?->accepted_details['accepted_at'])->format('M d, Y h:i A') }}
+
+                                                                {{ formatDateTime($estimate?->accepted_details['accepted_at']) }}
                                                             </td>
                                                         </tr>
                                                     </tbody>

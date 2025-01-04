@@ -1035,3 +1035,14 @@ function getTeamMates()
         ->where('company_id', Auth::user()->company_id)->get();
 
 }
+
+
+if (!function_exists('formatDateTime')) {
+    function formatDateTime($date, $timezone = null, $format = null)
+    {
+        $timezone = $timezone ?? config('app.timezone');
+        $format = $format ?? getSettingValue('Date Format') ?? 'M d, Y h:i A';
+
+        return $date ? \Carbon\Carbon::parse($date)->timezone($timezone)->format($format) : null;
+    }
+}

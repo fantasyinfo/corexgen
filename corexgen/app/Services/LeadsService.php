@@ -359,7 +359,7 @@ class LeadsService
                 return $this->renderActionsColumn($lead);
             })
             ->editColumn('created_at', function ($lead) {
-                return Carbon::parse($lead->created_at)->format('d M Y');
+                return formatDateTime($lead?->created_at);
             })
             ->editColumn('title', function ($lead) use ($module) {
                 return "<a  class='dt-link' href='" . route($this->tenantRoute . $module . '.view', $lead->id) . "' target='_blank'>$lead->title</a>";
