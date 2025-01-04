@@ -16,20 +16,20 @@ class TemplateService
 
     private $tenantRoute;
 
-    public function getDatatablesResponseProposals($request, $type)
+    public function getDatatablesResponse($request, $type, $module, $permission, $viewRoute,$editRoute, $deleteRoute)
     {
         $query = $this->applyTenantFilter(CRMTemplates::query()->with('createdBy')->where('type', $type));
 
-        $module = PANEL_MODULES[$this->getPanelModule()]['proposals'];
+        $module = PANEL_MODULES[$this->getPanelModule()][$module];
         $this->tenantRoute = $this->getTenantRoute();
 
         return DataTables::of($query)
-            ->addColumn('actions', fn($template) => $this->getActionsColumn($template, $module))
+            ->addColumn('actions', fn($template) => $this->getActionsColumn($template, $module, $permission, $editRoute, $deleteRoute))
             ->editColumn('created_by', function ($template) {
                 return $template->createdBy->name;
             })
-            ->editColumn('title', function ($template) use ($module) {
-                $viewRoute = route($this->tenantRoute . $module . '.view', $template->id);
+            ->editColumn('title', function ($template) use ($module,$viewRoute) {
+                $viewRoute = route($this->tenantRoute . $module . '.'. $viewRoute, $template->id);
                 return "<a class='dt-link' href='{$viewRoute}' target='_blank'>{$template->title}</a>";
             })
             ->editColumn('created_at', fn($template) => $template?->created_at ? $template?->created_at->format('d M Y') : '')
@@ -37,13 +37,13 @@ class TemplateService
             ->make(true);
     }
 
-    private function getActionsColumn($template, $module)
+    private function getActionsColumn($template, $module, $permission, $editRoute, $deleteRoute)
     {
-        $editRoute = route($this->tenantRoute . $module . '.editProposals', $template->id);
-        $deleteRoute = route($this->tenantRoute . $module . '.destroyProposals', $template->id);
+        $editRoute = route($this->tenantRoute . $module . '.' . $editRoute, $template->id);
+        $deleteRoute = route($this->tenantRoute . $module . '.' . $deleteRoute, $template->id);
 
         $actions = "";
-        $permissions = PermissionsHelper::getPermissionsArray('PROPOSALS_TEMPLATES');
+        $permissions = PermissionsHelper::getPermissionsArray($permission);
 
         if (hasPermission(strtoupper($module) . '.' . $permissions['UPDATE']['KEY'])) {
             $actions .= " <a 

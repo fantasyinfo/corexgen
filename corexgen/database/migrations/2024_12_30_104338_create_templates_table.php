@@ -17,7 +17,7 @@ return new class extends Migration
             $table->text('template_details');
             $table->unsignedBigInteger('company_id');
             $table->unsignedBigInteger('created_by'); // Add this line
-            $table->enum('type',['Proposals','Contracts']);
+            $table->enum('type',['Proposals','Contracts','Estimates']);
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
             $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
