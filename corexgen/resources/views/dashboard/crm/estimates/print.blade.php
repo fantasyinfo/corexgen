@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $proposal?->title }} - Print View</title>
+    <title>{{ $estimate?->title }} - Print View</title>
     <style>
         /* Reset and Base Styles */
         * {
@@ -206,40 +206,40 @@
         <!-- Header Section -->
         <div class="proposal-header">
             <div class="proposal-id">
-                {{ $proposal?->_prefix }}-{{ $proposal?->_id }}
+                {{ $estimate?->_prefix }}-{{ $estimate?->_id }}
             </div>
 
-            <h1 class="proposal-title">{{ $proposal?->title }}</h1>
-            <p class="client-name">Prepared for {{ $proposal?->typable?->title }}.
-                {{ $proposal?->typable?->first_name }} {{ $proposal?->typable?->last_name }}</p>
+            <h1 class="proposal-title">{{ $estimate?->title }}</h1>
+            <p class="client-name">Prepared for {{ $estimate?->typable?->title }}.
+                {{ $estimate?->typable?->first_name }} {{ $estimate?->typable?->last_name }}</p>
 
             <!-- Info Section -->
             <div class="info-section">
                 <div class="info-box">
                     <div class="info-box-title">Prepared By</div>
                     <div class="info-box-content">
-                        <h4 class="mb-2">{{ $proposal?->company?->name }}</h4>
-                        <p class="mb-1">{{ $proposal?->company?->addresses?->street_address }}</p>
-                        <p class="mb-1">{{ $proposal?->company?->addresses?->city?->name }},
-                            {{ $proposal?->company->addresses?->country?->name }}</p>
-                        <p class="mb-0">{{ $proposal?->company?->phone }}</p>
+                        <h4 class="mb-2">{{ $estimate?->company?->name }}</h4>
+                        <p class="mb-1">{{ $estimate?->company?->addresses?->street_address }}</p>
+                        <p class="mb-1">{{ $estimate?->company?->addresses?->city?->name }},
+                            {{ $estimate?->company->addresses?->country?->name }}</p>
+                        <p class="mb-0">{{ $estimate?->company?->phone }}</p>
                     </div>
                 </div>
 
                 <div class="info-box">
-                    <div class="info-box-title">Proposal Details</div>
+                    <div class="info-box-title">Estimate Details</div>
                     <div class="info-box-content">
                         <p class="mb-1">
                             <strong>Valid Until:</strong>
-                            {{ $proposal?->valid_date ? \Carbon\Carbon::parse($proposal?->valid_date)->format('F d, Y') : 'Not Specified' }}
+                            {{ $estimate?->valid_date ? \Carbon\Carbon::parse($estimate?->valid_date)->format('F d, Y') : 'Not Specified' }}
                         </p>
                         <p class="mb-0">
                             <strong>Created:</strong>
-                            {{ \Carbon\Carbon::parse($proposal?->creating_date)->format('F d, Y') }}
+                            {{ \Carbon\Carbon::parse($estimate?->creating_date)->format('F d, Y') }}
                         </p>
                         <p class="mb-0">
                             <strong>Status:</strong>
-                            <span class="status-badge">{{ $proposal?->status }}</span>
+                            <span class="status-badge">{{ $estimate?->status }}</span>
                         </p>
                     </div>
                 </div>
@@ -248,9 +248,9 @@
 
         <!-- Main Content -->
         <div class="proposal-content">
-            @if (!empty($proposal?->product_details) && $proposal?->product_details != NULL)
+            @if (!empty($estimate?->product_details) && $estimate?->product_details != NULL)
             @php
-                $details = json_decode($proposal->product_details, true);
+                $details = json_decode($estimate->product_details, true);
                 $products = $details['products'] ?? [];
                 $additionalFields = $details['additional_fields'] ?? [];
             @endphp
@@ -260,7 +260,7 @@
                 <div class="card-header table-bg">
                     <h5 class="mb-0">
                         <i class="fas fa-file-invoice me-2"></i>
-                        Proposal Details
+                        Estimate Details
                     </h5>
                 </div>
                 <div class="card-body">
@@ -386,12 +386,12 @@
             <section>
                 <h2 class="section-title">Executive Summary</h2>
                 <div class="proposal-body">
-                    {!! $proposal?->template?->template_details !!}
+                    {!! $estimate?->template?->template_details !!}
 
-                    @if (!is_null(trim($proposal?->details)))
+                    @if (!is_null(trim($estimate?->details)))
                         <h3 class="mt-4 mb-3">Additional Details</h3>
                         <div class="additional-details">
-                            {!! $proposal?->details !!}
+                            {!! $estimate?->details !!}
                         </div>
                     @endif
                 </div>
@@ -399,11 +399,11 @@
         </div>
 
         <div class="proposal-content">
-        @if ($proposal->status === 'ACCEPTED')
+        @if ($estimate->status === 'ACCEPTED')
             <div class="container mt-4">
                 <div class="card shadow-sm">
                     <div class="card-header bg-primary text-white">
-                        <h4 class="mb-0">Proposal Acceptance Details</h4>
+                        <h4 class="mb-0">Estimate Acceptance Details</h4>
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -416,18 +416,18 @@
                                                 <tr>
                                                     <td class="text-muted" style="width: 140px;">Name:</td>
                                                     <td class="font-weight-bold">
-                                                        {{ $proposal->accepted_details['first_name'] }}
-                                                        {{ $proposal->accepted_details['last_name'] }}</td>
+                                                        {{ $estimate->accepted_details['first_name'] }}
+                                                        {{ $estimate->accepted_details['last_name'] }}</td>
                                                 </tr>
                                                 <tr>
                                                     <td class="text-muted">Email:</td>
                                                     <td class="font-weight-bold">
-                                                        {{ $proposal->accepted_details['email'] }}</td>
+                                                        {{ $estimate->accepted_details['email'] }}</td>
                                                 </tr>
                                                 <tr>
                                                     <td class="text-muted">Accepted On:</td>
                                                     <td class="font-weight-bold">
-                                                        {{ \Carbon\Carbon::parse($proposal->accepted_at)->format('M d, Y h:i A') }}
+                                                        {{ \Carbon\Carbon::parse($estimate->accepted_at)->format('M d, Y h:i A') }}
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -439,7 +439,7 @@
                                 <div class="mb-4">
                                     <h5 class="text-muted mb-3">Digital Signature</h5>
                                     <div class="border rounded p-3 bg-light">
-                                        <img src="{{ $proposal->accepted_details['signature'] }}"
+                                        <img src="{{ $estimate->accepted_details['signature'] }}"
                                             alt="Digital Signature" class="img-fluid" style="max-height: 150px;">
                                     </div>
                                 </div>

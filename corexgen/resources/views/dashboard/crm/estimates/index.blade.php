@@ -15,7 +15,7 @@
 
 
 
-                @if (hasPermission('PROPOSALS.READ_ALL') || hasPermission('PROPOSALS.READ'))
+                @if (hasPermission('ESTIMATES.READ_ALL') || hasPermission('ESTIMATES.READ'))
                     @php
 
                         $columns = [
@@ -34,7 +34,7 @@
                             [
                                 'data' => '_id',
                                 'name' => '_id',
-                                'label' => __('proposals.ID'),
+                                'label' => __('estimates.ID'),
                                 'searchable' => true,
                                 'orderable' => true,
                                 'width' => '150px',
@@ -42,7 +42,7 @@
                             [
                                 'data' => 'title',
                                 'name' => 'title',
-                                'label' => __('proposals.Title'),
+                                'label' => __('estimates.Title'),
                                 'searchable' => true,
                                 'orderable' => true,
                                 'width' => '150px',
@@ -50,7 +50,7 @@
                             [
                                 'data' => 'to',
                                 'name' => 'to',
-                                'label' => __('proposals.To'),
+                                'label' => __('estimates.To'),
                                 'searchable' => false,
                                 'orderable' => false,
                                 'width' => '300px',
@@ -58,7 +58,7 @@
                             [
                                 'data' => 'value',
                                 'name' => 'value',
-                                'label' => __('proposals.Value'),
+                                'label' => __('estimates.Value'),
                                 'searchable' => true,
                                 'orderable' => true,
                                 'width' => '100px',
@@ -66,7 +66,7 @@
                             [
                                 'data' => 'creating_date',
                                 'name' => 'creating_date',
-                                'label' => __('proposals.Date'),
+                                'label' => __('estimates.Date'),
                                 'searchable' => true,
                                 'orderable' => true,
                                 'width' => '100px',
@@ -74,7 +74,7 @@
                             [
                                 'data' => 'valid_date',
                                 'name' => 'valid_date',
-                                'label' => __('proposals.Valid Till'),
+                                'label' => __('estimates.Valid Till'),
                                 'searchable' => true,
                                 'orderable' => true,
                                 'width' => '100px',
@@ -107,7 +107,7 @@
                         ];
                     @endphp
 
-                    <x-data-table id="companyProposalTable" :columns="$columns" :ajax-url="route(getPanelRoutes($module . '.index'))" :is-checkbox="true"
+                    <x-data-table id="companyEstimateTable" :columns="$columns" :ajax-url="route(getPanelRoutes($module . '.index'))" :is-checkbox="true"
                         :bulk-delete-url="route(getPanelRoutes($module . '.bulkDelete'))" :csrf-token="csrf_token()" />
                 @else
                     {{-- no permissions to view --}}

@@ -120,6 +120,7 @@
                                     <x-form-components.input-group type="text" class="custom-class" id="_prefix"
                                         name="_prefix" placeholder="{{ getSettingValue('Proposal Prefix') }}"
                                         value="{{ old('_prefix', getSettingValue('Proposal Prefix')) }}" disabled />
+                                        <input type="hidden" name="_prefix" value="{{getSettingValue('Proposal Prefix')}}" />
                                 </div>
                                 <p class="offset-lg-4 font-12 my-2 text-secondary"> Can be modify under one word settings.
                                 </p>

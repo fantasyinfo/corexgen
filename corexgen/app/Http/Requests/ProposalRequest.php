@@ -25,6 +25,7 @@ class ProposalRequest extends FormRequest
     public function rules(): array
     {
         return [
+            '_prefix' => 'required|string' ,
             '_id' => 'required|string|max:10',
             'type' => 'required|in:client,lead',
             'client_id' => 'required_if:type,client|exists:clients,id',

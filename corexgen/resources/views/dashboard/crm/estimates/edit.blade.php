@@ -2,29 +2,29 @@
 
 @section('content')
     @php
-        // prePrintR($proposal->toArray());
-        $type = $proposal->typable_type === App\Models\CRM\CRMClients::class ? 'client' : 'lead';
+        // prePrintR($estimate->toArray());
+        $type = $estimate->typable_type === App\Models\CRM\CRMClients::class ? 'client' : 'lead';
     @endphp
 
     <div class="container-fluid">
         <div class="row">
             <div class="justify-content-md-center col-lg-12">
                 <div class="card stretch stretch-full">
-                    <form id="proposalsFieldsForm" action="{{ route(getPanelRoutes('proposals.update')) }}" method="POST">
+                    <form id="estimatesFieldsForm" action="{{ route(getPanelRoutes('estimates.update')) }}" method="POST">
                         @csrf
                         @method('PUT')
-                        <input type="hidden" name="id" value="{{$proposal->id}}" />
+                        <input type="hidden" name="id" value="{{$estimate->id}}" />
                         <div class="card-body general-info">
                             <div class="mb-5 d-flex align-items-center justify-content-between">
                                 <p class="fw-bold mb-0 me-4">
-                                    <span class="d-block">{{ __('proposals.Update Proposal') }}</span>
+                                    <span class="d-block">{{ __('estimates.Update Estimate') }}</span>
                                     <span class="fs-12 fw-normal text-muted text-truncate-1-line">
                                         {{ __('crud.Please add correct information') }}
                                     </span>
                                 </p>
                                 <div>
                                     <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-save"></i> {{ __('proposals.Update Proposal') }}
+                                        <i class="fas fa-save"></i> {{ __('estimates.Update Estimate') }}
                                     </button>
                                 </div>
                             </div>
@@ -32,7 +32,7 @@
                             <div class="row mb-3 align-items-center">
                                 <div class="col-lg-4">
                                     <x-form-components.input-label for="type" required>
-                                        {{ __('proposals.Select Type') }}
+                                        {{ __('estimates.Select Type') }}
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
@@ -48,10 +48,10 @@
                             </div>
 
                             <div id="clientSection"
-                                style="display:  {{ old('type', $proposal->typable_type) === App\Models\CRM\CRMClients::class ? 'flex' : 'none' }};">
+                                style="display:  {{ old('type', $estimate->typable_type) === App\Models\CRM\CRMClients::class ? 'flex' : 'none' }};">
                                 <div class="col-lg-4">
                                     <x-form-components.input-label for="client_id" required>
-                                        {{ __('proposals.Select Client') }}
+                                        {{ __('estimates.Select Client') }}
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
@@ -67,7 +67,7 @@
                                                     : " [ $item->primary_email ]";
                                             @endphp
                                             <option value="{{ $item->id }}"
-                                                {{ old('client_id', $proposal->typable_id) == $item->id ? 'selected' : '' }}>
+                                                {{ old('client_id', $estimate->typable_id) == $item->id ? 'selected' : '' }}>
                                                 {{ $nameAndEmail }}
                                             </option>
                                         @endforeach
@@ -76,10 +76,10 @@
                             </div>
 
                             <div id="leadSection"
-                                style="display:  {{ old('type', $proposal->typable_type) === App\Models\CRM\CRMLeads::class ? 'flex' : 'none' }};">
+                                style="display:  {{ old('type', $estimate->typable_type) === App\Models\CRM\CRMLeads::class ? 'flex' : 'none' }};">
                                 <div class="col-lg-4">
                                     <x-form-components.input-label for="lead_id" required>
-                                        {{ __('proposals.Select Lead') }}
+                                        {{ __('estimates.Select Lead') }}
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
@@ -95,7 +95,7 @@
                                                     : " [ $item->email ]";
                                             @endphp
                                             <option value="{{ $item->id }}"
-                                                {{ old('lead_id', $proposal->typable_id) == $item->id ? 'selected' : '' }}>
+                                                {{ old('lead_id', $estimate->typable_id) == $item->id ? 'selected' : '' }}>
                                                 {{ $nameAndEmail }}
                                             </option>
                                         @endforeach
@@ -107,13 +107,13 @@
                             <div class="row mb-4 align-items-center">
                                 <div class="col-lg-4">
                                     <x-form-components.input-label for="_prefix" class="custom-class" required>
-                                        {{ __('proposals.Prefix') }}
+                                        {{ __('estimates.Prefix') }}
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
                                     <x-form-components.input-group type="text" class="custom-class" id="_prefix"
                                         name="_prefix" placeholder="{{ __('PRO-') }}"
-                                        value="{{ old('_prefix', $proposal->_prefix) }}" disabled="true" required
+                                        value="{{ old('_prefix', $estimate->_prefix) }}" disabled="true" required
                                         oninput="updateIdField()" />
                                 </div>
 
@@ -121,15 +121,15 @@
                             <div class="row mb-4 align-items-center">
                                 <div class="col-lg-4">
                                     <x-form-components.input-label for="_id" class="custom-class" required>
-                                        {{ __('proposals.ID') }}
+                                        {{ __('estimates.ID') }}
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
                                     <x-form-components.input-group-prepend-append
-                                    prepend="{{getSettingValue('Proposal Prefix')}}-"
+                                    prepend="{{getSettingValue('Estimate Prefix')}}-"
                                     append="..." type="text" class="custom-class" id="_id"
                                         name="_id" placeholder="{{ __('0001') }}" disabled="true"
-                                        value="{{ old('_id', $proposal->_id) }}" required />
+                                        value="{{ old('_id', $estimate->_id) }}" required />
                                 </div>
                                 <p class="offset-lg-4 font-12 my-2 text-secondary">
                                     <span class="text-success"> Auto-Increment (Last ID + 1)</span> by default. Can be
@@ -142,13 +142,13 @@
                                 <div class="col-lg-4">
 
                                     <x-form-components.input-label for="title" class="custom-class" required>
-                                        {{ __('proposals.Title') }}
+                                        {{ __('estimates.Title') }}
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
                                     <x-form-components.input-group type="text" class="custom-class" id="title"
-                                        name="title" placeholder="{{ __('Amazing title') }}"
-                                        value="{{ old('title', $proposal->title) }}" required />
+                                        name="title" placeholder="{{ __('Amazing Estimate title') }}"
+                                        value="{{ old('title', $estimate->title) }}" required />
 
                                 </div>
                             </div>
@@ -156,7 +156,7 @@
                                 <div class="col-lg-4">
 
                                     <x-form-components.input-label for="value" class="custom-class">
-                                        {{ __('proposals.Value') }}
+                                        {{ __('estimates.Value') }}
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
@@ -166,7 +166,7 @@
                                         prepend="{{ getSettingValue('Currency Symbol') }}"
                                         append="{{ getSettingValue('Currency Code') }}"
                                          name="value"
-                                        placeholder="{{ __('99999') }}" value="{{ old('value', $proposal->value) }}" />
+                                        placeholder="{{ __('99999') }}" value="{{ old('value', $estimate->value) }}" />
 
                                 </div>
                             </div>
@@ -176,15 +176,15 @@
                             <div class="row mb-3 align-items-center">
                                 <div class="col-lg-4">
                                     <x-form-components.input-label for="template_id">
-                                        {{ __('proposals.Select Template') }}
+                                        {{ __('estimates.Select Template') }}
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
                                     <select name="template_id" id="template_id" class="form-select">
-                                        <option value="">Select Template (optional)</option>
+                                        <option value="">Select Estimate Template (optional)</option>
                                         @foreach ($templates as $item)
                                             <option value="{{ $item->id }}"
-                                                {{ old('template_id', $proposal->template_id) == $item->id ? 'selected' : '' }}>
+                                                {{ old('template_id', $estimate->template_id) == $item->id ? 'selected' : '' }}>
                                                 {{ $item->title }}
                                             </option>
                                         @endforeach
@@ -196,12 +196,12 @@
                                 <div class="col-lg-4">
 
                                     <x-form-components.input-label for="creating_date" class="custom-class" required>
-                                        {{ __('proposals.Date') }}
+                                        {{ __('estimates.Date') }}
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
                                     <x-form-components.input-group type="date" class="custom-class" id="creating_date"
-                                        name="creating_date" value="{{ old('creating_date', $proposal->creating_date) }}"
+                                        name="creating_date" value="{{ old('creating_date', $estimate->creating_date) }}"
                                         required />
 
                                 </div>
@@ -210,12 +210,12 @@
                                 <div class="col-lg-4">
 
                                     <x-form-components.input-label for="valid_date" class="custom-class">
-                                        {{ __('proposals.Valid Till') }}
+                                        {{ __('estimates.Valid Till') }}
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
                                     <x-form-components.input-group type="date" class="custom-class" id="valid_date"
-                                        name="valid_date" value="{{ old('valid_date', $proposal->valid_date) }}" />
+                                        name="valid_date" value="{{ old('valid_date', $estimate->valid_date) }}" />
                                 </div>
                             </div>
                             <hr>
@@ -223,13 +223,13 @@
 
 
                                 <x-form-components.input-label for="valid_date" class="custom-class">
-                                    {{ __('proposals.Details') }}
+                                    {{ __('estimates.Details') }}
                                 </x-form-components.input-label>
 
 
                                 <x-form-components.textarea-group name="details" id="details"
                                     placeholder="Extra details, conditions, rules, commitments, products, services, discouts, tax ... if any"
-                                    value="{{ old('details', $proposal->details) }}" class="custom-class details" />
+                                    value="{{ old('details', $estimate->details) }}" class="custom-class details" />
 
                             </div>
 
@@ -271,7 +271,7 @@
                     content_css: currentTheme === 'dark' ? 'dark' : 'default',
                     setup: function(editor) {
                         editor.on('init', function() {
-                            editor.setContent(`{!! $proposal->details !!}`);
+                            editor.setContent(`{!! $estimate->details !!}`);
                         });
                     },
                     menubar: true,

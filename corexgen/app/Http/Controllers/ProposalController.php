@@ -650,7 +650,7 @@ class ProposalController extends Controller
             ]);
 
             // Find the proposal using the tenant filter
-            $proposal = $this->applyTenantFilter(CRMProposals::find($validatedData['id']));
+            $proposal = CRMProposals::find($validatedData['id']);
 
             if (!$proposal) {
                 throw new \Exception('Proposal not found.');

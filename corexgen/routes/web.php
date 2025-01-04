@@ -156,6 +156,16 @@ Route::get('/proposal/print/{id}', [ProposalController::class, 'print'])->name('
 Route::post('/proposal/accept', [ProposalController::class, 'accept'])->name('proposal.accept');
 
 
+// estimates view and signed
+Route::get('/estimate/view/{id}', [EstimatesController::class, 'viewOpen'])->name('estimate.viewOpen');
+Route::get('/estimate/print/{id}', [EstimatesController::class, 'print'])->name('estimate.print');
+Route::post('/estimate/accept', [EstimatesController::class, 'accept'])->name('estimate.accept');
+
+
+
+
+
+
 // register
 Route::get('/register', function () {
     // return view('auth.register', );
@@ -435,7 +445,7 @@ Route::middleware([
 
         Route::get('/changeStatusAction/{id}/{action}', [EstimatesController::class, 'changeStatusAction'])->name('changeStatusAction')->middleware('check.permission:ESTIMATES.CHANGE_STATUS');
 
-        Route::get('/sendProposal/{id}', [EstimatesController::class, 'sendProposal'])->name('sendProposal')->middleware('check.permission:ESTIMATES.CHANGE_STATUS');
+        Route::get('/sendEstimate/{id}', [EstimatesController::class, 'sendEstimate'])->name('sendEstimate')->middleware('check.permission:ESTIMATES.CHANGE_STATUS');
 
         Route::delete('/destroy/{id}', [EstimatesController::class, 'destroy'])->name('destroy')->middleware('check.permission:ESTIMATES.DELETE');
 
@@ -475,7 +485,7 @@ Route::middleware([
 
         Route::get('/changeStatusAction/{id}/{action}', [ContractsController::class, 'changeStatusAction'])->name('changeStatusAction')->middleware('check.permission:CONTRACTS.CHANGE_STATUS');
 
-        Route::get('/sendProposal/{id}', [ContractsController::class, 'sendProposal'])->name('sendProposal')->middleware('check.permission:CONTRACTS.CHANGE_STATUS');
+        Route::get('/sendContract/{id}', [ContractsController::class, 'sendContract'])->name('sendContract')->middleware('check.permission:CONTRACTS.CHANGE_STATUS');
 
         Route::delete('/destroy/{id}', [ContractsController::class, 'destroy'])->name('destroy')->middleware('check.permission:CONTRACTS.DELETE');
 
