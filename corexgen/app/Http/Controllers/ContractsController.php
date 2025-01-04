@@ -85,7 +85,7 @@ class ContractsController extends Controller
 
 
     ) {
-      
+
         $this->contractService = $contractService;
         $this->productServicesService = $productServicesService;
 
@@ -676,7 +676,7 @@ class ContractsController extends Controller
         try {
             // Validate the request data
             $validatedData = $request->validate([
-                'id' => 'required|exists:contracts,id',
+                'id' => 'required|exists:contract,id',
                 'first_name' => 'required|string|max:50',
                 'last_name' => 'required|string|max:50',
                 'email' => 'required|email|max:100',
@@ -692,7 +692,6 @@ class ContractsController extends Controller
 
             // Update the contract status and acceptance details
             $contract->update([
-                'status' => 'ACCEPTED',
                 'company_accepted_details' => [
                     'first_name' => $validatedData['first_name'],
                     'last_name' => $validatedData['last_name'],
@@ -700,6 +699,7 @@ class ContractsController extends Controller
                     'signature' => $validatedData['signature'],
                     'accepted_at' => now()
                 ],
+                'statusCompany' => 1
             ]);
 
             return redirect()->back()->with('success', 'Contract signed status updated successfully.');

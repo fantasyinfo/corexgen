@@ -24,8 +24,8 @@ return new class extends Migration
             $table->date('valid_date')->default(now())->nullable();
             $table->json('accepted_details')->nullable();
             $table->json('company_accepted_details')->nullable();
-            $table->json('product_details')->nullable();
-            $table->enum('status', CRM_STATUS_TYPES['ESTIMATES']['TABLE_STATUS'])->default(CRM_STATUS_TYPES['ESTIMATES']['STATUS']['OPEN']);
+            $table->enum('status', CRM_STATUS_TYPES['CONTRACTS']['TABLE_STATUS'])->default(CRM_STATUS_TYPES['CONTRACTS']['STATUS']['OPEN']);
+            $table->boolean('statusCompany')->default(false);
 
             $table->unsignedBigInteger('template_id')->nullable();
             $table->unsignedBigInteger('assign_to')->nullable();

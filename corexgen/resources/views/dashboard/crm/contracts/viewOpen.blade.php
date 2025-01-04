@@ -3,10 +3,18 @@
 @push('style')
     <style>
         :root {
-            --proposal-primary: var(--primary-color);
+            --proposal-primary: #f23636;
             --proposal-bg: var(--card-bg);
             --proposal-text: var(--body-color);
             --proposal-border: var(--border-color);
+        }
+
+        .backbg {
+            background-color: var(--proposal-primary);
+        }
+
+        .backbg-primary {
+            background-color: #c30606;
         }
 
         .proposal-container {
@@ -18,7 +26,7 @@
         .proposal-header {
             position: relative;
             padding: 2.5rem;
-            background: linear-gradient(45deg, var(--primary-color), var(--primary-hover));
+            background: linear-gradient(45deg, #f23636, #ec7063);
             color: white;
         }
 
@@ -105,7 +113,7 @@
                 <div class="row">
                     <div class="col-lg-8">
                         <div class="mb-4">
-                            <span class="status-badge bg-secondary text-dark mb-3">
+                            <span class="status-badge  backbg-primary text-dark mb-3">
                                 {{ $contract?->_prefix }}-{{ $contract?->_id }}
                             </span>
                             <h1 class="display-4 mb-2">{{ $contract?->title }}</h1>
@@ -146,148 +154,14 @@
                 <section class="mb-5">
 
                     <div class="row">
-                        @if (!empty($contract?->product_details) && $contract?->product_details != NULL)
-                        @php
-                            $details = json_decode($contract->product_details, true);
-                            $products = $details['products'] ?? [];
-                            $additionalFields = $details['additional_fields'] ?? [];
-                        @endphp
 
-                        @if(!empty($products))
-                        <div class="card mb-4">
-                            <div class="card-header table-bg">
-                                <h5 class="mb-0">
-                                    <i class="fas fa-file-invoice me-2"></i>
-                                    Proposal Details
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-striped table-hover">
-                                        <thead class="table-primary">
-                                            <tr>
-                                                <th>Title</th>
-                                                <th>Description</th>
-                                                <th class="text-center">Qty / Per Hr</th>
-                                                <th class="text-end" width="200px;">Rate ({{ getSettingValue('Currency Symbol') }})</th>
-                                                <th class="text-end">Tax</th>
-                                                <th class="text-end" width="200px;">Amount ({{ getSettingValue('Currency Symbol') }})</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($products as $product)
-                                                @php
-                                                    $qty = floatval($product['qty']);
-                                                    $rate = floatval($product['rate']);
-                                                    $tax = floatval($product['tax']);
-                                                    $amount = $qty * $rate;
-                                                    $taxAmount = ($amount * $tax) / 100;
-                                                @endphp
-                                                <tr>
-                                                    <td>
-                                                        <span class="fw-medium">{{ $product['title'] }}</span>
-                                                    </td>
-                                                    <td>
-                                                        <small class="text-muted">{{ $product['description'] }}</small>
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <span class="badge bg-light text-dark">
-                                                            {{ number_format($qty) }} 
-                                                           
-                                                        </span>
-                                                    </td>
-                                                    <td class="text-end">
-                                                        {{ getSettingValue('Currency Symbol') }} {{ number_format($rate, 2) }} {{ getSettingValue('Currency Code') }}
-                                                    </td>
-                                                    <td class="text-end">
-                                                        <span class="text-muted">
-                                                            {{ number_format($tax, 1) }}%
-                                                        </span>
-                                                    </td>
-                                                    <td class="text-end">
-                                                        {{ getSettingValue('Currency Symbol') }} {{ number_format($amount, 2) }} {{ getSettingValue('Currency Code') }}
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                        <tfoot class="table-bg">
-                                            @php
-                                                $subTotal = array_reduce(
-                                                    $products,
-                                                    function ($carry, $product) {
-                                                        return $carry +
-                                                            floatval($product['qty']) * floatval($product['rate']);
-                                                    },
-                                                    0,
-                                                );
-
-                                                $totalTax = array_reduce(
-                                                    $products,
-                                                    function ($carry, $product) {
-                                                        $amount =
-                                                            floatval($product['qty']) * floatval($product['rate']);
-                                                        return $carry + ($amount * floatval($product['tax'])) / 100;
-                                                    },
-                                                    0,
-                                                );
-
-                                                $discount = floatval($additionalFields['discount'] ?? 0);
-                                                $discountAmount = ($subTotal * $discount) / 100;
-
-                                                $adjustment = floatval($additionalFields['adjustment'] ?? 0);
-                                                $total = $subTotal - $discountAmount + $totalTax + $adjustment;
-                                            @endphp
-
-                                            <tr>
-                                                <td colspan="5" class="text-end">Sub Total:</td>
-                                                <td class="text-end"> {{ getSettingValue('Currency Symbol') }} {{ number_format($subTotal, 2) }} {{ getSettingValue('Currency Code') }}</td>
-                                            </tr>
-                                            @if ($discount > 0)
-                                                <tr>
-                                                    <td colspan="5" class="text-end text-danger">
-                                                        Discount ({{ number_format($discount, 1) }}%):
-                                                    </td>
-                                                    <td class="text-end text-danger">
-                                                        {{ getSettingValue('Currency Symbol') }}  -{{ number_format($discountAmount, 2) }} {{ getSettingValue('Currency Code') }}
-                                                    </td>
-                                                </tr>
-                                            @endif
-                                            @if ($totalTax > 0)
-                                                <tr>
-                                                    <td colspan="5" class="text-end">Tax:</td>
-                                                    <td class="text-end"> {{ getSettingValue('Currency Symbol') }} {{ number_format($totalTax, 2) }} {{ getSettingValue('Currency Code') }}</td>
-                                                </tr>
-                                            @endif
-                                            @if ($adjustment != 0)
-                                                <tr>
-                                                    <td colspan="5"
-                                                        class="text-end {{ $adjustment < 0 ? 'text-danger' : 'text-success' }}">
-                                                        Adjustment:
-                                                    </td>
-                                                    <td
-                                                        class="text-end {{ $adjustment < 0 ? 'text-danger' : 'text-success' }}">
-                                                        {{ getSettingValue('Currency Symbol') }}  {{ $adjustment > 0 ? '+' : '' }}{{ number_format($adjustment, 2) }} {{ getSettingValue('Currency Code') }}
-                                                    </td>
-                                                </tr>
-                                            @endif
-                                            <tr class="fw-bold">
-                                                <td colspan="5" class="text-end">Total:</td>
-                                                <td class="text-end"> {{ getSettingValue('Currency Symbol') }} {{ number_format($total, 2) }} {{ getSettingValue('Currency Code') }} </td>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                        @endif
-                    @endif
-                        @if (!is_null(trim($contract?->template?->template_details)) && $contract?->template?->template_details != NULL)
+                        @if (!is_null(trim($contract?->template?->template_details)) && $contract?->template?->template_details != null)
                             <h2 class="section-title">Executive Summary</h2>
                             <p class="lead">
                                 {!! $contract?->template?->template_details !!}
                             </p>
                         @endif
-                        @if (!is_null(trim($contract?->details)) && $contract?->details != NULL)
+                        @if (!is_null(trim($contract?->details)) && $contract?->details != null)
                             <h3 class="mt-3">Extra Details</h3>
                             <p>
                                 {!! $contract?->details !!}
@@ -301,14 +175,21 @@
                 <!-- Action Buttons -->
 
                 <div class="d-flex justify-content-end mt-5 pt-4 border-top">
+                    @if ($contract?->statusCompany != true)
+                        <button class="btn btn-dark me-2" data-bs-toggle="modal" data-bs-target="#signedCompanyModal">
+                            <i class="fas fa-check me-2"></i>Accept Contract For Company
+                        </button>
+                    @endif
+
                     <button class="btn btn-outline-secondary me-2" onclick="printProposal()">
                         <i class="fas fa-down me-2"></i>Download PDF
                     </button>
                     @if ($contract?->status !== 'ACCEPTED')
                         <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#signedModal">
-                            <i class="fas fa-check me-2"></i>Accept Contract
+                            <i class="fas fa-check me-2"></i>Accept Contract For Client
                         </button>
                     @endif
+
                 </div>
 
 
@@ -351,7 +232,7 @@
 
                                                 <input type="hidden" id="client_signature" name="signature" required>
                                                 <button type="button" class="btn btn-sm btn-secondary mt-2"
-                                                    onclick="clearSignature()">Clear Signature</button>
+                                                    onclick="clearSignature('signaturePad')">Clear Signature</button>
                                             </div>
 
 
@@ -368,51 +249,92 @@
                     </div>
                 @endif
 
-                @if ($contract?->status === 'ACCEPTED')
+                @if ($contract?->status === 'ACCEPTED' || $contract?->statusCompany == true)
                     <div class="container mt-4">
                         <div class="card shadow-sm">
-                            <div class="card-header bg-primary text-white">
+                            <div class="card-header backbg text-white">
                                 <h4 class="mb-0">Contract Acceptance Details</h4>
                             </div>
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-4">
-                                            <h5 class="text-muted mb-3">Client Information</h5>
-                                            <div class="table-responsive">
-                                                <table class="table table-borderless">
-                                                    <tbody>
-                                                        <tr>
-                                                            <td class="text-muted" style="width: 140px;">Name:</td>
-                                                            <td class="font-weight-bold">
-                                                                {{ $contract->accepted_details['first_name'] }}
-                                                                {{ $contract->accepted_details['last_name'] }}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="text-muted">Email:</td>
-                                                            <td class="font-weight-bold">
-                                                                {{ $contract->accepted_details['email'] }}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="text-muted">Accepted On:</td>
-                                                            <td class="font-weight-bold">
-                                                                {{ \Carbon\Carbon::parse($contract->accepted_details['accepted_at'])->format('M d, Y h:i A') }}
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
+                                    @if ($contract?->statusCompany == true)
+                                        <div class="col-md-6">
+                                            <div class="mb-4">
+                                                <h5 class="text-muted mb-3">Company Information</h5>
+                                                <div class="table-responsive">
+                                                    <table class="table table-borderless">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td class="text-muted" style="width: 140px;">Name:</td>
+                                                                <td class="font-weight-bold">
+                                                                    {{ $contract?->company_accepted_details['first_name'] }}
+                                                                    {{ $contract?->company_accepted_details['last_name'] }}
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="text-muted">Email:</td>
+                                                                <td class="font-weight-bold">
+                                                                    {{ $contract?->company_accepted_details['email'] }}
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="text-muted">Accepted On:</td>
+                                                                <td class="font-weight-bold">
+                                                                    {{ \Carbon\Carbon::parse($contract?->company_accepted_details['accepted_at'])->format('M d, Y h:i A') }}
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="mb-4">
+                                                <h5 class="text-muted mb-3">Digital Signature</h5>
+                                                <div class="border rounded p-3 bg-light">
+                                                    <img src="{{ $contract?->company_accepted_details['signature'] }}"
+                                                        alt="Digital Signature" class="img-fluid"
+                                                        style="max-height: 150px;">
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-4">
-                                            <h5 class="text-muted mb-3">Digital Signature</h5>
-                                            <div class="border rounded p-3 bg-light">
-                                                <img src="{{ $contract->accepted_details['signature'] }}"
-                                                    alt="Digital Signature" class="img-fluid" style="max-height: 150px;">
+                                    @endif
+                                    @if ($contract?->status === 'ACCEPTED')
+                                        <div class="col-md-6">
+                                            <div class="mb-4">
+                                                <h5 class="text-muted mb-3">Client Information</h5>
+                                                <div class="table-responsive">
+                                                    <table class="table table-borderless">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td class="text-muted" style="width: 140px;">Name:</td>
+                                                                <td class="font-weight-bold">
+                                                                    {{ $contract->accepted_details['first_name'] }}
+                                                                    {{ $contract->accepted_details['last_name'] }}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="text-muted">Email:</td>
+                                                                <td class="font-weight-bold">
+                                                                    {{ $contract->accepted_details['email'] }}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="text-muted">Accepted On:</td>
+                                                                <td class="font-weight-bold">
+                                                                    {{ \Carbon\Carbon::parse($contract->accepted_details['accepted_at'])->format('M d, Y h:i A') }}
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="mb-4">
+                                                <h5 class="text-muted mb-3">Digital Signature</h5>
+                                                <div class="border rounded p-3 bg-light">
+                                                    <img src="{{ $contract->accepted_details['signature'] }}"
+                                                        alt="Digital Signature" class="img-fluid"
+                                                        style="max-height: 150px;">
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    @endif
                                 </div>
 
                                 <div class="mt-3">
@@ -424,6 +346,65 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                @endif
+
+                @if ($contract?->statusCompany != true)
+                    <div class="modal fade" id="signedCompanyModal" tabindex="-1"
+                        aria-labelledby="signedCompanyModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered ">
+                            <form action="{{ route('contract.acceptCompany') }}" method="POST"
+                                id="acceptCompanyProposalForm">
+                                @csrf
+                                <input type="hidden" name="id" value="{{ $contract->id }}" />
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="signedModalLabel">Accept This Proposal</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="">
+                                            <div class="mb-3">
+                                                <label for="first_name" class="form-label">First Name</label>
+                                                <input type="text" id="first_name" name="first_name"
+                                                    class="form-control" placeholder="Enter your first name" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="last_name" class="form-label">Last Name</label>
+                                                <input type="text" id="last_name" name="last_name"
+                                                    class="form-control" placeholder="Enter your last name" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="company_email" class="form-label">Your Email</label>
+                                                <input type="email" id="company_email" name="email"
+                                                    class="form-control" placeholder="Enter your email" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="company_signature" class="form-label">Digital
+                                                    Signature</label>
+                                                <div>
+                                                    <canvas id="signaturePadCompany" class="border" width="400px"
+                                                        height="200"></canvas>
+                                                </div>
+
+                                                <input type="hidden" id="company_signature" name="signature" required>
+                                                <button type="button" class="btn btn-sm btn-secondary mt-2"
+                                                    onclick="clearSignature('signaturePadCompany')">Clear
+                                                    Signature</button>
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-primary">Accept Proposal</button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 @endif
@@ -456,107 +437,147 @@
         }
 
         // Initialize signature pad when document is loaded
-        let canvas;
-        let context;
-        let isDrawing = false;
-        let lastX = 0;
-        let lastY = 0;
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Get canvas element
-            canvas = document.getElementById('signaturePad');
-            context = canvas.getContext('2d');
+            // Initialize variables with null checks
+            const clientElements = {
+                canvas: document.getElementById('signaturePad'),
+                context: document.getElementById('signaturePad')?.getContext('2d'),
+                form: document.getElementById('acceptProposalForm'),
+                signatureField: document.getElementById('client_signature'),
+                isDrawing: false,
+                lastX: 0,
+                lastY: 0
+            };
 
-            // Set canvas styling
-            context.strokeStyle = '#000000';
-            context.lineWidth = 2;
-            context.lineCap = 'round';
+            const companyElements = {
+                canvas: document.getElementById('signaturePadCompany'),
+                context: document.getElementById('signaturePadCompany')?.getContext('2d'),
+                form: document.getElementById('acceptCompanyProposalForm'),
+                signatureField: document.getElementById('company_signature'),
+                isDrawing: false,
+                lastX: 0,
+                lastY: 0
+            };
 
-            // Add event listeners for mouse/touch events
-            canvas.addEventListener('mousedown', startDrawing);
-            canvas.addEventListener('mousemove', draw);
-            canvas.addEventListener('mouseup', stopDrawing);
-            canvas.addEventListener('mouseout', stopDrawing);
+            // Initialize signature pad for an element set
+            function initializeSignaturePad(elements) {
+                if (!elements.canvas || !elements.context) return;
 
-            // Touch events for mobile devices
-            canvas.addEventListener('touchstart', handleTouchStart);
-            canvas.addEventListener('touchmove', handleTouchMove);
-            canvas.addEventListener('touchend', stopDrawing);
+                elements.context.strokeStyle = '#000000';
+                elements.context.lineWidth = 2;
+                elements.context.lineCap = 'round';
 
-            // Handle form submission
-            const form = document.getElementById('acceptProposalForm');
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    if (isCanvasEmpty()) {
+                // Mouse events
+                elements.canvas.addEventListener('mousedown', (e) => startDrawing(e, elements));
+                elements.canvas.addEventListener('mousemove', (e) => draw(e, elements));
+                elements.canvas.addEventListener('mouseup', () => stopDrawing(elements));
+                elements.canvas.addEventListener('mouseout', () => stopDrawing(elements));
+
+                // Touch events
+                elements.canvas.addEventListener('touchstart', (e) => handleTouchStart(e, elements));
+                elements.canvas.addEventListener('touchmove', (e) => handleTouchMove(e, elements));
+                elements.canvas.addEventListener('touchend', () => stopDrawing(elements));
+            }
+
+            // Initialize both pads if they exist
+            initializeSignaturePad(clientElements);
+            initializeSignaturePad(companyElements);
+
+            // Drawing functions
+            function startDrawing(e, elements) {
+                if (!elements.canvas || !elements.context) return;
+
+                const rect = elements.canvas.getBoundingClientRect();
+                elements.isDrawing = true;
+                [elements.lastX, elements.lastY] = getCoordinates(e, rect);
+            }
+
+            function draw(e, elements) {
+                if (!elements.isDrawing || !elements.context || !elements.canvas) return;
+
+                e.preventDefault();
+                const rect = elements.canvas.getBoundingClientRect();
+                const [currentX, currentY] = getCoordinates(e, rect);
+
+                elements.context.beginPath();
+                elements.context.moveTo(elements.lastX, elements.lastY);
+                elements.context.lineTo(currentX, currentY);
+                elements.context.stroke();
+
+                [elements.lastX, elements.lastY] = [currentX, currentY];
+            }
+
+            function stopDrawing(elements) {
+                if (!elements) return;
+                elements.isDrawing = false;
+            }
+
+            function getCoordinates(e, rect) {
+                let x, y;
+                if (e.type.includes('touch')) {
+                    const touch = e.touches[0];
+                    x = touch.clientX - rect.left;
+                    y = touch.clientY - rect.top;
+                } else {
+                    x = e.clientX - rect.left;
+                    y = e.clientY - rect.top;
+                }
+                return [x, y];
+            }
+
+            function handleTouchStart(e, elements) {
+                e.preventDefault();
+                startDrawing(e, elements);
+            }
+
+            function handleTouchMove(e, elements) {
+                e.preventDefault();
+                draw(e, elements);
+            }
+
+            // Form submission handlers
+            if (clientElements.form && clientElements.canvas && clientElements.context) {
+                clientElements.form.addEventListener('submit', function(e) {
+                    if (isCanvasEmpty(clientElements.context, clientElements.canvas)) {
                         e.preventDefault();
                         alert('Please provide your signature');
                         return false;
                     }
-                    // Convert signature to base64 and set hidden input value
-                    const signatureData = canvas.toDataURL();
-                    document.getElementById('client_signature').value = signatureData;
+                    if (clientElements.signatureField) {
+                        clientElements.signatureField.value = clientElements.canvas.toDataURL();
+                    }
                 });
             }
-        });
 
-        function startDrawing(e) {
-            isDrawing = true;
-            [lastX, lastY] = getCoordinates(e);
-        }
-
-        function draw(e) {
-            if (!isDrawing) return;
-
-            e.preventDefault();
-
-            const [currentX, currentY] = getCoordinates(e);
-
-            context.beginPath();
-            context.moveTo(lastX, lastY);
-            context.lineTo(currentX, currentY);
-            context.stroke();
-
-            [lastX, lastY] = [currentX, currentY];
-        }
-
-        function stopDrawing() {
-            isDrawing = false;
-        }
-
-        function getCoordinates(e) {
-            let x, y;
-
-            if (e.type.includes('touch')) {
-                const rect = canvas.getBoundingClientRect();
-                const touch = e.touches[0];
-                x = touch.clientX - rect.left;
-                y = touch.clientY - rect.top;
-            } else {
-                const rect = canvas.getBoundingClientRect();
-                x = e.clientX - rect.left;
-                y = e.clientY - rect.top;
+            if (companyElements.form && companyElements.canvas && companyElements.context) {
+                companyElements.form.addEventListener('submit', function(e) {
+                    if (isCanvasEmpty(companyElements.context, companyElements.canvas)) {
+                        e.preventDefault();
+                        alert('Please provide your signature');
+                        return false;
+                    }
+                    if (companyElements.signatureField) {
+                        companyElements.signatureField.value = companyElements.canvas.toDataURL();
+                    }
+                });
             }
 
-            return [x, y];
-        }
+            // Helper function
+            function isCanvasEmpty(context, canvas) {
+                if (!context || !canvas) return true;
+                const pixelData = context.getImageData(0, 0, canvas.width, canvas.height).data;
+                return !pixelData.some(channel => channel !== 0);
+            }
 
-        function handleTouchStart(e) {
-            e.preventDefault();
-            startDrawing(e);
-        }
-
-        function handleTouchMove(e) {
-            e.preventDefault();
-            draw(e);
-        }
-
-        function clearSignature() {
-            context.clearRect(0, 0, canvas.width, canvas.height);
-        }
-
-        function isCanvasEmpty() {
-            const pixelData = context.getImageData(0, 0, canvas.width, canvas.height).data;
-            return !pixelData.some(channel => channel !== 0);
-        }
+            // Clear signature function (make it available globally)
+            window.clearSignature = function(canvasId) {
+                const targetCanvas = document.getElementById(canvasId);
+                const targetContext = targetCanvas?.getContext('2d');
+                if (targetContext && targetCanvas) {
+                    targetContext.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
+                }
+            };
+        });
     </script>
 @endpush

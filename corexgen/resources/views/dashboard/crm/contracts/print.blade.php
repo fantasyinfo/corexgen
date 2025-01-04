@@ -248,141 +248,7 @@
 
         <!-- Main Content -->
         <div class="Contract-content">
-            @if (!empty($contract?->product_details) && $contract?->product_details != NULL)
-            @php
-                $details = json_decode($contract->product_details, true);
-                $products = $details['products'] ?? [];
-                $additionalFields = $details['additional_fields'] ?? [];
-            @endphp
-
-            @if(!empty($products))
-            <div class="card mb-4">
-                <div class="card-header table-bg">
-                    <h5 class="mb-0">
-                        <i class="fas fa-file-invoice me-2"></i>
-                        Contract Details
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover">
-                            <thead class="table-primary">
-                                <tr>
-                                    <th>Title</th>
-                                    <th>Description</th>
-                                    <th class="text-center">Qty / Per Hr</th>
-                                    <th class="text-end" width="200px;">Rate ({{ getSettingValue('Currency Symbol') }})</th>
-                                    <th class="text-end">Tax</th>
-                                    <th class="text-end" width="200px;">Amount ({{ getSettingValue('Currency Symbol') }})</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($products as $product)
-                                    @php
-                                        $qty = floatval($product['qty']);
-                                        $rate = floatval($product['rate']);
-                                        $tax = floatval($product['tax']);
-                                        $amount = $qty * $rate;
-                                        $taxAmount = ($amount * $tax) / 100;
-                                    @endphp
-                                    <tr>
-                                        <td>
-                                            <span class="fw-medium">{{ $product['title'] }}</span>
-                                        </td>
-                                        <td>
-                                            <small class="text-muted">{{ $product['description'] }}</small>
-                                        </td>
-                                        <td class="text-center">
-                                            <span class="badge bg-light text-dark">
-                                                {{ number_format($qty) }} 
-                                               
-                                            </span>
-                                        </td>
-                                        <td class="text-end">
-                                            {{ getSettingValue('Currency Symbol') }} {{ number_format($rate, 2) }} {{ getSettingValue('Currency Code') }}
-                                        </td>
-                                        <td class="text-end">
-                                            <span class="text-muted">
-                                                {{ number_format($tax, 1) }}%
-                                            </span>
-                                        </td>
-                                        <td class="text-end">
-                                            {{ getSettingValue('Currency Symbol') }} {{ number_format($amount, 2) }} {{ getSettingValue('Currency Code') }}
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                            <tfoot class="table-bg">
-                                @php
-                                    $subTotal = array_reduce(
-                                        $products,
-                                        function ($carry, $product) {
-                                            return $carry +
-                                                floatval($product['qty']) * floatval($product['rate']);
-                                        },
-                                        0,
-                                    );
-
-                                    $totalTax = array_reduce(
-                                        $products,
-                                        function ($carry, $product) {
-                                            $amount =
-                                                floatval($product['qty']) * floatval($product['rate']);
-                                            return $carry + ($amount * floatval($product['tax'])) / 100;
-                                        },
-                                        0,
-                                    );
-
-                                    $discount = floatval($additionalFields['discount'] ?? 0);
-                                    $discountAmount = ($subTotal * $discount) / 100;
-
-                                    $adjustment = floatval($additionalFields['adjustment'] ?? 0);
-                                    $total = $subTotal - $discountAmount + $totalTax + $adjustment;
-                                @endphp
-
-                                <tr>
-                                    <td colspan="5" class="text-end">Sub Total:</td>
-                                    <td class="text-end"> {{ getSettingValue('Currency Symbol') }} {{ number_format($subTotal, 2) }} {{ getSettingValue('Currency Code') }}</td>
-                                </tr>
-                                @if ($discount > 0)
-                                    <tr>
-                                        <td colspan="5" class="text-end text-danger">
-                                            Discount ({{ number_format($discount, 1) }}%):
-                                        </td>
-                                        <td class="text-end text-danger">
-                                            {{ getSettingValue('Currency Symbol') }}  -{{ number_format($discountAmount, 2) }} {{ getSettingValue('Currency Code') }}
-                                        </td>
-                                    </tr>
-                                @endif
-                                @if ($totalTax > 0)
-                                    <tr>
-                                        <td colspan="5" class="text-end">Tax:</td>
-                                        <td class="text-end"> {{ getSettingValue('Currency Symbol') }} {{ number_format($totalTax, 2) }} {{ getSettingValue('Currency Code') }}</td>
-                                    </tr>
-                                @endif
-                                @if ($adjustment != 0)
-                                    <tr>
-                                        <td colspan="5"
-                                            class="text-end {{ $adjustment < 0 ? 'text-danger' : 'text-success' }}">
-                                            Adjustment:
-                                        </td>
-                                        <td
-                                            class="text-end {{ $adjustment < 0 ? 'text-danger' : 'text-success' }}">
-                                            {{ getSettingValue('Currency Symbol') }}  {{ $adjustment > 0 ? '+' : '' }}{{ number_format($adjustment, 2) }} {{ getSettingValue('Currency Code') }}
-                                        </td>
-                                    </tr>
-                                @endif
-                                <tr class="fw-bold">
-                                    <td colspan="5" class="text-end">Total:</td>
-                                    <td class="text-end"> {{ getSettingValue('Currency Symbol') }} {{ number_format($total, 2) }} {{ getSettingValue('Currency Code') }} </td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            @endif
-        @endif
+           
             <section>
                 <h2 class="section-title">Executive Summary</h2>
                 <div class="Contract-body">
@@ -399,58 +265,99 @@
         </div>
 
         <div class="Contract-content">
-        @if ($contract->status === 'ACCEPTED')
+            @if ($contract?->status === 'ACCEPTED' || $contract?->statusCompany == true)
             <div class="container mt-4">
                 <div class="card shadow-sm">
-                    <div class="card-header bg-primary text-white">
+                    <div class="card-header backbg text-white">
                         <h4 class="mb-0">Contract Acceptance Details</h4>
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-4">
-                                    <h5 class="text-muted mb-3">Client Information</h5>
-                                    <div class="table-responsive">
-                                        <table class="table table-borderless">
-                                            <tbody>
-                                                <tr>
-                                                    <td class="text-muted" style="width: 140px;">Name:</td>
-                                                    <td class="font-weight-bold">
-                                                        {{ $contract->accepted_details['first_name'] }}
-                                                        {{ $contract->accepted_details['last_name'] }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="text-muted">Email:</td>
-                                                    <td class="font-weight-bold">
-                                                        {{ $contract->accepted_details['email'] }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="text-muted">Accepted On:</td>
-                                                    <td class="font-weight-bold">
-                                                        {{ \Carbon\Carbon::parse($contract->accepted_at)->format('M d, Y h:i A') }}
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                            @if ($contract?->statusCompany == true)
+                                <div class="col-md-6">
+                                    <div class="mb-4">
+                                        <h5 class="text-muted mb-3">Company Information</h5>
+                                        <div class="table-responsive">
+                                            <table class="table table-borderless">
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="text-muted" style="width: 140px;">Name:</td>
+                                                        <td class="font-weight-bold">
+                                                            {{ $contract?->company_accepted_details['first_name'] }}
+                                                            {{ $contract?->company_accepted_details['last_name'] }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-muted">Email:</td>
+                                                        <td class="font-weight-bold">
+                                                            {{ $contract?->company_accepted_details['email'] }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-muted">Accepted On:</td>
+                                                        <td class="font-weight-bold">
+                                                            {{ \Carbon\Carbon::parse($contract?->company_accepted_details['accepted_at'])->format('M d, Y h:i A') }}
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <h5 class="text-muted mb-3">Digital Signature</h5>
+                                        <div class="border rounded p-3 bg-light">
+                                            <img src="{{ $contract?->company_accepted_details['signature'] }}"
+                                                alt="Digital Signature" class="img-fluid"
+                                                style="max-height: 150px;">
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-4">
-                                    <h5 class="text-muted mb-3">Digital Signature</h5>
-                                    <div class="border rounded p-3 bg-light">
-                                        <img src="{{ $contract->accepted_details['signature'] }}"
-                                            alt="Digital Signature" class="img-fluid" style="max-height: 150px;">
+                            @endif
+                            @if ($contract?->status === 'ACCEPTED')
+                                <div class="col-md-6">
+                                    <div class="mb-4">
+                                        <h5 class="text-muted mb-3">Client Information</h5>
+                                        <div class="table-responsive">
+                                            <table class="table table-borderless">
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="text-muted" style="width: 140px;">Name:</td>
+                                                        <td class="font-weight-bold">
+                                                            {{ $contract->accepted_details['first_name'] }}
+                                                            {{ $contract->accepted_details['last_name'] }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-muted">Email:</td>
+                                                        <td class="font-weight-bold">
+                                                            {{ $contract->accepted_details['email'] }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-muted">Accepted On:</td>
+                                                        <td class="font-weight-bold">
+                                                            {{ \Carbon\Carbon::parse($contract->accepted_details['accepted_at'])->format('M d, Y h:i A') }}
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <h5 class="text-muted mb-3">Digital Signature</h5>
+                                        <div class="border rounded p-3 bg-light">
+                                            <img src="{{ $contract->accepted_details['signature'] }}"
+                                                alt="Digital Signature" class="img-fluid"
+                                                style="max-height: 150px;">
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            @endif
                         </div>
 
                         <div class="mt-3">
                             <div class="alert alert-success d-flex align-items-center" role="alert">
                                 <i class="fas fa-check-circle me-2"></i>
                                 <div>
-                                    This Contract has been officially accepted and signed by the client.
+                                    This proposal has been officially accepted and signed by the client.
                                 </div>
                             </div>
                         </div>
