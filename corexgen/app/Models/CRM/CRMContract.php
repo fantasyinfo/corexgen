@@ -34,7 +34,7 @@ class CRMContract extends Model  implements Auditable
         'valid_date',
         'company_accepted_details',
         'accepted_details',
-        'product_details',
+        'statusCompany',
         'status',
         'template_id',
         'assign_to',
@@ -43,7 +43,8 @@ class CRMContract extends Model  implements Auditable
 
     protected $casts = [
         'accepted_details' => 'array',
-        'product_details' => 'array',
+        'company_accepted_details' => 'array',
+
     ];
 
 

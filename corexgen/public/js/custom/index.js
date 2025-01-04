@@ -1,109 +1,113 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // dselect init
-
-    if ($(".searchSelectBox").length > 0) {
+    // Select2 initialization
+    if (typeof $ !== 'undefined' && $(".searchSelectBox").length > 0) {
         $(".searchSelectBox").select2({
             placeholder: "Please select an option",
             minimumResultsForSearch: 5,
         });
     }
 
-    // date input
+    // Date input initialization
     const dateInputs = document.querySelectorAll('input[type="date"]');
-
-    // Apply Flatpickr to each date input
-    dateInputs.forEach((input) => {
-        flatpickr(input, {
-            enableTime: true,
-            altInput: true,
-            defaultDate: input.value,
+    if (dateInputs.length > 0 && typeof flatpickr !== 'undefined') {
+        dateInputs.forEach((input) => {
+            flatpickr(input, {
+                enableTime: true,
+                altInput: true,
+                defaultDate: input.value,
+            });
         });
-    });
+    }
 
-    // Ensure sidebar is open on desktop initially
-    if (window.innerWidth > 768) {
+    // Sidebar functionality
+    const sidebarToggle = document.getElementById("sidebarToggle");
+    const sidebarOverlay = document.querySelector(".sidebar-overlay");
+    const sidebarLinks = document.querySelectorAll('.sidebar .nav-link[data-bs-toggle="collapse"]');
+
+    if (sidebarToggle && window.innerWidth > 768) {
         document.body.classList.remove("sidebar-collapsed");
     }
 
-    // Toggle sidebar
-    document
-        .getElementById("sidebarToggle")
-        .addEventListener("click", function () {
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener("click", function () {
             document.body.classList.toggle("sidebar-collapsed");
         });
+    }
 
-    // Close sidebar when clicking overlay on mobile
-    document
-        .querySelector(".sidebar-overlay")
-        .addEventListener("click", function () {
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener("click", function () {
             document.body.classList.add("sidebar-collapsed");
         });
+    }
 
-    // Prevent auto-close when clicking on submenu links on mobile
-    document
-        .querySelectorAll('.sidebar .nav-link[data-bs-toggle="collapse"]')
-        .forEach(function (link) {
+    if (sidebarLinks.length > 0) {
+        sidebarLinks.forEach(function (link) {
             link.addEventListener("click", function (e) {
                 if (window.innerWidth <= 768) {
                     e.stopPropagation();
                 }
             });
         });
+    }
 
-    // Handle window resize
-    window.addEventListener("resize", function () {
-        if (window.innerWidth > 768) {
-            document.body.classList.remove("sidebar-collapsed");
-        } else {
-            document.body.classList.add("sidebar-collapsed");
+    // Window resize handler
+    const handleResize = function () {
+        if (document.querySelector(".sidebar")) {  // Only run if sidebar exists
+            if (window.innerWidth > 768) {
+                document.body.classList.remove("sidebar-collapsed");
+            } else {
+                document.body.classList.add("sidebar-collapsed");
+            }
         }
-    });
+    };
+    window.addEventListener("resize", handleResize);
 
     // Theme toggle functionality
     const themeToggleBtn = document.getElementById("themeToggle");
-    const themeIcon = themeToggleBtn.querySelector("i");
+    if (themeToggleBtn) {
+        const themeIcon = themeToggleBtn.querySelector("i");
+        if (themeIcon) {
+            const setTheme = function (theme) {
+                document.documentElement.setAttribute("data-bs-theme", theme);
+                localStorage.setItem("theme", theme);
+                themeIcon.className = theme === "dark" ? "fas fa-moon" : "fas fa-sun";
+            };
 
-    function setTheme(theme) {
-        document.documentElement.setAttribute("data-bs-theme", theme);
-        localStorage.setItem("theme", theme);
-        themeIcon.className = theme === "dark" ? "fas fa-moon" : "fas fa-sun";
+            const savedTheme =
+                localStorage.getItem("theme") ||
+                (window.matchMedia("(prefers-color-scheme: dark)").matches
+                    ? "dark"
+                    : "light");
+            setTheme(savedTheme);
+
+            themeToggleBtn.addEventListener("click", () => {
+                const currentTheme =
+                    document.documentElement.getAttribute("data-bs-theme");
+                setTheme(currentTheme === "dark" ? "light" : "dark");
+            });
+        }
     }
+});
 
-    const savedTheme =
-        localStorage.getItem("theme") ||
-        (window.matchMedia("(prefers-color-scheme: dark)").matches
-            ? "dark"
-            : "light");
-    setTheme(savedTheme);
-
-    themeToggleBtn.addEventListener("click", () => {
-        const currentTheme =
-            document.documentElement.getAttribute("data-bs-theme");
-        setTheme(currentTheme === "dark" ? "light" : "dark");
+// Tooltip initialization
+if (typeof $ !== 'undefined') {
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip();
     });
-});
+}
 
-$(function () {
-    // enable tooltip
-    $('[data-toggle="tooltip"]').tooltip();
-});
-
-// Function to toggle the filter section
-
-// Function to check filter state on page load
+// Filter sidebar functionality
 document.addEventListener("DOMContentLoaded", function () {
     const filterToggle = document.getElementById("filterToggle");
     const filterSidebar = document.getElementById("filterSidebar");
     const closeFilter = document.getElementById("closeFilter");
 
-    if (filterToggle) {
-        // Toggle filter sidebar
+    if (filterToggle && filterSidebar) {
         filterToggle.addEventListener("click", function () {
             filterSidebar.classList.toggle("show");
         });
 
         if (closeFilter) {
-            // Close filter sidebar
             closeFilter.addEventListener("click", function () {
                 filterSidebar.classList.remove("show");
             });
@@ -111,25 +115,22 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-// Get the drop zone element
+// Drop zone functionality
 const dropZone = document.querySelector(".drop-zone");
-const fileInput = document.querySelector("#csvFile");
+const fileInput = dropZone ? document.querySelector("#csvFile") : null;
 
-if (dropZone) {
-    // Click handler (you already have this)
+if (dropZone && fileInput) {
     dropZone.addEventListener("click", function () {
         fileInput.click();
     });
 
-    // File input change handler (you already have this)
     fileInput.addEventListener("change", function () {
         const file = this.files[0];
-        if (file) {
+        if (file && this.nextElementSibling) {
             this.nextElementSibling.textContent = file.name;
         }
     });
 
-    // Add drag and drop event listeners
     dropZone.addEventListener("dragover", function (e) {
         e.preventDefault();
         dropZone.style.backgroundColor = "#f8f9fa";
@@ -150,31 +151,34 @@ if (dropZone) {
         const files = e.dataTransfer.files;
         if (files.length) {
             fileInput.files = files;
-            // Trigger the change event manually
-            const event = new Event("change", {
-                bubbles: true,
-            });
+            const event = new Event("change", { bubbles: true });
             fileInput.dispatchEvent(event);
 
-            // Update the text
-            fileInput.nextElementSibling.textContent = files[0].name;
+            if (fileInput.nextElementSibling) {
+                fileInput.nextElementSibling.textContent = files[0].name;
+            }
         }
     });
 }
 
-$("#deleteModal").on("show.bs.modal", function (event) {
-    console.log("first");
-    var button = $(event.relatedTarget); // The button that triggered the modal
-    var roleId = button.data("id"); // Get the role ID
-    var route = button.data("route"); // Get the delete route
+// Delete modal functionality
+if (typeof $ !== 'undefined') {
+    $("#deleteModal").on("show.bs.modal", function (event) {
+        const button = $(event.relatedTarget);
+        const route = button.data("route");
+        const form = $("#deleteForm");
+        
+        if (form && route) {
+            form.attr("action", route);
+        }
+    });
+}
 
-    // Set the form action to the appropriate route
-    var form = $("#deleteForm");
-    form.attr("action", route);
-});
-
-document.querySelectorAll(".toast").forEach((toastEl) => {
-    const toast = new bootstrap.Toast(toastEl);
-    toast.show();
-});
-
+// Toast initialization
+const toasts = document.querySelectorAll(".toast");
+if (toasts.length > 0 && typeof bootstrap !== 'undefined') {
+    toasts.forEach((toastEl) => {
+        const toast = new bootstrap.Toast(toastEl);
+        toast.show();
+    });
+}
