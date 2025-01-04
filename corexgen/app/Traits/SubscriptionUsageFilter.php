@@ -25,12 +25,12 @@ trait SubscriptionUsageFilter
 
         $currentUsage = $this->getCurrentUsage($this->getCurrentSubscriptionId(), $module);
 
-        \Log::info('Usage', [
-            'currentUsage' => $currentUsage,
-            'totalAllow' => $totalAllow,
-            'companyId' => $this->getCompanyId(),
-            'currentSubID' => $this->getCurrentSubscriptionId()
-        ]);
+        // \Log::info('Usage', [
+        //     'currentUsage' => $currentUsage,
+        //     'totalAllow' => $totalAllow,
+        //     'companyId' => $this->getCompanyId(),
+        //     'currentSubID' => $this->getCurrentSubscriptionId()
+        // ]);
         // check 
 
         // for unlimited
