@@ -71,7 +71,7 @@ return [
     */
 
 
-    'timezone' => 'Asia/Kolkata', // todo:: create a dropdown on setting to set this value
+    'timezone' => 'UTC', // todo:: create a dropdown on setting to set this value
 
     /*
     |--------------------------------------------------------------------------
@@ -175,6 +175,7 @@ return [
         Yajra\DataTables\DataTablesServiceProvider::class,
         OwenIt\Auditing\AuditingServiceProvider::class,
         Modules\PaypalGatewayModule\PaypalGatewayModuleServiceProvider::class,
+
     ])->toArray(),
 
     /*

@@ -87,14 +87,19 @@ class SettingsController extends Controller
     public function defaultDateTimeFormats(): array
     {
         return [
-            'Y-m-d H:i:s' => 'Y-m-d H:i:s | 2024-12-14 12:34:56',
-            'd-m-Y H:i' => 'd-m-Y H:i | 14-12-2024 12:34',
-            'm/d/Y g:i A' => 'm/d/Y g:i A | 12/14/2024 12:34 PM',
-            'D, M j, Y' => 'D, M j, Y | Sat, Dec 14, 2024',
-            'l, F j, Y' => 'l, F j, Y | Saturday, December 14, 2024',
-            'c' => 'c | ISO 8601: 2024-12-14T12:34:56+00:00',
-            'r' => 'r | RFC 2822: Sat, 14 Dec 2024 12:34:56 +0000',
+            'Y-m-d H:i:s' => now()->format('Y-m-d H:i:s'),
+            'd-m-Y H:i' => now()->format('d-m-Y H:i'),
+            'm/d/Y g:i A' => now()->format('m/d/Y g:i A'),
+            'D, M j, Y h:i A' => now()->format('D, M j, Y h:i A'),
+            'l, F j, Y h:i A' => now()->format('l, F j, Y h:i A'),
+            'Y-m-d' => now()->format('Y-m-d'),
+            'd/m/Y' => now()->format('d/m/Y'),
+            'M j, Y h:i A' => now()->format('M j, Y h:i A'),
+            'c' => now()->format('c'),
+            'r' => now()->format('r'),
+            'U' => now()->format('U'),
         ];
+
     }
 
     public function generalUpdate(Request $request)
@@ -161,6 +166,7 @@ class SettingsController extends Controller
         // Handle the logo upload
         $this->updateCompanyLogo($request, $request->is_tenant);
 
+        clearSettingsCache();
         return redirect()->back()->with('success', 'Settings updated successfully');
     }
 

@@ -216,7 +216,8 @@ Route::middleware([
     'auth:sanctum',
     'company.onboarding',
     // config('jetstream.auth_session'),
-    'check.installation'
+    'check.installation',
+    'company.timezone'
 ])->prefix(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']))->as(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']) . '.')->group(function () {
 
     Route::get('/', function () {

@@ -187,7 +187,8 @@ class ClientService
                 return $this->renderActionsColumn($client);
             })
             ->editColumn('created_at', function ($client) {
-                return Carbon::parse($client->created_at)->format('d M Y');
+                // return Carbon::parse($client->created_at)->format('d M Y');
+                return formatDateTime($client?->created_at);
             })
             ->editColumn('title', function ($client) use ($module) {
                 return "<a class='dt-link' href='" . route($this->tenantRoute . $module . '.view', $client->id) . "' target='_blank'>$client->title</a>";
