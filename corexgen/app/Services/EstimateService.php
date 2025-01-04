@@ -285,7 +285,7 @@ class EstimateService
 
 
         // Check if the user has permission to update
-        if (hasPermission(strtoupper($module) . '.' . $permissions['UPDATE']['KEY']) && $proposal->status !== 'ACCEPTED') {
+        if (hasPermission(strtoupper($module) . '.' . $permissions['UPDATE']['KEY']) && $estimate->status !== 'ACCEPTED') {
             $action .= '<li class="m-1 p-1">
                 <a class="dropdown-item" href="' . route($tenantRoute . $module . '.edit', $id) . '" data-toggle="tooltip" title="Edit">
                  <i class="fas fa-pencil-alt me-2"></i> Edit

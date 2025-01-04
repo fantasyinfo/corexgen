@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('estimate', function (Blueprint $table) {
             $table->id();
-            $table->string('_prefix')->default('PRO');
+            $table->string('_prefix')->default('EST');
             $table->string('_id');
             $table->string('title');
             $table->string('url')->unique();

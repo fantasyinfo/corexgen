@@ -90,7 +90,7 @@
         $(document).ready(function() {
             const products = @json($products);
             const taxOptions = @json($tax);
-            const proposalInJson = @json($proposal);
+            const proposalInJson = @json($estimate);
 
             // Get product details directly from proposal JSON
             const productDetails = JSON.parse(proposalInJson?.product_details)?.products || [];

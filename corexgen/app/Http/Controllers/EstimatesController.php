@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 
 use App\Helpers\PermissionsHelper;
-use App\Http\Requests\ProposalEditRequest;
-use App\Http\Requests\ProposalRequest;
+use App\Http\Requests\EstimateEditRequest;
+use App\Http\Requests\EstimateRequest;
 use App\Models\CRM\CRMClients;
 use App\Models\CRM\CRMEstimate;
 use App\Models\CRM\CRMLeads;
@@ -109,12 +109,12 @@ class EstimatesController extends Controller
 
         // Build base query for Estimates totals
         $user = Auth::user();
-        $proposalQuery = CRMEstimate::query();
+        $estimateQuery = CRMEstimate::query();
 
-        $proposalQuery = $this->applyTenantFilter($proposalQuery);
+        $estimateQuery = $this->applyTenantFilter($estimateQuery);
 
         // Get all totals in a single query
-        $usersTotals = $proposalQuery->select([
+        $usersTotals = $estimateQuery->select([
             DB::raw('COUNT(*) as totalUsers'),
             DB::raw(sprintf(
                 'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalActive',
@@ -171,9 +171,8 @@ class EstimatesController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(ProposalRequest $request)
+    public function store(EstimateRequest $request)
     {
-
 
 
         $this->tenantRoute = $this->getTenantRoute();
@@ -275,7 +274,7 @@ class EstimatesController extends Controller
      * @param Request $request [explicite description]
      *
      */
-    public function update(ProposalEditRequest $request)
+    public function update(EstimateEditRequest $request)
     {
 
         $this->tenantRoute = $this->getTenantRoute();
@@ -341,7 +340,7 @@ class EstimatesController extends Controller
             $estimate = $this->applyTenantFilter(CRMEstimate::find($id));
 
             if ($action === 'SENT') {
-                return $this->sendProposal($id);
+                return $this->sendEstimate($id);
             }
 
             // Handle other status changes
@@ -578,7 +577,7 @@ class EstimatesController extends Controller
      * @param mixed $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
-    public function sendProposal($id)
+    public function sendEstimate($id)
     {
         $fromAPI = false;
         if (isset($_SERVER['QUERY_STRING']) && Str::contains($_SERVER['QUERY_STRING'], 'api=true')) {
@@ -638,23 +637,25 @@ class EstimatesController extends Controller
         */
     public function accept(Request $request)
     {
+      
         try {
             // Validate the request data
             $validatedData = $request->validate([
-                'id' => 'required|exists:estimates,id',
+                'id' => 'required|exists:estimate,id',
                 'first_name' => 'required|string|max:50',
                 'last_name' => 'required|string|max:50',
                 'email' => 'required|email|max:100',
                 'signature' => 'required|string',
             ]);
 
-            // Find the estimate using the tenant filter
-            $estimate = $this->applyTenantFilter(CRMEstimate::find($validatedData['id']));
 
+
+            // Find the estimate using the tenant filter
+            $estimate = CRMEstimate::find($validatedData['id']);
             if (!$estimate) {
                 throw new \Exception('Estimate not found.');
             }
-
+         
             // Update the estimate status and acceptance details
             $estimate->update([
                 'status' => 'ACCEPTED',
@@ -667,6 +668,7 @@ class EstimatesController extends Controller
                 ],
             ]);
 
+    
             return redirect()->back()->with('success', 'Estimate status updated successfully.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to process the request: ' . $e->getMessage());
