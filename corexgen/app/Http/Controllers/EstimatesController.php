@@ -610,7 +610,7 @@ class EstimatesController extends Controller
             }
 
             // Send estimate email
-            $this->estimateService->sendProposalOnEmail($estimate, $this->getViewFilePath('print'));
+            $this->estimateService->sendEstimateOnEmail($estimate, $this->getViewFilePath('print'));
 
             // Update estimate status
             // if($estimate->status != 'ACCEPTED'){

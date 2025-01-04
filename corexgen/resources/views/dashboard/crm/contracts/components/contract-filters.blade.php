@@ -18,7 +18,7 @@
             <div class="mb-3">
                 <div class="form-group">
                     <x-form-components.input-label for="nameFilter" class="custom-class" >
-                        {{ __('proposals.Title') }}
+                        {{ __('contracts.Title') }}
                     </x-form-components.input-label>
 
                     <x-form-components.input-group type="text" class="custom-class" id="nameFilter" name="title"
@@ -30,9 +30,9 @@
        
             <div class="mb-3">
                 <div class="form-group">
-                    <label for="clientFilter" class="mb-2 ">{{ __('proposals.Select Client') }}</label>
+                    <label for="clientFilter" class="mb-2 ">{{ __('contracts.Select Client') }}</label>
                     <select name="typable_id" class="form-select searchSelectBox" id="clientFilter" data-filter="client_id">
-                        <option value="">{{ __('proposals.Client') }}</option>
+                        <option value="">{{ __('contracts.Client') }}</option>
                         @foreach ($clients as $item)
                             <option value="{{$item->id}}" {{ request('typable_id') == $item->id ? 'selected' : '' }}>{{ $item->first_name . ' ' . $item->last_name . ' [' . $item->primary_email . ']' }}
                             </option>
@@ -42,9 +42,9 @@
             </div>
             <div class="mb-3">
                 <div class="form-group">
-                    <label for="leadFilter" class="mb-2 ">{{ __('proposals.Select Lead') }}</label>
+                    <label for="leadFilter" class="mb-2 ">{{ __('contracts.Select Lead') }}</label>
                     <select name="typable_id" class="form-select searchSelectBox" id="leadFilter" data-filter="lead_id">
-                        <option value="">{{ __('proposals.Lead') }}</option>
+                        <option value="">{{ __('contracts.Lead') }}</option>
                         @foreach ($leads as $item)
                             <option value="{{$item->id}}" {{ request('typable_id') == $item->id ? 'selected' : '' }}>{{ $item->first_name . ' ' . $item->last_name . ' [' . $item->email . ']' }}
                             </option>
@@ -54,9 +54,9 @@
             </div>
             <div class="mb-3">
                 <div class="form-group">
-                    <label for="statusFilter" class="mb-2 ">{{ __('proposals.All Statuses') }}</label>
+                    <label for="statusFilter" class="mb-2 ">{{ __('contracts.All Statuses') }}</label>
                     <select name="status" class="form-select" id="statusFilter" data-filter="status">
-                        <option value="">{{ __('proposals.All Statuses') }}</option>
+                        <option value="">{{ __('contracts.All Statuses') }}</option>
                         @foreach (CRM_STATUS_TYPES['PROPOSALS']['STATUS'] as $item)
                             <option value="{{$item}}" {{ request('status') == $item ? 'selected' : '' }}>{{$item}}</option>
                         @endforeach
@@ -66,14 +66,14 @@
 
             <div class="mb-3">
                 <div class="form-group">
-                    <label for="dateFilter" class="mb-2 ">{{ __('proposals.Date') }}</label>
+                    <label for="dateFilter" class="mb-2 ">{{ __('contracts.Date') }}</label>
                     <x-form-components.input-group type="date" class="custom-class" id="dateFilter" name="creating_date"
                     value="{{ request('creating_date') }}" data-filter="creating_date" />
                 </div>
             </div>
             <div class="mb-3">
                 <div class="form-group">
-                    <label for="vdateFilter" class="mb-2 ">{{ __('proposals.Valid Till') }}</label>
+                    <label for="vdateFilter" class="mb-2 ">{{ __('contracts.Valid Till') }}</label>
                     <x-form-components.input-group type="date" class="custom-class" id="vdateFilter" name="valid_date"
                     value="{{ request('valid_date') }}" data-filter="valid_date" />
                 </div>

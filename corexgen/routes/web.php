@@ -9,7 +9,6 @@ use App\Http\Controllers\CommentsController;
 use App\Http\Controllers\CompanyOnboardingController;
 use App\Http\Controllers\CompanyRegisterController;
 use App\Http\Controllers\ContractsController;
-use App\Http\Controllers\CountryCitySeederController;
 use App\Http\Controllers\CompaniesController;
 use App\Http\Controllers\CRM\ClientsController;
 use App\Http\Controllers\CRM\LeadsController;
@@ -162,6 +161,11 @@ Route::get('/estimate/print/{id}', [EstimatesController::class, 'print'])->name(
 Route::post('/estimate/accept', [EstimatesController::class, 'accept'])->name('estimate.accept');
 
 
+// contracts
+Route::get('/contract/view/{id}', [ContractsController::class, 'viewOpen'])->name('contract.viewOpen');
+Route::get('/contract/print/{id}', [ContractsController::class, 'print'])->name('contract.print');
+Route::post('/contract/accept', [ContractsController::class, 'accept'])->name('contract.accept');
+Route::post('/contract/acceptCompany', [ContractsController::class, 'acceptCompany'])->name('contract.acceptCompany');
 
 
 

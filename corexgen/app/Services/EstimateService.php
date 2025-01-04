@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Jobs\SendProposal;
+
 use App\Models\CRM\CRMClients;
 use App\Models\CRM\CRMEstimate;
 use App\Models\CRM\CRMLeads;
@@ -10,6 +10,7 @@ use App\Traits\IsSMTPValid;
 use App\Traits\TenantFilter;
 use Yajra\DataTables\Facades\DataTables;
 use App\Helpers\PermissionsHelper;
+use App\Jobs\SendEstimate;
 use App\Repositories\EsitmateRepository;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -123,43 +124,43 @@ class EstimateService
         ]);
     }
 
-    public function getProposals($typable_type, $typable_id)
+    public function getEstimates($typable_type, $typable_id)
     {
         return $this->applyTenantFilter(CRMEstimate::query()->where('typable_type', $typable_type)->where('typable_id', $typable_id)->latest()->get());
     }
 
 
-    public function sendProposalOnEmail(CRMEstimate $proposal, $view = "dashboard.crm.proposals.print"): bool
+    public function sendEstimateOnEmail(CRMEstimate $estimate, $view = "dashboard.crm.estimates.print"): bool
     {
         try {
             $mailSettings = $this->_getMailSettings();
 
-            $toEmail = $proposal->typable_type === CRMLeads::class
-                ? $proposal->typable->email
-                : $proposal->typable->primary_email;
+            $toEmail = $estimate->typable_type === CRMLeads::class
+                ? $estimate->typable->email
+                : $estimate->typable->primary_email;
 
             // Prepare email details
             $emailDetails = [
                 'from' => $mailSettings['Mail From Address'],
                 'to' => $toEmail,
-                'subject' => $proposal->title,
-                'details' => $proposal->details,
-                'template' => $proposal->template?->template_details
+                'subject' => $estimate->title,
+                'details' => $estimate->details,
+                'template' => $estimate->template?->template_details
             ];
 
             // Dispatch the job
-            SendProposal::dispatch(
+            SendEstimate::dispatch(
                 $mailSettings,
                 $emailDetails,
-                $proposal,
+                $estimate,
                 $view
             );
             return true;
         } catch (\Throwable $e) {
             // Log the error or handle it as needed
-            \Log::error('Failed to send proposal email', [
+            \Log::error('Failed to send estimate email', [
                 'error' => $e->getMessage(),
-                'proposal_id' => $proposal->id ?? null,
+                'estimate_id' => $estimate->id ?? null,
             ]);
 
             // Optionally, you can rethrow the exception if needed

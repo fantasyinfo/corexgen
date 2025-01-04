@@ -20,20 +20,20 @@
         <div class="row">
             <div class="justify-content-md-center col-lg-12">
                 <div class="card stretch stretch-full">
-                    <form id="proposalsFieldsForm" action="{{ route(getPanelRoutes('proposals.store')) }}" method="POST">
+                    <form id="contractFieldsForm" action="{{ route(getPanelRoutes('contracts.store')) }}" method="POST">
                         @csrf
 
                         <div class="card-body general-info">
                             <div class="mb-5 d-flex align-items-center justify-content-between">
                                 <p class="fw-bold mb-0 me-4">
-                                    <span class="d-block">{{ __('proposals.Create New Proposal') }}</span>
+                                    <span class="d-block">{{ __('contracts.Create New Contract') }}</span>
                                     <span class="fs-12 fw-normal text-muted text-truncate-1-line">
                                         {{ __('crud.Please add correct information') }}
                                     </span>
                                 </p>
                                 <div>
                                     <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-save"></i> {{ __('proposals.Create Proposal') }}
+                                        <i class="fas fa-save"></i> {{ __('contracts.Create Contract') }}
                                     </button>
                                 </div>
                             </div>
@@ -41,7 +41,7 @@
                             <div class="row mb-3 align-items-center">
                                 <div class="col-lg-4">
                                     <x-form-components.input-label for="type" required>
-                                        {{ __('proposals.Select Type') }}
+                                        {{ __('contracts.Select Type') }}
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
@@ -58,7 +58,7 @@
                             <div class="row mb-3 align-items-center" id="clientSection" style="display: none;">
                                 <div class="col-lg-4">
                                     <x-form-components.input-label for="client_id" required>
-                                        {{ __('proposals.Select Client') }}
+                                        {{ __('contracts.Select Client') }}
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
@@ -85,7 +85,7 @@
                             <div class="row mb-3 align-items-center" id="leadSection" style="display: none;">
                                 <div class="col-lg-4">
                                     <x-form-components.input-label for="lead_id" required>
-                                        {{ __('proposals.Select Lead') }}
+                                        {{ __('contracts.Select Lead') }}
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
@@ -113,13 +113,14 @@
                             <div class="row mb-4 align-items-center">
                                 <div class="col-lg-4">
                                     <x-form-components.input-label for="_prefix" class="custom-class" required>
-                                        {{ __('proposals.Prefix') }}
+                                        {{ __('contracts.Prefix') }}
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
                                     <x-form-components.input-group type="text" class="custom-class" id="_prefix"
-                                        name="_prefix" placeholder="{{ getSettingValue('Proposal Prefix') }}"
-                                        value="{{ old('_prefix', getSettingValue('Proposal Prefix')) }}" disabled />
+                                        name="_prefix" placeholder="{{ getSettingValue('Contract Prefix') }}"
+                                        value="{{ old('_prefix', getSettingValue('Contract Prefix')) }}" disabled />
+                                     <input type="hidden" name="_prefix" value="{{getSettingValue('Contract Prefix')}}" />
                                 </div>
                                 <p class="offset-lg-4 font-12 my-2 text-secondary"> Can be modify under one word settings.
                                 </p>
@@ -128,12 +129,12 @@
                             <div class="row mb-4 align-items-center">
                                 <div class="col-lg-4">
                                     <x-form-components.input-label for="_id" class="custom-class" required>
-                                        {{ __('proposals.ID') }}
+                                        {{ __('contracts.ID') }}
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
                                     <x-form-components.input-group-prepend-append
-                                        prepend="{{ getSettingValue('Proposal Prefix') }}-" append="..." type="text"
+                                        prepend="{{ getSettingValue('Contract Prefix') }}-" append="..." type="text"
                                         class="custom-class" id="_id" name="_id"
                                         placeholder="{{ __('0001') }}" value="{{ old('_id', $lastId) }}" required />
                                 </div>
@@ -148,12 +149,12 @@
                                 <div class="col-lg-4">
 
                                     <x-form-components.input-label for="title" class="custom-class" required>
-                                        {{ __('proposals.Title') }}
+                                        {{ __('contracts.Title') }}
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
                                     <x-form-components.input-group type="text" class="custom-class" id="title"
-                                        name="title" placeholder="{{ __('Amazing title') }}" value="{{ old('title') }}"
+                                        name="title" placeholder="{{ __('Amazing contract title') }}" value="{{ old('title') }}"
                                         required />
 
                                 </div>
@@ -162,7 +163,7 @@
                                 <div class="col-lg-4">
 
                                     <x-form-components.input-label for="value" class="custom-class">
-                                        {{ __('proposals.Value') }}
+                                        {{ __('contracts.Value') }}
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
@@ -179,12 +180,12 @@
                             <div class="row mb-3 align-items-center">
                                 <div class="col-lg-4">
                                     <x-form-components.input-label for="template_id">
-                                        {{ __('proposals.Select Template') }}
+                                        {{ __('contracts.Select Template') }}
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
                                     <select name="template_id" id="template_id" class="form-select">
-                                        <option value="">Select Template (optional)</option>
+                                        <option value="">Select Contract Template (optional)</option>
                                         @foreach ($templates as $item)
                                             <option value="{{ $item->id }}"
                                                 {{ old('template_id') == $item->id ? 'selected' : '' }}>
@@ -199,7 +200,7 @@
                                 <div class="col-lg-4">
 
                                     <x-form-components.input-label for="creating_date" class="custom-class" required>
-                                        {{ __('proposals.Date') }}
+                                        {{ __('contracts.Date') }}
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
@@ -212,7 +213,7 @@
                                 <div class="col-lg-4">
 
                                     <x-form-components.input-label for="valid_date" class="custom-class">
-                                        {{ __('proposals.Valid Till') }}
+                                        {{ __('contracts.Valid Till') }}
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
@@ -231,7 +232,7 @@
 
 
                                 <x-form-components.input-label for="valid_date" class="custom-class">
-                                    {{ __('proposals.Details') }}
+                                    {{ __('contracts.Details') }}
                                 </x-form-components.input-label>
 
 
@@ -240,8 +241,7 @@
                                     value="{{ old('details') }}" class="custom-class details" />
 
                             </div>
-                            <hr>
-                            @include('dashboard.crm.contracts.components._itemCreate')
+                          
                         </div>
                     </form>
                 </div>

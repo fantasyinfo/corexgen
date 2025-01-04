@@ -101,37 +101,37 @@
         <div class="proposal-container shadow-lg rounded-lg overflow-hidden">
             <!-- Cover Page -->
             <div class="proposal-header">
-                <div class="watermark">PROPOSAL</div>
+                <div class="watermark">CONTRACT</div>
                 <div class="row">
                     <div class="col-lg-8">
                         <div class="mb-4">
                             <span class="status-badge bg-secondary text-dark mb-3">
-                                {{ $proposal?->_prefix }}-{{ $proposal?->_id }}
+                                {{ $contract?->_prefix }}-{{ $contract?->_id }}
                             </span>
-                            <h1 class="display-4 mb-2">{{ $proposal?->title }}</h1>
-                            <p class="lead mb-0">Prepared for {{ $proposal?->typable->title }}.
-                                {{ $proposal?->typable?->first_name }} {{ $proposal?->typable?->last_name }}</p>
+                            <h1 class="display-4 mb-2">{{ $contract?->title }}</h1>
+                            <p class="lead mb-0">Prepared for {{ $contract?->typable->title }}.
+                                {{ $contract?->typable?->first_name }} {{ $contract?->typable?->last_name }}</p>
                         </div>
 
                         <div class="row mt-5">
                             <div class="col-md-6">
                                 <small class="text-light opacity-75">Prepared By</small>
-                                <h4>{{ $proposal?->company?->name }}</h4>
-                                <p class="mb-0">{{ $proposal?->company?->addresses?->street_address }}</p>
-                                <p class="mb-0">{{ $proposal?->company?->addresses?->city?->name }},
-                                    {{ $proposal?->company?->addresses?->country?->name }}</p>
-                                <p class="mb-0">{{ $proposal?->company?->phone }}</p>
+                                <h4>{{ $contract?->company?->name }}</h4>
+                                <p class="mb-0">{{ $contract?->company?->addresses?->street_address }}</p>
+                                <p class="mb-0">{{ $contract?->company?->addresses?->city?->name }},
+                                    {{ $contract?->company?->addresses?->country?->name }}</p>
+                                <p class="mb-0">{{ $contract?->company?->phone }}</p>
                             </div>
                             <div class="col-md-6">
                                 <small class="text-light opacity-75">Valid Until</small>
-                                <h4>{{ $proposal?->valid_date ? \Carbon\Carbon::parse($proposal?->valid_date)->format('F d, Y') : 'Not Specified' }}
+                                <h4>{{ $contract?->valid_date ? \Carbon\Carbon::parse($contract?->valid_date)->format('F d, Y') : 'Not Specified' }}
                                 </h4>
                                 <p class="mb-0">Created:
-                                    {{ \Carbon\Carbon::parse($proposal?->creating_date)->format('F d, Y') }}</p>
+                                    {{ \Carbon\Carbon::parse($contract?->creating_date)->format('F d, Y') }}</p>
 
 
                                 <p class="mb-3">Status: <span
-                                        class="badge bg-{{ CRM_STATUS_TYPES['PROPOSALS']['BT_CLASSES'][$proposal?->status] }} ms-2">{{ $proposal?->status }}</span>
+                                        class="badge bg-{{ CRM_STATUS_TYPES['PROPOSALS']['BT_CLASSES'][$contract?->status] }} ms-2">{{ $contract?->status }}</span>
                                 </p>
 
                             </div>
@@ -146,9 +146,9 @@
                 <section class="mb-5">
 
                     <div class="row">
-                        @if (!empty($proposal?->product_details) && $proposal?->product_details != NULL)
+                        @if (!empty($contract?->product_details) && $contract?->product_details != NULL)
                         @php
-                            $details = json_decode($proposal->product_details, true);
+                            $details = json_decode($contract->product_details, true);
                             $products = $details['products'] ?? [];
                             $additionalFields = $details['additional_fields'] ?? [];
                         @endphp
@@ -281,16 +281,16 @@
                         </div>
                         @endif
                     @endif
-                        @if (!is_null(trim($proposal?->template?->template_details)) && $proposal?->template?->template_details != NULL)
+                        @if (!is_null(trim($contract?->template?->template_details)) && $contract?->template?->template_details != NULL)
                             <h2 class="section-title">Executive Summary</h2>
                             <p class="lead">
-                                {!! $proposal?->template?->template_details !!}
+                                {!! $contract?->template?->template_details !!}
                             </p>
                         @endif
-                        @if (!is_null(trim($proposal?->details)) && $proposal?->details != NULL)
+                        @if (!is_null(trim($contract?->details)) && $contract?->details != NULL)
                             <h3 class="mt-3">Extra Details</h3>
                             <p>
-                                {!! $proposal?->details !!}
+                                {!! $contract?->details !!}
                             </p>
                         @endif
                     </div>
@@ -304,21 +304,21 @@
                     <button class="btn btn-outline-secondary me-2" onclick="printProposal()">
                         <i class="fas fa-down me-2"></i>Download PDF
                     </button>
-                    @if ($proposal?->status !== 'ACCEPTED')
+                    @if ($contract?->status !== 'ACCEPTED')
                         <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#signedModal">
-                            <i class="fas fa-check me-2"></i>Accept Proposal
+                            <i class="fas fa-check me-2"></i>Accept Contract
                         </button>
                     @endif
                 </div>
 
 
-                @if ($proposal?->status !== 'ACCEPTED')
+                @if ($contract?->status !== 'ACCEPTED')
                     <div class="modal fade" id="signedModal" tabindex="-1" aria-labelledby="signedModalLabel"
                         aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered ">
-                            <form action="{{ route('proposal.accept') }}" method="POST" id="acceptProposalForm">
+                            <form action="{{ route('contract.accept') }}" method="POST" id="acceptProposalForm">
                                 @csrf
-                                <input type="hidden" name="id" value="{{ $proposal->id }}" />
+                                <input type="hidden" name="id" value="{{ $contract->id }}" />
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="signedModalLabel">Accept This Proposal</h5>
@@ -368,11 +368,11 @@
                     </div>
                 @endif
 
-                @if ($proposal?->status === 'ACCEPTED')
+                @if ($contract?->status === 'ACCEPTED')
                     <div class="container mt-4">
                         <div class="card shadow-sm">
                             <div class="card-header bg-primary text-white">
-                                <h4 class="mb-0">Proposal Acceptance Details</h4>
+                                <h4 class="mb-0">Contract Acceptance Details</h4>
                             </div>
                             <div class="card-body">
                                 <div class="row">
@@ -385,18 +385,18 @@
                                                         <tr>
                                                             <td class="text-muted" style="width: 140px;">Name:</td>
                                                             <td class="font-weight-bold">
-                                                                {{ $proposal->accepted_details['first_name'] }}
-                                                                {{ $proposal->accepted_details['last_name'] }}</td>
+                                                                {{ $contract->accepted_details['first_name'] }}
+                                                                {{ $contract->accepted_details['last_name'] }}</td>
                                                         </tr>
                                                         <tr>
                                                             <td class="text-muted">Email:</td>
                                                             <td class="font-weight-bold">
-                                                                {{ $proposal->accepted_details['email'] }}</td>
+                                                                {{ $contract->accepted_details['email'] }}</td>
                                                         </tr>
                                                         <tr>
                                                             <td class="text-muted">Accepted On:</td>
                                                             <td class="font-weight-bold">
-                                                                {{ \Carbon\Carbon::parse($proposal->accepted_details['accepted_at'])->format('M d, Y h:i A') }}
+                                                                {{ \Carbon\Carbon::parse($contract->accepted_details['accepted_at'])->format('M d, Y h:i A') }}
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -408,7 +408,7 @@
                                         <div class="mb-4">
                                             <h5 class="text-muted mb-3">Digital Signature</h5>
                                             <div class="border rounded p-3 bg-light">
-                                                <img src="{{ $proposal->accepted_details['signature'] }}"
+                                                <img src="{{ $contract->accepted_details['signature'] }}"
                                                     alt="Digital Signature" class="img-fluid" style="max-height: 150px;">
                                             </div>
                                         </div>
@@ -437,11 +437,11 @@
         function printProposal() {
             // Open print view in a new window
 
-            let _id = "{{ $proposal->id }}";
+            let _id = "{{ $contract->id }}";
 
             const printWindow = window.open(
-                `/proposal/print/${_id}`,
-                'PrintProposal',
+                `/contract/print/${_id}`,
+                'PrintContract',
                 'width=1140,height=800'
             );
 
