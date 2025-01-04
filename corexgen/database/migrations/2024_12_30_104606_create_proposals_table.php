@@ -34,7 +34,7 @@ return new class extends Migration {
             $table->foreign('assign_to')->references('id')->on('users')->onDelete('set null');
             $table->foreign('template_id')->references('id')->on('templates')->onDelete('set null');
 
-            $table->unique(['_id', '_prefix', 'company_id', 'deleted_at'], 'proposals_unique_softdelete');
+
 
             $table->softDeletes();
             $table->timestamps();

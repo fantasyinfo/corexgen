@@ -15,6 +15,7 @@
         // prePrintR($tax->toArray());
 
     @endphp
+    
     <div class="container-fluid">
         <div class="row">
             <div class="justify-content-md-center col-lg-12">

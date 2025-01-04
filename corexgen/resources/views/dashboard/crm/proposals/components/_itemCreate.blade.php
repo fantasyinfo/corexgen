@@ -1,4 +1,3 @@
-
 <h6>Select Products & Services</h6>
 <div class="row mb-4 align-items-center">
     <div class="col-lg-12">
@@ -28,9 +27,9 @@
                 <th>Title</th>
                 <th>Description</th>
                 <th>Qty / Per Hour</th>
-                <th>Rate</th>
+                <th>Rate ({{ getSettingValue('Currency Symbol') }})</th>
                 <th>Tax</th>
-                <th class="text-end">Amount</th>
+                <th class="text-end" style="width:200px;">Amount</th>
                 <th></th>
             </tr>
         </thead>
@@ -40,7 +39,8 @@
         <tfoot>
             <tr>
                 <td colspan="5" class="text-end">Sub Total:</td>
-                <td class="text-end" id="subTotal">0.00</td>
+                <td class="text-end" id="subTotal">{{ getSettingValue('Currency Symbol') }} 0.00
+                    {{ getSettingValue('Currency Code') }}</td>
                 <td></td>
             </tr>
             <tr>
@@ -52,12 +52,14 @@
                         <span class="input-group-text">%</span>
                     </div>
                 </td>
-                <td class="text-end" id="discountAmount">0.00</td>
+                <td class="text-end" id="discountAmount">{{ getSettingValue('Currency Symbol') }} 0.00
+                    {{ getSettingValue('Currency Code') }}</td>
                 <td></td>
             </tr>
             <tr>
                 <td colspan="5" class="text-end">Tax:</td>
-                <td class="text-end" id="totalTax">0.00</td>
+                <td class="text-end" id="totalTax">{{ getSettingValue('Currency Symbol') }} 0.00
+                    {{ getSettingValue('Currency Code') }}</td>
                 <td></td>
             </tr>
             <tr>
@@ -66,12 +68,14 @@
                     <input type="number" class="form-control" id="adjustment" name="adjustment" value="0"
                         step="0.01">
                 </td>
-                <td class="text-end" id="adjustmentAmount">0.00</td>
+                <td class="text-end" id="adjustmentAmount">{{ getSettingValue('Currency Symbol') }} 0.00
+                    {{ getSettingValue('Currency Code') }}</td>
                 <td></td>
             </tr>
             <tr>
                 <td colspan="5" class="text-end fw-bold">Total:</td>
-                <td class="text-end fw-bold" id="total">0.00</td>
+                <td class="text-end fw-bold" id="total">{{ getSettingValue('Currency Symbol') }} 0.00
+                    {{ getSettingValue('Currency Code') }}</td>
                 <td></td>
             </tr>
         </tfoot>
@@ -147,7 +151,7 @@
                 <div class="input-group">
                     <input type="number" class="form-control qty-input" name="product_qty[]" 
                         value="${product ? product.qty || 1 : 1}" min="1" step="1" required>
-                    <span class="input-group-text">Unit</span>
+                    <span class="input-group-text">Unit | Hr</span>
                 </div>
             </td>
             <td>
@@ -180,16 +184,16 @@
                 return taxOptions
                     .map(tax =>
                         `<option value="${tax.name}" data-rate="${tax.name}" ${selectedTax == tax.id ? 'selected' : ''}>${tax.name}</option>`
-                        )
+                    )
                     .join('');
             }
 
             // Function: Initialize Events for Row
             function initializeRowEvents($row) {
                 $row.find('.qty-input, .rate-input, .tax-select').off('input change').on('input change',
-            function() {
-                    updateRowAmount($row);
-                });
+                    function() {
+                        updateRowAmount($row);
+                    });
 
                 $row.find('.remove-row').off('click').on('click', function() {
                     $row.remove();
@@ -226,10 +230,21 @@
                 const discountAmount = (subTotal * discount) / 100;
                 const total = subTotal - discountAmount + totalTax + adjustment;
 
-                $('#subTotal').text(subTotal.toFixed(2));
-                $('#totalTax').text(totalTax.toFixed(2));
-                $('#discountAmount').text(discountAmount.toFixed(2));
-                $('#total').text(total.toFixed(2));
+                $('#subTotal').text(' {{ getSettingValue('Currency Symbol') }} ' + subTotal.toFixed(2) +
+                    ' {{ getSettingValue('Currency Code') }} ');
+
+                $('#totalTax').text(' {{ getSettingValue('Currency Symbol') }} ' + totalTax.toFixed(2) +
+                    ' {{ getSettingValue('Currency Code') }} ');
+
+                $('#discountAmount').text(' {{ getSettingValue('Currency Symbol') }} ' + discountAmount.toFixed(
+                    2) + ' {{ getSettingValue('Currency Code') }} ');
+
+                $('#adjustmentAmount').text(' {{ getSettingValue('Currency Symbol') }} ' + adjustment.toFixed(2) + ' {{ getSettingValue('Currency Code') }} ');
+
+        
+
+                $('#total').text(' {{ getSettingValue('Currency Symbol') }} ' + total.toFixed(2) +
+                    ' {{ getSettingValue('Currency Code') }} ');
             }
         });
     </script>

@@ -97,7 +97,7 @@
 @endpush
 
 @section('content')
-    <div class="container-fluid py-5">
+    <div class="container-fluid ">
         <div class="proposal-container shadow-lg rounded-lg overflow-hidden">
             <!-- Cover Page -->
             <div class="proposal-header">
@@ -106,7 +106,7 @@
                     <div class="col-lg-8">
                         <div class="mb-4">
                             <span class="status-badge bg-secondary text-dark mb-3">
-                                {{ $proposal?->_prefix }}{{ $proposal?->_id }}
+                                {{ $proposal?->_prefix }}-{{ $proposal?->_id }}
                             </span>
                             <h1 class="display-4 mb-2">{{ $proposal?->title }}</h1>
                             <p class="lead mb-0">Prepared for {{ $proposal?->typable?->title }}.
@@ -146,146 +146,169 @@
                 <section class="mb-5">
 
                     <div class="row">
-                
-                        @if (!empty($proposal?->product_details) && $proposal?->product_details != NULL)
+
+                        @if (!empty($proposal?->product_details) && $proposal?->product_details != null)
                             @php
                                 $details = json_decode($proposal->product_details, true);
                                 $products = $details['products'] ?? [];
                                 $additionalFields = $details['additional_fields'] ?? [];
                             @endphp
 
-                            <div class="card mb-4">
-                                <div class="card-header table-bg">
-                                    <h5 class="mb-0">
-                                        <i class="fas fa-file-invoice me-2"></i>
-                                        Proposal Details
-                                    </h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-striped table-hover">
-                                            <thead class="table-primary">
-                                                <tr>
-                                                    <th>Title</th>
-                                                    <th>Description</th>
-                                                    <th class="text-center">Qty</th>
-                                                    <th class="text-end">Rate</th>
-                                                    <th class="text-end">Tax</th>
-                                                    <th class="text-end">Amount</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach ($products as $product)
+                            @if (!empty($products))
+                                <div class="card mb-4">
+                                    <div class="card-header table-bg">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-file-invoice me-2"></i>
+                                            Proposal Details
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-hover">
+                                                <thead class="table-primary">
+                                                    <tr>
+                                                        <th>Title</th>
+                                                        <th>Description</th>
+                                                        <th class="text-center">Qty / Per Hr</th>
+                                                        <th class="text-end" width="200px;">Rate
+                                                            ({{ getSettingValue('Currency Symbol') }})</th>
+                                                        <th class="text-end">Tax</th>
+                                                        <th class="text-end" width="200px;">Amount
+                                                            ({{ getSettingValue('Currency Symbol') }})</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach ($products as $product)
+                                                        @php
+                                                            $qty = floatval($product['qty']);
+                                                            $rate = floatval($product['rate']);
+                                                            $tax = floatval($product['tax']);
+                                                            $amount = $qty * $rate;
+                                                            $taxAmount = ($amount * $tax) / 100;
+                                                        @endphp
+                                                        <tr>
+                                                            <td>
+                                                                <span class="fw-medium">{{ $product['title'] }}</span>
+                                                            </td>
+                                                            <td>
+                                                                <small
+                                                                    class="text-muted">{{ $product['description'] }}</small>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <span class="badge bg-light text-dark">
+                                                                    {{ number_format($qty) }}
+
+                                                                </span>
+                                                            </td>
+                                                            <td class="text-end">
+                                                                {{ getSettingValue('Currency Symbol') }}
+                                                                {{ number_format($rate, 2) }}
+                                                                {{ getSettingValue('Currency Code') }}
+                                                            </td>
+                                                            <td class="text-end">
+                                                                <span class="text-muted">
+                                                                    {{ number_format($tax, 1) }}%
+                                                                </span>
+                                                            </td>
+                                                            <td class="text-end">
+                                                                {{ getSettingValue('Currency Symbol') }}
+                                                                {{ number_format($amount, 2) }}
+                                                                {{ getSettingValue('Currency Code') }}
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                                <tfoot class="table-bg">
                                                     @php
-                                                        $qty = floatval($product['qty']);
-                                                        $rate = floatval($product['rate']);
-                                                        $tax = floatval($product['tax']);
-                                                        $amount = $qty * $rate;
-                                                        $taxAmount = ($amount * $tax) / 100;
+                                                        $subTotal = array_reduce(
+                                                            $products,
+                                                            function ($carry, $product) {
+                                                                return $carry +
+                                                                    floatval($product['qty']) *
+                                                                        floatval($product['rate']);
+                                                            },
+                                                            0,
+                                                        );
+
+                                                        $totalTax = array_reduce(
+                                                            $products,
+                                                            function ($carry, $product) {
+                                                                $amount =
+                                                                    floatval($product['qty']) *
+                                                                    floatval($product['rate']);
+                                                                return $carry +
+                                                                    ($amount * floatval($product['tax'])) / 100;
+                                                            },
+                                                            0,
+                                                        );
+
+                                                        $discount = floatval($additionalFields['discount'] ?? 0);
+                                                        $discountAmount = ($subTotal * $discount) / 100;
+
+                                                        $adjustment = floatval($additionalFields['adjustment'] ?? 0);
+                                                        $total = $subTotal - $discountAmount + $totalTax + $adjustment;
                                                     @endphp
-                                                    <tr>
-                                                        <td>
-                                                            <span class="fw-medium">{{ $product['title'] }}</span>
-                                                        </td>
-                                                        <td>
-                                                            <small class="text-muted">{{ $product['description'] }}</small>
-                                                        </td>
-                                                        <td class="text-center">
-                                                            <span class="badge bg-light text-dark">
-                                                                {{ number_format($qty) }}
-                                                            </span>
-                                                        </td>
-                                                        <td class="text-end">
-                                                            {{ number_format($rate, 2) }}
-                                                        </td>
-                                                        <td class="text-end">
-                                                            <span class="text-muted">
-                                                                {{ number_format($tax, 1) }}%
-                                                            </span>
-                                                        </td>
-                                                        <td class="text-end">
-                                                            {{ number_format($amount, 2) }}
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                            <tfoot class="table-bg">
-                                                @php
-                                                    $subTotal = array_reduce(
-                                                        $products,
-                                                        function ($carry, $product) {
-                                                            return $carry +
-                                                                floatval($product['qty']) * floatval($product['rate']);
-                                                        },
-                                                        0,
-                                                    );
 
-                                                    $totalTax = array_reduce(
-                                                        $products,
-                                                        function ($carry, $product) {
-                                                            $amount =
-                                                                floatval($product['qty']) * floatval($product['rate']);
-                                                            return $carry + ($amount * floatval($product['tax'])) / 100;
-                                                        },
-                                                        0,
-                                                    );
-
-                                                    $discount = floatval($additionalFields['discount'] ?? 0);
-                                                    $discountAmount = ($subTotal * $discount) / 100;
-
-                                                    $adjustment = floatval($additionalFields['adjustment'] ?? 0);
-                                                    $total = $subTotal - $discountAmount + $totalTax + $adjustment;
-                                                @endphp
-
-                                                <tr>
-                                                    <td colspan="5" class="text-end">Sub Total:</td>
-                                                    <td class="text-end">{{ number_format($subTotal, 2) }}</td>
-                                                </tr>
-                                                @if ($discount > 0)
                                                     <tr>
-                                                        <td colspan="5" class="text-end text-danger">
-                                                            Discount ({{ number_format($discount, 1) }}%):
-                                                        </td>
-                                                        <td class="text-end text-danger">
-                                                            -{{ number_format($discountAmount, 2) }}
-                                                        </td>
+                                                        <td colspan="5" class="text-end">Sub Total:</td>
+                                                        <td class="text-end"> {{ getSettingValue('Currency Symbol') }}
+                                                            {{ number_format($subTotal, 2) }}
+                                                            {{ getSettingValue('Currency Code') }}</td>
                                                     </tr>
-                                                @endif
-                                                @if ($totalTax > 0)
-                                                    <tr>
-                                                        <td colspan="5" class="text-end">Tax:</td>
-                                                        <td class="text-end">{{ number_format($totalTax, 2) }}</td>
+                                                    @if ($discount > 0)
+                                                        <tr>
+                                                            <td colspan="5" class="text-end text-danger">
+                                                                Discount ({{ number_format($discount, 1) }}%):
+                                                            </td>
+                                                            <td class="text-end text-danger">
+                                                                {{ getSettingValue('Currency Symbol') }}
+                                                                -{{ number_format($discountAmount, 2) }}
+                                                                {{ getSettingValue('Currency Code') }}
+                                                            </td>
+                                                        </tr>
+                                                    @endif
+                                                    @if ($totalTax > 0)
+                                                        <tr>
+                                                            <td colspan="5" class="text-end">Tax:</td>
+                                                            <td class="text-end"> {{ getSettingValue('Currency Symbol') }}
+                                                                {{ number_format($totalTax, 2) }}
+                                                                {{ getSettingValue('Currency Code') }}</td>
+                                                        </tr>
+                                                    @endif
+                                                    @if ($adjustment != 0)
+                                                        <tr>
+                                                            <td colspan="5"
+                                                                class="text-end {{ $adjustment < 0 ? 'text-danger' : 'text-success' }}">
+                                                                Adjustment:
+                                                            </td>
+                                                            <td
+                                                                class="text-end {{ $adjustment < 0 ? 'text-danger' : 'text-success' }}">
+                                                                {{ getSettingValue('Currency Symbol') }}
+                                                                {{ $adjustment > 0 ? '+' : '' }}{{ number_format($adjustment, 2) }}
+                                                                {{ getSettingValue('Currency Code') }}
+                                                            </td>
+                                                        </tr>
+                                                    @endif
+                                                    <tr class="fw-bold">
+                                                        <td colspan="5" class="text-end">Total:</td>
+                                                        <td class="text-end"> {{ getSettingValue('Currency Symbol') }}
+                                                            {{ number_format($total, 2) }}
+                                                            {{ getSettingValue('Currency Code') }} </td>
                                                     </tr>
-                                                @endif
-                                                @if ($adjustment != 0)
-                                                    <tr>
-                                                        <td colspan="5"
-                                                            class="text-end {{ $adjustment < 0 ? 'text-danger' : 'text-success' }}">
-                                                            Adjustment:
-                                                        </td>
-                                                        <td
-                                                            class="text-end {{ $adjustment < 0 ? 'text-danger' : 'text-success' }}">
-                                                            {{ $adjustment > 0 ? '+' : '' }}{{ number_format($adjustment, 2) }}
-                                                        </td>
-                                                    </tr>
-                                                @endif
-                                                <tr class="fw-bold">
-                                                    <td colspan="5" class="text-end">Total:</td>
-                                                    <td class="text-end">{{ number_format($total, 2) }}</td>
-                                                </tr>
-                                            </tfoot>
-                                        </table>
+                                                </tfoot>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            @endif
                         @endif
-                        @if (!is_null(trim($proposal?->template?->template_details)) && $proposal?->template?->template_details != NULL)
+                        @if (!is_null(trim($proposal?->template?->template_details)) && $proposal?->template?->template_details != null)
                             <h2 class="section-title">Executive Summary</h2>
                             <p class="lead">
                                 {!! $proposal?->template?->template_details !!}
                             </p>
                         @endif
-                        @if (!is_null(trim($proposal?->details)) && $proposal?->details != NULL)
+                        @if (!is_null(trim($proposal?->details)) && $proposal?->details != null)
                             <h3 class="mt-3">Extra Details</h3>
                             <p>
                                 {!! $proposal?->details !!}
@@ -299,6 +322,10 @@
                 <!-- Action Buttons -->
 
                 <div class="d-flex justify-content-end mt-5 pt-4 border-top">
+                    <a href="{{ route('proposal.viewOpen', ['id' => $proposal->id]) }}"
+                        class="dt-link btn btn-outline-dark me-2">
+                        View as client
+                    </a>
                     <button class="btn btn-outline-secondary me-2" onclick="printProposal()">
                         <i class="bi bi-download me-2"></i>Download PDF
                     </button>
