@@ -7,8 +7,8 @@ use App\Helpers\PermissionsHelper;
 use App\Http\Requests\ProposalEditRequest;
 use App\Http\Requests\ProposalRequest;
 use App\Models\CRM\CRMClients;
+use App\Models\CRM\CRMEstimate;
 use App\Models\CRM\CRMLeads;
-use App\Models\CRM\CRMProposals;
 use App\Models\CRM\CRMTemplates;
 use App\Services\ProductServicesService;
 use App\Traits\IsSMTPValid;
@@ -18,24 +18,23 @@ use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use App\Repositories\ProposalRepository;
-use App\Services\ProposalService;
+use App\Services\EstimateService;
 use Illuminate\Support\Str;
 
 /**
- * proposalController handles CRUD operations for Proposals
+ * EstimatesController handles CRUD operations for Estimates
  * 
- * This controller manages proposal-related functionality including:
- * - Listing proposal with server-side DataTables
- * - Creating new proposal
- * - Editing existing proposal
- * - Exporting proposal to CSV
- * - Importing proposal from CSV
- * - Changing proposal here status removed,
+ * This controller manages Estimates-related functionality including:
+ * - Listing Estimates with server-side DataTables
+ * - Creating new Estimates
+ * - Editing existing Estimates
+ * - Exporting Estimates to CSV
+ * - Importing Estimates from CSV
+ * - Changing Estimates here status removed,
  *  - New VErsion Check
  */
 
-class ProposalController extends Controller
+class EstimatesController extends Controller
 {
 
     use TenantFilter;
@@ -59,7 +58,7 @@ class ProposalController extends Controller
      * Base directory for view files
      * @var string
      */
-    private $viewDir = 'dashboard.crm.proposals.';
+    private $viewDir = 'dashboard.crm.estimates.';
 
     /**
      * Generate full view file path
@@ -73,27 +72,27 @@ class ProposalController extends Controller
     }
 
 
-    protected $proposalRepository;
-    protected $proposalService;
+  
+    protected $estimateService;
 
     protected $customFieldService;
     protected $productServicesService;
 
     public function __construct(
-        ProposalRepository $proposalRepository,
-        ProposalService $proposalService,
+
+        EstimateService $estimateService,
         ProductServicesService $productServicesService
 
 
     ) {
-        $this->proposalRepository = $proposalRepository;
-        $this->proposalService = $proposalService;
+
+        $this->estimateService = $estimateService;
         $this->productServicesService = $productServicesService;
 
     }
 
     /**
-     * Display list of proposal with filtering and DataTables support
+     * Display list of Estimates with filtering and DataTables support
      * 
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Contracts\View\View|\Illuminate\Http\JsonResponse
@@ -102,15 +101,15 @@ class ProposalController extends Controller
     {
         // Ajax DataTables request
         if ($request->ajax()) {
-            return $this->proposalService->getDatatablesResponse($request);
+            return $this->estimateService->getDatatablesResponse($request);
         }
 
 
         // Fetch the totals in a single query
 
-        // Build base query for proposal totals
+        // Build base query for Estimates totals
         $user = Auth::user();
-        $proposalQuery = CRMProposals::query();
+        $proposalQuery = CRMEstimate::query();
 
         $proposalQuery = $this->applyTenantFilter($proposalQuery);
 
@@ -119,11 +118,11 @@ class ProposalController extends Controller
             DB::raw('COUNT(*) as totalUsers'),
             DB::raw(sprintf(
                 'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalActive',
-                CRM_STATUS_TYPES['PROPOSALS']['STATUS']['OPEN']
+                CRM_STATUS_TYPES['ESTIMATES']['STATUS']['OPEN']
             )),
             DB::raw(sprintf(
                 'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalInactive',
-                CRM_STATUS_TYPES['PROPOSALS']['STATUS']['DECLINED']
+                CRM_STATUS_TYPES['ESTIMATES']['STATUS']['DECLINED']
             ))
         ])->first();
 
@@ -132,7 +131,7 @@ class ProposalController extends Controller
         // fetch usage
 
         if (!$user->is_tenant && !is_null($user->company_id)) {
-            $usages = $this->fetchTotalAllowAndUsedUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['PROPOSALS']]));
+            $usages = $this->fetchTotalAllowAndUsedUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['ESTIMATES']]));
         } else if ($user->is_tenant) {
             $usages = [
                 'totalAllow' => '-1',
@@ -140,7 +139,7 @@ class ProposalController extends Controller
             ];
         }
 
-        $templates = $this->applyTenantFilter(CRMTemplates::query()->where('type', 'Proposals'))->get();
+        $templates = $this->applyTenantFilter(CRMTemplates::query()->where('type', 'Estimates'))->get();
 
         $clients = $this->applyTenantFilter(CRMClients::query())->select('id', 'first_name', 'last_name', 'type', 'company_name', 'primary_email')->get();
 
@@ -149,11 +148,11 @@ class ProposalController extends Controller
 
         return view($this->getViewFilePath('index'), [
             'filters' => $request->all(),
-            'title' => 'Proposals Management',
+            'title' => 'Estimates Management',
             'templates' => $templates,
-            'permissions' => PermissionsHelper::getPermissionsArray('PROPOSALS'),
-            'module' => PANEL_MODULES[$this->getPanelModule()]['proposals'],
-            'type' => 'Proposals',
+            'permissions' => PermissionsHelper::getPermissionsArray('ESTIMATES'),
+            'module' => PANEL_MODULES[$this->getPanelModule()]['estimates'],
+            'type' => 'Estimates',
             'total_allow' => $usages['totalAllow'],
             'total_used' => $usages['currentUsage'],
             'total_active' => $usersTotals->totalActive,
@@ -168,7 +167,7 @@ class ProposalController extends Controller
 
 
     /**
-     * Storing the data of proposal into db
+     * Storing the data of Estimates into db
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -182,19 +181,19 @@ class ProposalController extends Controller
         try {
 
 
-            $proposal = $this->proposalService->createProposal($request->validated());
+            $estimate = $this->estimateService->createEstimate($request->validated());
 
 
             // update current usage
-            $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['PROPOSALS']]), '+', '1');
+            $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['ESTIMATES']]), '+', '1');
 
 
 
-            return redirect()->route($this->tenantRoute . 'proposals.index')
-                ->with('success', 'Proposals created successfully.');
+            return redirect()->route($this->tenantRoute . 'estimates.index')
+                ->with('success', 'Estimates created successfully.');
         } catch (\Exception $e) {
             return redirect()->back()->withInput()
-                ->with('error', 'An error occurred while creating the Proposals: ' . $e->getMessage());
+                ->with('error', 'An error occurred while creating the Estimates: ' . $e->getMessage());
         }
     }
 
@@ -202,15 +201,15 @@ class ProposalController extends Controller
 
 
     /**
-     * Return the view for creating new proposal 
+     * Return the view for creating new Estimates 
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function create()
     {
 
-        $this->checkCurrentUsage(strtolower(PLANS_FEATURES['PROPOSALS']));
+        $this->checkCurrentUsage(strtolower(PLANS_FEATURES['ESTIMATES']));
         // Regular view rendering
-        $templates = $this->applyTenantFilter(CRMTemplates::query()->select('id', 'title')->where('type', 'Proposals'))->get();
+        $templates = $this->applyTenantFilter(CRMTemplates::query()->select('id', 'title')->where('type', 'Estimates'))->get();
 
         $clients = $this->applyTenantFilter(CRMClients::query())->select('id', 'first_name', 'last_name', 'type', 'company_name', 'primary_email')->get();
 
@@ -218,13 +217,13 @@ class ProposalController extends Controller
 
 
         // Fetch the last `_id` from the database
-        $lastId = CRMProposals::where('company_id', Auth::user()->company_id)->latest('id')->value('id');
+        $lastId = CRMEstimate::where('company_id', Auth::user()->company_id)->latest('id')->value('id');
         $incrementedId = $lastId ? (int) filter_var($lastId, FILTER_SANITIZE_NUMBER_INT) + 1 : 1;
         $defaultId = str_pad($incrementedId, 4, '0', STR_PAD_LEFT);
 
 
         return view($this->getViewFilePath('create'), [
-            'title' => 'Create Proposal',
+            'title' => 'Create Estimate',
             'templates' => $templates,
             'clients' => $clients,
             'leads' => $leads,
@@ -235,21 +234,21 @@ class ProposalController extends Controller
     }
 
     /**
-     * showing the edit proposal view
+     * showing the edit Estimates view
      * @param mixed $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function edit($id)
     {
 
-        $query = CRMProposals::query()
+        $query = CRMEstimate::query()
             ->where('id', $id);
         $query = $this->applyTenantFilter($query);
-        $proposal = $query->firstOrFail();
+        $estimate = $query->firstOrFail();
 
 
         // Regular view rendering
-        $templates = $this->applyTenantFilter(CRMTemplates::query()->select('id', 'title')->where('type', 'Proposals'))->get();
+        $templates = $this->applyTenantFilter(CRMTemplates::query()->select('id', 'title')->where('type', 'Estimates'))->get();
 
         $clients = $this->applyTenantFilter(CRMClients::query())->select('id', 'first_name', 'last_name', 'type', 'company_name', 'primary_email')->get();
 
@@ -257,8 +256,8 @@ class ProposalController extends Controller
 
         return view($this->getViewFilePath('edit'), [
 
-            'title' => 'Edit Proposal',
-            'proposal' => $proposal,
+            'title' => 'Edit Estimate',
+            'estimate' => $estimate,
             'templates' => $templates,
             'clients' => $clients,
             'leads' => $leads,
@@ -271,7 +270,7 @@ class ProposalController extends Controller
 
     /**
      * Method update 
-     * for updating the proposal
+     * for updating the Estimates
      *
      * @param Request $request [explicite description]
      *
@@ -284,13 +283,13 @@ class ProposalController extends Controller
         try {
 
 
-            $proposal = $this->proposalService->updateProposal($request->validated());
+            $estimate = $this->estimateService->updateEstimate($request->validated());
 
-            return redirect()->route($this->tenantRoute . 'proposals.index')
-                ->with('success', 'proposal updated successfully.');
+            return redirect()->route($this->tenantRoute . 'estimates.index')
+                ->with('success', 'estimate updated successfully.');
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'An error occurred while updating the proposal: ' . $e->getMessage());
+                ->with('error', 'An error occurred while updating the estimate: ' . $e->getMessage());
         }
     }
 
@@ -299,7 +298,7 @@ class ProposalController extends Controller
 
 
     /**
-     * Deleting the proposal
+     * Deleting the Estimates
      * @param mixed $id
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -307,47 +306,47 @@ class ProposalController extends Controller
     {
 
         try {
-            // Delete the proposal
+            // Delete the estimate
 
-            $user = $this->applyTenantFilter(CRMProposals::find($id));
-            if ($user) {
+            $estimate = $this->applyTenantFilter(CRMEstimate::find($id));
+            if ($estimate) {
                 // delete  now
-                $user->delete();
+                $estimate->delete();
 
                 // update the subscription usage
-                $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['PROPOSALS']]), '-', '1');
+                $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['ESTIMATES']]), '-', '1');
 
-                return redirect()->back()->with('success', 'Proposal deleted successfully.');
+                return redirect()->back()->with('success', 'Estimate deleted successfully.');
             } else {
-                return redirect()->back()->with('error', 'Failed to delete the Proposal: Proposal not found with this id.');
+                return redirect()->back()->with('error', 'Failed to delete the Estimate: Estimate not found with this id.');
             }
 
         } catch (\Exception $e) {
             // Handle any exceptions
-            return redirect()->back()->with('error', 'Failed to delete the proposal: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to delete the estimate: ' . $e->getMessage());
         }
     }
 
 
     /**
-     * Method changeStatus (change proposal status)
+     * Method changeStatus (change Estimates status)
      *
-     * @param $id $id [explicite id of proposal]
+     * @param $id $id [explicite id of Estimates]
      * @param $status $status [explicite status to change]
      *
      */
     public function changeStatusAction($id, $action)
     {
         try {
-            $proposal = $this->applyTenantFilter(CRMProposals::find($id));
+            $estimate = $this->applyTenantFilter(CRMEstimate::find($id));
 
             if ($action === 'SENT') {
                 return $this->sendProposal($id);
             }
 
             // Handle other status changes
-            $proposal->update(['status' => $action]);
-            return redirect()->back()->with('success', 'Proposal status updated successfully.');
+            $estimate->update(['status' => $action]);
+            return redirect()->back()->with('success', 'Estimate status updated successfully.');
 
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to process the request: ' . $e->getMessage());
@@ -358,7 +357,7 @@ class ProposalController extends Controller
 
 
     /**
-     * Bulk Delete the proposal
+     * Bulk Delete the Estimates
      * Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -369,27 +368,27 @@ class ProposalController extends Controller
 
 
         try {
-            // Delete the proposal
+            // Delete the Estimates
 
             if (is_array($ids) && count($ids) > 0) {
                 DB::transaction(function () use ($ids) {
 
 
 
-                    // Then delete the proposal
-                    CRMProposals::whereIn('id', $ids)->delete();
+                    // Then delete the Estimates
+                    CRMEstimate::whereIn('id', $ids)->delete();
 
                     $this->updateUsage(
-                        strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['PROPOSALS']]),
+                        strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['ESTIMATES']]),
                         '-',
                         count($ids)
                     );
                 });
 
-                return response()->json(['message' => 'Selected proposals deleted successfully.'], 200);
+                return response()->json(['message' => 'Selected estimates deleted successfully.'], 200);
             }
 
-            return response()->json(['message' => 'No proposals selected for deletion.'], 400);
+            return response()->json(['message' => 'No estimates selected for deletion.'], 400);
 
         } catch (\Exception $e) {
             // Handle any exceptions
@@ -401,14 +400,14 @@ class ProposalController extends Controller
 
 
     /**
-     * View proposal
+     * View Estimates
      * @param mixed $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function view($id)
     {
         $proposalQuery = $this->applyTenantFilter(
-            CRMProposals::query()
+            CRMEstimate::query()
                 ->with([
                     'typable' => function ($query) {
                         if (request('typable_type') === CRMClients::class) {
@@ -447,26 +446,26 @@ class ProposalController extends Controller
 
 
         $query = $this->applyTenantFilter($proposalQuery);
-        $proposal = $query->firstOrFail();
+        $estimate = $query->firstOrFail();
 
 
         return view($this->getViewFilePath('view'), [
-            'title' => 'View Proposal',
-            'proposal' => $proposal,
-            'module' => PANEL_MODULES[$this->getPanelModule()]['proposals'],
+            'title' => 'View Estimate',
+            'estimate' => $estimate,
+            'module' => PANEL_MODULES[$this->getPanelModule()]['estimates'],
 
         ]);
     }
 
     /**
-     * View as client proposal
+     * View as client Estimates
      * @param mixed $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function viewOpen($id)
     {
         $proposalQuery = $this->applyTenantFilter(
-            CRMProposals::query()
+            CRMEstimate::query()
                 ->with([
                     'typable' => function ($query) {
                         if (request('typable_type') === CRMClients::class) {
@@ -505,26 +504,26 @@ class ProposalController extends Controller
 
 
         $query = $this->applyTenantFilter($proposalQuery);
-        $proposal = $query->firstOrFail();
+        $estimate = $query->firstOrFail();
 
 
         return view($this->getViewFilePath('viewOpen'), [
-            'title' => 'View Proposal',
-            'proposal' => $proposal,
-            'module' => PANEL_MODULES[$this->getPanelModule()]['proposals'],
+            'title' => 'View Estimate',
+            'estimate' => $estimate,
+            'module' => PANEL_MODULES[$this->getPanelModule()]['estimates'],
 
         ]);
     }
 
     /**
-     * print proposal
+     * print Estimates
      * @param mixed $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function print($id)
     {
         $proposalQuery = $this->applyTenantFilter(
-            CRMProposals::query()
+            CRMEstimate::query()
                 ->with([
                     'typable' => function ($query) {
                         if (request('typable_type') === CRMClients::class) {
@@ -563,19 +562,19 @@ class ProposalController extends Controller
 
 
         $query = $this->applyTenantFilter($proposalQuery);
-        $proposal = $query->firstOrFail();
+        $estimate = $query->firstOrFail();
 
 
         return view($this->getViewFilePath('print'), [
-            'title' => 'Print Proposal',
-            'proposal' => $proposal,
-            'module' => PANEL_MODULES[$this->getPanelModule()]['proposals'],
+            'title' => 'Print Estimate',
+            'estimate' => $estimate,
+            'module' => PANEL_MODULES[$this->getPanelModule()]['estimates'],
 
         ]);
     }
 
     /**
-     * send  proposal
+     * send  Estimates
      * @param mixed $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
@@ -587,8 +586,8 @@ class ProposalController extends Controller
         }
 
         try {
-            $proposal = $this->applyTenantFilter(
-                CRMProposals::query()
+            $estimate = $this->applyTenantFilter(
+                CRMEstimate::query()
                     ->with([
                         'typable',
                         'template',
@@ -600,9 +599,9 @@ class ProposalController extends Controller
             )->findOrFail($id);
 
             // Get recipient email based on typable type
-            $toEmail = $proposal->typable_type === CRMLeads::class
-                ? $proposal->typable->email
-                : $proposal->typable->primary_email;
+            $toEmail = $estimate->typable_type === CRMLeads::class
+                ? $estimate->typable->email
+                : $estimate->typable->primary_email;
 
             if (empty($toEmail)) {
                 $errorResponse = ['error' => 'No email found for this client/lead'];
@@ -611,16 +610,16 @@ class ProposalController extends Controller
                     : redirect()->back()->with('error', $errorResponse['error']);
             }
 
-            // Send proposal email
-            $this->proposalService->sendProposalOnEmail($proposal, $this->getViewFilePath('print'));
+            // Send estimate email
+            $this->estimateService->sendProposalOnEmail($estimate, $this->getViewFilePath('print'));
 
-            // Update proposal status
-            // if($proposal->status != 'ACCEPTED'){
+            // Update estimate status
+            // if($estimate->status != 'ACCEPTED'){
 
-            //     $proposal->update(['status' => 'SENT']);
+            //     $estimate->update(['status' => 'SENT']);
             // }
 
-            $successResponse = ['success' => 'Proposal has been sent in the background job and will be delivered soon.'];
+            $successResponse = ['success' => 'Estimate has been sent in the background job and will be delivered soon.'];
             return $fromAPI
                 ? response()->json($successResponse)
                 : redirect()->back()->with('success', $successResponse['success']);
@@ -634,7 +633,7 @@ class ProposalController extends Controller
 
 
     /**
-        * accept proposal
+        * accept Estimates
 
         */
     public function accept(Request $request)
@@ -642,22 +641,22 @@ class ProposalController extends Controller
         try {
             // Validate the request data
             $validatedData = $request->validate([
-                'id' => 'required|exists:proposals,id',
+                'id' => 'required|exists:estimates,id',
                 'first_name' => 'required|string|max:50',
                 'last_name' => 'required|string|max:50',
                 'email' => 'required|email|max:100',
                 'signature' => 'required|string',
             ]);
 
-            // Find the proposal using the tenant filter
-            $proposal = $this->applyTenantFilter(CRMProposals::find($validatedData['id']));
+            // Find the estimate using the tenant filter
+            $estimate = $this->applyTenantFilter(CRMEstimate::find($validatedData['id']));
 
-            if (!$proposal) {
-                throw new \Exception('Proposal not found.');
+            if (!$estimate) {
+                throw new \Exception('Estimate not found.');
             }
 
-            // Update the proposal status and acceptance details
-            $proposal->update([
+            // Update the estimate status and acceptance details
+            $estimate->update([
                 'status' => 'ACCEPTED',
                 'accepted_details' => [
                     'first_name' => $validatedData['first_name'],
@@ -668,7 +667,7 @@ class ProposalController extends Controller
                 ],
             ]);
 
-            return redirect()->back()->with('success', 'Proposal status updated successfully.');
+            return redirect()->back()->with('success', 'Estimate status updated successfully.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to process the request: ' . $e->getMessage());
         }

@@ -125,7 +125,7 @@ table tr {
     top: 0;
     right: -350px;
     background: var(--sidebar-bg);
-    color: #fff;
+    /* color: #fff; */
 
     box-shadow: -4px 0 6px rgba(0, 0, 0, 0.1);
     transition: right 0.3s ease-in-out;
@@ -641,8 +641,7 @@ table.celled {
 }
 
 .submenu {
-    box-shadow: inset -3px 3px 14px rgba(0, 0, 0, 0.5),
-        inset -2px -2px 3px rgba(255, 255, 255, 0.2);
+    box-shadow:  inset 0px 0px 10px rgba(0, 0, 0, 0.1);
     background: var(--body-bg);
 }
 

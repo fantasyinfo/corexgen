@@ -19,7 +19,7 @@
                         <div class="card-body general-info">
                             <div class="mb-5 d-flex align-items-center justify-content-between">
                                 <p class="fw-bold mb-0 me-4">
-                                    <span class="d-block">{{ __('templates.Create New Template') }}</span>
+                                    <span class="d-block">{{ __('templates.Create New Template') }} {{$type}}</span>
                                     <span
                                         class="fs-12 fw-normal text-muted text-truncate-1-line">{{ __('crud.Please add correct information') }}</span>
                                 </p>
@@ -35,7 +35,7 @@
                                 </x-form-components.input-label>
 
                                 <x-form-components.input-group type="text" name="title" id="templateTitle"
-                                    placeholder="{{ __('X Services / X Products Proposals') }}" value="{{ old('title') }}"
+                                    placeholder="{{ __('X Services / X Products ') }}{{$type}}" value="{{ old('title') }}"
                                     required class="custom-class" />
 
                             </div>
@@ -48,7 +48,7 @@
                                 </x-form-components.input-label>
 
                                 <x-form-components.textarea-group name="template_details" id="template_details"
-                                    placeholder="Design template" value="{{ old('template_details') }}"
+                                    placeholder="Design {{$type}} template" value="{{ old('template_details') }}"
                                     class="custom-class template_details" />
 
                             </div>

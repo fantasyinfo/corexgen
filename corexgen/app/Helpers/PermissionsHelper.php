@@ -34,8 +34,12 @@ class PermissionsHelper
         'CUSTOM_FIELDS' => 'CUSTOM_FIELDS',
         'LEADS' => 'LEADS',
         'PROPOSALS' => 'PROPOSALS',
+        'ESTIMATES' => 'ESTIMATES',
+        'CONTRACTS' => 'CONTRACTS',
         'PROPOSALS_TEMPLATES' => 'PROPOSALS_TEMPLATES',
         'PRODUCTS_SERVICES' => 'PRODUCTS_SERVICES',
+        'ESTIMATES_TEMPLATES' => 'ESTIMATES_TEMPLATES',
+        'CONTRACTS_TEMPLATES' => 'CONTRACTS_TEMPLATES'
 
     ];
 
@@ -103,7 +107,7 @@ class PermissionsHelper
 
             self::$plansPermissionsKeys['LEADS'] => [3101 => 'CREATE', 3102 => 'READ', 3103 => 'READ_ALL', 3104 => 'UPDATE', 3105 => 'DELETE', 3106 => 'IMPORT', 3107 => 'EXPORT', 3108 => 'FILTER', 3109 => 'CHANGE_STATUS', 3110 => 'BULK_DELETE', 3111 => 'VIEW', 3112 => 'KANBAN_BOARD', 3113 => 'CHANGE_STAGE'],
 
-     
+
 
 
             self::$plansPermissionsKeys['PROPOSALS'] => [3151 => 'CREATE', 3152 => 'READ', 3153 => 'READ_ALL', 3154 => 'UPDATE', 3155 => 'DELETE', 3158 => 'FILTER', 3159 => 'CHANGE_STATUS', 3160 => 'BULK_DELETE', 3161 => 'VIEW'],
@@ -112,6 +116,14 @@ class PermissionsHelper
 
 
             self::$plansPermissionsKeys['PRODUCTS_SERVICES'] => [3251 => 'CREATE', 3252 => 'READ', 3253 => 'READ_ALL', 3254 => 'UPDATE', 3255 => 'DELETE', 3258 => 'FILTER', 3259 => 'CHANGE_STATUS', 3260 => 'BULK_DELETE', 3261 => 'VIEW'],
+
+            self::$plansPermissionsKeys['ESTIMATES'] => [3301 => 'CREATE', 3302 => 'READ', 3303 => 'READ_ALL', 3304 => 'UPDATE', 3305 => 'DELETE', 3306 => 'FILTER', 3307 => 'CHANGE_STATUS', 3308 => 'BULK_DELETE', 3309 => 'VIEW'],
+
+            self::$plansPermissionsKeys['CONTRACTS'] => [3351 => 'CREATE', 3352 => 'READ', 3353 => 'READ_ALL', 3354 => 'UPDATE', 3355 => 'DELETE', 3356 => 'FILTER', 3357 => 'CHANGE_STATUS', 3358 => 'BULK_DELETE', 3359 => 'VIEW'],
+
+            self::$plansPermissionsKeys['ESTIMATES_TEMPLATES'] => [3401 => 'CREATE', 3402 => 'READ', 3403 => 'READ_ALL', 3404 => 'UPDATE', 3405 => 'DELETE', 3406 => 'CHANGE_STATUS'],
+
+            self::$plansPermissionsKeys['CONTRACTS_TEMPLATES'] => [3451 => 'CREATE', 3452 => 'READ', 3453 => 'READ_ALL', 3454 => 'UPDATE', 3455 => 'DELETE', 3456 => 'CHANGE_STATUS'],
 
         ];
     }
@@ -130,6 +142,8 @@ class PermissionsHelper
             'PLANUPGRADE' => 'PLANUPGRADE',
             'BULK_IMPORT_STATUS' => 'BULK_IMPORT_STATUS',
             'PROPOSALS_TEMPLATES' => 'PROPOSALS_TEMPLATES',
+            'ESTIMATES_TEMPLATES' => 'ESTIMATES_TEMPLATES',
+            'CONTRACTS_TEMPLATES' => 'CONTRACTS_TEMPLATES',
         ];
     }
 

@@ -202,6 +202,34 @@ PermissionsHelper::initializePermissions();
         'for' => 'company',
         'is_feature' => true,
     ],
+    PermissionsHelper::$plansPermissionsKeys['ESTIMATES'] => [
+        'name' => 'ESTIMATES',
+        'id' => PermissionsHelper::getParentPermissionId('106'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['ESTIMATES'],
+        'for' => 'company',
+        'is_feature' => true,
+    ],
+    PermissionsHelper::$plansPermissionsKeys['CONTRACTS'] => [
+        'name' => 'CONTRACTS',
+        'id' => PermissionsHelper::getParentPermissionId('107'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['CONTRACTS'],
+        'for' => 'company',
+        'is_feature' => true,
+    ],
+    PermissionsHelper::$plansPermissionsKeys['ESTIMATES_TEMPLATES'] => [
+        'name' => 'ESTIMATES_TEMPLATES',
+        'id' => PermissionsHelper::getParentPermissionId('108'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['ESTIMATES_TEMPLATES'],
+        'for' => 'company',
+        'is_feature' => false,
+    ],
+    PermissionsHelper::$plansPermissionsKeys['CONTRACTS_TEMPLATES'] => [
+        'name' => 'CONTRACTS_TEMPLATES',
+        'id' => PermissionsHelper::getParentPermissionId('109'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['CONTRACTS_TEMPLATES'],
+        'for' => 'company',
+        'is_feature' => false,
+    ],
 ]);
 
 // super panel menus
@@ -377,6 +405,26 @@ PermissionsHelper::initializePermissions();
             'Templates' => ['menu_url' => 'proposals.indexProposals', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PROPOSALS_TEMPLATES'], 'READ_ALL')],
         ]
     ],
+    'Estimates' => [
+        'menu_icon' => 'fa-file-signature',
+        'feature_type' => PermissionsHelper::$plansPermissionsKeys['ESTIMATES'], // this need to match the PLANS_FEATURES key
+        'permission_plan' => PermissionsHelper::$plansPermissionsKeys['ESTIMATES'],
+        'permission_id' => PermissionsHelper::getParentPermissionId('106'),
+        'children' => [
+            'Estimates' => ['menu_url' => 'estimates.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['ESTIMATES'], 'READ_ALL')],
+            'Templates' => ['menu_url' => 'estimates.indexEstimates', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['ESTIMATES_TEMPLATES'], 'READ_ALL')],
+        ]
+    ],
+    'Contracts' => [
+        'menu_icon' => 'fa-file-contract',
+        'feature_type' => PermissionsHelper::$plansPermissionsKeys['CONTRACTS'], // this need to match the PLANS_FEATURES key
+        'permission_plan' => PermissionsHelper::$plansPermissionsKeys['CONTRACTS'],
+        'permission_id' => PermissionsHelper::getParentPermissionId('107'),
+        'children' => [
+            'Contracts' => ['menu_url' => 'contracts.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['CONTRACTS'], 'READ_ALL')],
+            'Templates' => ['menu_url' => 'contracts.indexContracts', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['CONTRACTS_TEMPLATES'], 'READ_ALL')],
+        ]
+    ],
     'Products & Services' => [
         'menu_icon' => 'fa-boxes',
         'feature_type' => PermissionsHelper::$plansPermissionsKeys['PRODUCTS_SERVICES'], // this need to match the PLANS_FEATURES key
@@ -450,6 +498,16 @@ PermissionsHelper::initializePermissions();
         'STATUS' => ['DRAFT' => 'DRAFT', 'SENT' => 'SENT', 'OPEN' => 'OPEN', 'DECLINED' => 'DECLINED', 'ACCEPTED' => 'ACCEPTED', 'EXPIRED' => 'EXPIRED', 'REVISED' => 'REVISED'],
         'BT_CLASSES' => ['DRAFT' => 'dark', 'SENT' => 'info', 'OPEN' => 'light', 'ACCEPTED' => 'success', 'DECLINED' => 'danger', 'EXPIRED' => 'warning', 'REVISED' => 'info'],
     ],
+    'CONTRACTS' => [
+        'TABLE_STATUS' => ['DRAFT', 'SENT', 'OPEN', 'DECLINED', 'ACCEPTED', 'EXPIRED', 'REVISED'],
+        'STATUS' => ['DRAFT' => 'DRAFT', 'SENT' => 'SENT', 'OPEN' => 'OPEN', 'DECLINED' => 'DECLINED', 'ACCEPTED' => 'ACCEPTED', 'EXPIRED' => 'EXPIRED', 'REVISED' => 'REVISED'],
+        'BT_CLASSES' => ['DRAFT' => 'dark', 'SENT' => 'info', 'OPEN' => 'light', 'ACCEPTED' => 'success', 'DECLINED' => 'danger', 'EXPIRED' => 'warning', 'REVISED' => 'info'],
+    ],
+    'ESTIMATES' => [
+        'TABLE_STATUS' => ['DRAFT', 'SENT', 'OPEN', 'DECLINED', 'ACCEPTED', 'EXPIRED', 'REVISED'],
+        'STATUS' => ['DRAFT' => 'DRAFT', 'SENT' => 'SENT', 'OPEN' => 'OPEN', 'DECLINED' => 'DECLINED', 'ACCEPTED' => 'ACCEPTED', 'EXPIRED' => 'EXPIRED', 'REVISED' => 'REVISED'],
+        'BT_CLASSES' => ['DRAFT' => 'dark', 'SENT' => 'info', 'OPEN' => 'light', 'ACCEPTED' => 'success', 'DECLINED' => 'danger', 'EXPIRED' => 'warning', 'REVISED' => 'info'],
+    ],
     'CRM_ROLES' => [
         'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE'],
         'STATUS' => ['ACTIVE' => 'ACTIVE', 'DEACTIVE' => 'DEACTIVE'],
@@ -518,6 +576,8 @@ PermissionsHelper::initializePermissions();
         'leads' => 'leads',
         'proposals' => 'proposals',
         'products_services' => 'products_services',
+        'estimates' => 'estimates',
+        'contracts' => 'contracts',
 
     ]
 ]);
@@ -544,6 +604,8 @@ PermissionsHelper::initializePermissions();
     PermissionsHelper::$plansPermissionsKeys['CUSTOM_FIELDS'] => PermissionsHelper::$plansPermissionsKeys['CUSTOM_FIELDS'],
     PermissionsHelper::$plansPermissionsKeys['LEADS'] => PermissionsHelper::$plansPermissionsKeys['LEADS'],
     PermissionsHelper::$plansPermissionsKeys['PROPOSALS'] => PermissionsHelper::$plansPermissionsKeys['PROPOSALS'],
+    PermissionsHelper::$plansPermissionsKeys['ESTIMATES'] => PermissionsHelper::$plansPermissionsKeys['ESTIMATES'],
+    PermissionsHelper::$plansPermissionsKeys['CONTRACTS'] => PermissionsHelper::$plansPermissionsKeys['CONTRACTS'],
     PermissionsHelper::$plansPermissionsKeys['PRODUCTS_SERVICES'] => PermissionsHelper::$plansPermissionsKeys['PRODUCTS_SERVICES'],
 ]);
 

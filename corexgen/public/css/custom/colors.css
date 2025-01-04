@@ -9,14 +9,14 @@
     --info-color: #2C5CC5;
     --light-color: #F8F9FA;
     --dark-color: #1D1E20;
-    --body-bg: rgba(237, 232, 252,0.6);
+    --body-bg: #F4F4F5;
     --body-color: #1D1E20;
     --border-color: #E6E6E6;
     --card-bg: #ffffff;
     --input-bg: #ffffff;
     --input-border: #E6E6E6;
     --neutral-gray: #727586;
-    --sidebar-bg:#2D2D2D;
+    --sidebar-bg:#ffffff;
 
 
     --dark-black-001 : #1D1E20;
@@ -48,6 +48,7 @@
     --sidebar-diff-bg:#0e0d0d;
 
     --task-columns-cards-border:#30363d;
+    --sidebar-bg:#2D2D2D;
   }
   
   /* Global Styles */

@@ -8,12 +8,14 @@ use App\Http\Controllers\BackupController;
 use App\Http\Controllers\CommentsController;
 use App\Http\Controllers\CompanyOnboardingController;
 use App\Http\Controllers\CompanyRegisterController;
+use App\Http\Controllers\ContractsController;
 use App\Http\Controllers\CountryCitySeederController;
 use App\Http\Controllers\CompaniesController;
 use App\Http\Controllers\CRM\ClientsController;
 use App\Http\Controllers\CRM\LeadsController;
 use App\Http\Controllers\CustomFieldController;
 use App\Http\Controllers\DownloadController;
+use App\Http\Controllers\EstimatesController;
 use App\Http\Controllers\ProductServicesController;
 use App\Http\Controllers\ProposalController;
 use App\Http\Controllers\RoleController;
@@ -414,9 +416,97 @@ Route::middleware([
         // create, edit, change status, delete
         Route::get('templates/create', [TemplatesController::class, 'createProposals'])->name('createProposals')->middleware('check.permission:PROPOSALS.CREATE');
         Route::get('templates/edit/{id}', [TemplatesController::class, 'editProposals'])->name('editProposals')->middleware('check.permission:PROPOSALS.UPDATE');
+        Route::get('templates/view/{id}', [TemplatesController::class, 'viewProposals'])->name('viewProposals')->middleware('check.permission:PROPOSALS.READ');
         Route::delete('templates/destroy/{id}', [TemplatesController::class, 'destroyProposals'])->name('destroyProposals')->middleware('check.permission:PROPOSALS.DELETE');
 
     });
+
+
+    // estimates
+    Route::prefix(PANEL_MODULES['COMPANY_PANEL']['estimates'])->as(PANEL_MODULES['COMPANY_PANEL']['estimates'] . '.')->group(function () {
+        // role for fetch, store, update
+        Route::get('/', [EstimatesController::class, 'index'])->name('index')->middleware('check.permission:ESTIMATES.READ_ALL');
+        Route::post('/', [EstimatesController::class, 'store'])->name('store')->middleware('check.permission:ESTIMATES.CREATE');
+        Route::put('/', [EstimatesController::class, 'update'])->name('update')->middleware('check.permission:ESTIMATES.UPDATE');
+
+        // create, edit, change status, delete
+        Route::get('/create', [EstimatesController::class, 'create'])->name('create')->middleware('check.permission:ESTIMATES.CREATE');
+        Route::get('/edit/{id}', [EstimatesController::class, 'edit'])->name('edit')->middleware('check.permission:ESTIMATES.UPDATE');
+
+        Route::get('/changeStatusAction/{id}/{action}', [EstimatesController::class, 'changeStatusAction'])->name('changeStatusAction')->middleware('check.permission:ESTIMATES.CHANGE_STATUS');
+
+        Route::get('/sendProposal/{id}', [EstimatesController::class, 'sendProposal'])->name('sendProposal')->middleware('check.permission:ESTIMATES.CHANGE_STATUS');
+
+        Route::delete('/destroy/{id}', [EstimatesController::class, 'destroy'])->name('destroy')->middleware('check.permission:ESTIMATES.DELETE');
+
+
+        Route::post('/bulkDelete', [EstimatesController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:ESTIMATES.BULK_DELETE');
+
+        Route::get('/view/{id}', [EstimatesController::class, 'view'])->name('view')->middleware('check.permission:ESTIMATES.VIEW');
+
+
+
+
+        // template
+        Route::get('/templates', [TemplatesController::class, 'indexEstimates'])->name('indexEstimates')->middleware('check.permission:ESTIMATES.READ_ALL');
+        Route::post('/templates', [TemplatesController::class, 'storeEstimates'])->name('storeEstimates')->middleware('check.permission:ESTIMATES.CREATE');
+        Route::put('/templates', [TemplatesController::class, 'updateEstimates'])->name('updateEstimates')->middleware('check.permission:ESTIMATES.UPDATE');
+
+        // create, edit, change status, delete
+        Route::get('templates/create', [TemplatesController::class, 'createEstimates'])->name('createEstimates')->middleware('check.permission:ESTIMATES.CREATE');
+        Route::get('templates/edit/{id}', [TemplatesController::class, 'editEstimates'])->name('editEstimates')->middleware('check.permission:ESTIMATES.UPDATE');
+        Route::get('templates/view/{id}', [TemplatesController::class, 'viewEstimates'])->name('viewEstimates')->middleware('check.permission:ESTIMATES.READ');
+        Route::delete('templates/destroy/{id}', [TemplatesController::class, 'destroyEstimates'])->name('destroyEstimates')->middleware('check.permission:ESTIMATES.DELETE');
+
+    });
+
+
+    // contracts
+
+    Route::prefix(PANEL_MODULES['COMPANY_PANEL']['contracts'])->as(PANEL_MODULES['COMPANY_PANEL']['contracts'] . '.')->group(function () {
+        // role for fetch, store, update
+        Route::get('/', [ContractsController::class, 'index'])->name('index')->middleware('check.permission:CONTRACTS.READ_ALL');
+        Route::post('/', [ContractsController::class, 'store'])->name('store')->middleware('check.permission:CONTRACTS.CREATE');
+        Route::put('/', [ContractsController::class, 'update'])->name('update')->middleware('check.permission:CONTRACTS.UPDATE');
+
+        // create, edit, change status, delete
+        Route::get('/create', [ContractsController::class, 'create'])->name('create')->middleware('check.permission:CONTRACTS.CREATE');
+        Route::get('/edit/{id}', [ContractsController::class, 'edit'])->name('edit')->middleware('check.permission:CONTRACTS.UPDATE');
+
+        Route::get('/changeStatusAction/{id}/{action}', [ContractsController::class, 'changeStatusAction'])->name('changeStatusAction')->middleware('check.permission:CONTRACTS.CHANGE_STATUS');
+
+        Route::get('/sendProposal/{id}', [ContractsController::class, 'sendProposal'])->name('sendProposal')->middleware('check.permission:CONTRACTS.CHANGE_STATUS');
+
+        Route::delete('/destroy/{id}', [ContractsController::class, 'destroy'])->name('destroy')->middleware('check.permission:CONTRACTS.DELETE');
+
+
+        Route::post('/bulkDelete', [ContractsController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:CONTRACTS.BULK_DELETE');
+
+        Route::get('/view/{id}', [ContractsController::class, 'view'])->name('view')->middleware('check.permission:CONTRACTS.VIEW');
+
+
+
+
+        // template
+        Route::get('/templates', [TemplatesController::class, 'indexContracts'])->name('indexContracts')->middleware('check.permission:CONTRACTS.READ_ALL');
+        Route::post('/templates', [TemplatesController::class, 'storeContracts'])->name('storeContracts')->middleware('check.permission:CONTRACTS.CREATE');
+        Route::put('/templates', [TemplatesController::class, 'updateContracts'])->name('updateContracts')->middleware('check.permission:CONTRACTS.UPDATE');
+
+        // create, edit, change status, delete
+        Route::get('templates/create', [TemplatesController::class, 'createContracts'])->name('createContracts')->middleware('check.permission:CONTRACTS.CREATE');
+        Route::get('templates/edit/{id}', [TemplatesController::class, 'editContracts'])->name('editContracts')->middleware('check.permission:CONTRACTS.UPDATE');
+        Route::get('templates/view/{id}', [TemplatesController::class, 'viewContracts'])->name('viewContracts')->middleware('check.permission:CONTRACTS.READ');
+        Route::delete('templates/destroy/{id}', [TemplatesController::class, 'destroyContracts'])->name('destroyContracts')->middleware('check.permission:CONTRACTS.DELETE');
+
+    });
+
+
+
+
+
+
+
+
 
 
 

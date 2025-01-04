@@ -12,7 +12,7 @@
                 </nav>
                 <div class="mb-3 d-flex flex-wrap justify-content-end">
                     @if (isset($permissions['CREATE']) && hasPermission(strtoupper($module) . '.' . $permissions['CREATE']['KEY']))
-                        <a href="{{ route(getPanelRoutes($module . '.createProposals')) }}" class="btn btn-primary btn-xl me-2"
+                        <a href="{{ route(getPanelRoutes($module . '.create' . $type)) }}" class="btn btn-primary btn-xl me-2"
                             data-toggle="tooltip" title="{{ __('crud.Create New') }}">
                             <i class="fas fa-plus me-2"></i> {{ __('Create') }}
                         </a>
@@ -66,7 +66,7 @@
                         ];
                     @endphp
 
-                    <x-data-table id="companyProposalsTemplateTable" :columns="$columns" :ajax-url="route(getPanelRoutes($module . '.indexProposals'))" :is-checkbox="true"
+                    <x-data-table id="companyProposalsTemplateTable" :columns="$columns" :ajax-url="route(getPanelRoutes($module . '.index'. $type))" :is-checkbox="true"
                         :bulk-delete-url="route(getPanelRoutes($module . '.bulkDelete'))" :csrf-token="csrf_token()" />
                 @else
                     {{-- no permissions to view --}}

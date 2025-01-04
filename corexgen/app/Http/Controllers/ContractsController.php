@@ -23,19 +23,19 @@ use App\Services\ProposalService;
 use Illuminate\Support\Str;
 
 /**
- * proposalController handles CRUD operations for Proposals
+ * ContractsController handles CRUD operations for Contracts
  * 
- * This controller manages proposal-related functionality including:
- * - Listing proposal with server-side DataTables
- * - Creating new proposal
- * - Editing existing proposal
- * - Exporting proposal to CSV
- * - Importing proposal from CSV
- * - Changing proposal here status removed,
+ * This controller manages Contracts-related functionality including:
+ * - Listing Contracts with server-side DataTables
+ * - Creating new Contracts
+ * - Editing existing Contracts
+ * - Exporting Contracts to CSV
+ * - Importing Contracts from CSV
+ * - Changing Contracts here status removed,
  *  - New VErsion Check
  */
 
-class ProposalController extends Controller
+class ContractsController extends Controller
 {
 
     use TenantFilter;
@@ -59,7 +59,7 @@ class ProposalController extends Controller
      * Base directory for view files
      * @var string
      */
-    private $viewDir = 'dashboard.crm.proposals.';
+    private $viewDir = 'dashboard.crm.contracts.';
 
     /**
      * Generate full view file path
@@ -93,7 +93,7 @@ class ProposalController extends Controller
     }
 
     /**
-     * Display list of proposal with filtering and DataTables support
+     * Display list of Contracts with filtering and DataTables support
      * 
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Contracts\View\View|\Illuminate\Http\JsonResponse
@@ -108,7 +108,7 @@ class ProposalController extends Controller
 
         // Fetch the totals in a single query
 
-        // Build base query for proposal totals
+        // Build base query for Contracts totals
         $user = Auth::user();
         $proposalQuery = CRMProposals::query();
 
@@ -168,7 +168,7 @@ class ProposalController extends Controller
 
 
     /**
-     * Storing the data of proposal into db
+     * Storing the data of Contracts into db
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -202,7 +202,7 @@ class ProposalController extends Controller
 
 
     /**
-     * Return the view for creating new proposal 
+     * Return the view for creating new Contracts 
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function create()
@@ -235,7 +235,7 @@ class ProposalController extends Controller
     }
 
     /**
-     * showing the edit proposal view
+     * showing the edit Contracts view
      * @param mixed $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
@@ -271,7 +271,7 @@ class ProposalController extends Controller
 
     /**
      * Method update 
-     * for updating the proposal
+     * for updating the Contracts
      *
      * @param Request $request [explicite description]
      *
@@ -299,7 +299,7 @@ class ProposalController extends Controller
 
 
     /**
-     * Deleting the proposal
+     * Deleting the Contracts
      * @param mixed $id
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -307,7 +307,7 @@ class ProposalController extends Controller
     {
 
         try {
-            // Delete the proposal
+            // Delete the Contracts
 
             $user = $this->applyTenantFilter(CRMProposals::find($id));
             if ($user) {
@@ -330,9 +330,9 @@ class ProposalController extends Controller
 
 
     /**
-     * Method changeStatus (change proposal status)
+     * Method changeStatus (change Contracts status)
      *
-     * @param $id $id [explicite id of proposal]
+     * @param $id $id [explicite id of Contracts]
      * @param $status $status [explicite status to change]
      *
      */
@@ -358,7 +358,7 @@ class ProposalController extends Controller
 
 
     /**
-     * Bulk Delete the proposal
+     * Bulk Delete the Contracts
      * Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -369,14 +369,14 @@ class ProposalController extends Controller
 
 
         try {
-            // Delete the proposal
+            // Delete the Contracts
 
             if (is_array($ids) && count($ids) > 0) {
                 DB::transaction(function () use ($ids) {
 
 
 
-                    // Then delete the proposal
+                    // Then delete the Contracts
                     CRMProposals::whereIn('id', $ids)->delete();
 
                     $this->updateUsage(
@@ -401,7 +401,7 @@ class ProposalController extends Controller
 
 
     /**
-     * View proposal
+     * View Contracts
      * @param mixed $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
@@ -459,7 +459,7 @@ class ProposalController extends Controller
     }
 
     /**
-     * View as client proposal
+     * View as client Contracts
      * @param mixed $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
@@ -517,7 +517,7 @@ class ProposalController extends Controller
     }
 
     /**
-     * print proposal
+     * print Contracts
      * @param mixed $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
@@ -575,7 +575,7 @@ class ProposalController extends Controller
     }
 
     /**
-     * send  proposal
+     * send  Contracts
      * @param mixed $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
@@ -634,7 +634,7 @@ class ProposalController extends Controller
 
 
     /**
-        * accept proposal
+        * accept Contracts
 
         */
     public function accept(Request $request)
