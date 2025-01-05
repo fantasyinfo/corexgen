@@ -9,7 +9,6 @@ use App\Http\Requests\ClientRequest;
 use App\Http\Requests\ClientsEditRequest;
 use App\Models\Country;
 use App\Models\CRM\CRMClients;
-use App\Repositories\ClientRepository;
 use App\Services\Csv\ClientsCsvRowProcessor;
 use App\Services\ClientService;
 use App\Services\ProposalService;
@@ -22,10 +21,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use App\Jobs\CsvImportJob;
-use App\Models\CategoryGroupTag;
+use App\Services\ContractService;
 use App\Services\CustomFieldService;
+use App\Services\EstimateService;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 
 class ClientsController extends Controller
 {
@@ -65,22 +64,28 @@ class ClientsController extends Controller
     }
 
 
-    protected $clientRepository;
+
     protected $clientService;
 
     protected $customFieldService;
     protected $proposalService;
+    protected $contractService;
+    protected $estimateService;
 
     public function __construct(
-        ClientRepository $clientRepository,
+
         ClientService $clientService,
         ProposalService $proposalService,
+        ContractService $contractService,
+        EstimateService $estimateService,
         CustomFieldService $customFieldService
     ) {
-        $this->clientRepository = $clientRepository;
+
         $this->clientService = $clientService;
         $this->customFieldService = $customFieldService;
         $this->proposalService = $proposalService;
+        $this->contractService = $contractService;
+        $this->estimateService = $estimateService;
     }
 
 
@@ -213,7 +218,7 @@ class ClientsController extends Controller
         $this->tenantRoute = $this->getTenantRoute();
 
         // dd($request->all());
-      
+
 
         try {
 
@@ -234,8 +239,8 @@ class ClientsController extends Controller
                 $this->customFieldService->saveValues($client['client'], $validatedData);
             }
 
-               // kanban board return....
-               if ($request->has('from_view') && $request->input('from_view')) {
+            // kanban board return....
+            if ($request->has('from_view') && $request->input('from_view')) {
                 return redirect()
                     ->back()
                     ->with('success', 'Client updated successfully..');
@@ -711,11 +716,11 @@ class ClientsController extends Controller
             },
             'customFields'
         ])->where('id', $id);
-        
+
         $query = $this->applyTenantFilter($query, 'clients');
-        
+
         $client = $query->firstOrFail();
-        
+
 
         // custom fields
 
@@ -746,6 +751,17 @@ class ClientsController extends Controller
         $proposals = collect();
         $proposals = $this->proposalService->getProposals(\App\Models\CRM\CRMClients::class, $id);
 
+        // estimates
+
+
+        $estimates = collect();
+        $estimates = $this->estimateService->getEstimates(\App\Models\CRM\CRMClients::class, $id);
+
+        // contracts
+
+        $contracts = collect();
+        $contracts = $this->contractService->getContracts(\App\Models\CRM\CRMClients::class, $id);
+
 
         return view($this->getViewFilePath('view'), [
             'title' => 'View Client',
@@ -757,6 +773,8 @@ class ClientsController extends Controller
             'countries' => Country::all(),
             'permissions' => PermissionsHelper::getPermissionsArray('CLIENTS'),
             'proposals' => $proposals,
+            'contracts' => $contracts,
+            'estimates' => $estimates,
             'categories' => $categories
         ]);
     }

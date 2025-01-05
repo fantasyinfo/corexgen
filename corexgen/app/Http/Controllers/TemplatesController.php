@@ -168,6 +168,19 @@ class TemplatesController extends Controller
     }
 
 
+    public function viewProposals($id)
+    {
+        $template = $this->applyTenantFilter(CRMTemplates::where('id', $id))->firstOrFail();
+
+        return view($this->getViewFilePath('view'), [
+            'title' => 'View Proposals Template',
+            'type' => 'Proposals',
+            'template' => $template
+        ]);
+    }
+    
+
+
     // estimate
 
     public function indexEstimates(Request $request)
@@ -280,6 +293,16 @@ class TemplatesController extends Controller
         }
     }
 
+    public function viewEstimates($id)
+    {
+        $template = $this->applyTenantFilter(CRMTemplates::where('id', $id))->firstOrFail();
+
+        return view($this->getViewFilePath('view'), [
+            'title' => 'View Estimates Template',
+            'type' => 'Estimates',
+            'template' => $template
+        ]);
+    }
 
      // contracts
 
@@ -391,5 +414,16 @@ class TemplatesController extends Controller
              return redirect()->back()
                  ->with('error', 'An error occurred while updated the Contracts Template: ' . $e->getMessage());
          }
+     }
+
+     public function viewContracts($id)
+     {
+         $template = $this->applyTenantFilter(CRMTemplates::where('id', $id))->firstOrFail();
+ 
+         return view($this->getViewFilePath('view'), [
+             'title' => 'View Contracts Template',
+             'type' => 'Contracts',
+             'template' => $template
+         ]);
      }
 }

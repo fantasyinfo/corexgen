@@ -5,14 +5,13 @@ namespace App\Http\Controllers\CRM;
 use App\Helpers\CustomFieldsValidation;
 use App\Helpers\PermissionsHelper;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ClientRequest;
-use App\Http\Requests\ClientsEditRequest;
 use App\Http\Requests\LeadsEditRequest;
 use App\Http\Requests\LeadsRequest;
 use App\Models\Country;
 use App\Models\CRM\CRMClients;
-use App\Repositories\LeadsRepository;
+use App\Services\ContractService;
 use App\Services\Csv\ClientsCsvRowProcessor;
+use App\Services\EstimateService;
 use App\Services\ProposalService;
 use App\Traits\AuditFilter;
 use App\Traits\CategoryGroupTagsFilter;
@@ -23,12 +22,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use App\Jobs\CsvImportJob;
-use App\Models\CategoryGroupTag;
 use App\Models\CRM\CRMLeads;
 use App\Services\CustomFieldService;
 use App\Services\LeadsService;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
+
 
 class LeadsController extends Controller
 {
@@ -68,22 +66,28 @@ class LeadsController extends Controller
     }
 
 
-    protected $leadsRepository;
+
     protected $leadsService;
 
     protected $customFieldService;
     protected $proposalService;
+    protected $contractService;
+    protected $estimateService;
 
     public function __construct(
-        LeadsRepository $leadsRepository,
+
         LeadsService $leadsService,
         ProposalService $proposalService,
+        ContractService $contractService,
+        EstimateService $estimateService,
         CustomFieldService $customFieldService
     ) {
-        $this->leadsRepository = $leadsRepository;
+   
         $this->leadsService = $leadsService;
         $this->customFieldService = $customFieldService;
         $this->proposalService = $proposalService;
+        $this->contractService = $contractService;
+        $this->estimateService = $estimateService;
     }
 
 
@@ -730,6 +734,14 @@ class LeadsController extends Controller
         $proposals = collect();
         $proposals = $this->proposalService->getProposals(\App\Models\CRM\CRMLeads::class, $id);
 
+       // estimates
+        $estimates = collect();
+        $estimates = $this->estimateService->getEstimates(\App\Models\CRM\CRMLeads::class, $id);
+
+        // contracts
+
+        $contracts = collect();
+        $contracts = $this->contractService->getContracts(\App\Models\CRM\CRMLeads::class, $id);
 
         return view($this->getViewFilePath('view'), [
             'title' => 'View Lead',
@@ -744,7 +756,9 @@ class LeadsController extends Controller
             'activities' => $activitesQuery,
             'countries' => Country::all(),
             'permissions' => PermissionsHelper::getPermissionsArray('LEADS'),
-            'proposals' => $proposals
+            'proposals' => $proposals,
+            'contracts' => $contracts,
+            'estimates' => $estimates,
         ]);
     }
     public function profile()

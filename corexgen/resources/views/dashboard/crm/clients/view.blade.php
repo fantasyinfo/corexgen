@@ -440,6 +440,16 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#estimates">
+                                <i class="fas fa-file-signature me-2"></i>Estimates
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#contracts">
+                                <i class="fas fa-file-contract me-2"></i>Contracts
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" data-bs-toggle="tab" href="#activities">
                                 <i class="fas fa-history me-2"></i>Activities
                             </a>
@@ -518,6 +528,12 @@
 
                         <div class="tab-pane fade" id="proposals">
                             @include('dashboard.crm.clients.components._proposals')
+                        </div>
+                        <div class="tab-pane fade" id="estimates">
+                            @include('dashboard.crm.clients.components._estimates')
+                        </div>
+                        <div class="tab-pane fade" id="contracts">
+                            @include('dashboard.crm.clients.components._contracts')
                         </div>
 
                         <div class="tab-pane fade" id="activities">
