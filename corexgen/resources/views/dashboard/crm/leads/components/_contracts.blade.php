@@ -29,8 +29,8 @@
                                     {{ ucfirst(strtolower($contract->status)) }}
                                 </span>
                             </td>
-                            <td>{{ \Carbon\Carbon::parse($contract->creating_date)->format('F d, Y') }}</td>
-                            <td>{{ $contract->valid_date ? \Carbon\Carbon::parse($contract->valid_date)->format('F d, Y') : 'Not Specified' }}</td>
+                            <td>{{ formatDateTime($contract->creating_date) }}</td>
+                            <td>{{ $contract->valid_date ? formatDateTime($contract->valid_date) : 'Not Specified' }}</td>
                             <td>
                                 <div class="btn-group">
                                     <a href="{{ route(getPanelRoutes('contracts.sendContract'), $contract->id) }}" class="btn btn-sm btn-outline-primary"><i class="fas fa-envelope me-2"></i> Send to client</a>

@@ -222,9 +222,9 @@ class ProposalService
             ->editColumn('value', function ($proposal) {
                 return $proposal?->value ? "$ " . number_format($proposal->value) : "0";
             })
-            ->editColumn('created_at', fn($proposal) => $proposal?->created_at ? Carbon::parse($proposal->created_at)->format('d M Y') : '')
-            ->editColumn('creating_date', fn($proposal) => $proposal?->creating_date ? Carbon::parse($proposal->creating_date)->format('d M Y') : '')
-            ->editColumn('valid_date', fn($proposal) => $proposal?->valid_date ? Carbon::parse($proposal->valid_date)->format('d M Y') : '')
+            ->editColumn('created_at', fn($proposal) => $proposal?->created_at ? formatDateTime($proposal->created_at) : '')
+            ->editColumn('creating_date', fn($proposal) => $proposal?->creating_date ? formatDateTime($proposal->creating_date) : '')
+            ->editColumn('valid_date', fn($proposal) => $proposal?->valid_date ? formatDateTime($proposal->valid_date) : '')
             ->editColumn('status', function ($proposal) {
                 return "<span class='badge bg-" . CRM_STATUS_TYPES['PROPOSALS']['BT_CLASSES'][$proposal->status] . "'>$proposal->status</span>";
             })

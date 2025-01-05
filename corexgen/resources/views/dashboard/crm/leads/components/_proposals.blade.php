@@ -29,8 +29,8 @@
                                     {{ ucfirst(strtolower($proposal->status)) }}
                                 </span>
                             </td>
-                            <td>{{ \Carbon\Carbon::parse($proposal->creating_date)->format('F d, Y') }}</td>
-                            <td>{{ $proposal->valid_date ? \Carbon\Carbon::parse($proposal->valid_date)->format('F d, Y') : 'Not Specified' }}</td>
+                            <td>{{ formatDateTime($proposal->creating_date) }}</td>
+                            <td>{{ $proposal->valid_date ? formatDateTime($proposal->valid_date) : 'Not Specified' }}</td>
                             <td>
                                 <div class="btn-group">
                                     <a href="{{ route(getPanelRoutes('proposals.sendProposal'), $proposal->id) }}" class="btn btn-sm btn-outline-primary"><i class="fas fa-envelope me-2"></i> Send to client</a>

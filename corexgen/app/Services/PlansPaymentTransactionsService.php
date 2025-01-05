@@ -44,10 +44,10 @@ class PlansPaymentTransactionsService
             //     return $this->renderActionsColumn($ppT);
             // })
             ->editColumn('created_at', function ($ppT) {
-                return Carbon::parse($ppT->created_at)->format('d M Y');
+                return formatDateTime($ppT->created_at);
             })
             ->editColumn('transaction_date', function ($ppT) {
-                return Carbon::parse($ppT->transaction_date)->format('d M Y');
+                return formatDateTime($ppT->transaction_date);
             })
             ->editColumn('name', function ($ppT) use ($cmodule) {
                 if(isset($ppT?->company) && isset($ppT?->company?->name)){
@@ -59,7 +59,7 @@ class PlansPaymentTransactionsService
    
             })
             ->editColumn('subscription.start_date', function ($ppT) {
-                return Carbon::parse($ppT->subscription->start_date)->format('d M Y');
+                return formatDateTime($ppT->subscription->start_date);
             })
             ->rawColumns([  'name','subscription.start_date','created_at','transaction_date']) // Add 'status' to raw columns
             ->make(true);
@@ -79,20 +79,20 @@ class PlansPaymentTransactionsService
 
         return DataTables::of($query)
             ->editColumn('created_at', function ($ppT) {
-                return Carbon::parse($ppT->created_at)->format('d M Y');
+                return formatDateTime($ppT->created_at);
             })
             ->editColumn('start_date', function ($ppT) {
-                return Carbon::parse($ppT->start_date)->format('d M Y');
+                return formatDateTime($ppT->start_date);
             })
             ->editColumn('end_date', function ($ppT) {
-                return Carbon::parse($ppT->end_date)->format('d M Y');
+                return formatDateTime($ppT->end_date);
             })
             ->editColumn('next_billing_date', function ($ppT) {
-                return Carbon::parse($ppT->next_billing_date)->format('d M Y');
+                return formatDateTime($ppT->next_billing_date);
             })
             ->editColumn('upgrade_date', function ($ppT) {
                 if($ppT->upgrade_date == null) return;
-                return Carbon::parse($ppT->upgrade_date)->format('d M Y');
+                return formatDateTime($ppT->upgrade_date);
             })
             ->editColumn('name', function ($ppT) use ($cmodule) {
                 return "<a class='dt-link' href='" . route($this->tenantRoute . $cmodule . '.view', $ppT->company->id) . "' target='_blank'>"

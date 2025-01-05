@@ -222,9 +222,9 @@ class EstimateService
             ->editColumn('value', function ($estimate) {
                 return $estimate?->value ? "$ " . number_format($estimate->value) : "0";
             })
-            ->editColumn('created_at', fn($estimate) => $estimate?->created_at ? Carbon::parse($estimate->created_at)->format('d M Y') : '')
-            ->editColumn('creating_date', fn($estimate) => $estimate?->creating_date ? Carbon::parse($estimate->creating_date)->format('d M Y') : '')
-            ->editColumn('valid_date', fn($estimate) => $estimate?->valid_date ? Carbon::parse($estimate->valid_date)->format('d M Y') : '')
+            ->editColumn('created_at', fn($estimate) => $estimate?->created_at ? formatDateTime($estimate->created_at) : '')
+            ->editColumn('creating_date', fn($estimate) => $estimate?->creating_date ? formatDateTime($estimate->creating_date) : '')
+            ->editColumn('valid_date', fn($estimate) => $estimate?->valid_date ? formatDateTime($estimate->valid_date) : '')
             ->editColumn('status', function ($estimate) {
                 return "<span class='badge bg-" . CRM_STATUS_TYPES['ESTIMATES']['BT_CLASSES'][$estimate->status] . "'>$estimate->status</span>";
             })

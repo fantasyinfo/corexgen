@@ -32,7 +32,7 @@ class TemplateService
                 $viewRoute = route($this->tenantRoute . $module . '.'. $viewRoute, $template->id);
                 return "<a class='dt-link' href='{$viewRoute}' target='_blank'>{$template->title}</a>";
             })
-            ->editColumn('created_at', fn($template) => $template?->created_at ? $template?->created_at->format('d M Y') : '')
+            ->editColumn('created_at', fn($template) => $template?->created_at ? formatDatetime($template?->created_at) : '')
             ->rawColumns(['actions', 'title'])
             ->make(true);
     }
