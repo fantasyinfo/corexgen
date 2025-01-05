@@ -231,11 +231,11 @@
                     <div class="info-box-content">
                         <p class="mb-1">
                             <strong>Valid Until:</strong>
-                            {{ $estimate?->valid_date ? \Carbon\Carbon::parse($estimate?->valid_date)->format('F d, Y') : 'Not Specified' }}
+                            {{ $estimate?->valid_date ? formatDateTime($estimate?->valid_date) : 'Not Specified' }}
                         </p>
                         <p class="mb-0">
                             <strong>Created:</strong>
-                            {{ \Carbon\Carbon::parse($estimate?->creating_date)->format('F d, Y') }}
+                            {{ formatDateTime($estimate?->creating_date) }}
                         </p>
                         <p class="mb-0">
                             <strong>Status:</strong>
@@ -427,7 +427,7 @@
                                                 <tr>
                                                     <td class="text-muted">Accepted On:</td>
                                                     <td class="font-weight-bold">
-                                                        {{ \Carbon\Carbon::parse($estimate->accepted_at)->format('M d, Y h:i A') }}
+                                                        {{ formatDateTime($estimate->accepted_at) }}
                                                     </td>
                                                 </tr>
                                             </tbody>

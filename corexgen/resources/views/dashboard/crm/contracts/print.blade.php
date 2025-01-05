@@ -231,11 +231,11 @@
                     <div class="info-box-content">
                         <p class="mb-1">
                             <strong>Valid Until:</strong>
-                            {{ $contract?->valid_date ? \Carbon\Carbon::parse($contract?->valid_date)->format('F d, Y') : 'Not Specified' }}
+                            {{ $contract?->valid_date ? formatDateTime($contract?->valid_date) : 'Not Specified' }}
                         </p>
                         <p class="mb-0">
                             <strong>Created:</strong>
-                            {{ \Carbon\Carbon::parse($contract?->creating_date)->format('F d, Y') }}
+                            {{ formatDateTime($contract?->creating_date) }}
                         </p>
                         <p class="mb-0">
                             <strong>Status:</strong>
@@ -296,7 +296,7 @@
                                                     <tr>
                                                         <td class="text-muted">Accepted On:</td>
                                                         <td class="font-weight-bold">
-                                                            {{ \Carbon\Carbon::parse($contract?->company_accepted_details['accepted_at'])->format('M d, Y h:i A') }}
+                                                            {{ formatDateTime($contract?->company_accepted_details['accepted_at']) }}
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -334,7 +334,7 @@
                                                     <tr>
                                                         <td class="text-muted">Accepted On:</td>
                                                         <td class="font-weight-bold">
-                                                            {{ \Carbon\Carbon::parse($contract->accepted_details['accepted_at'])->format('M d, Y h:i A') }}
+                                                            {{ formatDateTime($contract->accepted_details['accepted_at']) }}
                                                         </td>
                                                     </tr>
                                                 </tbody>

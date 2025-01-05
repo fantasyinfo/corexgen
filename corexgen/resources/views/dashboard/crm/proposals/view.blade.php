@@ -2,11 +2,19 @@
 
 @push('style')
     <style>
-        :root {
-            --proposal-primary: var(--primary-color);
+       :root {
+            --proposal-primary: #0056B8;
             --proposal-bg: var(--card-bg);
             --proposal-text: var(--body-color);
             --proposal-border: var(--border-color);
+        }
+
+        .backbg {
+            background-color: var(--proposal-primary);
+        }
+
+        .backbg-primary {
+            background-color: #043976;
         }
 
         .proposal-container {
@@ -18,7 +26,7 @@
         .proposal-header {
             position: relative;
             padding: 2.5rem;
-            background: linear-gradient(45deg, var(--primary-color), var(--primary-hover));
+            background: linear-gradient(45deg, #0056B8, #1f7ae2);
             color: white;
         }
 
@@ -105,7 +113,7 @@
                 <div class="row">
                     <div class="col-lg-8">
                         <div class="mb-4">
-                            <span class="status-badge bg-secondary text-dark mb-3">
+                            <span class="status-badge backbg-primary text-dark mb-3">
                                 {{ $proposal?->_prefix }}-{{ $proposal?->_id }}
                             </span>
                             <h1 class="display-4 mb-2">{{ $proposal?->title }}</h1>
@@ -124,10 +132,10 @@
                             </div>
                             <div class="col-md-6">
                                 <small class="text-light opacity-75">Valid Until</small>
-                                <h4>{{ $proposal?->valid_date ? \Carbon\Carbon::parse($proposal?->valid_date)->format('F d, Y') : 'Not Specified' }}
+                                <h4>{{ $proposal?->valid_date ? formatDateTime($proposal?->valid_date) : 'Not Specified' }}
                                 </h4>
                                 <p class="mb-0">Created:
-                                    {{ \Carbon\Carbon::parse($proposal?->creating_date)->format('F d, Y') }}</p>
+                                    {{ formatDateTime($proposal?->creating_date) }}</p>
 
 
                                 <p class="mb-3">Status: <span
@@ -340,7 +348,7 @@
                 @if ($proposal?->status === 'ACCEPTED')
                     <div class="container mt-4">
                         <div class="card shadow-sm">
-                            <div class="card-header bg-primary text-white">
+                            <div class="card-header backbg text-white">
                                 <h4 class="mb-0">Proposal Acceptance Details</h4>
                             </div>
                             <div class="card-body">
@@ -365,7 +373,7 @@
                                                         <tr>
                                                             <td class="text-muted">Accepted On:</td>
                                                             <td class="font-weight-bold">
-                                                                {{ \Carbon\Carbon::parse($proposal?->accepted_details['accepted_at'])->format('M d, Y h:i A') }}
+                                                                {{ formatDateTime($proposal?->accepted_details['accepted_at']) }}
                                                             </td>
                                                         </tr>
                                                     </tbody>
