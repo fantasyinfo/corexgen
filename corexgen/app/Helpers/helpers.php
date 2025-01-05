@@ -1040,8 +1040,14 @@ function getTeamMates()
 if (!function_exists('formatDateTime')) {
     function formatDateTime($date, $timezone = null, $format = null)
     {
-        $timezone = $timezone ?? config('app.timezone');
-        $format = $format ?? getSettingValue('Date Format') ?? 'M d, Y h:i A';
+        if (Auth::user()->is_tenant) {
+            $timezone = getSettingValue('Panel Time Zone') ?: config('app.timezone');
+            $format = getSettingValue('Panel Date Format') ?: 'd M Y, h:i A';
+        } else {
+            $timezone = getSettingValue('Time Zone') ?: config('app.timezone');
+            $format = getSettingValue('Date Format') ?: 'd M Y, h:i A';
+        }
+
 
         return $date ? \Carbon\Carbon::parse($date)->timezone($timezone)->format($format) : null;
     }

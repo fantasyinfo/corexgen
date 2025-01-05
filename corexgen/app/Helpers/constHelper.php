@@ -710,7 +710,7 @@ PermissionsHelper::initializePermissions();
     ],
     'TIME_ZONE' => [
         'key' => 'Panel Time Zone',
-        'value' => 'default',
+        'value' => 'UTC',
         'is_media_setting' => false,
         'media_id' => null,
         'value_type' => 'string',
@@ -721,7 +721,7 @@ PermissionsHelper::initializePermissions();
     ],
     'CURRENCY_SYMBOL' => [
         'key' => 'Panel Currency Symbol',
-        'value' => 'default',
+        'value' => '$',
         'is_media_setting' => false,
         'media_id' => null,
         'value_type' => 'string',
@@ -732,7 +732,7 @@ PermissionsHelper::initializePermissions();
     ],
     'CURRENCY_CODE' => [
         'key' => 'Panel Currency Code',
-        'value' => 'default',
+        'value' => 'USD',
         'is_media_setting' => false,
         'media_id' => null,
         'value_type' => 'string',
@@ -793,7 +793,7 @@ PermissionsHelper::initializePermissions();
     ],
     'TIME_ZONE' => [
         'key' => 'Time Zone',
-        'value' => 'default',
+        'value' => 'UTC',
         'is_media_setting' => false,
         'media_id' => null,
         'value_type' => 'string',
@@ -804,7 +804,7 @@ PermissionsHelper::initializePermissions();
     ],
     'CURRENCY_SYMBOL' => [
         'key' => 'Currency Symbol',
-        'value' => 'default',
+        'value' => '$',
         'is_media_setting' => false,
         'media_id' => null,
         'value_type' => 'string',
@@ -815,7 +815,7 @@ PermissionsHelper::initializePermissions();
     ],
     'CURRENCY_CODE' => [
         'key' => 'Currency Code',
-        'value' => 'default',
+        'value' => 'USD',
         'is_media_setting' => false,
         'media_id' => null,
         'value_type' => 'string',
