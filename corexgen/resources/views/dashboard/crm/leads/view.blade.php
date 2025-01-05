@@ -288,7 +288,7 @@
             /* background: rgba(0, 0, 0, 0.2); */
         }
 
-       
+
 
         /* Task List Styling */
         .task-list {
@@ -440,6 +440,16 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#estimates">
+                                <i class="fas fa-file-signature me-2"></i>Estimates
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#contracts">
+                                <i class="fas fa-file-contract me-2"></i>Contracts
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" data-bs-toggle="tab" href="#activities">
                                 <i class="fas fa-history me-2"></i>Activities
                             </a>
@@ -462,10 +472,12 @@
                         <div class="tab-pane fade show active" id="details">
                             @if (isset($permissions['UPDATE']) && hasPermission(strtoupper($module) . '.' . $permissions['UPDATE']['KEY']))
                                 <div class="d-flex my-3 justify-content-lg-end gap-2 ">
-                                    <button id='editToggle' title="Edit" data-toggle="tooltip" class="btn btn-outline-secondary">
+                                    <button id='editToggle' title="Edit" data-toggle="tooltip"
+                                        class="btn btn-outline-secondary">
                                         <i class="fas fa-pencil-alt me-2"></i>
                                     </button>
-                                    <button form="leadEditForm" title="Update" data-toggle="tooltip" type="submit" id="updateBtn" class="btn btn-primary">
+                                    <button form="leadEditForm" title="Update" data-toggle="tooltip" type="submit"
+                                        id="updateBtn" class="btn btn-primary">
                                         <i class="fas fa-plus me-2"></i> <span>Update </span>
                                     </button>
                                 </div>
@@ -518,6 +530,13 @@
 
                         <div class="tab-pane fade" id="proposals">
                             @include('dashboard.crm.leads.components._proposals')
+                        </div>
+
+                        <div class="tab-pane fade" id="estimates">
+                            @include('dashboard.crm.leads.components._estimates')
+                        </div>
+                        <div class="tab-pane fade" id="contracts">
+                            @include('dashboard.crm.leads.components._contracts')
                         </div>
 
                         <div class="tab-pane fade" id="activities">
