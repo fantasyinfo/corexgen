@@ -6,14 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\RoleRequest;
 use Illuminate\Http\Request;
 use App\Models\CRM\CRMRole;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
 use App\Traits\TenantFilter;
 use Illuminate\Support\Facades\View;
 use App\Helpers\PermissionsHelper;
-use App\Models\User;
 use App\Traits\SubscriptionUsageFilter;
 use Illuminate\Support\Facades\DB;
 
@@ -103,7 +101,7 @@ class RoleController extends Controller
 
                     ])->render();
                 })
-                ->editColumn('created_at', fn($role) => $role->created_at->format('d M Y'))
+                ->editColumn('created_at', fn($role) => formatDateTime($role?->created_at))
                 ->editColumn('status', function ($role) {
                     return View::make(getComponentsDirFilePath('dt-status'), [
 
