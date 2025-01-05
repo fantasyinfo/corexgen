@@ -9,7 +9,7 @@
         </div>
         <div>
             <h6 class="stat-label">Birth Date</h6>
-            <h3 class="stat-value">{{ $client->birth_date ? $client->birth_date->format('M d, Y') : 'Not Set' }}
+            <h3 class="stat-value">{{ $client->birth_date ? formatDateTime($client?->birth_date) : 'Not Set' }}
             </h3>
         </div>
     </div>

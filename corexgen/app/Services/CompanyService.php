@@ -147,7 +147,7 @@ class CompanyService
             ]);
         }
     }
-    
+
     public function generatezOneWordSettingsForCompany($companyid)
     {
         foreach (CRM_COMPANY_ONE_WORD_SETTINGS as $setting) {
@@ -282,9 +282,9 @@ class CompanyService
             ];
         }
 
-          // products taxes
+        // products taxes
 
-          $productTaxes = [
+        $productTaxes = [
             'dark' => '0%',
             'warning' => '5%',
             'info' => '12%',
@@ -310,40 +310,6 @@ class CompanyService
 
 
 
-    // public function createCompany(array $validatedData)
-    // {
-    //     // temporary basic
-    //     // create compnay acc with status of onbording
-    //     // create user acc 
-
-    //     return DB::transaction(function () use ($validatedData) {
-    //         $address = $this->createAddressIfProvided($validatedData);
-
-    //         $userFullName = $validatedData['name'];
-    //         $company = Company::create(array_merge($validatedData, [
-    //             'address_id' => $address?->id,
-    //             'name' => $validatedData['cname']
-    //         ]));
-
-    //         $companyAdminUser = $this->createCompanyUser($company, $validatedData, $userFullName);
-
-    //         // todo:: add payment trasation 
-    //         $paymentDetails = @$validatedData['payment_details'] ?? [];
-
-    //         $this->createPaymentTransaction($validatedData['plan_id'], $company->id, $paymentDetails);
-    //         // add subscription
-
-
-    //         $this->givePermissionsToCompany($company, $companyAdminUser);
-
-    //         // $this->createMenuItemsForCompanyPanel($validatedData['plan_id']);
-
-
-    //         // todo:: add permissions to this user
-
-    //         return $company;
-    //     });
-    // }
 
 
 
@@ -868,7 +834,7 @@ class CompanyService
                 return $this->renderActionsColumn($company);
             })
             ->editColumn('created_at', function ($company) {
-                return Carbon::parse($company->created_at)->format('d M Y');
+                return formatDateTime($company->created_at);
             })
             ->editColumn('name', function ($company) use ($module) {
                 return "<a  class='dt-link' href='" . route($this->tenantRoute . $module . '.view', $company->id) . "' target='_blank'>$company->name</a>";
@@ -877,13 +843,13 @@ class CompanyService
                 return $this->renderStatusColumn($company);
             })
             ->editColumn('latestSubscription.start_date', function ($company) {
-                return Carbon::parse($company->latestSubscription->start_date)->format('d M Y');
+                return formatDateTime($company->latestSubscription->start_date);
             })
             ->editColumn('latestSubscription.end_date', function ($company) {
-                return Carbon::parse($company->latestSubscription->end_date)->format('d M Y');
+                return formatDateTime($company->latestSubscription->end_date);
             })
             ->editColumn('latestSubscription.next_billing_date', function ($company) {
-                return Carbon::parse($company->latestSubscription->next_billing_date)->format('d M Y');
+                return formatDateTime($company->latestSubscription->next_billing_date);
             })
             ->rawColumns(['actions', 'status', 'name']) // Add 'status' to raw columns
             ->make(true);

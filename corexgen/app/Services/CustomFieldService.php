@@ -157,7 +157,7 @@ class CustomFieldService
                 return $this->renderActionsColumn($customfield);
             })
             ->editColumn('created_at', function ($customfield) {
-                return Carbon::parse($customfield->created_at)->format('d M Y');
+                return formatDateTime($customfield->created_at);
             })
             ->editColumn('entity_type', function ($customfield) {
                 return CUSTOM_FIELDS_RELATION_TYPES['VALUES'][$customfield->entity_type];

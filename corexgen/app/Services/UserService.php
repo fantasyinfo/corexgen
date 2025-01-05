@@ -175,7 +175,7 @@ class UserService
             ->editColumn('name', function ($user) use ($module) {
                 return "<a class='dt-link' href='" . route($this->tenantRoute . $module . '.view', $user->id) . "' target='_blank'>$user->name</a>";
             })
-            ->editColumn('created_at', fn($user) => $user?->created_at ? $user?->created_at->format('d M Y') : '')
+            ->editColumn('created_at', fn($user) => $user?->created_at ? formatDateTime($user?->created_at) : '')
             ->editColumn('status', function ($user) {
                 return $this->renderStatusColumn($user);
             })

@@ -2,8 +2,8 @@
 
 @push('style')
     <style>
-        :root {
-            --proposal-primary: #f23636;
+       :root {
+            --proposal-primary: #333333;
             --proposal-bg: var(--card-bg);
             --proposal-text: var(--body-color);
             --proposal-border: var(--border-color);
@@ -14,7 +14,7 @@
         }
 
         .backbg-primary {
-            background-color: #c30606;
+            background-color: #161515;
         }
 
         .proposal-container {
@@ -26,7 +26,7 @@
         .proposal-header {
             position: relative;
             padding: 2.5rem;
-            background: linear-gradient(45deg, #f23636, #ec7063);
+            background: linear-gradient(45deg, #333333, #5c5c5c);
             color: white;
         }
 
@@ -132,10 +132,10 @@
                             </div>
                             <div class="col-md-6">
                                 <small class="text-light opacity-75">Valid Until</small>
-                                <h4>{{ $contract?->valid_date ? \Carbon\Carbon::parse($contract?->valid_date)->format('F d, Y') : 'Not Specified' }}
+                                <h4>{{ $contract?->valid_date ? formatDateTime($contract?->valid_date) : 'Not Specified' }}
                                 </h4>
                                 <p class="mb-0">Created:
-                                    {{ \Carbon\Carbon::parse($contract?->creating_date)->format('F d, Y') }}</p>
+                                    {{ formatDateTime($contract?->creating_date) }}</p>
 
 
                                 <p class="mb-3">Status: <span
@@ -280,7 +280,7 @@
                                                             <tr>
                                                                 <td class="text-muted">Accepted On:</td>
                                                                 <td class="font-weight-bold">
-                                                                    {{ \Carbon\Carbon::parse($contract?->company_accepted_details['accepted_at'])->format('M d, Y h:i A') }}
+                                                                    {{ formatDateTime($contract?->company_accepted_details['accepted_at']) }}
                                                                 </td>
                                                             </tr>
                                                         </tbody>
@@ -318,7 +318,7 @@
                                                             <tr>
                                                                 <td class="text-muted">Accepted On:</td>
                                                                 <td class="font-weight-bold">
-                                                                    {{ \Carbon\Carbon::parse($contract->accepted_details['accepted_at'])->format('M d, Y h:i A') }}
+                                                                    {{ formatDateTime($contract->accepted_details['accepted_at']) }}
                                                                 </td>
                                                             </tr>
                                                         </tbody>

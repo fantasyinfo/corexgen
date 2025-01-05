@@ -184,9 +184,9 @@ class ContractService
             ->editColumn('value', function ($contract) {
                 return $contract?->value ? "$ " . number_format($contract->value) : "0";
             })
-            ->editColumn('created_at', fn($contract) => $contract?->created_at ? Carbon::parse($contract->created_at)->format('d M Y') : '')
-            ->editColumn('creating_date', fn($contract) => $contract?->creating_date ? Carbon::parse($contract->creating_date)->format('d M Y') : '')
-            ->editColumn('valid_date', fn($contract) => $contract?->valid_date ? Carbon::parse($contract->valid_date)->format('d M Y') : '')
+            ->editColumn('created_at', fn($contract) => $contract?->created_at ? formatDateTime($contract->created_at) : '')
+            ->editColumn('creating_date', fn($contract) => $contract?->creating_date ? formatDateTime($contract->creating_date) : '')
+            ->editColumn('valid_date', fn($contract) => $contract?->valid_date ? formatDateTime($contract->valid_date) : '')
             ->editColumn('status', function ($contract) {
                 return "<span class='badge bg-" . CRM_STATUS_TYPES['CONTRACTS']['BT_CLASSES'][$contract->status] . "'>$contract->status</span>";
             })

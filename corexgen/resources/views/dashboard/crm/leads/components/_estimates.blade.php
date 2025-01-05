@@ -29,8 +29,8 @@
                                     {{ ucfirst(strtolower($estimate->status)) }}
                                 </span>
                             </td>
-                            <td>{{ \Carbon\Carbon::parse($estimate->creating_date)->format('F d, Y') }}</td>
-                            <td>{{ $estimate->valid_date ? \Carbon\Carbon::parse($estimate->valid_date)->format('F d, Y') : 'Not Specified' }}</td>
+                            <td>{{ formatDateTime($estimate->creating_date) }}</td>
+                            <td>{{ $estimate->valid_date ? formatDateTime($estimate->valid_date) : 'Not Specified' }}</td>
                             <td>
                                 <div class="btn-group">
                                     <a href="{{ route(getPanelRoutes('estimates.sendEstimate'), $estimate->id) }}" class="btn btn-sm btn-outline-primary"><i class="fas fa-envelope me-2"></i> Send to client</a>

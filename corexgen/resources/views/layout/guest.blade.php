@@ -1,6 +1,12 @@
     @include('layout.header.header')
 
-
+<style>
+    @media (max-width: 768px){
+        .content-area {
+            display: block !important;
+        }
+    }
+</style>
     <body>
 
 

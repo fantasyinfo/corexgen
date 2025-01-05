@@ -37,7 +37,7 @@
         </div>
         <div>
             <h6 class="stat-label">Follow Up</h6>
-            <h3 class="stat-value">{{ $lead->follow_up_date ? $lead->follow_up_date->format('M d, Y') : 'Not Set' }}
+            <h3 class="stat-value">{{ $lead?->follow_up_date ? formatDateTime($lead?->follow_up_date) : 'Not Set' }}
             </h3>
         </div>
     </div>

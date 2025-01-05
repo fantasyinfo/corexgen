@@ -119,7 +119,7 @@ class ProductServicesService
                 return $this->renderActionsColumn($product);
             })
             ->editColumn('created_at', function ($product) {
-                return Carbon::parse($product->created_at)->format('d M Y');
+                return formatDateTime($product->created_at);
             })
             ->editColumn('rate', function ($product) {
                 return number_format($product->rate);
