@@ -172,6 +172,10 @@ class ClientService
     }
 
 
+    public function getAllClients()
+    {
+        return CRMClients::where('company_id', Auth::user()->company_id)->where('status', CRM_STATUS_TYPES['CLIENTS']['STATUS']['ACTIVE'])->get();
+    }
 
     public function getDatatablesResponse($request)
     {

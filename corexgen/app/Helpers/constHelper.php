@@ -230,6 +230,13 @@ PermissionsHelper::initializePermissions();
         'for' => 'company',
         'is_feature' => false,
     ],
+    PermissionsHelper::$plansPermissionsKeys['PROJECTS'] => [
+        'name' => 'PROJECTS',
+        'id' => PermissionsHelper::getParentPermissionId('151'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['PROJECTS'],
+        'for' => 'company',
+        'is_feature' => true,
+    ],
 ]);
 
 // super panel menus
@@ -395,6 +402,15 @@ PermissionsHelper::initializePermissions();
             'Leads' => ['menu_url' => 'leads.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['LEADS'], 'READ_ALL')],
         ]
     ],
+    'Projects' => [
+        'menu_icon' => 'fa-folder-plus',
+        'feature_type' => PermissionsHelper::$plansPermissionsKeys['PROJECTS'], // this need to match the PLANS_FEATURES key
+        'permission_plan' => PermissionsHelper::$plansPermissionsKeys['PROJECTS'],
+        'permission_id' => PermissionsHelper::getParentPermissionId('151'),
+        'children' => [
+            'Projects' => ['menu_url' => 'projects.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PROJECTS'], 'READ_ALL')],
+        ]
+    ],
     'Proposals' => [
         'menu_icon' => 'fa-flag',
         'feature_type' => PermissionsHelper::$plansPermissionsKeys['PROPOSALS'], // this need to match the PLANS_FEATURES key
@@ -533,7 +549,22 @@ PermissionsHelper::initializePermissions();
         'STATUS' => ['SUCCESS' => 'SUCCESS', 'FAILED' => 'FAILED', 'PENDING' => 'PENDING'],
         'BT_CLASSES' => ['SUCCESS' => 'success', 'FAILED' => 'danger', 'PENDING' => 'warning'],
     ],
+    'INVOICES' => [
+        'TABLE_STATUS' => ['SUCCESS', 'OVERDUE', 'PENDING'],
+        'STATUS' => ['SUCCESS' => 'SUCCESS', 'OVERDUE' => 'OVERDUE', 'PENDING' => 'PENDING'],
+        'BT_CLASSES' => ['SUCCESS' => 'success', 'OVERDUE' => 'danger', 'PENDING' => 'warning'],
+    ],
 
+    'PROJECTS' => [
+        'TABLE_STATUS' => ['ACTIVE', 'COMPLETED','ON_HOLD','CANCELED'],
+        'STATUS' => ['ACTIVE' => 'ACTIVE', 'COMPLETED' => 'COMPLETED', 'ON_HOLD' => 'ON HOLD', 'CANCELED' => 'CANCELED'],
+        'BT_CLASSES' => ['ACTIVE' => 'success', 'COMPLETED' => 'info', 'ON_HOLD' => 'dark', 'CANCELED' => 'danger'],
+    ],
+    'MILESTONES' => [
+        'TABLE_STATUS' => ['PENDING', 'COMPLETED','CANCELED'],
+        'STATUS' => ['PENDING' => 'PENDING', 'COMPLETED' => 'COMPLETED',  'CANCELED' => 'CANCELED'],
+        'BT_CLASSES' => ['PENDING' => 'warning', 'COMPLETED' => 'success', 'CANCELED' => 'danger'],
+    ],
 ]);
 
 !defined('PANEL_TYPES') && define('PANEL_TYPES', [
@@ -578,6 +609,7 @@ PermissionsHelper::initializePermissions();
         'products_services' => 'products_services',
         'estimates' => 'estimates',
         'contracts' => 'contracts',
+        'projects' => 'projects',
 
     ]
 ]);
@@ -607,6 +639,7 @@ PermissionsHelper::initializePermissions();
     PermissionsHelper::$plansPermissionsKeys['ESTIMATES'] => PermissionsHelper::$plansPermissionsKeys['ESTIMATES'],
     PermissionsHelper::$plansPermissionsKeys['CONTRACTS'] => PermissionsHelper::$plansPermissionsKeys['CONTRACTS'],
     PermissionsHelper::$plansPermissionsKeys['PRODUCTS_SERVICES'] => PermissionsHelper::$plansPermissionsKeys['PRODUCTS_SERVICES'],
+    PermissionsHelper::$plansPermissionsKeys['PROJECTS'] => PermissionsHelper::$plansPermissionsKeys['PROJECTS'],
 ]);
 
 
@@ -1089,8 +1122,8 @@ PermissionsHelper::initializePermissions();
 
 // kyes must match the model name in lowercase
 !defined('CUSTOM_FIELDS_RELATION_TYPES') && define('CUSTOM_FIELDS_RELATION_TYPES', [
-    'KEYS' => ['crmclients' => 'crmclients', 'user' => 'user', 'crmleads' => 'crmleads', 'productsservices' => 'productsservices'],
-    'VALUES' => ['crmclients' => 'Clients', 'user' => 'Users & Employees', 'crmleads' => 'Leads', 'productsservices' => 'Products & Services'],
+    'KEYS' => ['crmclients' => 'crmclients', 'user' => 'user', 'crmleads' => 'crmleads', 'productsservices' => 'productsservices','projects' => 'projects'],
+    'VALUES' => ['crmclients' => 'Clients', 'user' => 'Users & Employees', 'crmleads' => 'Leads', 'productsservices' => 'Products & Services', 'projects' => 'Projects'],
 ]);
 
 
@@ -1103,7 +1136,8 @@ PermissionsHelper::initializePermissions();
         'leads_sources',
         'leads_status',
         'products_categories',
-        'products_taxs'
+        'products_taxs',
+        'tasks_status'
     ],
     'STATUS' => [
         'categories' => 'Categories',
@@ -1114,6 +1148,7 @@ PermissionsHelper::initializePermissions();
         'leads_status' => 'Leads Status',
         'products_categories' => 'Products Categories',
         'products_taxs' => 'Products Tags',
+        'tasks_status' => 'Tasks Status',
     ],
     'KEY' => [
         'categories' => 'categories',
@@ -1124,6 +1159,7 @@ PermissionsHelper::initializePermissions();
         'leads_status' => 'leads_status',
         'products_categories' => 'products_categories',
         'products_taxs' => 'products_taxs',
+        'tasks_status' => 'tasks_status',
     ],
 ]);
 
@@ -1132,15 +1168,18 @@ PermissionsHelper::initializePermissions();
         'clients',
         'leads',
         'products_services',
+        'tasks'
     ],
     'STATUS' => [
         'clients' => 'Clients',
         'leads' => 'Leads',
         'products_services' => 'Products & Services',
+        'tasks' => 'Tasks',
     ],
     'KEY' => [
         'clients' => 'clients',
         'leads' => 'leads',
         'products_services' => 'products_services',
+        'tasks' => 'tasks',
     ],
 ]);

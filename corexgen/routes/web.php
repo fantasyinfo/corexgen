@@ -12,6 +12,7 @@ use App\Http\Controllers\ContractsController;
 use App\Http\Controllers\CompaniesController;
 use App\Http\Controllers\CRM\ClientsController;
 use App\Http\Controllers\CRM\LeadsController;
+use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\CustomFieldController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\EstimatesController;
@@ -602,6 +603,44 @@ Route::middleware([
 
         Route::get('/view/{id}', [CustomFieldController::class, 'view'])->name('view')->middleware('check.permission:CUSTOM_FIELDS.VIEW');
         Route::get('/profile', [CustomFieldController::class, 'profile'])->name('profile');
+    });
+
+
+     // projects routes
+     Route::prefix(PANEL_MODULES['COMPANY_PANEL']['projects'])->as(PANEL_MODULES['COMPANY_PANEL']['projects'] . '.')->group(function () {
+        // role for fetch, store, update
+        Route::get('/', [ProjectController::class, 'index'])->name('index')->middleware('check.permission:PROJECTS.READ_ALL');
+        Route::post('/', [ProjectController::class, 'store'])->name('store')->middleware('check.permission:PROJECTS.CREATE');
+        Route::put('/', [ProjectController::class, 'update'])->name('update')->middleware('check.permission:PROJECTS.UPDATE');
+
+        // create, edit, change status, delete
+        Route::get('/create', [ProjectController::class, 'create'])->name('create')->middleware('check.permission:PROJECTS.CREATE');
+        Route::get('/edit/{id}', [ProjectController::class, 'edit'])->name('edit')->middleware('check.permission:PROJECTS.UPDATE');
+        Route::get('/changeStatus/{id}/{status}', [ProjectController::class, 'changeStatus'])->name('changeStatus')->middleware('check.permission:PROJECTS.CHANGE_STATUS');
+        Route::delete('/destroy/{id}', [ProjectController::class, 'destroy'])->name('destroy')->middleware('check.permission:PROJECTS.DELETE');
+
+        // validate, export, import
+        Route::get('/export', [ProjectController::class, 'export'])->name('export')->middleware('check.permission:PROJECTS.EXPORT');
+        Route::get('/import', [ProjectController::class, 'importView'])->name('importView')->middleware('check.permission:PROJECTS.IMPORT');
+        Route::post('/import', [ProjectController::class, 'import'])->name('import')->middleware('check.permission:PROJECTS.IMPORT');
+
+        Route::post('/bulkDelete', [ProjectController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:PROJECTS.BULK_DELETE');
+
+        Route::get('/view/{id}', [ProjectController::class, 'view'])->name('view')->middleware('check.permission:PROJECTS.VIEW');
+        Route::get('/profile', [ProjectController::class, 'profile'])->name('profile');
+
+
+        // comments routes...
+        Route::post('/comment', [CommentsController::class, 'addLeadsComment'])->name('comment.create')->middleware('check.permission:PROJECTS.CREATE');
+        Route::delete('/comment/destroy/{id}', [CommentsController::class, 'destroyLeadsComment'])->name('comment.destroy')->middleware('check.permission:PROJECTS.DELETE');
+
+
+
+        // attachments routes
+
+        Route::post('/attachment', [AttachmentController::class, 'addLeadsAttachment'])->name('attachment.create')->middleware('check.permission:PROJECTS.CREATE');
+        Route::delete('/attachment/destroy/{id}', [AttachmentController::class, 'destroyLeadsAttachment'])->name('attachment.destroy')->middleware('check.permission:PROJECTS.DELETE');
+
     });
 });
 
