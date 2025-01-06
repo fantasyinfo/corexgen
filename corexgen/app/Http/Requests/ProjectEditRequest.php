@@ -11,7 +11,7 @@ class ProjectEditRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return hasPermission('PROJECTS.UPDATE');
     }
 
     /**
@@ -22,7 +22,20 @@ class ProjectEditRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'id' => ['required','exists:projects,id'],
+            'title' => ['required', 'string', 'max:200'],
+            'description' => ['nullable', 'string'],
+            'billing_type' => ['required', 'in:Hourly,One-Time'],
+            'start_date' => ['required', 'date'],
+            'due_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+            'deadline' => ['nullable', 'date', 'after_or_equal:start_date'],
+            'estimated_hours' => ['nullable', 'integer', 'min:0'],
+            'time_spent' => ['integer', 'min:0'],
+            'client_id' => ['required', 'exists:clients,id'],
+            'one_time_cost' => ['nullable', 'numeric', 'required_if:billing_type,One-Time'],
+            'per_hour_cost' => ['nullable', 'numeric', 'required_if:billing_type,Hourly'],
+            'progress' => ['nullable', 'integer', 'min:0', 'max:100'],
+            'assign_to' => 'array|nullable|exists:users,id'
         ];
     }
 }

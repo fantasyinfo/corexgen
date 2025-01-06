@@ -95,9 +95,9 @@ class Project extends Model implements Auditable
 
 
         // Add a global scope to filter by status = 'active'
-        static::addGlobalScope('active', function (Builder $builder) {
-            $builder->where('projects.status', CRM_STATUS_TYPES['PROJECTS']['STATUS']['ACTIVE']);
-        });
+        // static::addGlobalScope('active', function (Builder $builder) {
+        //     $builder->where('projects.status', CRM_STATUS_TYPES['PROJECTS']['STATUS']['ACTIVE']);
+        // });
 
 
         static::creating(function ($project) {

@@ -57,7 +57,10 @@ return [
     'Due Date' => 'Due Date',
     'Progress' => 'Progress',
     'Estimated Hours' => 'Estimated Hours',
-    'Time Spent' => 'Time Spent'
+    'Time Spent' => 'Time Spent',
+    'Deadline' => 'Deadline',
+    'Members' => 'Members',
+    'Client' => 'Client'
 
 
 ];

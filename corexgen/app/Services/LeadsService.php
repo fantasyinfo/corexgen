@@ -201,12 +201,12 @@ class LeadsService
             // Retrieve current assignees from the database
             $existingAssignees = $lead->assignees()->pluck('lead_user.user_id')->sort()->values()->toArray();
             $newAssignees = collect($validatedData['assign_to'])->sort()->values()->toArray();
-    
+
             // Skip if assignees are identical - NO NEED TO CREATE AUDIT
             if ($existingAssignees === $newAssignees) {
                 return;
             }
-    
+
             // Prepare data for pivot table
             $companyId = Auth::user()->company_id;
             $assignToData = collect($validatedData['assign_to'])->mapWithKeys(function ($userId) use ($companyId) {
@@ -218,24 +218,24 @@ class LeadsService
                     ],
                 ];
             })->toArray();
-    
+
             // Sync assignments
             $lead->assignees()->sync($assignToData);
-    
+
         } else {
             // Handle detachment of assignees
             $existingAssignees = $lead->assignees()->pluck('lead_user.user_id')->toArray();
-    
+
             if (empty($existingAssignees)) {
                 return; // No existing assignees, skip detachment and logging
             }
-    
+
             $lead->assignees()->detach();
-    
-         
+
+
         }
     }
-    
+
 
 
 
@@ -351,6 +351,7 @@ class LeadsService
         $query = $this->applyTenantFilter($query, 'leads');
 
         $module = PANEL_MODULES[$this->getPanelModule()]['leads'];
+        $umodule = PANEL_MODULES[$this->getPanelModule()]['users'];
 
         $stages = $this->getLeadsStatus();
 
@@ -374,12 +375,19 @@ class LeadsService
                 // return "<span class='badge badge-pill bg-" . $lead->stage->color . "'>{$lead->stage->name}</span>";
                 return $this->renderStageColumn($lead, $stages);
             })
-            ->editColumn('assign_to', function ($lead) {
-                return "<span class='badge badge-pill bg-" . $lead->stage->color . "'>{$lead->stage->name}</span>";
+            ->editColumn('assign_to', function ($lead) use ($umodule) {
+                $assign_to = "";
+                foreach ($lead->assignees as $user) {
+                    $assign_to .= '<a href="' . route($this->tenantRoute . $umodule . '.view', ['id' => $user->id]) . '">';
+                    $assign_to .= '<img src="' . asset(
+                        'storage/' . ($user->profile_photo_path ?? 'avatars/default.webp')
+                    ) . '" alt="' . $user->name . '" title="' . $user->name . '" style="width:40px; height:40px; border-radius:50%;" />';
+                    $assign_to .= '</a>';
+                }
+                return $assign_to;
             })
-            ->editColumn('assign_by', function ($lead) {
-                return "<span class='badge badge-pill bg-" . $lead->stage->color . "'>{$lead->stage->name}</span>";
-            })
+
+
             // ->editColumn('name', function ($lead) use ($module) {
             //     $fullName = trim("{$lead->title} {$lead->first_name} {$lead->middle_name} {$lead->last_name}");
             //     return "<a class='dt-link' href='" . route($this->tenantRoute . $module . '.view', $lead->id) . "' target='_blank'>$fullName</a>";
@@ -393,7 +401,7 @@ class LeadsService
             // ->editColumn('status', function ($lead) {
             //     return $this->renderStatusColumn($lead);
             // })
-            ->rawColumns(['actions', 'title', 'group', 'source', 'stage', 'name']) // Include any HTML columns
+            ->rawColumns(['actions', 'assign_to', 'title', 'group', 'source', 'stage', 'name']) // Include any HTML columns
             ->make(true);
     }
 

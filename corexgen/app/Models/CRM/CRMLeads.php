@@ -134,9 +134,9 @@ class CRMLeads extends Model implements Auditable
 
 
         // Add a global scope to filter by status = 'active'
-        static::addGlobalScope('active', function (Builder $builder) {
-            $builder->where('leads.status', CRM_STATUS_TYPES['LEADS']['STATUS']['ACTIVE']);
-        });
+        // static::addGlobalScope('active', function (Builder $builder) {
+        //     $builder->where('leads.status', CRM_STATUS_TYPES['LEADS']['STATUS']['ACTIVE']);
+        // });
 
 
         static::creating(function ($lead) {
