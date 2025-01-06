@@ -204,10 +204,10 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="file-upload-area mb-3">
-                <form id="mediaForm" method="POST" action="{{ route(getPanelRoutes('leads.attachment.create')) }}"
+                <form id="mediaForm" method="POST" action="{{ route(getPanelRoutes('projects.attachment.create')) }}"
                     enctype="multipart/form-data">
                     @csrf
-                    <input type="hidden" name="id" value="{{ $lead->id }}" />
+                    <input type="hidden" name="id" value="{{ $project->id }}" />
                     <input type="file" multiple class="d-none" name="files[]" id="fileUpload">
                     <label for="fileUpload" class="file-upload-label">
                         <i class="fas fa-cloud-upload-alt"></i>
@@ -234,8 +234,8 @@
                         $deletePermission = true;
                     }
                 @endphp
-                @if ($lead->attachments->count() > 0)
-                    @foreach ($lead->attachments as $attachment)
+                @if ($project->attachments->count() > 0)
+                    @foreach ($project->attachments as $attachment)
                         <div class="attachment-item mb-4">
                             <div class="d-flex">
                                 <!-- Attachment Icon -->
@@ -278,7 +278,7 @@
                                             <!-- Delete Button -->
                                             @if ($deletePermission)
                                                 <form id="deleteAttachment{{ $attachment->id }}" method="POST"
-                                                    action="{{ route(getPanelRoutes('leads.attachment.destroy'), ['id' => $attachment->id]) }}">
+                                                    action="{{ route(getPanelRoutes('projects.attachment.destroy'), ['id' => $attachment->id]) }}">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button title="Delete Attachment" data-toggle="tooltip"
