@@ -161,9 +161,10 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <x-form-components.input-group-prepend-append step="0.001" prepend="{{ getSettingValue('Currency Symbol') }}"
-                                            append="{{ getSettingValue('Currency Code') }}"
-                                                type="number" name="value" id="value"
+                                            <x-form-components.input-group-prepend-append step="0.001"
+                                                prepend="{{ getSettingValue('Currency Symbol') }}"
+                                                append="{{ getSettingValue('Currency Code') }}" type="number"
+                                                name="value" id="value"
                                                 placeholder="{{ __('New Development Project Lead') }}"
                                                 value="{{ old('value', $lead->value) }}" />
                                         </div>
@@ -298,7 +299,7 @@
 
                                         <div class="col-lg-8">
                                             <x-form-components.dropdown-with-profile :title="'Select Team Members'" :options="$teamMates"
-                                                :name="'assign_to'" :multiple="true" :selected="$lead->assignees->pluck('id')->toArray()" />
+                                                :name="'assign_to'" :multiple="true" :selected="old('assign_to', $lead->assignees->pluck('id')->toArray())" />
                                         </div>
                                     </div>
 
@@ -500,7 +501,7 @@
 
                                 <!-- Custom Fields Tab -->
                                 @if (isset($customFields) && $customFields->isNotEmpty())
-                                    <x-form-components.custom-fields-create :customFields="$customFields" :cfOldValues="$cfOldValues" />
+                                    <x-form-components.custom-fields-edit :customFields="$customFields" :cfOldValues="$cfOldValues" />
                                 @endif
                             </div>
                         </div>
@@ -592,9 +593,9 @@
                         'wordcount'
                     ],
                     toolbar: 'undo redo | formatselect | bold italic backcolor | \
-                                                                                                                              alignleft aligncenter alignright alignjustify | \
-                                                                                                                              bullist numlist outdent indent | removeformat | help | \
-                                                                                                                              link image media preview codesample table'
+                                                                                                                                  alignleft aligncenter alignright alignjustify | \
+                                                                                                                                  bullist numlist outdent indent | removeformat | help | \
+                                                                                                                                  link image media preview codesample table'
                 });
             }
 

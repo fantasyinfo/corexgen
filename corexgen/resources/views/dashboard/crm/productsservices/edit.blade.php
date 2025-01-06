@@ -209,7 +209,10 @@
 
                                 <!-- Custom Fields Tab -->
                                 @if (isset($customFields) && $customFields->isNotEmpty())
-                                    <x-form-components.custom-fields-create :customFields="$customFields" />
+                                    <x-form-components.custom-fields-edit 
+                                     :customFields="$customFields"
+                                     :cfOldValues="$cfOldValues"
+                                      />
                                 @endif
 
                             </div>

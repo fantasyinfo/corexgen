@@ -15,6 +15,7 @@ class ProjectRepository
 
         $query = Project::query()->select('projects.*')
             ->with([
+                'client',
                 'assignees' => fn($q) => $q
                     ->select(['users.id', 'users.name'])
                     ->withOnly([])

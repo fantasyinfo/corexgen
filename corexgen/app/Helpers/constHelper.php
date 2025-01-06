@@ -557,7 +557,7 @@ PermissionsHelper::initializePermissions();
 
     'PROJECTS' => [
         'TABLE_STATUS' => ['ACTIVE', 'COMPLETED','ON_HOLD','CANCELED'],
-        'STATUS' => ['ACTIVE' => 'ACTIVE', 'COMPLETED' => 'COMPLETED', 'ON_HOLD' => 'ON HOLD', 'CANCELED' => 'CANCELED'],
+        'STATUS' => ['ACTIVE' => 'ACTIVE', 'COMPLETED' => 'COMPLETED', 'ON_HOLD' => 'ON_HOLD', 'CANCELED' => 'CANCELED'],
         'BT_CLASSES' => ['ACTIVE' => 'success', 'COMPLETED' => 'info', 'ON_HOLD' => 'dark', 'CANCELED' => 'danger'],
     ],
     'MILESTONES' => [
@@ -1122,8 +1122,8 @@ PermissionsHelper::initializePermissions();
 
 // kyes must match the model name in lowercase
 !defined('CUSTOM_FIELDS_RELATION_TYPES') && define('CUSTOM_FIELDS_RELATION_TYPES', [
-    'KEYS' => ['crmclients' => 'crmclients', 'user' => 'user', 'crmleads' => 'crmleads', 'productsservices' => 'productsservices','projects' => 'projects'],
-    'VALUES' => ['crmclients' => 'Clients', 'user' => 'Users & Employees', 'crmleads' => 'Leads', 'productsservices' => 'Products & Services', 'projects' => 'Projects'],
+    'KEYS' => ['crmclients' => 'crmclients', 'user' => 'user', 'crmleads' => 'crmleads', 'productsservices' => 'productsservices','project' => 'project'],
+    'VALUES' => ['crmclients' => 'Clients', 'user' => 'Users & Employees', 'crmleads' => 'Leads', 'productsservices' => 'Products & Services', 'project' => 'Projects'],
 ]);
 
 

@@ -95,6 +95,14 @@
                                 'width' => '100px',
                             ],
                             [
+                                'data' => 'assign_to',
+                                'name' => 'assign_to',
+                                'label' => __('leads.Assign To'),
+                                'searchable' => false,
+                                'orderable' => true,
+                                'width' => '200px',
+                            ],
+                            [
                                 'data' => 'group',
                                 'name' => 'group.name',
                                 'label' => __('leads.Groups'),
