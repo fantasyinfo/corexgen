@@ -39,7 +39,8 @@ class PermissionsHelper
         'PROPOSALS_TEMPLATES' => 'PROPOSALS_TEMPLATES',
         'PRODUCTS_SERVICES' => 'PRODUCTS_SERVICES',
         'ESTIMATES_TEMPLATES' => 'ESTIMATES_TEMPLATES',
-        'CONTRACTS_TEMPLATES' => 'CONTRACTS_TEMPLATES'
+        'CONTRACTS_TEMPLATES' => 'CONTRACTS_TEMPLATES',
+        'PROJECTS' => 'PROJECTS'
 
     ];
 
@@ -124,6 +125,8 @@ class PermissionsHelper
             self::$plansPermissionsKeys['ESTIMATES_TEMPLATES'] => [3401 => 'CREATE', 3402 => 'READ', 3403 => 'READ_ALL', 3404 => 'UPDATE', 3405 => 'DELETE', 3406 => 'CHANGE_STATUS'],
 
             self::$plansPermissionsKeys['CONTRACTS_TEMPLATES'] => [3451 => 'CREATE', 3452 => 'READ', 3453 => 'READ_ALL', 3454 => 'UPDATE', 3455 => 'DELETE', 3456 => 'CHANGE_STATUS'],
+
+            self::$plansPermissionsKeys['PROJECTS'] => [4101 => 'CREATE', 4102 => 'READ', 4103 => 'READ_ALL', 4104 => 'UPDATE', 4105 => 'DELETE', 4106 => 'IMPORT', 4107 => 'EXPORT', 4108 => 'FILTER', 4109 => 'CHANGE_STATUS', 4110 => 'BULK_DELETE', 4111 => 'VIEW'],
 
         ];
     }

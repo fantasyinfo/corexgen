@@ -305,6 +305,30 @@ class CompanyService
             ];
         }
 
+
+        // tasks status
+        $tasksStatus = [
+            'info' => 'New',
+            'secondary' => 'In Progress',
+            'dark' => 'Testing',
+            'primary' => 'Awating Feedback',
+            'success' => 'Completed',
+            'danger' => 'Issue',
+        ];
+
+        foreach ($tasksStatus as $color => $cc) {
+            $insertArray[] = [
+                'name' => $cc,
+                'color' => $color,
+                'relation_type' => CATEGORY_GROUP_TAGS_RELATIONS['KEY']['tasks'],
+                'type' => CATEGORY_GROUP_TAGS_TYPES['KEY']['tasks_status'],
+                'status' => 'active',
+                'company_id' => $companyid,
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        }
+
         CategoryGroupTag::insert($insertArray);
     }
 

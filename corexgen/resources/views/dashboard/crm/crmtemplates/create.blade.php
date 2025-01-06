@@ -86,8 +86,8 @@
           
                 content_style: 'body { font-family: Arial, sans-serif; }', // Optional: add inline styling for the editor content
          
-                // skin: currentTheme === 'dark' ? 'oxide-dark' : 'oxide',
-                // content_css: currentTheme === 'dark' ? 'dark' : 'default',
+                skin: currentTheme === 'dark' ? 'oxide-dark' : 'oxide',
+                content_css: currentTheme === 'dark' ? 'dark' : 'default',
                 menubar: true,
                 plugins: [
                     'accordion',
