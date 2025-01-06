@@ -5,8 +5,8 @@
             <i class="fas fa-dollar-sign"></i>
         </div>
         <div>
-            <h6 class="stat-label">Deal Value</h6>
-            <h3 class="stat-value">${{ number_format($lead->value, 2) }}</h3>
+            <h6 class="stat-label">{{$project?->type === 'Hourly' ? 'Per hour cost' : 'One time cost'}}</h6>
+            <h3 class="stat-value">{{getSettingValue('Currency Symbol')}} {{$project?->type === 'Hourly' ? $project?->per_hour_cost : $project?->one_time_cost}}</h3>
         </div>
 
     </div>
@@ -20,9 +20,9 @@
         </div>
         <div>
 
-            <h6 class="stat-label">Last Contact</h6>
+            <h6 class="stat-label">Start Contact</h6>
             <h3 class="stat-value">
-                {{ $lead->last_contacted_date ? $lead->last_contacted_date->diffForHumans() : 'Never' }}
+                {{ $project->start_date ? formatDateTime($project->start_date) : 'Never' }}
             </h3>
         </div>
     </div>
@@ -36,13 +36,27 @@
             <i class="fas fa-calendar-check"></i>
         </div>
         <div>
-            <h6 class="stat-label">Follow Up</h6>
-            <h3 class="stat-value">{{ $lead?->follow_up_date ? formatDateTime($lead?->follow_up_date) : 'Not Set' }}
+            <h6 class="stat-label">Due Date</h6>
+            <h3 class="stat-value">{{ $project?->due_date ? formatDateTime($project?->due_date) : 'Not Set' }}
             </h3>
         </div>
     </div>
 </div>
 
+
+<div class="card  border-2 mb-4">
+
+    <div class="card-body d-flex gap-2">
+        <div class="stat-icon">
+            <i class="fas fa-calendar-check"></i>
+        </div>
+        <div>
+            <h6 class="stat-label">Deadline</h6>
+            <h3 class="stat-value">{{ $project?->deadline ? formatDateTime($project?->deadline) : 'Not Set' }}
+            </h3>
+        </div>
+    </div>
+</div>
 
 <div class="card  border-2 mb-4">
     <div class="card-body d-flex gap-2">

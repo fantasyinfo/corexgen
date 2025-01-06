@@ -7,7 +7,6 @@ use App\Helpers\PermissionsHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProjectEditRequest;
 use App\Http\Requests\ProjectRequest;
-use App\Models\Country;
 use App\Models\Project;
 use App\Services\ContractService;
 use App\Services\EstimateService;
@@ -18,10 +17,8 @@ use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
 use App\Traits\SubscriptionUsageFilter;
 use Illuminate\Support\Facades\Auth;
-use App\Models\CRM\projects;
 use App\Services\ClientService;
 use App\Services\CustomFieldService;
-
 use App\Services\ProjectService;
 use Illuminate\Support\Facades\DB;
 
@@ -364,19 +361,8 @@ class ProjectController extends Controller
     }
     public function view($id)
     {
-        $query = projects::query()->with([
-            'address' => fn($q) => $q
-                ->select(['id', 'street_address', 'postal_code', 'city_id', 'country_id'])
-                ->with([
-
-                    'city:id,name',
-                    'country:id,name'
-                ]),
-            'group:id,name,color',
-            'source:id,name,color',
-            'stage:id,name,color',
+        $query = Project::query()->with([
             'customFields',
-            'assignedBy:id,name',
             'assignees' => fn($q) => $q
                 ->select(['users.id', 'users.name'])
                 ->withOnly([])
@@ -384,7 +370,7 @@ class ProjectController extends Controller
 
         $query = $this->applyTenantFilter($query, 'projects');
 
-        $lead = $query->firstOrFail();
+        $project = $query->firstOrFail();
 
         // custom fields
 
@@ -392,15 +378,15 @@ class ProjectController extends Controller
         $customFields = collect();
         $cfOldValues = collect();
         if (!is_null(Auth::user()->company_id)) {
-            $customFields = $this->customFieldService->getFieldsForEntity(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['projects'], Auth::user()->company_id);
+            $customFields = $this->customFieldService->getFieldsForEntity(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['project'], Auth::user()->company_id);
 
             // fetch already existing values
 
-            $cfOldValues = $this->customFieldService->getValuesForEntity($lead);
+            $cfOldValues = $this->customFieldService->getValuesForEntity($project);
         }
 
         // fetch teams actvities
-        $activitesQuery = $this->getActivites(\App\Models\CRM\projects::class, $id);
+        $activitesQuery = $this->getActivites(\App\Models\Project::class, $id);
         $activitesQuery = $this->applyTenantFilter($activitesQuery);
         // $activities = $activitesQuery->get();
 
@@ -409,29 +395,25 @@ class ProjectController extends Controller
 
         // get proposals
         $proposals = collect();
-        $proposals = $this->proposalService->getProposals(\App\Models\CRM\projects::class, $id);
+        $proposals = $this->proposalService->getProposals(\App\Models\Project::class, $id);
 
         // estimates
         $estimates = collect();
-        $estimates = $this->estimateService->getEstimates(\App\Models\CRM\projects::class, $id);
+        $estimates = $this->estimateService->getEstimates(\App\Models\Project::class, $id);
 
         // contracts
 
         $contracts = collect();
-        $contracts = $this->contractService->getContracts(\App\Models\CRM\projects::class, $id);
+        $contracts = $this->contractService->getContracts(\App\Models\Project::class, $id);
 
         return view($this->getViewFilePath('view'), [
             'title' => 'View Project',
-            'lead' => $lead,
+            'project' => $project,
             'module' => PANEL_MODULES[$this->getPanelModule()]['projects'],
-            'leadsGroups' => $this->projectService->getLeadsGroups(),
-            'leadsSources' => $this->projectService->getLeadsSources(),
-            'leadsStatus' => $this->projectService->getLeadsStatus(),
             'teamMates' => getTeamMates(),
             'cfOldValues' => $cfOldValues,
             'customFields' => $customFields,
             'activities' => $activitesQuery,
-            'countries' => Country::all(),
             'permissions' => PermissionsHelper::getPermissionsArray('PROJECTS'),
             'proposals' => $proposals,
             'contracts' => $contracts,
