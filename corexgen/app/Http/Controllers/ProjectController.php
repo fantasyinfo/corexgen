@@ -5,14 +5,11 @@ namespace App\Http\Controllers;
 use App\Helpers\CustomFieldsValidation;
 use App\Helpers\PermissionsHelper;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\LeadsEditRequest;
 use App\Http\Requests\ProjectEditRequest;
 use App\Http\Requests\ProjectRequest;
 use App\Models\Country;
-use App\Models\CRM\CRMClients;
 use App\Models\Project;
 use App\Services\ContractService;
-use App\Services\Csv\ClientsCsvRowProcessor;
 use App\Services\EstimateService;
 use App\Services\ProposalService;
 use App\Traits\AuditFilter;
@@ -21,9 +18,6 @@ use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
 use App\Traits\SubscriptionUsageFilter;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
-use App\Jobs\CsvImportJob;
 use App\Models\CRM\projects;
 use App\Services\ClientService;
 use App\Services\CustomFieldService;
@@ -155,6 +149,7 @@ class ProjectController extends Controller
             'total_inactive' => $usersTotals->totalInactive,
             'total_ussers' => $usersTotals->totalUsers,
             'teamMates' => getTeamMates(),
+            'clients' => $this->clientService->getAllClients()
         ]);
     }
 

@@ -1,4 +1,4 @@
-@if (hasPermission('USERS.FILTER'))
+@if (hasPermission('PROPOSALS.FILTER'))
     <div class="filter-sidebar" id="filterSidebar">
 
         <div class="filter-sidebar-content">
