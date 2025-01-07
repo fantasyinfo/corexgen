@@ -321,7 +321,7 @@ class ProjectController extends Controller
             return redirect()->back()->with('error', 'Failed to delete the client: ' . $e->getMessage());
         }
     }
-    
+
     public function bulkDelete(Request $request)
     {
         $ids = $request->input('ids');
@@ -395,16 +395,17 @@ class ProjectController extends Controller
 
         // get proposals
         $proposals = collect();
-        $proposals = $this->proposalService->getProposals(\App\Models\Project::class, $id);
+        $proposals = $this->proposalService->getProposals(\App\Models\CRM\CRMClients::class, $project?->client?->id);
+
 
         // estimates
         $estimates = collect();
-        $estimates = $this->estimateService->getEstimates(\App\Models\Project::class, $id);
+        $estimates = $this->estimateService->getEstimates(\App\Models\CRM\CRMClients::class, $project?->client?->id);
 
         // contracts
 
         $contracts = collect();
-        $contracts = $this->contractService->getContracts(\App\Models\Project::class, $id);
+        $contracts = $this->contractService->getContracts(\App\Models\CRM\CRMClients::class, $project?->client?->id);
 
         return view($this->getViewFilePath('view'), [
             'title' => 'View Project',
@@ -420,7 +421,7 @@ class ProjectController extends Controller
             'estimates' => $estimates,
         ]);
     }
-  
+
 
     public function changeStatus($id, $status)
     {
@@ -433,6 +434,25 @@ class ProjectController extends Controller
             return redirect()->back()->with('error', 'Failed to changed the projects status: ' . $e->getMessage());
         }
     }
+
+    public function addAssignee(Request $request)
+    {
+        $request->validate([
+            'assign_to' => 'array|nullable|exists:users,id',
+            'id' => 'required|exists:projects,id',
+        ]);
+
+        try {
+            $project = $this->applyTenantFilter(Project::query()->where('id', '=', $request->input('id')))->firstOrFail();
+
+            $this->projectService->assignprojectsToUserIfProvided($request->only(['assign_to', 'id']), $project);
+
+            return redirect()->back()->with('success', 'Project assingee addedd successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to addedd the projects assingee: ' . $e->getMessage());
+        }
+    }
+
 
 
 

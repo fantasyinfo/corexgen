@@ -71,7 +71,7 @@ class ProjectService
     }
 
 
-    private function assignprojectsToUserIfProvided(array $validatedData, Project $project)
+    public function assignprojectsToUserIfProvided(array $validatedData, Project $project)
     {
         if (!empty($validatedData['assign_to']) && is_array($validatedData['assign_to'])) {
             // Retrieve current assignees from the database

@@ -1,35 +1,35 @@
 @extends('layout.app')
 @push('style')
     <style>
-        #editDetails,
+        #projectView #editDetails,
         #updateBtn {
             display: none;
         }
 
-        .divider {
+        #projectView .divider {
             background-color: var(--body-bg);
         }
 
-        .card {
+        #projectView .card {
             background-color: var(--card-bg);
             box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
             transition: all 0.3s ease;
         }
 
-        .card:hover {
-            transform: translateY(-2px);
+        #projectView .card:hover {
+            /* transform: translateY(-2px); */
             box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
         }
 
         /* Lead Header Styles */
         /* Lead Header Styles */
-        .lead-header-card {
+        #projectView .lead-header-card {
             background: var(--card-bg);
             border-radius: 1rem;
             margin-bottom: 2rem;
         }
 
-        .lead-avatar {
+        #projectView .lead-avatar {
             width: 64px;
             height: 64px;
             border-radius: 16px;
@@ -40,7 +40,7 @@
             font-weight: 600;
         }
 
-        .company-avatar {
+        #projectView .company-avatar {
             background: var(--primary-color);
             color: white;
             width: 100%;
@@ -51,7 +51,7 @@
             border-radius: inherit;
         }
 
-        .individual-avatar {
+        #projectView .individual-avatar {
             background: var(--secondary-color);
             color: white;
             width: 100%;
@@ -62,7 +62,7 @@
             border-radius: inherit;
         }
 
-        .lead-score {
+        #projectView .lead-score {
             background: var(--light-color);
             padding: 0.25rem 0.75rem;
             border-radius: 1rem;
@@ -70,12 +70,12 @@
         }
 
         /* Stat Cards */
-        .stat-card {
+        #projectView .stat-card {
             border-radius: 1rem;
             background: var(--card-bg);
         }
 
-        .stat-icon {
+        #projectView .stat-icon {
             width: 40px;
             height: 40px;
             background: var(--primary-color);
@@ -87,24 +87,24 @@
             margin-bottom: 0.5rem;
         }
 
-        .stat-label {
+        #projectView .stat-label {
             color: var(--neutral-gray);
             font-size: 0.875rem;
             margin-bottom: 0.25rem;
         }
 
-        .stat-value {
+        #projectView .stat-value {
             font-size: 1.25rem;
             font-weight: 600;
             margin: 0;
         }
 
         /* Tabs Styling */
-        .nav-tabs {
+        #projectView .nav-tabs {
             border-bottom: none;
         }
 
-        .nav-tabs .nav-link {
+        #projectView .nav-tabs .nav-link {
             border: none;
             color: var(--neutral-gray);
             padding: 1rem 1.5rem;
@@ -112,13 +112,13 @@
             position: relative;
         }
 
-        .nav-tabs .nav-link.active {
+        #projectView .nav-tabs .nav-link.active {
             color: var(--primary-color);
             background: transparent;
             border: none;
         }
 
-        .nav-tabs .nav-link.active::after {
+        #projectView .nav-tabs .nav-link.active::after {
             content: '';
             position: absolute;
             bottom: 0;
@@ -129,7 +129,7 @@
         }
 
         /* Detail Sections */
-        .detail-label {
+        #projectView .detail-label {
             color: var(--neutral-gray);
             font-size: 0.875rem;
             text-transform: uppercase;
@@ -137,32 +137,32 @@
             margin-bottom: 1rem;
         }
 
-        .detail-group {
+        #projectView .detail-group {
             margin-bottom: 1rem;
         }
 
-        .detail-group label {
+        #projectView .detail-group label {
             color: var(--neutral-gray);
             font-size: 0.875rem;
             margin-bottom: 0.25rem;
         }
 
-        .detail-group p {
+        #projectView .detail-group p {
             margin: 0;
             font-weight: 500;
         }
 
-        .timeline-wrapper {
+        #projectView .timeline-wrapper {
             position: relative;
             padding: 1rem 0;
         }
 
-        .timeline {
+        #projectView .timeline {
             position: relative;
             padding-left: 3rem;
         }
 
-        .timeline::before {
+        #projectView .timeline::before {
             content: '';
             position: absolute;
             left: 14px;
@@ -172,19 +172,19 @@
             background: var(--body-bg);
         }
 
-        .timeline-item {
+        #projectView .timeline-item {
             position: relative;
             margin-bottom: 2rem;
         }
 
-        .timeline-icon {
+        #projectView .timeline-icon {
             position: absolute;
             left: -3rem;
             width: 30px;
             height: 30px;
         }
 
-        .icon-wrapper {
+        #projectView .icon-wrapper {
             width: 30px;
             height: 30px;
             border-radius: 50%;
@@ -195,7 +195,7 @@
             font-size: 0.875rem;
         }
 
-        .timeline-content-wrapper {
+        #projectView .timeline-content-wrapper {
             /* background: var(--body-bg); */
             border-radius: 0.75rem;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -204,37 +204,37 @@
 
 
 
-        .activity-header {
+        #projectView .activity-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 1rem;
         }
 
-        .activity-title {
+        #projectView .activity-title {
             display: flex;
             align-items: center;
             gap: 1rem;
         }
 
-        .activity-title h6 {
+        #projectView .activity-title h6 {
             margin: 0;
             color: var(--primary-color);
             font-weight: 600;
         }
 
-        .activity-time {
+        #projectView .activity-time {
             font-size: 0.875rem;
             color: var(--neutral-gray);
         }
 
-        .activity-changes {
+        #projectView .activity-changes {
             background: var(--input-bg);
             border-radius: 0.5rem;
             /* padding: 0.75rem; */
         }
 
-        .change-item {
+        #projectView .change-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -243,36 +243,36 @@
             border-bottom: 1px solid var(--border-color);
         }
 
-        .change-item:last-child {
+        #projectView .change-item:last-child {
             border-bottom: none;
         }
 
-        .field-label {
+        #projectView .field-label {
             font-weight: 500;
             color: var(--body-color);
         }
 
-        .change-values {
+        #projectView .change-values {
             display: flex;
             align-items: center;
             font-size: 0.875rem;
         }
 
-        .old-value {
+        #projectView .old-value {
             color: var(--danger-color);
             text-decoration: line-through;
         }
 
-        .new-value {
+        #projectView .new-value {
             color: var(--success-color);
         }
 
-        .empty-state {
+        #projectView .empty-state {
             text-align: center;
             padding: 3rem 1rem;
         }
 
-        .empty-state-icon {
+        #projectView .empty-state-icon {
             font-size: 2.5rem;
             color: var(--neutral-gray);
             margin-bottom: 1rem;
@@ -291,11 +291,11 @@
 
 
         /* Task List Styling */
-        .task-list {
+        #projectView .task-list {
             padding: 1rem;
         }
 
-        .task-item {
+        #projectView .task-item {
             padding: 0.75rem;
             border-radius: 0.5rem;
             background: var(--input-bg);
@@ -303,41 +303,41 @@
         }
 
         /* Badge Styling */
-        .badge {
+        #projectView .badge {
             padding: 0.5rem 1rem;
             font-weight: 500;
             border-radius: 0.5rem;
         }
 
-        .bg-priority-high {
+        #projectView .bg-priority-high {
             background-color: var(--danger-color);
             color: white;
         }
 
-        .bg-priority-medium {
+        #projectView .bg-priority-medium {
             background-color: var(--warning-color);
             color: var(--dark-color);
         }
 
-        .bg-priority-low {
+        #projectView .bg-priority-low {
             background-color: var(--success-color);
             color: white;
         }
 
         /* Button Styling */
-        .btn {
+        #projectView .btn {
             padding: 0.5rem 1rem;
             font-weight: 500;
             border-radius: 0.5rem;
-            transition: all 0.3s ease;
+            /* transition: all 0.3s ease; */
         }
 
-        .btn-primary {
+        #projectView .btn-primary {
             background-color: var(--primary-color);
             border-color: var(--primary-color);
         }
 
-        .btn-primary:hover {
+        #projectView .btn-primary:hover {
             background-color: var(--primary-hover);
             border-color: var(--primary-hover);
         }
@@ -357,45 +357,45 @@
 
         /* Responsive Adjustments */
         @media (max-width: 768px) {
-            .lead-header-card .d-flex {
+            #projectView .lead-header-card .d-flex {
                 flex-direction: column;
             }
 
-            .stat-card {
+            #projectView .stat-card {
                 margin-bottom: 1rem;
             }
 
-            .nav-tabs .nav-link {
+            #projectView .nav-tabs .nav-link {
                 padding: 0.75rem 1rem;
             }
         }
 
         /* Animation Effects */
-        .card,
-        .btn,
-        .badge {
+        /* #projectView .card,
+        #projectView .btn,
+        #projectView .badge {
             transition: all 0.3s ease;
-        }
+        } */
 
-        .divider-container {
+        #projectView .divider-container {
             display: flex;
             justify-content: center;
             align-items: stretch;
         }
 
-        .divider {
+        #projectView .divider {
             width: 1px;
             background-color: var(--body-bg);
             /* Adjust color as per your theme */
             height: 100%;
         }
 
-        .main-content-view {
+        #projectView .main-content-view {
             padding-right: 1rem;
             /* Add space near the divider */
         }
 
-        .sidebar-view {
+        #projectView .sidebar-view {
             padding-left: 1rem;
             /* Add space near the divider */
         }
@@ -412,7 +412,7 @@
     @php
         //  prePrintR($project->attachments->toArray());
     @endphp
-    <div class="container-fluid ">
+    <div class="container-fluid " id="projectView">
         <!-- Lead Header -->
         <div class="card mb-4 border-0 pb-0 lead-header-card">
             <div class="card-body">
@@ -478,8 +478,8 @@
                                         @include('dashboard.crm.projects.components.viewpartials._basic')
                                         @include('dashboard.crm.projects.components.viewpartials._additional')
                                     </div>
-
                                     @include('dashboard.crm.projects.components.viewpartials._details')
+
                                 </div>
                                 <div class="col-lg-1 divider-container">
                                     <div class="divider"></div>
@@ -487,6 +487,7 @@
                                 <div class="col-lg-4 sidebar-view">
                                     @include('dashboard.crm.projects.components.viewpartials._sidebar')
                                 </div>
+                               
                             </div>
 
 
