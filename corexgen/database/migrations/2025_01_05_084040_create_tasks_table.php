@@ -30,11 +30,13 @@ return new class extends Migration
             $table->unsignedBigInteger('milestone_id')->nullable();
             $table->unsignedBigInteger('status_id')->nullable();
             $table->unsignedBigInteger('company_id');
+            $table->unsignedBigInteger('assign_by')->nullable();
 
             $table->foreign('project_id')->references('id')->on('projects')->onDelete('set null');
             $table->foreign('milestone_id')->references('id')->on('milestones')->onDelete('set null');
             $table->foreign('status_id')->references('id')->on('category_group_tag')->onDelete('set null');
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
+            $table->foreign('assign_by')->references('id')->on('users')->onDelete('set null');
         
 
             $table->timestamps();

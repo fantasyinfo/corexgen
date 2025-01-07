@@ -113,6 +113,10 @@ class ProjectService
     }
 
 
+    public function getAllProjects()
+    {
+        return $this->applyTenantFilter(Project::where('status', CRM_STATUS_TYPES['PROJECTS']['STATUS']['ACTIVE']))->get();
+    }
 
 
     public function getDatatablesResponse($request)

@@ -28,6 +28,7 @@ use App\Http\Controllers\PlansController;
 use App\Http\Controllers\PlansPaymentTransaction;
 use App\Http\Controllers\PlanUpgrade;
 use App\Http\Controllers\SystemInstallerController;
+use App\Http\Controllers\TasksController;
 use App\Http\Controllers\TemplatesController;
 use App\Http\Controllers\UserController;
 use App\Models\City;
@@ -643,6 +644,53 @@ Route::middleware([
 
         Route::post('/attachment', [AttachmentController::class, 'addProjectsAttachment'])->name('attachment.create')->middleware('check.permission:PROJECTS.CREATE');
         Route::delete('/attachment/destroy/{id}', [AttachmentController::class, 'destroyProjectsAttachment'])->name('attachment.destroy')->middleware('check.permission:PROJECTS.DELETE');
+
+    });
+
+      // tasks routes
+      Route::prefix(PANEL_MODULES['COMPANY_PANEL']['tasks'])->as(PANEL_MODULES['COMPANY_PANEL']['tasks'] . '.')->group(function () {
+        // role for fetch, store, update
+        Route::get('/', [TasksController::class, 'index'])->name('index')->middleware('check.permission:TASKS.READ_ALL');
+        Route::post('/', [TasksController::class, 'store'])->name('store')->middleware('check.permission:TASKS.CREATE');
+        Route::put('/', [TasksController::class, 'update'])->name('update')->middleware('check.permission:TASKS.UPDATE');
+
+        // create, edit, change status, delete
+        Route::get('/create', [TasksController::class, 'create'])->name('create')->middleware('check.permission:TASKS.CREATE');
+        Route::get('/edit/{id}', [TasksController::class, 'edit'])->name('edit')->middleware('check.permission:TASKS.UPDATE');
+        Route::get('/changeStatus/{id}/{status}', [TasksController::class, 'changeStatus'])->name('changeStatus')->middleware('check.permission:TASKS.CHANGE_STATUS');
+        Route::delete('/destroy/{id}', [TasksController::class, 'destroy'])->name('destroy')->middleware('check.permission:TASKS.DELETE');
+
+        Route::post('/bulkDelete', [TasksController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:TASKS.BULK_DELETE');
+
+        Route::get('/view/{id}', [TasksController::class, 'view'])->name('view')->middleware('check.permission:TASKS.VIEW');
+        Route::get('/profile', [TasksController::class, 'profile'])->name('profile');
+
+
+
+        // kanban board routes.
+
+        Route::get('/kanban', [TasksController::class, 'kanban'])->name('kanban')->middleware('check.permission:TASKS.KANBAN_BOARD');
+
+        Route::get('/kanbanEdit/{id}', [TasksController::class, 'kanbanEdit'])->name('kanbanEdit')->middleware('check.permission:TASKS.UPDATE');
+
+        Route::get('/kanbanView/{id}', [TasksController::class, 'kanbanView'])->name('kanbanView')->middleware('check.permission:TASKS.READ');
+
+        Route::get('/kanbanLoad', [TasksController::class, 'kanbanLoad'])->name('kanbanLoad')->middleware('check.permission:TASKS.KANBAN_BOARD');
+
+        Route::get('/changeStage/{leadid}/{stageid}', [TasksController::class, 'changeStage'])->name('changeStage')->middleware('check.permission:TASKS.CHANGE_STATUS');
+
+
+
+        // comments routes...
+        Route::post('/comment', [CommentsController::class, 'addLeadsComment'])->name('comment.create')->middleware('check.permission:TASKS.CREATE');
+        Route::delete('/comment/destroy/{id}', [CommentsController::class, 'destroyLeadsComment'])->name('comment.destroy')->middleware('check.permission:TASKS.DELETE');
+
+
+
+        // attachments routes
+
+        Route::post('/attachment', [AttachmentController::class, 'addLeadsAttachment'])->name('attachment.create')->middleware('check.permission:TASKS.CREATE');
+        Route::delete('/attachment/destroy/{id}', [AttachmentController::class, 'destroyLeadsAttachment'])->name('attachment.destroy')->middleware('check.permission:TASKS.DELETE');
 
     });
 });
