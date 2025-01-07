@@ -11,7 +11,8 @@ class TasksRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        // Check if the user has permission to create tasks
+        return hasPermission('TASKS.CREATE');
     }
 
     /**
@@ -22,7 +23,20 @@ class TasksRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            "title" => "required|string|max:200",
+            "hourly_rate" => "nullable|numeric|min:0",
+            "start_date" => "nullable|date|before_or_equal:due_date",
+            "due_date" => "nullable|date|after_or_equal:start_date",
+            "priority" => "required|in:Low,Medium,High,Urgent",
+            "related_to" => "required",
+            "project_id" => "nullable|exists:projects,id",
+            "files" => "nullable|array",
+            "description" => "nullable|string",
+            "assign_to" => "nullable|array",
+            "assign_to.*" => "exists:users,id", // Validate each user ID in the array
+            "billable" => "nullable|boolean",
+            "visible_to_client" => "nullable|boolean",
+            'status_id' => 'nullable|exists:category_group_tag,id',
         ];
     }
 }

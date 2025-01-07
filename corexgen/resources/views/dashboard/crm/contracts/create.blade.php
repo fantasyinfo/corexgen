@@ -204,7 +204,7 @@
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
-                                    <x-form-components.input-group type="date" class="custom-class" id="creating_date"
+                                    <x-form-components.input-group type="date" placeholder="Select Date" class="custom-class" id="creating_date"
                                         name="creating_date" value="{{ old('creating_date') }}" required />
 
                                 </div>
@@ -217,7 +217,7 @@
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
-                                    <x-form-components.input-group type="date" class="custom-class" id="valid_date"
+                                    <x-form-components.input-group type="date" placeholder="Select Date" class="custom-class" id="valid_date"
                                         name="valid_date" value="{{ old('valid_date') }}" />
                                 </div>
                             </div>

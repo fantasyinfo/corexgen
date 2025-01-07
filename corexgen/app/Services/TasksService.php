@@ -4,11 +4,14 @@ namespace App\Services;
 
 use App\Helpers\PermissionsHelper;
 use App\Models\CategoryGroupTag;
+use App\Models\Tasks;
 use App\Repositories\TasksRepository;
 use App\Traits\CategoryGroupTagsFilter;
 use App\Traits\TenantFilter;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\DB;
 
 class TasksService
 {
@@ -20,12 +23,117 @@ class TasksService
 
     private $tenantRoute;
 
-    public function __construct(TasksRepository $tasksRepository)
+    private $attachmentService;
+
+    public function __construct(TasksRepository $tasksRepository, AttachmentService $attachmentService)
     {
         $this->tasksRepository = $tasksRepository;
+        $this->attachmentService = $attachmentService;
         $this->tenantRoute = $this->getTenantRoute();
     }
- 
+
+
+    public function createTask(array $validatedData)
+    {
+        return DB::transaction(function () use ($validatedData) {
+
+            $validStatusID = $this->checkIsValidCGTID($validatedData['status_id'], Auth::user()->company_id, CATEGORY_GROUP_TAGS_TYPES['KEY']['tasks_status'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['tasks']);
+
+            if (!$validStatusID) {
+                throw new \InvalidArgumentException("Failed to create lead beacuse invalid Stage ID ");
+            }
+
+
+
+            $task = Tasks::create($validatedData);
+
+            $this->addAttachmentsIFProvideded($validatedData, $task);
+            // assign  
+            $this->assignTasksToUserIfProvided($validatedData, $task);
+            return $task;
+        });
+    }
+
+
+    public function updateTask(array $validatedData)
+    {
+        if (empty($validatedData['id'])) {
+            throw new \InvalidArgumentException('Task ID is required for updating');
+        }
+        return DB::transaction(function () use ($validatedData) {
+
+            $validStatusID = $this->checkIsValidCGTID($validatedData['status_id'], Auth::user()->company_id, CATEGORY_GROUP_TAGS_TYPES['KEY']['tasks_status'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['tasks']);
+
+            if (!$validStatusID) {
+                throw new \InvalidArgumentException("Failed to create task beacuse invalid Stage ID ");
+            }
+
+
+            $task = Tasks::findOrFail($validatedData['id']);
+            unset($validatedData['id']);
+
+
+            $task->update($validatedData);
+
+            $this->addAttachmentsIFProvideded($validatedData, $task);
+            // assign  
+            $this->assignTasksToUserIfProvided($validatedData, $task);
+            return $task;
+        });
+    }
+
+    public function addAttachmentsIFProvideded(array $validatedData, Tasks $task)
+    {
+
+        if (!empty($validatedData['files']) && is_array($validatedData['files'])) {
+
+
+            $this->attachmentService->add($task, $validatedData);
+        }
+    }
+
+
+    public function assignTasksToUserIfProvided(array $validatedData, Tasks $task)
+    {
+        if (!empty($validatedData['assign_to']) && is_array($validatedData['assign_to'])) {
+            // Retrieve current assignees from the database
+            $existingAssignees = $task->assignees()->pluck('task_user.user_id')->sort()->values()->toArray();
+            $newAssignees = collect($validatedData['assign_to'])->sort()->values()->toArray();
+
+            // Skip if assignees are identical - NO NEED TO CREATE AUDIT
+            if ($existingAssignees === $newAssignees) {
+                return;
+            }
+
+            // Prepare data for pivot table
+            $companyId = Auth::user()->company_id;
+            $assignToData = collect($validatedData['assign_to'])->mapWithKeys(function ($userId) use ($companyId) {
+                return [
+                    $userId => [
+                        'company_id' => $companyId,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ],
+                ];
+            })->toArray();
+
+            // Sync assignments
+            $task->assignees()->sync($assignToData);
+
+        } else {
+            // Handle detachment of assignees
+            $existingAssignees = $task->assignees()->pluck('task_user.user_id')->toArray();
+
+            if (empty($existingAssignees)) {
+                return; // No existing assignees, skip detachment and logging
+            }
+
+            $task->assignees()->detach();
+
+
+        }
+    }
+
     public function getDatatablesResponse($request)
     {
         $this->tenantRoute = $this->getTenantRoute();
@@ -44,6 +152,9 @@ class TasksService
             })
             ->editColumn('created_at', function ($task) {
                 return formatDateTime($task?->created_at);
+            })
+            ->editColumn('related_to', function ($task) {
+                return TASKS_RELATED_TO['STATUS'][$task?->related_to];
             })
             ->editColumn('title', function ($task) use ($module) {
                 return "<a  class='dt-link' href='" . route($this->tenantRoute . $module . '.view', $task->id) . "' target='_blank'>$task->title</a>";
@@ -82,7 +193,7 @@ class TasksService
 
     protected function renderStageColumn($task, $stages)
     {
-        return View::make(getComponentsDirFilePath('dt-tasks-stage'), [
+        return View::make(getComponentsDirFilePath('dt-leads-stage'), [
             'tenantRoute' => $this->tenantRoute,
             'permissions' => PermissionsHelper::getPermissionsArray('TASKS'),
             'module' => PANEL_MODULES[$this->getPanelModule()]['tasks'],

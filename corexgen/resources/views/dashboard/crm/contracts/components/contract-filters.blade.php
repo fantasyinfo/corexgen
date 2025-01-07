@@ -67,14 +67,14 @@
             <div class="mb-3">
                 <div class="form-group">
                     <label for="dateFilter" class="mb-2 ">{{ __('contracts.Date') }}</label>
-                    <x-form-components.input-group type="date" class="custom-class" id="dateFilter" name="creating_date"
+                    <x-form-components.input-group type="date" placeholder="Select Date" class="custom-class" id="dateFilter" name="creating_date"
                     value="{{ request('creating_date') }}" data-filter="creating_date" />
                 </div>
             </div>
             <div class="mb-3">
                 <div class="form-group">
                     <label for="vdateFilter" class="mb-2 ">{{ __('contracts.Valid Till') }}</label>
-                    <x-form-components.input-group type="date" class="custom-class" id="vdateFilter" name="valid_date"
+                    <x-form-components.input-group type="date" placeholder="Select Date" class="custom-class" id="vdateFilter" name="valid_date"
                     value="{{ request('valid_date') }}" data-filter="valid_date" />
                 </div>
             </div>

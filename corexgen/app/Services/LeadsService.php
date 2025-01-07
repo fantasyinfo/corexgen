@@ -7,7 +7,6 @@ use App\Models\Address;
 use App\Models\CategoryGroupTag;
 use App\Models\City;
 use App\Models\CRM\CRMLeads;
-use App\Models\LeadUser;
 use App\Repositories\LeadsRepository;
 use App\Traits\CategoryGroupTagsFilter;
 use App\Traits\MediaTrait;
@@ -15,7 +14,6 @@ use App\Traits\TenantFilter;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
 use Yajra\DataTables\Facades\DataTables;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class LeadsService

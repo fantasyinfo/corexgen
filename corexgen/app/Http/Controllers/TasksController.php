@@ -7,6 +7,8 @@ use App\Helpers\PermissionsHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LeadsEditRequest;
 use App\Http\Requests\LeadsRequest;
+use App\Http\Requests\TasksEditRequest;
+use App\Http\Requests\TasksRequest;
 use App\Models\Country;
 use App\Models\CRM\CRMClients;
 use App\Models\Tasks;
@@ -158,28 +160,27 @@ class TasksController extends Controller
 
 
 
-    public function store(LeadsRequest $request)
+    public function store(TasksRequest $request)
     {
-
-
-
+      
         try {
 
             // custom fields validation if any
             $validatedData = [];
             if ($request->has('custom_fields') && !is_null(Auth::user()->company_id)) {
                 $validator = new CustomFieldsValidation();
-                $validatedData = $validator->validate($request->input('custom_fields'), CUSTOM_FIELDS_RELATION_TYPES['KEYS']['crmleads'], Auth::user()->company_id);
+                $validatedData = $validator->validate($request->input('custom_fields'), CUSTOM_FIELDS_RELATION_TYPES['KEYS']['tasks'], Auth::user()->company_id);
             }
 
 
+       
             // Create lead
-            $lead = $this->leadsService->createLead($request->validated());
+            $task = $this->tasksService->createTask($request->validated());
 
 
             // insert custom fields values to db
             if ($request->has('custom_fields') && !empty($validatedData) && count($validatedData) > 0 && !is_null(Auth::user()->company_id)) {
-                $this->customFieldService->saveValues($lead['lead'], $validatedData);
+                $this->customFieldService->saveValues($task, $validatedData);
             }
 
             $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['TASKS']]), '+', '1');
@@ -219,7 +220,7 @@ class TasksController extends Controller
         ]);
     }
 
-    public function update(LeadsEditRequest $request)
+    public function update(TasksEditRequest $request)
     {
         $this->tenantRoute = $this->getTenantRoute();
 
@@ -232,17 +233,17 @@ class TasksController extends Controller
             $validatedData = [];
             if ($request->has('custom_fields') && !is_null(Auth::user()->company_id)) {
                 $validator = new CustomFieldsValidation();
-                $validatedData = $validator->validate($request->input('custom_fields'), CUSTOM_FIELDS_RELATION_TYPES['KEYS']['crmleads'], Auth::user()->company_id);
+                $validatedData = $validator->validate($request->input('custom_fields'), CUSTOM_FIELDS_RELATION_TYPES['KEYS']['tasks'], Auth::user()->company_id);
             }
 
 
 
-            $lead = $this->leadsService->updateLead($request->validated());
+            $task = $this->tasksService->updateTask($request->validated());
 
 
             // insert custom fields values to db
             if ($request->has('custom_fields') && !empty($validatedData) && count($validatedData) > 0 && !is_null(Auth::user()->company_id)) {
-                $this->customFieldService->saveValues($lead['lead'], $validatedData);
+                $this->customFieldService->saveValues($task, $validatedData);
             }
 
 
@@ -270,14 +271,7 @@ class TasksController extends Controller
     }
     public function edit($id)
     {
-        $query = CRMLeads::query()->with([
-            'address' => fn($q) => $q
-                ->select(['id', 'street_address', 'postal_code', 'city_id', 'country_id'])
-                ->with([
-                    'city:id,name',
-                    'country:id,name'
-                ]),
-            'customFields',
+        $query = Tasks::query()->with([
             'assignees' => fn($q) => $q
                 ->select(['users.id', 'users.name'])
                 ->withOnly([])
@@ -285,22 +279,17 @@ class TasksController extends Controller
 
         $query = $this->applyTenantFilter($query, 'tasks');
 
-        $lead = $query->firstOrFail();
-
-
-        // countries
-        $countries = Country::all();
-
+        $task = $query->firstOrFail();
 
         // custom fields
         $customFields = collect();
         $cfOldValues = collect();
         if (!is_null(Auth::user()->company_id)) {
-            $customFields = $this->customFieldService->getFieldsForEntity(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['crmleads'], Auth::user()->company_id);
+            $customFields = $this->customFieldService->getFieldsForEntity(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['tasks'], Auth::user()->company_id);
 
             // fetch already existing values
 
-            $cfOldValues = $this->customFieldService->getValuesForEntity($lead);
+            $cfOldValues = $this->customFieldService->getValuesForEntity($task);
         }
 
 
@@ -308,33 +297,28 @@ class TasksController extends Controller
         return view($this->getViewFilePath('edit'), [
 
             'title' => 'Edit Task',
-            'lead' => $lead,
-            'countries' => $countries,
+            'task' => $task,
             'module' => PANEL_MODULES[$this->getPanelModule()]['tasks'],
-            'leadsGroups' => $this->leadsService->getLeadsGroups(),
-            'leadsSources' => $this->leadsService->getLeadsSources(),
-            'leadsStatus' => $this->leadsService->getLeadsStatus(),
             'customFields' => $customFields,
             'teamMates' => getTeamMates(),
-            'cfOldValues' => $cfOldValues
+            'cfOldValues' => $cfOldValues,
+            'projects' => $this->projectService->getAllProjects(),
+            'tasksStatus' => $this->tasksService->getTasksStatus(),
         ]);
     }
-
-
-
 
     public function destroy($id)
     {
         try {
             // Delete the user
-            $lead = CRMLeads::find($id);
-            if ($lead) {
+            $task = Tasks::find($id);
+            if ($task) {
 
                 // delete its custom fields also if any
-                $this->customFieldService->deleteEntityValues($lead);
+                $this->customFieldService->deleteEntityValues($task);
 
                 // delete  now
-                $lead->delete();
+                $task->delete();
 
                 // update the subscription usage
                 $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['TASKS']]), '-', '1');
@@ -348,307 +332,7 @@ class TasksController extends Controller
             return redirect()->back()->with('error', 'Failed to delete the client: ' . $e->getMessage());
         }
     }
-    public function export(Request $request)
-    {
-        // Apply filters and fetch tasks
-        $tasks = CRMClients::query()
-            ->where('company_id', Auth::user()->company_id)
-            ->with([
-                'addresses' => function ($query) {
-                    $query->with(['country', 'city'])
-                        ->select('addresses.id', 'addresses.street_address', 'addresses.postal_code', 'addresses.city_id', 'addresses.country_id');
-                }
-            ])
-            ->when(
-                $request->filled('name'),
-                fn($q) => $q->where(function ($subQuery) use ($request) {
-                    $subQuery->where('first_name', 'LIKE', "%{$request->name}%")
-                        ->orWhere('middle_name', 'LIKE', "%{$request->name}%")
-                        ->orWhere('last_name', 'LIKE', "%{$request->name}%");
-                })
-            )
-            ->when(
-                $request->filled('email'),
-                fn($q) => $q->whereJsonContains('email', $request->email)
-            )
-            ->when(
-                $request->filled('phone'),
-                fn($q) => $q->whereJsonContains('phone', $request->phone)
-            )
-            ->when(
-                $request->filled('status') && $request->status != 0,
-                fn($q) => $q->where('status', $request->status)
-            )
-            ->when(
-                $request->filled('start_date'),
-                fn($q) => $q->whereDate('created_at', '>=', $request->start_date)
-            )
-            ->when(
-                $request->filled('end_date'),
-                fn($q) => $q->whereDate('created_at', '<=', $request->end_date)
-            )
-            ->get();
-
-        $csvData = $this->generateCSVForClients($tasks);
-        return response($csvData['csvContent'])
-            ->header('Content-Type', 'text/csv')
-            ->header('Content-Disposition', "attachment; filename={$csvData['file']}");
-    }
-
-    public function generateCSVForClients($tasks)
-    {
-
-        // Prepare CSV data
-        $csvData = [];
-        $csvData[] = [
-            'Task ID',
-            'Type',
-            'Company Name',
-            'Title',
-            'First Name',
-            'Middle Name',
-            'Last Name',
-            'Emails',
-            'Phones',
-            'Social Media Links',
-            'CGT ID',
-            'Street Address',
-            'City ID',
-            'City Name',
-            'Country ID',
-            'Country Name',
-            'Pincode',
-            'Status',
-            'Created At',
-        ]; // CSV headers
-
-        foreach ($tasks as $client) {
-            // Prepare consolidated data
-            $emails = isset($client->email) ? implode('; ', $client->email) : '';
-            $phones = isset($client->phone) ? implode('; ', $client->phone) : '';
-            $socialMedia = isset($client->social_media)
-                ? implode('; ', array_map(fn($key, $value) => "$key: $value", array_keys($client->social_media), $client->social_media))
-                : '';
-
-            // Use the first address as a representative for each client
-            $address = $client->addresses->first();
-
-            $csvData[] = [
-                $client->id,
-                $client->type,
-                $client->company_name,
-                $client->title,
-                $client->first_name,
-                $client->middle_name,
-                $client->last_name,
-                $emails,
-                $phones,
-                $socialMedia,
-                $client->cgt_id,
-                $address?->street_address ?? '',
-                $address?->city_id ?? '',
-                $address?->city?->name ?? '',
-                $address?->country_id ?? '',
-                $address?->country?->name ?? '',
-                $address?->postal_code ?? '',
-                $client->status,
-                $client?->created_at?->format('Y-m-d H:i:s') ?? 'N/A',
-            ];
-        }
-
-        // Convert data to CSV string
-        $csvContent = '';
-        foreach ($csvData as $row) {
-            $csvContent .= implode(',', array_map(fn($value) => '"' . str_replace('"', '""', $value) . '"', $row)) . "\n";
-        }
-
-        // Return the response with the CSV content as a file
-        $fileName = 'clients_export_' . now()->format('Y_m_d_H_i_s') . '.csv';
-
-        return [
-            'file' => $fileName,
-            'csvContent' => $csvContent
-        ];
-    }
-
-    public function importView()
-    {
-
-
-        $expectedHeaders = [
-            'Type' => [
-                'key' => 'Type',
-                'message' => 'string, e.g., Individual or Company',
-            ],
-            'Company Name' => [
-                'key' => 'Company Name',
-                'message' => 'string, required only if type is company e.g., Abc Ltd Pty, Xyz Limited',
-            ],
-            'Title' => [
-                'key' => 'Title',
-                'message' => 'string, e.g., Mr, Miss, Dr, Master',
-            ],
-            'First Name' => [
-                'key' => 'First Name',
-                'message' => 'string, e.g., John, Anna',
-            ],
-            'Middle Name' => [
-                'key' => 'Middle Name',
-                'message' => 'string, optional, e.g., Edward, Marie',
-            ],
-            'Last Name' => [
-                'key' => 'Last Name',
-                'message' => 'string, e.g., Doe, Smith',
-            ],
-            'Emails' => [
-                'key' => 'Emails',
-                'message' => 'array, comma-separated, e.g., john.doe@example.com, jane.doe@example.org',
-            ],
-            'Phones' => [
-                'key' => 'Phones',
-                'message' => 'array, comma-separated, e.g., +1-555-123-4567, +1-555-765-4321',
-            ],
-            'Social Media Links' => [
-                'key' => 'Social Media Links',
-                'message' => 'array, optional, comma-separated, e.g., x: https://x.com/user, fb: https://www.facebook.com/user',
-            ],
-            'CGT ID' => [
-                'key' => 'CGT ID',
-                'message' => 'required,  exists:from CGT ID,id, e.g., 1 ,2,3 ',
-            ],
-            'Street Address' => [
-                'key' => 'Street Address',
-                'message' => 'string, optional, e.g., 123 Elm Street',
-            ],
-            'City Name' => [
-                'key' => 'City Name',
-                'message' => 'string, optional, e.g., Springfield, London',
-            ],
-            'Country ID' => [
-                'key' => 'Country ID',
-                'message' => 'string or integer, optional, e.g., 1 for USA, 44 for UK',
-            ],
-            'Pincode' => [
-                'key' => 'Pincode',
-                'message' => 'string or integer, optional, e.g., 12345, E1 6AN',
-            ],
-        ];
-
-
-        $sampleData = [
-            [
-                'Type' => 'Individual',
-                'Company Name' => '',
-                'Title' => 'Mr',
-                'First Name' => 'John',
-                'Middle Name' => 'Edward',
-                'Last Name' => 'Doe',
-                'Emails' => 'john.doe@example.com; jane.doe@example.org',
-                'Phones' => '+91 8989898989; +1 89898989898',
-                'Social Media Links' => 'x: https://x.com/johndoe, fb: https://www.facebook.com/johndoe, in: https://www.instagram.com/johndoe, ln: https://www.linkedin.com/in/johndoe',
-                'CGT ID' => '2',
-                'Street Address' => '123 Elm Street',
-                'City Name' => 'Springfield',
-                'Country ID' => '1',
-                'Pincode' => '12345',
-            ],
-            [
-                'Type' => 'Company',
-                'Company Name' => 'ABC Multi Brach Hospital For Children',
-                'Title' => 'Dr',
-                'First Name' => 'Anna',
-                'Middle Name' => 'Marie',
-                'Last Name' => 'Smith',
-                'Emails' => 'anna.smith@example.org; contact@smithco.com',
-                'Phones' => '+44 8787878787; +44 7676767676',
-                'Social Media Links' => 'x: https://x.com/smithco, fb: https://www.facebook.com/smithco, in: https://www.instagram.com/smithco, ln: https://www.linkedin.com/company/smithco',
-                'CGT ID' => '1',
-                'Street Address' => '456 Oak Avenue',
-                'City Name' => 'London',
-                'Country ID' => '44',
-                'Pincode' => 'E1 6AN',
-            ],
-        ];
-
-
-
-
-        return view($this->getViewFilePath('import'), [
-
-            'title' => 'Import Tasks',
-            'headers' => $expectedHeaders,
-            'data' => $sampleData,
-            'module' => PANEL_MODULES[$this->getPanelModule()]['tasks'],
-        ]);
-    }
-    public function import(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'file' => 'required|mimes:csv,txt|max:' . BULK_CSV_UPLOAD_FILE_SIZE, // Validate file type and size
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors(),
-            ]);
-        }
-
-        try {
-            $file = $request->file('file');
-            $filePath = $file->storeAs('csv', uniqid() . '_' . $file->getClientOriginalName()); // Store file in a persistent directory
-            $absoluteFilePath = storage_path('app/' . $filePath); // Get the absolute path
-
-            // Validation rules for each row
-            $rules = [
-                'Type' => ['required', 'string', Rule::in(['Individual', 'Company'])],
-                'Company Name' => ['nullable', 'required_if:Type,Company'],
-                'Title' => ['nullable', 'string'],
-                'First Name' => ['required', 'string'],
-                'Middle Name' => ['nullable', 'string'],
-                'Last Name' => ['required', 'string'],
-                'Emails' => ['required', 'string'],
-                'Phones' => ['required', 'string'],
-                'Social Media Links' => ['nullable', 'string'], // Allow empty
-                'CGT ID' => ['required', 'string', 'exists:category_group_tag,id'],
-                'Street Address' => ['nullable', 'string', 'max:255'], // Allow empty
-                'City Name' => ['nullable', 'string'], // Allow empty
-                'Country ID' => ['nullable', 'exists:countries,id'], // Allow empty
-                'Pincode' => ['nullable', 'string'], // Allow empty
-            ];
-
-            // Expected CSV headers
-            $expectedHeaders = ['Type', 'Company Name', 'Title', 'First Name', 'Middle Name', 'Last Name', 'Emails', 'Phones', 'Social Media Links', 'CGT ID', 'Street Address', 'City Name', 'Country ID', 'Pincode'];
-
-            // Dispatch the job
-            CsvImportJob::dispatch(
-                $absoluteFilePath,
-                $rules,
-                ClientsCsvRowProcessor::class,
-                $expectedHeaders,
-                [
-                    'company_id' => Auth::user()->company_id,
-                    'user_id' => Auth::id(),
-                    'is_tenant' => Auth::user()->is_tenant,
-                    'import_type' => 'Tasks'
-                ]
-            );
-
-            return response()->json([
-                'success' => true,
-                'message' => 'CSV file uploaded successfully. Processing will happen in the background.',
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'An error occurred: ' . $e->getMessage(),
-            ]);
-        }
-    }
-
-
-
-
+  
     public function bulkDelete(Request $request)
     {
         $ids = $request->input('ids');
@@ -657,10 +341,10 @@ class TasksController extends Controller
             if (is_array($ids) && count($ids) > 0) {
                 DB::transaction(function () use ($ids) {
                     // First, delete custom field values
-                    $this->customFieldService->bulkDeleteEntityValues(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['crmleads'], $ids);
+                    $this->customFieldService->bulkDeleteEntityValues(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['tasks'], $ids);
 
                     // Then delete the tasks
-                    CRMLeads::whereIn('id', $ids)->delete();
+                    Tasks::whereIn('id', $ids)->delete();
 
                     $this->updateUsage(
                         strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['TASKS']]),
@@ -716,7 +400,7 @@ class TasksController extends Controller
         $customFields = collect();
         $cfOldValues = collect();
         if (!is_null(Auth::user()->company_id)) {
-            $customFields = $this->customFieldService->getFieldsForEntity(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['crmleads'], Auth::user()->company_id);
+            $customFields = $this->customFieldService->getFieldsForEntity(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['tasks'], Auth::user()->company_id);
 
             // fetch already existing values
 
@@ -762,9 +446,7 @@ class TasksController extends Controller
             'estimates' => $estimates,
         ]);
     }
-    public function profile()
-    {
-    }
+  
 
     public function changeStatus($id, $status)
     {
@@ -784,7 +466,7 @@ class TasksController extends Controller
     {
 
         try {
-            CRMLeads::query()->where('id', '=', $leadid)->update(['status_id' => $stageid]);
+            Tasks::query()->where('id', '=', $leadid)->update(['status_id' => $stageid]);
 
             if (isset($_GET['from_kanban']) && $_GET['from_kanban']) {
                 // Return success response as JSON
@@ -820,7 +502,7 @@ class TasksController extends Controller
 
         $customFields = collect();
         if (!is_null(Auth::user()->company_id)) {
-            $customFields = $this->customFieldService->getFieldsForEntity(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['crmleads'], Auth::user()->company_id);
+            $customFields = $this->customFieldService->getFieldsForEntity(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['tasks'], Auth::user()->company_id);
         }
 
 

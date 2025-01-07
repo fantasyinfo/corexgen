@@ -77,7 +77,7 @@
                     <x-form-components.input-label for="startDate" class="custom-class">
                         {{ __('projects.Start Date') }}
                     </x-form-components.input-label>
-                    <x-form-components.input-group type="date" data-filter="start_date" name="start_date" id="startDate"
+                    <x-form-components.input-group type="date" placeholder="Select Date" data-filter="start_date" name="start_date" id="startDate"
                         value="{{ request('start_date') }}" class="custom-class" />
                 </div>
             </div>
@@ -86,7 +86,7 @@
                     <x-form-components.input-label for="dueDate" class="custom-class">
                         {{ __('projects.Due Date') }}
                     </x-form-components.input-label>
-                    <x-form-components.input-group type="date" data-filter="due_date" name="due_date" id="dueDate"
+                    <x-form-components.input-group type="date" placeholder="Select Date" data-filter="due_date" name="due_date" id="dueDate"
                         value="{{ request('due_date') }}" class="custom-class" />
                 </div>
             </div>

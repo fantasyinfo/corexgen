@@ -24,7 +24,7 @@
 
             <h6 class="stat-label">Last Contact</h6>
             <h3 class="stat-value">
-                <x-form-components.input-group type="date" name="last_contacted_date" id="last_contacted_date"
+                <x-form-components.input-group type="date" placeholder="Select Date" name="last_contacted_date" id="last_contacted_date"
                     value="{{ old('last_contacted_date', $lead->last_contacted_date) }}" />
             </h3>
 
@@ -41,7 +41,7 @@
         </div>
         <div>
             <h6 class="stat-label">Follow Up</h6>
-            <x-form-components.input-group type="date" name="follow_up_date" id="follow_up_date"
+            <x-form-components.input-group type="date" placeholder="Select Date" name="follow_up_date" id="follow_up_date"
                 value="{{ old('follow_up_date', $lead->follow_up_date) }}" />
             </h3>
         </div>

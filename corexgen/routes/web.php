@@ -519,16 +519,6 @@ Route::middleware([
 
 
 
-
-
-
-
-
-
-
-
-
-
     // leads routes
     Route::prefix(PANEL_MODULES['COMPANY_PANEL']['leads'])->as(PANEL_MODULES['COMPANY_PANEL']['leads'] . '.')->group(function () {
         // role for fetch, store, update

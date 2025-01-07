@@ -26,9 +26,11 @@ class AttachmentService
 
     public function createMedia($data)
     {
+
         $files = $data['files'] ?? [$data['file']]; // Handle both single and multiple files
         $savedMedia = [];
 
+    
         foreach ($files as $file) {
             // Generate file properties
             $fileName = time() . '_' . $file->getClientOriginalName();

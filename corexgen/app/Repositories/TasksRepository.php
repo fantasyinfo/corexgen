@@ -21,7 +21,7 @@ class TasksRepository
                 'tasks.priority',
                 'tasks.billable',
                 'tasks.start_date',
-                'tasks.relatable_type',
+                'tasks.related_to',
                 'tasks.due_date',
                 'tasks.title',
                 'tasks.created_at',

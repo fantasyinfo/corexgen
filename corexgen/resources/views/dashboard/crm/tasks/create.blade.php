@@ -8,7 +8,7 @@
         <div class="row">
             <div class="col-lg-9">
                 <div class="card stretch stretch-full">
-                    <form id="taskForm" action="{{ route(getPanelRoutes('tasks.store')) }}" method="POST">
+                    <form id="taskForm" action="{{ route(getPanelRoutes('tasks.store')) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="card-body">
                             <div class="mb-4 d-flex align-items-center justify-content-between">
@@ -51,16 +51,23 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-
                                             <input type="checkbox" name="billable" id="billable" value="1"
                                                 {{ old('billable') == '1' ? 'checked' : '' }}
                                                 class="custom-class form-check-input" />
                                             <label class="me-2">Billable</label>
+                                            <br>
+                                            @error('billable')
+                                                <span class="text-danger">{{ $message }}</span>
+                                            @enderror
 
                                             <input type="checkbox" name="visible_to_client" id="visible_to_client"
                                                 value="1" {{ old('visible_to_client') == '1' ? 'checked' : '' }}
                                                 class="custom-class form-check-input" />
                                             <label class="me-2">Visible to client</label>
+                                            <br>
+                                            @error('visible_to_client')
+                                                <span class="text-danger">{{ $message }}</span>
+                                            @enderror
                                         </div>
                                     </div>
 
@@ -99,7 +106,7 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <x-form-components.input-group type="date" name="start_date" id="start_date"
+                                            <x-form-components.input-group type="date" placeholder="Select Date" name="start_date" id="start_date"
                                                 placeholder="{{ __('Select Date') }}" value="{{ old('start_date') }}"
                                                 class="custom-class" />
                                         </div>
@@ -112,7 +119,7 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <x-form-components.input-group type="date" name="due_date" id="due_date"
+                                            <x-form-components.input-group type="date" placeholder="Select Date" name="due_date" id="due_date"
                                                 placeholder="{{ __('Select Date') }}" value="{{ old('due_date') }}"
                                                 class="custom-class" />
                                         </div>
@@ -132,8 +139,32 @@
                                                         {{ $pri }}</option>
                                                 @endforeach
                                             </select>
+                                            @error('priority')
+                                                <span class="text-danger">{{ $message }}</span>
+                                            @enderror
                                         </div>
                                     </div>
+
+                                    <div class="row mb-4">
+                                        <div class="col-lg-4">
+                                            <x-form-components.input-label for="status_id" required>
+                                                {{ __('tasks.Status') }}
+                                            </x-form-components.input-label>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <select class="form-select" name="status_id" id="status_id" required>
+                                                @foreach ($tasksStatus as $ts)
+                                                    <option value="{{ $ts->id }}"
+                                                        {{ old('status_id') == $ts->id ? 'selected' : '' }}>
+                                                        {{ $ts->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            @error('status_id')
+                                                <span class="text-danger">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
+
 
                                     <div class="row mb-4">
                                         <div class="col-lg-4">
@@ -143,30 +174,37 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <select class="form-select" name="related_to" id="related_to" required>
-                                                @foreach (TASKS_RELATED_TO['STATUS'] as $pri)
-                                                    <option value="{{ $pri }}"
-                                                        {{ old('related_to') == $pri ? 'selected' : '' }}>
+                                                @foreach (TASKS_RELATED_TO['STATUS'] as $key =>  $pri)
+                                                    <option value="{{ $key }}"
+                                                        {{ old('related_to') == $key ? 'selected' : '' }}>
                                                         {{ $pri }}</option>
                                                 @endforeach
                                             </select>
+                                            @error('related_to')
+                                                <span class="text-danger">{{ $message }}</span>
+                                            @enderror
                                         </div>
                                     </div>
 
 
                                     <div class="row mb-4">
                                         <div class="col-lg-4">
-                                            <x-form-components.input-label for="project_id" >
+                                            <x-form-components.input-label for="project_id">
                                                 {{ __('tasks.Project') }}
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <select class="form-select searchSelectBox" name="project_id" id="project_id" >
+                                            <select class="form-select searchSelectBox" name="project_id"
+                                                id="project_id">
                                                 @foreach ($projects as $pro)
                                                     <option value="{{ $pro->id }}"
                                                         {{ old('project_id') == $pro->id ? 'selected' : '' }}>
                                                         {{ $pro->title }}</option>
                                                 @endforeach
                                             </select>
+                                            @error('project_id')
+                                                <span class="text-danger">{{ $message }}</span>
+                                            @enderror
                                         </div>
                                     </div>
 
@@ -180,23 +218,44 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-
-
                                             <x-form-components.dropdown-with-profile :title="'Select Team Members'" :options="$teamMates"
                                                 :name="'assign_to'" :multiple="true" :selected="old('assign_to')" />
-
-
+                                            @error('assign_to')
+                                                <span class="text-danger">{{ $message }}</span>
+                                            @enderror
                                         </div>
                                     </div>
 
                                     <div class="row mb-4">
-                                      
-                                            <x-form-components.input-label for="description">
-                                                {{ __('tasks.Description') }}
+                                        <div class="col-lg-4">
+                                            <x-form-components.input-label for="files[]">
+                                                {{ __('tasks.Attach Files') }}
                                             </x-form-components.input-label>
-                                     
-                                            <textarea name="description" id="description" class="form-control wysiwyg-editor" rows="5">{{ old('description') }}</textarea>
-                                        
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <input class="form-control" type="file" name="files[]" multiple />
+                                            @error('files')
+                                                <span class="text-danger">{{ $message }}</span>
+                                            @enderror
+                                            @if ($errors->has('files.*'))
+                                                @foreach ($errors->get('files.*') as $fileErrors)
+                                                    @foreach ($fileErrors as $fileError)
+                                                        <span class="text-danger d-block">{{ $fileError }}</span>
+                                                    @endforeach
+                                                @endforeach
+                                            @endif
+                                        </div>
+                                    </div>
+
+
+                                    <div class="row mb-4">
+
+                                        <x-form-components.input-label for="description">
+                                            {{ __('tasks.Description') }}
+                                        </x-form-components.input-label>
+
+                                        <textarea name="description" id="description" class="form-control wysiwyg-editor" rows="5">{{ old('description') }}</textarea>
+
                                     </div>
                                     <hr>
                                     @if (isset($customFields) && $customFields->isNotEmpty())
@@ -275,9 +334,9 @@
                         'wordcount'
                     ],
                     toolbar: 'undo redo | formatselect | bold italic backcolor | \
-                                                                                                                          alignleft aligncenter alignright alignjustify | \
-                                                                                                                          bullist numlist outdent indent | removeformat | help | \
-                                                                                                                          link image media preview codesample table'
+                                                                                                                                  alignleft aligncenter alignright alignjustify | \
+                                                                                                                                  bullist numlist outdent indent | removeformat | help | \
+                                                                                                                                  link image media preview codesample table'
                 });
             }
 

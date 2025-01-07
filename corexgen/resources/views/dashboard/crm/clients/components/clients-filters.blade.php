@@ -61,7 +61,7 @@
                     <x-form-components.input-label for="startDateFilter" class="custom-class">
                         {{ __('clients.Start Date') }}
                     </x-form-components.input-label>
-                    <x-form-components.input-group type="date" data-filter="start_date"  name="start_date" id="startDateFilter"
+                    <x-form-components.input-group type="date" placeholder="Select Date" data-filter="start_date"  name="start_date" id="startDateFilter"
                         value="{{ request('start_date') }}" class="custom-class" />
                 </div>
             </div>
@@ -71,7 +71,7 @@
                     <x-form-components.input-label for="endDateFilter" class="custom-class">
                         {{ __('clients.End Date') }}
                     </x-form-components.input-label>
-                    <x-form-components.input-group type="date" data-filter="end_date" name="end_date" id="endDateFilter"
+                    <x-form-components.input-group type="date" placeholder="Select Date" data-filter="end_date" name="end_date" id="endDateFilter"
                         value="{{ request('end_date') }}" class="custom-class" />
                 </div>
             </div>

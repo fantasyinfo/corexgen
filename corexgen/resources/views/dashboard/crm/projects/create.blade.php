@@ -188,7 +188,7 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <x-form-components.input-group type="date" name="start_date"
+                                            <x-form-components.input-group type="date" placeholder="Select Date" name="start_date"
                                                 id="startDate" value="{{ old('start_date') }}" required
                                                 class="custom-class" />
                                         </div>
@@ -201,7 +201,7 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <x-form-components.input-group type="date" name="due_date" id="dueDate"
+                                            <x-form-components.input-group type="date" placeholder="Select Date" name="due_date" id="dueDate"
                                                 value="{{ old('due_date') }}" class="custom-class" />
                                         </div>
                                     </div>
@@ -213,7 +213,7 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <x-form-components.input-group type="date" name="deadline" id="deadLine"
+                                            <x-form-components.input-group type="date" placeholder="Select Date" name="deadline" id="deadLine"
                                                 value="{{ old('deadline') }}" class="custom-class" />
                                         </div>
                                     </div>
