@@ -1052,3 +1052,21 @@ if (!function_exists('formatDateTime')) {
         return $date ? \Carbon\Carbon::parse($date)->timezone($timezone)->format($format) : null;
     }
 }
+
+
+function truncateFileName($filename) {
+    // Get file extension
+    $extension = pathinfo($filename, PATHINFO_EXTENSION);
+    $nameWithoutExt = pathinfo($filename, PATHINFO_FILENAME);
+    
+    // If filename is too short, return as is
+    if(strlen($nameWithoutExt) <= 6) {
+        return $filename;
+    }
+    
+    // Get first 3 and last 3 chars of the name without extension
+    $first = substr($nameWithoutExt, 0, 3);
+    $last = substr($nameWithoutExt, -3);
+    
+    return $first . '...' . $last . '.' . $extension;
+}

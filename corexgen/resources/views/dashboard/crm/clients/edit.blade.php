@@ -153,7 +153,7 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <x-form-components.input-group type="date" name="birthdate" id="birthdate"
+                                            <x-form-components.input-group type="date" placeholder="Select Date" name="birthdate" id="birthdate"
                                                 value="{{ old('birthdate', $client->birthdate) }}" />
                                         </div>
                                     </div>

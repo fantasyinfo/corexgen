@@ -31,8 +31,7 @@ class Tasks extends Model implements Auditable
         'description',
         'billable',
         'hourly_rate',
-        'relatable_type',
-        'relatable_id',
+        'related_to',
         'start_date',
         'due_date',
         'priority',
@@ -44,8 +43,6 @@ class Tasks extends Model implements Auditable
     ];
 
     protected $casts = [
-        'start_date' => 'datetime',
-        'due_date' => 'datetime',
         'visible_to_client' => 'boolean',
         'billable' => 'boolean',
     ];
@@ -102,9 +99,7 @@ class Tasks extends Model implements Auditable
 
     }
 
-    public function relatable(){
-        return $this->morphTo();
-    }
+
 
 
     /**
@@ -121,16 +116,14 @@ class Tasks extends Model implements Auditable
         // });
 
 
-        static::creating(function ($lead) {
+        static::creating(function ($task) {
 
             if (Auth::check()) {
-                $lead->company_id = $lead->company_id ?? Auth::user()->company_id;
-                $lead->created_by = $lead->created_by ?? Auth::id();
-                $lead->updated_by = $lead->updated_by ?? Auth::id();
+                $task->company_id = $task->company_id ?? Auth::user()->company_id;
+                $task->assign_by = $task->assign_by ?? Auth::id();
             } else {
-                $lead->company_id = $lead->company_id ?? null;
-                $lead->created_by = $lead->created_by ?? null;
-                $lead->updated_by = $lead->updated_by ?? null;
+                $task->company_id = $task->company_id ?? null;
+                $task->assign_by = $task->assign_by ?? null;
             }
         });
     }

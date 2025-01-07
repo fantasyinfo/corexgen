@@ -255,7 +255,7 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <x-form-components.input-group type="date" name="last_contacted_date"
+                                            <x-form-components.input-group type="date" placeholder="Select Date" name="last_contacted_date"
                                                 id="last_contacted_date"
                                                 value="{{ old('last_contacted_date', $lead->last_contacted_date) }}" />
                                         </div>
@@ -268,7 +268,7 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <x-form-components.input-group type="date" name="last_activity_date"
+                                            <x-form-components.input-group type="date" placeholder="Select Date" name="last_activity_date"
                                                 id="last_activity_date"
                                                 value="{{ old('last_activity_date', $lead->last_activity_date) }}" />
                                         </div>
@@ -281,7 +281,7 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <x-form-components.input-group type="date" name="follow_up_date"
+                                            <x-form-components.input-group type="date" placeholder="Select Date" name="follow_up_date"
                                                 id="follow_up_date"
                                                 value="{{ old('follow_up_date', $lead->follow_up_date) }}" />
                                         </div>

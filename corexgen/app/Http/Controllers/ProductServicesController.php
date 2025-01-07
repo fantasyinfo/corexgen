@@ -6,16 +6,13 @@ use App\Helpers\CustomFieldsValidation;
 use App\Helpers\PermissionsHelper;
 use App\Http\Requests\ProductServicesEditRequest;
 use App\Http\Requests\ProductServicesRequest;
-use App\Models\CRM\CRMClients;
-use App\Models\CRM\CRMLeads;
-use App\Models\CRM\CRMProposals;
+
 use App\Models\ProductsServices;
 use App\Repositories\ProductServicesRepository;
 use App\Services\CustomFieldService;
 use App\Services\ProductServicesService;
 use App\Traits\CategoryGroupTagsFilter;
-use App\Traits\IsSMTPValid;
-use App\Traits\MediaTrait;
+
 use App\Traits\SubscriptionUsageFilter;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
@@ -353,39 +350,33 @@ class ProductServicesController extends Controller
      */
     public function bulkDelete(Request $request)
     {
-
         $ids = $request->input('ids');
-
-
+    
         try {
-            // Delete the user
-
             if (is_array($ids) && count($ids) > 0) {
                 DB::transaction(function () use ($ids) {
-
-                    // First, delete custom field values
-                    $this->customFieldService->bulkDeleteEntityValues(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['products'], $ids);
-
-                    // Then delete the clients
+                    $this->customFieldService->bulkDeleteEntityValues(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['productsservices'], $ids);
                     ProductsServices::whereIn('id', $ids)->delete();
-
+    
                     $this->updateUsage(
                         strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['PRODUCTS_SERVICES']]),
                         '-',
                         count($ids)
                     );
                 });
-
+    
                 return response()->json(['message' => 'Selected products_services deleted successfully.'], 200);
             }
-
+    
             return response()->json(['message' => 'No products_services selected for deletion.'], 400);
-
         } catch (\Exception $e) {
-            // Handle any exceptions
-            return redirect()->back()->with('error', 'Failed to delete the user: ' . $e->getMessage());
+            // Log the exception
+            \Log::error('Bulk delete failed: ' . $e->getMessage());
+    
+            return response()->json(['error' => 'Failed to delete the products_services: ' . $e->getMessage()], 500);
         }
     }
+    
 
 
     /**

@@ -21,8 +21,7 @@ return new class extends Migration
             $table->date('start_date')->nullable();
             $table->date('due_date')->nullable();
             $table->enum('priority', ['Low', 'Medium', 'High', 'Urgent'])->default('Medium');
-            $table->morphs('relatable');
-
+            $table->enum('related_to',TASKS_RELATED_TO['TABLE_STATUS'])->default(TASKS_RELATED_TO['KEY']['project']);
 
             $table->boolean('visible_to_client')->default(false);
        

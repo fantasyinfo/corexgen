@@ -27,22 +27,7 @@
                                     return `<input type="checkbox" class="bulk-select" data-id="${row.id}" />`;
                                 }',
                             ],
-                            [
-                                'data' => 'type',
-                                'name' => 'type',
-                                'label' => __('tasks.Type'),
-                                'searchable' => true,
-                                'orderable' => true,
-                                'width' => '100px',
-                            ],
-                            [
-                                'data' => 'project_title',
-                                'name' => 'project_title',
-                                'label' => __('tasks.Project'),
-                                'searchable' => true,
-                                'orderable' => true,
-                                'width' => '150px',
-                            ],
+
                             [
                                 'data' => 'title',
                                 'name' => 'title',
@@ -50,6 +35,14 @@
                                 'searchable' => true,
                                 'orderable' => true,
                                 'width' => '200px',
+                            ],
+                            [
+                                'data' => 'related_to',
+                                'name' => 'related_to',
+                                'label' => __('tasks.Related To'),
+                                'searchable' => true,
+                                'orderable' => true,
+                                'width' => '100px',
                             ],
 
                             [
@@ -67,7 +60,7 @@
                                 'label' => __('tasks.Stage'),
                                 'searchable' => true,
                                 'orderable' => true,
-                                'width' => '100px',
+                                'width' => '200px',
                             ],
 
                             [

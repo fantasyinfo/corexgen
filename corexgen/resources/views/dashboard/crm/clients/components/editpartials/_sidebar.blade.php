@@ -11,7 +11,7 @@
         </div>
         <div>
             <h6 class="stat-label">Birth Date</h6>
-            <x-form-components.input-group type="date" name="birth_date" id="birth_date"
+            <x-form-components.input-group type="date" placeholder="Select Date" name="birth_date" id="birth_date"
                 value="{{ old('birth_date', $client->birth_date) }}" />
             </h3>
         </div>
