@@ -10,17 +10,17 @@
         <p>{{ $project->client?->type }}</p>
     </div>
     <div class="detail-group">
-        <label>Company Name</label>
+        <label>Company Name (if type company)</label>
         <p>{{ $project->client?->company_name }}</p>
     </div>
     <div class="detail-group">
-        <label>First Name</label>
-        <p>{{ $project->client?->first_name }}</p>
+        <label>Client Name</label>
+        <p>
+            <a href="{{ route(getPanelRoutes('clients.view'), ['id' => $project->client?->id]) }}">{{ $project->client?->first_name }}
+                {{ $project->client?->last_name }}</a>
+        </p>
     </div>
-    <div class="detail-group">
-        <label>Last Name</label>
-        <p>{{ $project->client?->last_name }}</p>
-    </div>
+
     <div class="detail-group">
         <label>Email</label>
         <p><a href="mailto:{{ $project->client?->primary_email }}">{{ $project->client?->primary_email }}</a></p>

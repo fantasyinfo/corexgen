@@ -613,6 +613,9 @@ Route::middleware([
         Route::post('/', [ProjectController::class, 'store'])->name('store')->middleware('check.permission:PROJECTS.CREATE');
         Route::put('/', [ProjectController::class, 'update'])->name('update')->middleware('check.permission:PROJECTS.UPDATE');
 
+        // add assignee
+        Route::post('/add-assignee', [ProjectController::class, 'addAssignee'])->name('addAssignee')->middleware('check.permission:PROJECTS.UPDATE');
+
         // create, edit, change status, delete
         Route::get('/create', [ProjectController::class, 'create'])->name('create')->middleware('check.permission:PROJECTS.CREATE');
         Route::get('/edit/{id}', [ProjectController::class, 'edit'])->name('edit')->middleware('check.permission:PROJECTS.UPDATE');
@@ -631,15 +634,15 @@ Route::middleware([
 
 
         // comments routes...
-        Route::post('/comment', [CommentsController::class, 'addLeadsComment'])->name('comment.create')->middleware('check.permission:PROJECTS.CREATE');
-        Route::delete('/comment/destroy/{id}', [CommentsController::class, 'destroyLeadsComment'])->name('comment.destroy')->middleware('check.permission:PROJECTS.DELETE');
+        Route::post('/comment', [CommentsController::class, 'addProjectsComment'])->name('comment.create')->middleware('check.permission:PROJECTS.CREATE');
+        Route::delete('/comment/destroy/{id}', [CommentsController::class, 'destroyProjectsComment'])->name('comment.destroy')->middleware('check.permission:PROJECTS.DELETE');
 
 
 
         // attachments routes
 
-        Route::post('/attachment', [AttachmentController::class, 'addLeadsAttachment'])->name('attachment.create')->middleware('check.permission:PROJECTS.CREATE');
-        Route::delete('/attachment/destroy/{id}', [AttachmentController::class, 'destroyLeadsAttachment'])->name('attachment.destroy')->middleware('check.permission:PROJECTS.DELETE');
+        Route::post('/attachment', [AttachmentController::class, 'addProjectsAttachment'])->name('attachment.create')->middleware('check.permission:PROJECTS.CREATE');
+        Route::delete('/attachment/destroy/{id}', [AttachmentController::class, 'destroyProjectsAttachment'])->name('attachment.destroy')->middleware('check.permission:PROJECTS.DELETE');
 
     });
 });
