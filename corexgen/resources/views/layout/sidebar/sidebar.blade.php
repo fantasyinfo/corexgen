@@ -16,7 +16,7 @@
     }
 </style>
 <!-- Sidebar -->
-<nav class="sidebar shadow-sm">
+<nav class="sidebar shadow-sm"  style="padding-bottom:300px;">
     <div class="sidebar-brand">
         <a href="">
             <img src="{{ asset('storage/' . getLogoPath()) }}" alt="logo" class="logo">
