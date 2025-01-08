@@ -43,6 +43,7 @@ class PermissionsHelper
         'PROJECTS' => 'PROJECTS',
         'TASKS' => 'TASKS',
         'MILESTONES' => 'MILESTONES',
+        'TIMESHEETS' => 'TIMESHEETS'
 
 
     ];
@@ -136,6 +137,8 @@ class PermissionsHelper
 
             self::$plansPermissionsKeys['MILESTONES'] => [4301 => 'READ', 4302 => 'READ_ALL', 4303 => 'CREATE', 4304 => 'UPDATE', 4305 => 'DELETE'],
 
+            self::$plansPermissionsKeys['TIMESHEETS'] => [43511 => 'READ', 4352 => 'READ_ALL', 4353 => 'CREATE', 4354 => 'UPDATE', 4355 => 'DELETE'],
+
         ];
     }
 
@@ -155,6 +158,7 @@ class PermissionsHelper
             'PROPOSALS_TEMPLATES' => 'PROPOSALS_TEMPLATES',
             'ESTIMATES_TEMPLATES' => 'ESTIMATES_TEMPLATES',
             'CONTRACTS_TEMPLATES' => 'CONTRACTS_TEMPLATES',
+            'TIMESHEETS' => 'TIMESHEETS'
         ];
     }
 

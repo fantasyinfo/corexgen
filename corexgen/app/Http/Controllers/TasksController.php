@@ -375,9 +375,9 @@ class TasksController extends Controller
     }
     public function view($id)
     {
-        $query = Tasks::query()->with([  
+        $query = Tasks::query()->with([
             'milestone',
-            'project',   
+            'project',
             'stage:id,name,color',
             'assignedBy:id,name',
             'assignees' => fn($q) => $q
@@ -424,7 +424,7 @@ class TasksController extends Controller
             'projects' => $this->projectService->getAllProjects(),
             'permissions' => PermissionsHelper::getPermissionsArray('TASKS'),
             'milestones' => $milestones
-    
+
         ]);
     }
 
@@ -575,6 +575,16 @@ class TasksController extends Controller
         ]);
     }
 
+
+    public function getAssignee(int $taskid)
+    {
+        $task = $this->applyTenantFilter(Tasks::query()
+            ->where('id', $taskid)
+            ->with(['assignees:id,name']) // Only select needed fields
+            ->first());
+        
+        return response()->json($task ? $task->assignees : []);
+    }
 
 
 
