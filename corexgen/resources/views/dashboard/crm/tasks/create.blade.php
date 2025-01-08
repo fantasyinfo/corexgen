@@ -127,6 +127,27 @@
 
                                     <div class="row mb-4">
                                         <div class="col-lg-4">
+                                            <x-form-components.input-label for="milestone_id" >
+                                                {{ __('tasks.Milestone') }}
+                                            </x-form-components.input-label>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <select class="form-select searchSelectBox" name="milestone_id" id="milestone_id" >
+                                                <option>Select Milestone (optional)</option>
+                                                @foreach ($milestones as $ml)
+                                                    <option value="{{ $ml->id }}"
+                                                        {{ old('milestone_id') == $ml->id ? 'selected' : '' }}>
+                                                        {{ $ml->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            @error('milestone_id')
+                                                <span class="text-danger">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-4">
+                                        <div class="col-lg-4">
                                             <x-form-components.input-label for="priority" required>
                                                 {{ __('tasks.Priority') }}
                                             </x-form-components.input-label>

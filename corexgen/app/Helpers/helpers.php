@@ -1042,10 +1042,10 @@ if (!function_exists('formatDateTime')) {
     {
         if (Auth::user()->is_tenant) {
             $timezone = getSettingValue('Panel Time Zone') ?: config('app.timezone');
-            $format = getSettingValue('Panel Date Format') ?: 'd M Y, h:i A';
+            $format = getSettingValue('Panel Date Format') ?: 'd M Y';
         } else {
             $timezone = getSettingValue('Time Zone') ?: config('app.timezone');
-            $format = getSettingValue('Date Format') ?: 'd M Y, h:i A';
+            $format = getSettingValue('Date Format') ?: 'd M Y';
         }
 
 

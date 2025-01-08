@@ -7,6 +7,7 @@ use App\Helpers\PermissionsHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TasksEditRequest;
 use App\Http\Requests\TasksRequest;
+use App\Models\Milestone;
 use App\Models\Tasks;
 use App\Services\ContractService;
 use App\Services\EstimateService;
@@ -201,13 +202,18 @@ class TasksController extends Controller
             $customFields = $this->customFieldService->getFieldsForEntity(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['tasks'], Auth::user()->company_id);
         }
 
+        // milestones
+        $milestones = collect();
+        $milestones = $this->applyTenantFilter(Milestone::query())->get();
+
         return view($this->getViewFilePath('create'), [
             'title' => 'Create Task',
             'module' => PANEL_MODULES[$this->getPanelModule()]['tasks'],
             'tasksStatus' => $this->tasksService->getTasksStatus(),
             'customFields' => $customFields,
             'teamMates' => getTeamMates(),
-            'projects' => $this->projectService->getAllProjects()
+            'projects' => $this->projectService->getAllProjects(),
+            'milestones' => $milestones
 
         ]);
     }
@@ -286,6 +292,10 @@ class TasksController extends Controller
 
 
 
+        // milestones
+        $milestones = collect();
+        $milestones = $this->applyTenantFilter(Milestone::query())->get();
+
         return view($this->getViewFilePath('edit'), [
 
             'title' => 'Edit Task',
@@ -296,6 +306,7 @@ class TasksController extends Controller
             'cfOldValues' => $cfOldValues,
             'projects' => $this->projectService->getAllProjects(),
             'tasksStatus' => $this->tasksService->getTasksStatus(),
+            'milestones' => $milestones
         ]);
     }
 
@@ -365,6 +376,7 @@ class TasksController extends Controller
     public function view($id)
     {
         $query = Tasks::query()->with([  
+            'milestone',
             'project',   
             'stage:id,name,color',
             'assignedBy:id,name',
@@ -395,6 +407,9 @@ class TasksController extends Controller
         $activitesQuery = $this->applyTenantFilter($activitesQuery);
         // $activities = $activitesQuery->get();
 
+        // milestones
+        $milestones = collect();
+        $milestones = $this->applyTenantFilter(Milestone::query())->get();
         //  dd($activitesQuery->toArray());
 
         return view($this->getViewFilePath('view'), [
@@ -408,6 +423,7 @@ class TasksController extends Controller
             'activities' => $activitesQuery,
             'projects' => $this->projectService->getAllProjects(),
             'permissions' => PermissionsHelper::getPermissionsArray('TASKS'),
+            'milestones' => $milestones
     
         ]);
     }

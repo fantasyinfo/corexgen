@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (dateInputs.length > 0 && typeof flatpickr !== 'undefined') {
         dateInputs.forEach((input) => {
             flatpickr(input, {
-                enableTime: true,
+                // enableTime: true,
                 altInput: true,
                 defaultDate: input.value,
             });
