@@ -7,6 +7,7 @@ use App\Helpers\PermissionsHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProjectEditRequest;
 use App\Http\Requests\ProjectRequest;
+use App\Models\Milestone;
 use App\Models\Project;
 use App\Services\ContractService;
 use App\Services\EstimateService;
@@ -414,6 +415,12 @@ class ProjectController extends Controller
         $tasks = collect();
         $tasks = $this->tasksService->getAllTasks($id);
 
+
+        // milestones
+        $milestones = collect();
+        $milestones = $this->applyTenantFilter(Milestone::where('project_id', $id))->get();
+
+
         return view($this->getViewFilePath('view'), [
             'title' => 'View Project',
             'project' => $project,
@@ -426,7 +433,8 @@ class ProjectController extends Controller
             'proposals' => $proposals,
             'contracts' => $contracts,
             'estimates' => $estimates,
-            'tasks' => $tasks
+            'tasks' => $tasks,
+            'milestones' => $milestones
         ]);
     }
 
@@ -462,6 +470,45 @@ class ProjectController extends Controller
     }
 
 
+
+    // milestones
+
+    public function storeMilestones(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'color' => 'required|string|in:success,danger,warning,dark,light,info',
+            'project_id' => 'required|exists:projects,id',
+        ]);
+
+        $milestone = Milestone::create($validated);
+        return response()->json($milestone);
+    }
+
+    public function editMilestones($id)
+    {
+        $milestone = Milestone::find($id);
+        return response()->json($milestone);
+    }
+
+    public function updateMilestones(Request $request)
+    {
+        $validated = $request->validate([
+            'id' => 'required|exists:milestones,id',
+            'name' => 'required|string|max:255',
+            'color' => 'required|string|in:success,danger,warning,dark,light,info',
+            'project_id' => 'required|exists:projects,id',
+        ]);
+
+        $milestone = Milestone::find($validated['id'])->update($validated);
+        return response()->json($milestone);
+    }
+
+    public function destroyMilestones($id)
+    {
+        $milestone = Milestone::find($id)->delete();
+        return response()->json(['message' => 'Milestone deleted successfully']);
+    }
 
 
 }

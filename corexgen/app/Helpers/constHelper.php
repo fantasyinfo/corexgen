@@ -244,6 +244,13 @@ PermissionsHelper::initializePermissions();
         'for' => 'company',
         'is_feature' => true,
     ],
+    PermissionsHelper::$plansPermissionsKeys['MILESTONES'] => [
+        'name' => 'MILESTONES',
+        'id' => PermissionsHelper::getParentPermissionId('153'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['MILESTONES'],
+        'for' => 'company',
+        'is_feature' => true,
+    ],
 ]);
 
 // super panel menus
@@ -627,6 +634,7 @@ PermissionsHelper::initializePermissions();
         'contracts' => 'contracts',
         'projects' => 'projects',
         'tasks' => 'tasks',
+        'milestones' => 'milestones',
 
     ]
 ]);
@@ -658,6 +666,7 @@ PermissionsHelper::initializePermissions();
     PermissionsHelper::$plansPermissionsKeys['PRODUCTS_SERVICES'] => PermissionsHelper::$plansPermissionsKeys['PRODUCTS_SERVICES'],
     PermissionsHelper::$plansPermissionsKeys['PROJECTS'] => PermissionsHelper::$plansPermissionsKeys['PROJECTS'],
     PermissionsHelper::$plansPermissionsKeys['TASKS'] => PermissionsHelper::$plansPermissionsKeys['TASKS'],
+    PermissionsHelper::$plansPermissionsKeys['MILESTONES'] => PermissionsHelper::$plansPermissionsKeys['MILESTONES'],
 ]);
 
 

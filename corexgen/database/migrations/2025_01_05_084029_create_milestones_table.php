@@ -14,14 +14,9 @@ return new class extends Migration
         Schema::create('milestones', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->text('description')->nullable();
-            $table->date('start_date')->nullable();
-            $table->date('due_date')->nullable();
-
-            $table->boolean('visible_to_client')->default(false);
+            $table->string('color')->default('success');
 
             $table->enum('status', CRM_STATUS_TYPES['MILESTONES']['TABLE_STATUS'])->default(CRM_STATUS_TYPES['MILESTONES']['STATUS']['PENDING']);
-
 
             $table->unsignedBigInteger('project_id');
             $table->unsignedBigInteger('company_id');

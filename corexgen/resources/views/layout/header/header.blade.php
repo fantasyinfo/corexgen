@@ -9,6 +9,7 @@
     <meta name="description" content="" />
     <meta name="keyword" content="" />
     <meta name="author" content="{{ config('app.name') }}" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
 
     <title>{{ $title ?? '' }} || {{ config('app.name') }}</title>

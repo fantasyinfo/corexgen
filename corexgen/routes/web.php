@@ -635,6 +635,18 @@ Route::middleware([
         Route::post('/attachment', [AttachmentController::class, 'addProjectsAttachment'])->name('attachment.create')->middleware('check.permission:PROJECTS.CREATE');
         Route::delete('/attachment/destroy/{id}', [AttachmentController::class, 'destroyProjectsAttachment'])->name('attachment.destroy')->middleware('check.permission:PROJECTS.DELETE');
 
+        // milestones
+
+        Route::get('/milestones', [ProjectController::class, 'indexMilestones'])->name('indexMilestones')->middleware('check.permission:MILESTONES.READ_ALL');
+        Route::post('/milestones', [ProjectController::class, 'storeMilestones'])->name('storeMilestones')->middleware('check.permission:MILESTONES.CREATE');
+        Route::put('/milestones', [ProjectController::class, 'updateMilestones'])->name('updateMilestones')->middleware('check.permission:MILESTONES.UPDATE');
+
+
+        // create, edit, change status, delete
+        Route::get('/milestones/create', [ProjectController::class, 'createMilestones'])->name('createMilestones')->middleware('check.permission:MILESTONES.CREATE');
+        Route::get('/milestones/edit/{id}', [ProjectController::class, 'editMilestones'])->name('editMilestones')->middleware('check.permission:MILESTONES.UPDATE');
+        Route::delete('/milestones/destroy/{id}', [ProjectController::class, 'destroyMilestones'])->name('destroyMilestones')->middleware('check.permission:MILESTONES.DELETE');
+
     });
 
       // tasks routes
