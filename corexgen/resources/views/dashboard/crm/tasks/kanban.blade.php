@@ -12,7 +12,7 @@
     <div class="kanban-wrapper">
 
         @include('layout.components.header-buttons')
-        @include('dashboard.crm.leads.components.leads-filters')
+        @include('dashboard.crm.tasks.components.tasks-filters')
 
         <div class="row my-2">
             <div class="w-100 mx-auto">
@@ -44,7 +44,7 @@
 
     </div>
 
-    @include('dashboard.crm.leads.components.view-modal')
+    @include('dashboard.crm.tasks.components.view-modal')
 
 @endsection
 
@@ -54,18 +54,6 @@
         $(document).ready(function() {
             loadTasks();
             updateTaskCounts();
-
-            $('#clientType').on('change', function() {
-                var selectedType = $(this).val();
-                if (selectedType === 'Company') {
-                    $('#company_name_div').show();
-                } else {
-                    $('#company_name_div').hide();
-                }
-            });
-
-            // Trigger change event on page load
-            $('#clientType').trigger('change');
 
         });
 
@@ -169,28 +157,33 @@
 
         // Create a new function to generate lead cards
         function createLeadElement(lead) {
-
             let baseUrl =
                 "{{ route(getPanelRoutes($module . '.view'), ['id' => ':id']) }}";
             let url = baseUrl.replace(':id', lead.id);
 
-
-            const nameElement = lead.type === 'Company' ?
-                `<h6 class="task-title"> <span class="status-circle bg-success me-2"></span> ${lead.company_name}</h6>` :
-                `<h6 class="task-title"> <span class="status-circle bg-warning me-2"></span> ${lead.first_name}</h6>`;
-
             const assigneeElements = lead.assignees.map(assignee =>
                 `<img src="${assignee.profile_photo_url}" 
-             alt="${assignee.name}" 
-             title="${assignee.name}"
-             class="rounded-circle"
-             style="width: 24px; height: 24px;">`
+         alt="${assignee.name}" 
+         title="${assignee.name}"
+         class="rounded-circle"
+         style="width: 24px; height: 24px;">`
             ).join('');
 
-            const statusClass = lead.status === 'ACTIVE' ? 'bg-success' : 'bg-danger';
-            const formattedDate = new Date(lead.created_at).toLocaleDateString();
+            const startDate = new Date(lead.start_date).toLocaleDateString();
+            const dueDate = new Date(lead.due_date).toLocaleDateString();
 
+            // Filter the first image file (jpg, jpeg, png, gif, webp)
+            const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+            const firstImage = lead.attachments.find(attachment =>
+                imageExtensions.includes(attachment.file_extension.toLowerCase())
+            );
 
+            const imageElement = firstImage ?
+                `<img src="${firstImage.file_path.replace(/\\/g, '/')}" 
+             alt="${firstImage.file_name}" 
+             class="rounded"
+             style="width: 100%; height: auto;">` :
+                '';
 
             return `
         <div class="task-card border-bottom border-${lead.stage.color}" 
@@ -198,33 +191,51 @@
              ondragstart="drag(event)" 
              id="task-${lead.id}">
             <div class="task-header">
-                ${nameElement}
-   
+                ${lead.title}
                 <div class="task-actions">
-                 
-                    <i class="fas fa-eye " onclick="viewTask(${lead.id})"></i>
-                    <i class="fas fa-trash-alt " onclick="deleteTask(${lead.id})"></i>
+                    <i class="fas fa-eye" onclick="viewTask(${lead.id})"></i>
+                    <i class="fas fa-trash-alt" onclick="deleteTask(${lead.id})"></i>
                 </div>
             </div>
-            <p class="mb-2 text-muted small">${lead.first_name} ${lead.last_name}</p>
+   
             <div class="task-meta">
                 <div class="task-badges">
-                    <span class="badge bg-${lead.group.color}">${lead.group.name}</span>
-                    <span class="badge bg-${lead.source.color}">${lead.source.name}</span>
+                    <span class="badge ${getPriorityClass(lead.priority)}">${lead.priority}</span>
                 </div>
                 <div class="assignees d-flex gap-1">
                     ${assigneeElements}
                 </div>
             </div>
-            <div class="task-footer mt-2 d-flex justify-content-between align-items-center">
+            
+            <div class="task-attachment mt-2 border-1">
+                ${imageElement}
+            </div>
+            
+            <div class="task-footer mt-2 ">
+                <div class="mb-2">
                 <small class="text-muted">
                     <i class="far fa-calendar-alt"></i> 
-                    ${formattedDate}
+                   Start Date:  ${startDate}
                 </small>
+            </div>
+                <div class="mb-2">
+                    <small class="text-muted">
+                    <i class="far fa-calendar-alt"></i> 
+                   Due Date: ${dueDate}
+                </small>
+                </div>
+                <div class="mb-2">
+                    <small class="text-muted">
+                        <i class="fas fa-money-bill-wave-alt"></i>
+                   Billable: ${lead.billable == '1' ? 'Yes' : 'No'}
+                </small>
+                </div>
+              
             </div>
         </div>
     `;
         }
+
 
 
         function drag(ev) {
@@ -416,36 +427,25 @@
             const lead = data.lead;
 
             // Basic Information
-            $('#viewLeadModal #type').text(lead.type);
-            $('#viewLeadModal #companyName').text(lead.company_name);
-            $('#viewLeadModal #contactName').text(`${lead.first_name} ${lead.last_name}`);
+            $('#viewLeadModal #billable').text(lead.billable == '1' ? 'Yes' : 'No');
             $('#viewLeadModal #title').text(lead.title);
-            $('#viewLeadModal #email').html(`<a href="mailto:${lead.email}">${lead.email}</a>`);
-            $('#viewLeadModal #phone').html(`<a href="tel:${lead.phone}">${lead.phone}</a>`);
-            $('#viewLeadModal #value').text(`$${parseFloat(lead.value).toLocaleString()}`);
-            $('#viewLeadModal #pcm').text(lead.preferred_contact_method);
+            $('#viewLeadModal #relatedTo').text(lead.related_to.toUpperCase());
+            $('#viewLeadModal #hourlyRate').text(`${parseFloat(lead.hourly_rate).toLocaleString()}`);
 
             // Status & Priority
             $('#viewLeadModal #stage').html(`<span class="badge bg-${lead.stage.color}" >${lead.stage.name}</span>`);
             $('#viewLeadModal #priority').html(
                 `<span class="badge bg-${getPriorityClass(lead.priority)}" >${lead.priority}</span>`);
-            $('#viewLeadModal #source').html(`<span class="badge bg-${lead.source.color}" >${lead.source.name}</span>`);
-            $('#viewLeadModal #group').html(`<span class="badge bg-${lead.group.color}" >${lead.group.name}</span>`);
-            $('#viewLeadModal #score').html(lead.score);
+
 
             // Dates
-            $('#viewLeadModal #lastContactedDate').text(formatDate(lead.last_contacted_date));
-            $('#viewLeadModal #lastActivityDate').text(formatDate(lead.last_activity_date));
-            $('#viewLeadModal #followUpDate').text(formatDate(lead.follow_up_date));
-
+            $('#viewLeadModal #startDate').text(formatDate(lead.start_date));
+            $('#viewLeadModal #dueDate').text(formatDate(lead.due_date));
 
 
             // tabs
 
-            $('#viewLeadModal  #detailsShow #detailsView').html(lead.details);
-
-
-
+            $('#viewLeadModal  #detailsView').html(lead.description);
 
 
             let baseUrl =
@@ -497,6 +497,8 @@
                     return 'bg-warning';
                 case 'low':
                     return 'bg-info';
+                case 'urgent':
+                    return 'bg-primary';
                 default:
                     return 'bg-secondary';
             }

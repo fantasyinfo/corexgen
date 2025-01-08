@@ -17,12 +17,12 @@
             <!-- Search Input -->
             <div class="mb-3">
                 <div class="form-group">
-                    <x-form-components.input-label for="nameFilter" class="custom-class">
-                        {{ __('leads.Name') }}
+                    <x-form-components.input-label for="titleFileter" class="custom-class">
+                        {{ __('tasks.Title') }}
                     </x-form-components.input-label>
 
-                    <x-form-components.input-group type="text" name="name" data-filter="name" id="nameFilter"
-                        placeholder="{{ __('Enter Name') }}" value="{{ request('name') }}" required
+                    <x-form-components.input-group type="text" name="title" data-filter="title" id="titleFileter"
+                        placeholder="{{ __('Enter Title') }}" value="{{ request('title') }}" required
                         class="custom-class" />
 
 
@@ -30,36 +30,28 @@
             </div>
             <div class="mb-3">
                 <div class="form-group">
-                    <x-form-components.input-label for="emailFilter" class="custom-class">
-                        {{ __('leads.Email') }}
+                    <x-form-components.input-label for="relatedTo" class="custom-class">
+                        {{ __('tasks.Related To') }}
                     </x-form-components.input-label>
 
-                    <x-form-components.input-group type="email" name="email" data-filter="email" id="emailFilter"
-                        placeholder="{{ __('Enter Email') }}" value="{{ request('email') }}" required
-                        class="custom-class" />
+                    <select class="form-select" name="related_to" id="related_to"  data-filter="related_to">
+                        <option selected value="0">Select Related To</option>
+                        @foreach (TASKS_RELATED_TO['STATUS'] as $key => $pri)
+                            <option value="{{ $key }}"
+                                {{ request('related_to') == $key ? 'selected' : '' }}>
+                                {{ $pri }}</option>
+                        @endforeach
+                    </select>
 
 
                 </div>
             </div>
-            <div class="mb-3">
-                <div class="form-group">
-                    <x-form-components.input-label for="phoneFilter" class="custom-class">
-                        {{ __('leads.Phone') }}
-                    </x-form-components.input-label>
-
-                    <x-form-components.input-group type="tel" name="phone" data-filter="phone" id="phoneFilter"
-                        placeholder="{{ __('Enter Phone') }}" value="{{ request('phone') }}" required
-                        class="custom-class" />
-
-
-                </div>
-            </div>
-
+        
             <!-- Date Filters -->
             <div class="mb-3">
                 <div class="form-group">
                     <x-form-components.input-label for="startDateFilter" class="custom-class">
-                        {{ __('leads.Start Date') }}
+                        {{ __('tasks.Start Date') }}
                     </x-form-components.input-label>
                     <x-form-components.input-group type="date" placeholder="Select Date" data-filter="start_date" name="start_date"
                         id="startDateFilter" value="{{ request('start_date') }}" class="custom-class" />
@@ -69,10 +61,10 @@
             <div class="mb-3">
                 <div class="form-group">
                     <x-form-components.input-label for="endDateFilter" class="custom-class">
-                        {{ __('leads.End Date') }}
+                        {{ __('tasks.Due Date') }}
                     </x-form-components.input-label>
-                    <x-form-components.input-group type="date" placeholder="Select Date" data-filter="end_date" name="end_date"
-                        id="endDateFilter" value="{{ request('end_date') }}" class="custom-class" />
+                    <x-form-components.input-group type="date" placeholder="Select Date" data-filter="due_date" name="due_date"
+                        id="endDateFilter" value="{{ request('due_date') }}" class="custom-class" />
                 </div>
             </div>
 
@@ -80,7 +72,7 @@
             <div class="mb-3">
                 <div class="form-group">
                     <x-form-components.input-label for="stageFilter" class="custom-class">
-                        {{ __('leads.Stage') }}
+                        {{ __('tasks.Stage') }}
                     </x-form-components.input-label>
 
                     <select name="status_id" class="form-select" id="stageFilter" data-filter="status_id">
@@ -94,6 +86,23 @@
                     </select>
                 </div>
             </div>
+            <div class="mb-3">
+                <div class="form-group">
+                    <x-form-components.input-label for="stageFilter" class="custom-class">
+                        {{ __('tasks.Project') }}
+                    </x-form-components.input-label>
+
+                    <select class="form-select searchSelectBox" name="project_id"
+                    id="project_id" data-filter="project_id">
+                    <option selected value="0">Select Project</option>
+                    @foreach ($projects as $pro)
+                        <option value="{{ $pro->id }}"
+                            {{ old('project_id') == $pro->id ? 'selected' : '' }}>
+                            {{ $pro->title }}</option>
+                    @endforeach
+                </select>
+                </div>
+            </div>
 
             <!-- groups Dropdown -->
        
@@ -101,10 +110,11 @@
             <div class="mb-3">
                 <div class="form-group">
                     <x-form-components.input-label for="assignToFilter" class="custom-class">
-                        {{ __('leads.Assigns To') }}
+                        {{ __('tasks.Assigns To') }}
                     </x-form-components.input-label>
 
                     <select name="assign_to[]" class="form-select searchSelectBox" id="assignToFilter" multiple="multiple" data-filter="assign_to">
+                        
                         @foreach ($teamMates as $ls)
                             <option value="{{ $ls->id }}"
                                 {{ request('assign_to') == $ls->id ? 'selected' : '' }}>
@@ -118,7 +128,7 @@
             <div class="mb-3">
                 <div class="form-group">
                     <x-form-components.input-label for="assignByFilter" class="custom-class">
-                        {{ __('leads.Assign By') }}
+                        {{ __('tasks.Assign By') }}
                     </x-form-components.input-label>
 
                     <select name="status" class="form-selec searchSelectBox" id="assignByFilter" data-filter="assign_by">

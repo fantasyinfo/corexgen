@@ -5,31 +5,22 @@ namespace App\Http\Controllers;
 use App\Helpers\CustomFieldsValidation;
 use App\Helpers\PermissionsHelper;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\LeadsEditRequest;
-use App\Http\Requests\LeadsRequest;
 use App\Http\Requests\TasksEditRequest;
 use App\Http\Requests\TasksRequest;
-use App\Models\Country;
-use App\Models\CRM\CRMClients;
 use App\Models\Tasks;
 use App\Services\ContractService;
-use App\Services\Csv\ClientsCsvRowProcessor;
 use App\Services\EstimateService;
 use App\Services\ProjectService;
 use App\Services\ProposalService;
+use App\Services\TasksService;
 use App\Traits\AuditFilter;
 use App\Traits\CategoryGroupTagsFilter;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
 use App\Traits\SubscriptionUsageFilter;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
-use App\Jobs\CsvImportJob;
 use App\Models\CRM\CRMLeads;
 use App\Services\CustomFieldService;
-use App\Services\LeadsService;
-use App\Services\TasksService;
 use Illuminate\Support\Facades\DB;
 
 
@@ -154,6 +145,7 @@ class TasksController extends Controller
             'total_inactive' => 0,
             'total_ussers' => 0,
             'tasksStatus' => $this->tasksService->getTasksStatus(),
+            'projects' => $this->projectService->getAllProjects(),
             'teamMates' => getTeamMates(),
         ]);
     }
@@ -162,7 +154,7 @@ class TasksController extends Controller
 
     public function store(TasksRequest $request)
     {
-      
+
         try {
 
             // custom fields validation if any
@@ -173,7 +165,7 @@ class TasksController extends Controller
             }
 
 
-       
+
             // Create lead
             $task = $this->tasksService->createTask($request->validated());
 
@@ -332,7 +324,7 @@ class TasksController extends Controller
             return redirect()->back()->with('error', 'Failed to delete the client: ' . $e->getMessage());
         }
     }
-  
+
     public function bulkDelete(Request $request)
     {
         $ids = $request->input('ids');
@@ -446,7 +438,7 @@ class TasksController extends Controller
             'estimates' => $estimates,
         ]);
     }
-  
+
 
     public function changeStatus($id, $status)
     {
@@ -512,13 +504,11 @@ class TasksController extends Controller
             'permissions' => PermissionsHelper::getPermissionsArray('TASKS'),
             'module' => PANEL_MODULES[$this->getPanelModule()]['tasks'],
             'type' => 'Tasks',
-            'stages' => $this->leadsService->getKanbanBoardStages($request->all()),
-            'leadsGroups' => $this->leadsService->getLeadsGroups(),
-            'leadsSources' => $this->leadsService->getLeadsSources(),
-            'leadsStatus' => $this->leadsService->getLeadsStatus(),
+            'stages' => $this->tasksService->getKanbanBoardStages($request->all()),
+            'tasksStatus' => $this->tasksService->getTasksStatus(),
+            'projects' => $this->projectService->getAllProjects(),
             'customFields' => $customFields,
             'teamMates' => getTeamMates(),
-            'countries' => Country::all(),
         ]);
     }
 
@@ -527,7 +517,7 @@ class TasksController extends Controller
         $this->tenantRoute = $this->getTenantRoute();
 
         $data = collect();
-        $data = $this->leadsService->getKanbanLoad($request->all());
+        $data = $this->tasksService->getKanbanLoad($request->all());
         return response()->json($data);
     }
 
@@ -568,18 +558,8 @@ class TasksController extends Controller
     }
     public function kanbanView($id)
     {
-        $query = CRMLeads::query()->with([
-            'address' => fn($q) => $q
-                ->select(['id', 'street_address', 'postal_code', 'city_id', 'country_id'])
-                ->with([
-
-                    'city:id,name',
-                    'country:id,name'
-                ]),
-            'group:id,name,color',
-            'source:id,name,color',
+        $query = Tasks::query()->with([
             'stage:id,name,color',
-            'customFields',
             'assignedBy:id,name',
             'assignees' => fn($q) => $q
                 ->select(['users.id', 'users.name'])
@@ -598,7 +578,6 @@ class TasksController extends Controller
             // fetch already existing values
             $cfOldValues = $this->customFieldService->getValuesForEntity($lead);
         }
-
 
         return response()->json([
             'lead' => $lead,

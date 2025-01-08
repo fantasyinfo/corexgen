@@ -45,8 +45,8 @@ class TasksRepository
             });
         }
 
-        // return $this->applyFilters($query, $request);
-        return $query;
+        return $this->applyFilters($query, $request);
+        //return $query;
     }
 
     protected function applyFilters($query, $request)
@@ -56,68 +56,39 @@ class TasksRepository
                 $request->filled('search'),
                 fn($q) => $q->where(function ($subQuery) use ($request) {
                     $searchTerm = strtolower($request->search['value']);
-                    $subQuery->where('leads.type', 'LIKE', "%{$searchTerm}%")
-                        ->orWhere('leads.company_name', 'LIKE', "%{$searchTerm}%")
-                        ->orWhere('leads.title', 'LIKE', "%{$searchTerm}%")
-                        ->orWhere('leads.first_name', 'LIKE', "%{$searchTerm}%")
-                        ->orWhere('leads.email', 'LIKE', "%{$searchTerm}%")
-                        ->orWhere('leads.phone', 'LIKE', "%{$searchTerm}%")
-                        ->orWhereHas(
-                            'group',
-                            fn($groupQuery) =>
-                            $groupQuery->where('name', 'LIKE', "%{$searchTerm}%")
-                        )
-                        ->orWhereHas(
-                            'source',
-                            fn($sourceQuery) =>
-                            $sourceQuery->where('name', 'LIKE', "%{$searchTerm}%")
-                        )
+                    $subQuery->where('tasks.hourly_rate', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('tasks.title', 'LIKE', "%{$searchTerm}%")
                         ->orWhereHas(
                             'stage',
                             fn($stageQuery) =>
                             $stageQuery->where('name', 'LIKE', "%{$searchTerm}%")
                         )
-                        ->orWhere('leads.created_at', 'LIKE', "%{$searchTerm}%");
+                        ->orWhere('tasks.created_at', 'LIKE', "%{$searchTerm}%");
                 })
             )
             ->when(
-                $request->filled('name'),
-                fn($q) => $q->where(function ($subQuery) use ($request) {
-                    $subQuery->where('leads.first_name', 'LIKE', "%{$request->name}%")
-                        ->orWhere('leads.last_name', 'LIKE', "%{$request->name}%");
-                })
-            )
-            ->when(
-                $request->filled('email'),
-                fn($q) => $q->where('leads.email', 'LIKE', "%{$request->email}%")
-            )
-            ->when(
-                $request->filled('phone'),
-                fn($q) => $q->where('leads.phone', 'LIKE', "%{$request->phone}%")
-            )
-            ->when(
-                $request->filled('status') && $request->status != 0,
-                fn($q) => $q->where('leads.status', $request->status)
+                $request->filled('title'),
+                fn($q) => $q->where('tasks.title', 'LIKE', "%{$request->title}%")
             )
             ->when(
                 $request->filled('status_id') && $request->status_id != 0,
-                fn($q) => $q->where('leads.status_id', $request->status_id)
+                fn($q) => $q->where('tasks.status_id', $request->status_id)
             )
             ->when(
-                $request->filled('group_id') && $request->group_id != 0,
-                fn($q) => $q->where('leads.group_id', $request->group_id)
+                $request->filled('project_id') && $request->project_id != 0,
+                fn($q) => $q->where('tasks.project_id', $request->project_id)
             )
             ->when(
-                $request->filled('source_id') && $request->source_id != 0,
-                fn($q) => $q->where('leads.source_id', $request->source_id)
+                $request->filled('related_to') && $request->related_to != 0,
+                fn($q) => $q->where('tasks.related_to', $request->related_to)
             )
             ->when(
                 $request->filled('start_date'),
-                fn($q) => $q->whereDate('leads.created_at', '>=', $request->start_date)
+                fn($q) => $q->whereDate('tasks.start_date', '>=', $request->start_date)
             )
             ->when(
-                $request->filled('end_date'),
-                fn($q) => $q->whereDate('leads.created_at', '<=', $request->end_date)
+                $request->filled('due_date'),
+                fn($q) => $q->whereDate('tasks.due_date', '<=', $request->due_date)
             )
             ->when(
                 $request->filled('assign_to') && count($request->assign_to) != 0,
@@ -147,39 +118,26 @@ class TasksRepository
 
         $query = Tasks::query()
             ->select([
-                'leads.id',
-                'leads.type',
-                'leads.company_name',
-                'leads.title',
-                'leads.first_name',
-                'leads.last_name',
-                'leads.email',
-                'leads.phone',
-                'leads.status',
-                'leads.created_at',
-                'leads.group_id',
-                'leads.source_id',
-                'leads.status_id',
-                'leads.address_id',
-                'leads.assign_by',
-                'category_group_tag.name as stage_name'
+                'tasks.id',
+                'tasks.priority',
+                'tasks.billable',
+                'tasks.start_date',
+                'tasks.related_to',
+                'tasks.due_date',
+                'tasks.title',
+                'tasks.created_at',
+                'tasks.status_id',
+                'tasks.assign_by'
             ])
-            ->join('category_group_tag', 'leads.status_id', '=', 'category_group_tag.id')
             ->with([
-                'group:id,name,color',
-                'source:id,name,color',
+                'project',
+                'attachments',
                 'stage:id,name,color',
-                'address' => fn($q) => $q
-                    ->select(['id', 'street_address', 'postal_code', 'city_id', 'country_id'])
-                    ->with([
-                        'city:id,name',
-                        'country:id,name'
-                    ]),
                 'assignedBy:id,name',
                 'assignees' => fn($q) => $q
                     ->select(['users.id', 'users.name'])
                     ->withOnly([])
-            ])->orderBy('leads.updated_at', 'desc');
+            ]);
 
         if ($wantCurrentUserItems === true) {
             $query->whereHas('assignees', function ($query) {
@@ -187,7 +145,8 @@ class TasksRepository
             });
         }
 
-        return $this->applyKanbanFilters($query, $request['filters']);
+        //return $this->applyKanbanFilters($query, $request['filters']);
+        return $query;
     }
 
     protected function applyKanbanFilters($query, $request)

@@ -422,7 +422,7 @@
             $('#viewLeadModal #title').text(lead.title);
             $('#viewLeadModal #email').html(`<a href="mailto:${lead.email}">${lead.email}</a>`);
             $('#viewLeadModal #phone').html(`<a href="tel:${lead.phone}">${lead.phone}</a>`);
-            $('#viewLeadModal #value').text(`$${parseFloat(lead.value).toLocaleString()}`);
+            $('#viewLeadModal #value').text(`${parseFloat(lead.value).toLocaleString()}`);
             $('#viewLeadModal #pcm').text(lead.preferred_contact_method);
 
             // Status & Priority
@@ -442,7 +442,7 @@
 
             // tabs
 
-            $('#viewLeadModal  #detailsShow #detailsView').html(lead.details);
+            $('#viewLeadModal   #detailsView').html(lead.details);
 
 
 
