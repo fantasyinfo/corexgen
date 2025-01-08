@@ -42,6 +42,8 @@ class PermissionsHelper
         'CONTRACTS_TEMPLATES' => 'CONTRACTS_TEMPLATES',
         'PROJECTS' => 'PROJECTS',
         'TASKS' => 'TASKS',
+        'MILESTONES' => 'MILESTONES',
+
 
     ];
 
@@ -130,8 +132,9 @@ class PermissionsHelper
             self::$plansPermissionsKeys['PROJECTS'] => [4101 => 'CREATE', 4102 => 'READ', 4103 => 'READ_ALL', 4104 => 'UPDATE', 4105 => 'DELETE', 4106 => 'IMPORT', 4107 => 'EXPORT', 4108 => 'FILTER', 4109 => 'CHANGE_STATUS', 4110 => 'BULK_DELETE', 4111 => 'VIEW'],
 
 
-            self::$plansPermissionsKeys['TASKS'] => [4201 => 'CREATE', 4202 => 'READ', 4203 => 'READ_ALL', 4204 => 'UPDATE', 4205 => 'DELETE',  4208 => 'FILTER', 4209 => 'CHANGE_STATUS', 4210 => 'BULK_DELETE', 4211 => 'VIEW', 4212 => 'KANBAN_BOARD', 4213 => 'CHANGE_STAGE'],
+            self::$plansPermissionsKeys['TASKS'] => [4201 => 'CREATE', 4202 => 'READ', 4203 => 'READ_ALL', 4204 => 'UPDATE', 4205 => 'DELETE', 4208 => 'FILTER', 4209 => 'CHANGE_STATUS', 4210 => 'BULK_DELETE', 4211 => 'VIEW', 4212 => 'KANBAN_BOARD', 4213 => 'CHANGE_STAGE'],
 
+            self::$plansPermissionsKeys['MILESTONES'] => [4301 => 'READ', 4302 => 'READ_ALL', 4303 => 'CREATE', 4304 => 'UPDATE', 4305 => 'DELETE'],
 
         ];
     }

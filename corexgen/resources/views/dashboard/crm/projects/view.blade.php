@@ -439,6 +439,11 @@
                                 <i class="fas fa-tasks me-2"></i>Tasks
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#milestones">
+                                <i class="fas fa-rocket me-2"></i>Milestones
+                            </a>
+                        </li>
 
                         <li class="nav-item">
                             <a class="nav-link" data-bs-toggle="tab" href="#proposals">
@@ -501,6 +506,9 @@
 
                         <div class="tab-pane fade" id="tasks">
                             @include('dashboard.crm.projects.components._tasks')
+                        </div>
+                        <div class="tab-pane fade" id="milestones">
+                            @include('dashboard.crm.projects.components._milestones')
                         </div>
 
                         <div class="tab-pane fade" id="proposals">
