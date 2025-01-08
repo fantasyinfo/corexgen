@@ -435,6 +435,12 @@
                         </li>
 
                         <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#tasks">
+                                <i class="fas fa-tasks me-2"></i>Tasks
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
                             <a class="nav-link" data-bs-toggle="tab" href="#proposals">
                                 <i class="fas fa-flag me-2"></i>Proposals
                             </a>
@@ -493,6 +499,9 @@
 
                         </div>
 
+                        <div class="tab-pane fade" id="tasks">
+                            @include('dashboard.crm.projects.components._tasks')
+                        </div>
 
                         <div class="tab-pane fade" id="proposals">
                             @include('dashboard.crm.projects.components._proposals')

@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Services\ClientService;
 use App\Services\CustomFieldService;
 use App\Services\ProjectService;
+use App\Services\TasksService;
 use Illuminate\Support\Facades\DB;
 
 
@@ -70,16 +71,16 @@ class ProjectController extends Controller
     protected $estimateService;
 
     protected $clientService;
+    protected $tasksService;
 
     public function __construct(
-
-
         ProposalService $proposalService,
         ContractService $contractService,
         EstimateService $estimateService,
         CustomFieldService $customFieldService,
         ProjectService $projectService,
-        ClientService $clientService
+        ClientService $clientService,
+        TasksService $tasksService
     ) {
 
 
@@ -89,6 +90,7 @@ class ProjectController extends Controller
         $this->estimateService = $estimateService;
         $this->projectService = $projectService;
         $this->clientService = $clientService;
+        $this->tasksService = $tasksService;
     }
 
 
@@ -407,6 +409,11 @@ class ProjectController extends Controller
         $contracts = collect();
         $contracts = $this->contractService->getContracts(\App\Models\CRM\CRMClients::class, $project?->client?->id);
 
+        // tasks
+
+        $tasks = collect();
+        $tasks = $this->tasksService->getAllTasks($id);
+
         return view($this->getViewFilePath('view'), [
             'title' => 'View Project',
             'project' => $project,
@@ -419,6 +426,7 @@ class ProjectController extends Controller
             'proposals' => $proposals,
             'contracts' => $contracts,
             'estimates' => $estimates,
+            'tasks' => $tasks
         ]);
     }
 
