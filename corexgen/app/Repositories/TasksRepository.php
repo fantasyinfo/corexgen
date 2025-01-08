@@ -71,8 +71,8 @@ class TasksRepository
                 fn($q) => $q->where('tasks.title', 'LIKE', "%{$request->title}%")
             )
             ->when(
-                $request->filled('status_id') && $request->status_id != 0,
-                fn($q) => $q->where('tasks.status_id', $request->status_id)
+                $request->filled('status_id') && $request->project_id != 0,
+                fn($q) => $q->where('tasks.status_id', $request->project_id )
             )
             ->when(
                 $request->filled('project_id') && $request->project_id != 0,
@@ -145,8 +145,8 @@ class TasksRepository
             });
         }
 
-        //return $this->applyKanbanFilters($query, $request['filters']);
-        return $query;
+        return $this->applyKanbanFilters($query, $request['filters']);
+        //return $query;
     }
 
     protected function applyKanbanFilters($query, $request)
@@ -157,71 +157,41 @@ class TasksRepository
                 $request['search'] && $request['search'] != '',
                 fn($q) => $q->where(function ($subQuery) use ($request) {
                     $searchTerm = strtolower($request['search']);
-                    $subQuery->where('leads.type', 'LIKE', "%{$searchTerm}%")
-                        ->orWhere('leads.company_name', 'LIKE', "%{$searchTerm}%")
-                        ->orWhere('leads.title', 'LIKE', "%{$searchTerm}%")
-                        ->orWhere('leads.first_name', 'LIKE', "%{$searchTerm}%")
-                        ->orWhere('leads.email', 'LIKE', "%{$searchTerm}%")
-                        ->orWhere('leads.phone', 'LIKE', "%{$searchTerm}%")
-                        ->orWhereHas(
-                            'group',
-                            fn($groupQuery) =>
-                            $groupQuery->where('name', 'LIKE', "%{$searchTerm}%")
-                        )
-                        ->orWhereHas(
-                            'source',
-                            fn($sourceQuery) =>
-                            $sourceQuery->where('name', 'LIKE', "%{$searchTerm}%")
-                        )
+                    $subQuery->where('tasks.hourly_rate', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('tasks.title', 'LIKE', "%{$searchTerm}%")
                         ->orWhereHas(
                             'stage',
                             fn($stageQuery) =>
                             $stageQuery->where('name', 'LIKE', "%{$searchTerm}%")
                         )
-                        ->orWhere('leads.created_at', 'LIKE', "%{$searchTerm}%");
+                        ->orWhere('tasks.created_at', 'LIKE', "%{$searchTerm}%");
                 })
             )
             ->when(
-                isset($request['name']) && !empty($request['name']),
-                fn($q) => $q->where(function ($subQuery) use ($request) {
-                    $subQuery->where('leads.first_name', 'LIKE', "%" . $request['name'] . "%")
-                        ->orWhere('leads.last_name', 'LIKE', "%" . $request['name'] . "%");
-                })
+                isset($request['title']) && !empty($request['title']),
+                fn($q) => $q->where('tasks.title', 'LIKE', "%{$request['title']}%")
+            )->when(
+                isset($request['status_id']) && $request['status_id']!= 0,
+                fn($q) => $q->where('tasks.status_id', $request['status_id'])
             )
             ->when(
-                isset($request['email']) && !empty($request['email']),
-                fn($q) => $q->where('leads.email', 'LIKE', "%" . $request['email'] . "%")
+                isset($request['project_id']) && $request['project_id'] != 0,
+                fn($q) => $q->where('tasks.project_id', $request['project_id'])
             )
             ->when(
-                isset($request['phone']) && !empty($request['phone']),
-                fn($q) => $q->where('leads.phone', 'LIKE', "%" . $request['phone'] . "%")
+                isset($request['related_to']) && $request['related_to'] != 0,
+                fn($q) => $q->where('tasks.related_to', $request['related_to'])
             )
             ->when(
-                isset($request['status']) && $request['status'] != 0,
-                fn($q) => $q->where('leads.status', $request['status'])
+                isset($request['start_date']),
+                fn($q) => $q->whereDate('tasks.start_date', '>=', $request['start_date'])
             )
             ->when(
-                isset($request['status_id']) && $request['status_id'] != 0,
-                fn($q) => $q->where('leads.status_id', $request['status_id'])
+                isset($request['due_date']),
+                fn($q) => $q->whereDate('tasks.due_date', '<=', $request['due_date'])
             )
             ->when(
-                isset($request['group_id']) && $request['group_id'] != 0,
-                fn($q) => $q->where('leads.group_id', $request['group_id'])
-            )
-            ->when(
-                isset($request['source_id']) && $request['source_id'] != 0,
-                fn($q) => $q->where('leads.source_id', $request['source_id'])
-            )
-            ->when(
-                isset($request['start_date']) && !empty($request['start_date']),
-                fn($q) => $q->whereDate('leads.created_at', '>=', $request['start_date'])
-            )
-            ->when(
-                isset($request['end_date']) && !empty($request['end_date']),
-                fn($q) => $q->whereDate('leads.created_at', '<=', $request['end_date'])
-            )
-            ->when(
-                isset($request['assign_to']) && count($request['assign_to']) > 0,
+                isset($request['assign_to']) && count($request['assign_to']) != 0,
                 fn($q) => $q->whereHas(
                     'assignees',
                     fn($assigneeQuery) =>
@@ -235,7 +205,8 @@ class TasksRepository
                     fn($assignByQuery) =>
                     $assignByQuery->where('users.id', $request['assign_by'])
                 )
-            );
+            )
+            ;
     }
 
 }

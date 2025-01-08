@@ -16,6 +16,7 @@ class RoleSeeder extends Seeder
     // php artisan db:seed --class=UserSeeder
     // php artisan db:seed --class=LeadsSeeder
     // php artisan db:seed --class=ClientSeeder
+    // php artisan db:seed --class=TasksSeeder
 
 
 
@@ -23,7 +24,7 @@ class RoleSeeder extends Seeder
     {
         //
 
-        $companyId = 1;
+        $companyId = 10;
 
         $rolesArray = [];
 

@@ -364,18 +364,9 @@ class TasksController extends Controller
     }
     public function view($id)
     {
-        $query = CRMLeads::query()->with([
-            'address' => fn($q) => $q
-                ->select(['id', 'street_address', 'postal_code', 'city_id', 'country_id'])
-                ->with([
-
-                    'city:id,name',
-                    'country:id,name'
-                ]),
-            'group:id,name,color',
-            'source:id,name,color',
+        $query = Tasks::query()->with([  
+            'project',   
             'stage:id,name,color',
-            'customFields',
             'assignedBy:id,name',
             'assignees' => fn($q) => $q
                 ->select(['users.id', 'users.name'])
@@ -384,7 +375,7 @@ class TasksController extends Controller
 
         $query = $this->applyTenantFilter($query, 'tasks');
 
-        $lead = $query->firstOrFail();
+        $task = $query->firstOrFail();
 
         // custom fields
 
@@ -396,46 +387,28 @@ class TasksController extends Controller
 
             // fetch already existing values
 
-            $cfOldValues = $this->customFieldService->getValuesForEntity($lead);
+            $cfOldValues = $this->customFieldService->getValuesForEntity($task);
         }
 
         // fetch teams actvities
-        $activitesQuery = $this->getActivites(\App\Models\CRM\CRMLeads::class, $id);
+        $activitesQuery = $this->getActivites(\App\Models\Tasks::class, $id);
         $activitesQuery = $this->applyTenantFilter($activitesQuery);
         // $activities = $activitesQuery->get();
 
         //  dd($activitesQuery->toArray());
 
-
-        // get proposals
-        $proposals = collect();
-        $proposals = $this->proposalService->getProposals(\App\Models\CRM\CRMLeads::class, $id);
-
-        // estimates
-        $estimates = collect();
-        $estimates = $this->estimateService->getEstimates(\App\Models\CRM\CRMLeads::class, $id);
-
-        // contracts
-
-        $contracts = collect();
-        $contracts = $this->contractService->getContracts(\App\Models\CRM\CRMLeads::class, $id);
-
         return view($this->getViewFilePath('view'), [
             'title' => 'View Task',
-            'lead' => $lead,
+            'task' => $task,
             'module' => PANEL_MODULES[$this->getPanelModule()]['tasks'],
-            'leadsGroups' => $this->leadsService->getLeadsGroups(),
-            'leadsSources' => $this->leadsService->getLeadsSources(),
-            'leadsStatus' => $this->leadsService->getLeadsStatus(),
+            'tasksStatus' => $this->tasksService->getTasksStatus(),
             'teamMates' => getTeamMates(),
             'cfOldValues' => $cfOldValues,
             'customFields' => $customFields,
             'activities' => $activitesQuery,
-            'countries' => Country::all(),
+            'projects' => $this->projectService->getAllProjects(),
             'permissions' => PermissionsHelper::getPermissionsArray('TASKS'),
-            'proposals' => $proposals,
-            'contracts' => $contracts,
-            'estimates' => $estimates,
+    
         ]);
     }
 

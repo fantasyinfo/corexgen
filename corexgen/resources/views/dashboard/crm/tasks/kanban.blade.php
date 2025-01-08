@@ -17,7 +17,7 @@
         <div class="row my-2">
             <div class="w-100 mx-auto">
                 <x-form-components.input-group type="search" name="search" id="searchFilter"
-                    placeholder="{{ __('Search... type, name, company name, title, email, phone ... ') }}"
+                    placeholder="{{ __('Search... title ... ') }}"
                     value="{{ request('search') }}" required class="custom-class border-radius" />
             </div>
         </div>

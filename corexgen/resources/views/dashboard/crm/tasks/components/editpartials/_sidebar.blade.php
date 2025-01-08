@@ -1,53 +1,4 @@
 <h6 class="detail-label">Sidebar (Edit)</h6>
-<div class="card  border-0  mb-4">
-    <div class="card-body d-flex gap-2">
-        <div class="stat-icon">
-            <i class="fas fa-dollar-sign"></i>
-        </div>
-        <div>
-            <h6 class="stat-label">Deal Value</h6>
-            <x-form-components.input-group-prepend-append prepend="$" append="USD" type="number" name="value"
-                id="value" placeholder="{{ __('New Development Project Lead') }}"
-                value="{{ old('value', $lead->value) }}" />
-        </div>
-
-    </div>
-</div>
-
-
-<div class="card   border-0  mb-4">
-    <div class="card-body d-flex gap-2">
-        <div class="stat-icon">
-            <i class="fas fa-clock"></i>
-        </div>
-        <div>
-
-            <h6 class="stat-label">Last Contact</h6>
-            <h3 class="stat-value">
-                <x-form-components.input-group type="date" placeholder="Select Date" name="last_contacted_date" id="last_contacted_date"
-                    value="{{ old('last_contacted_date', $lead->last_contacted_date) }}" />
-            </h3>
-
-        </div>
-    </div>
-</div>
-
-
-<div class="card  border-0  mb-4">
-
-    <div class="card-body d-flex gap-2">
-        <div class="stat-icon">
-            <i class="fas fa-calendar-check"></i>
-        </div>
-        <div>
-            <h6 class="stat-label">Follow Up</h6>
-            <x-form-components.input-group type="date" placeholder="Select Date" name="follow_up_date" id="follow_up_date"
-                value="{{ old('follow_up_date', $lead->follow_up_date) }}" />
-            </h3>
-        </div>
-    </div>
-</div>
-
 
 <div class="card  border-0  mb-4">
     <div class="card-body d-flex gap-2">
@@ -61,9 +12,6 @@
         </div>
     </div>
 </div>
-
-
-
 
 @if (isset($customFields) && $customFields->isNotEmpty())
 
