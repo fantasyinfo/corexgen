@@ -672,15 +672,15 @@ Route::middleware([
 
 
         // comments routes...
-        Route::post('/comment', [CommentsController::class, 'addLeadsComment'])->name('comment.create')->middleware('check.permission:TASKS.CREATE');
-        Route::delete('/comment/destroy/{id}', [CommentsController::class, 'destroyLeadsComment'])->name('comment.destroy')->middleware('check.permission:TASKS.DELETE');
+        Route::post('/comment', [CommentsController::class, 'addTasksComment'])->name('comment.create')->middleware('check.permission:TASKS.CREATE');
+        Route::delete('/comment/destroy/{id}', [CommentsController::class, 'destroyTasksComment'])->name('comment.destroy')->middleware('check.permission:TASKS.DELETE');
 
 
 
         // attachments routes
 
-        Route::post('/attachment', [AttachmentController::class, 'addLeadsAttachment'])->name('attachment.create')->middleware('check.permission:TASKS.CREATE');
-        Route::delete('/attachment/destroy/{id}', [AttachmentController::class, 'destroyLeadsAttachment'])->name('attachment.destroy')->middleware('check.permission:TASKS.DELETE');
+        Route::post('/attachment', [AttachmentController::class, 'addTasksAttachment'])->name('attachment.create')->middleware('check.permission:TASKS.CREATE');
+        Route::delete('/attachment/destroy/{id}', [AttachmentController::class, 'destroyTasksAttachment'])->name('attachment.destroy')->middleware('check.permission:TASKS.DELETE');
 
     });
 });
