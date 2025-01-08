@@ -76,6 +76,7 @@ return [
     'Hourly Rate' => 'Hourly Rate',
     'Check' => 'Check',
     'Due Date' => 'Due Date',
-    'Attach Files' => 'Attach Files'
+    'Attach Files' => 'Attach Files',
+    'Milestone' => 'Milestone'
 
 ];

@@ -70,6 +70,11 @@ class Tasks extends Model implements Auditable
     }
 
 
+    public function milestone()
+    {
+        return $this->hasOne(Milestone::class, 'id','milestone_id');
+    }
+
 
     // Belongs to user who assigned it
     public function assignedBy()

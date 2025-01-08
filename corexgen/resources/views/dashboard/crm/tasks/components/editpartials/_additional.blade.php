@@ -1,5 +1,23 @@
 <div class="col-md-6">
     <h6 class="detail-label">Additional Information</h6>
+  
+    <div class="detail-group">
+        <x-form-components.input-label for="milestone_id">
+            {{ __('tasks.Milestone') }}
+        </x-form-components.input-label>
+        <select class="form-select searchSelectBox" name="milestone_id" id="milestone_id">
+            <option>Select Milestone (optional)</option>
+            @foreach ($milestones as $ml)
+                <option value="{{ $ml->id }}"
+                    {{ old('milestone_id', $task->milestone_id) == $ml->id ? 'selected' : '' }}>
+                    {{ $ml->name }}</option>
+            @endforeach
+        </select>
+        @error('milestone_id')
+            <span class="text-danger">{{ $message }}</span>
+        @enderror
+    </div>
+
     <div class="detail-group">
         <x-form-components.input-label for="priority" required>
             {{ __('tasks.Priority') }}

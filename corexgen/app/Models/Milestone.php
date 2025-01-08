@@ -26,6 +26,9 @@ class Milestone extends Model
         return $this->belongsTo(Project::class, 'project_id');
     }
 
+    public function tasks(){
+        return $this->belongsTo(Tasks::class, 'milestone_id');
+    }
     protected static function boot()
     {
         parent::boot();

@@ -9,6 +9,7 @@ use App\Http\Requests\ProjectEditRequest;
 use App\Http\Requests\ProjectRequest;
 use App\Models\Milestone;
 use App\Models\Project;
+use App\Models\Timesheet;
 use App\Services\ContractService;
 use App\Services\EstimateService;
 use App\Services\ProposalService;
@@ -420,6 +421,13 @@ class ProjectController extends Controller
         $milestones = collect();
         $milestones = $this->applyTenantFilter(Milestone::where('project_id', $id))->get();
 
+        // timesheets
+        $timesheets = collect();
+        $taskIds = $tasks->pluck('id');
+        $timesheets = $this->applyTenantFilter(Timesheet::whereIn('task_id', $taskIds))->get();
+
+
+
 
         return view($this->getViewFilePath('view'), [
             'title' => 'View Project',
@@ -434,7 +442,8 @@ class ProjectController extends Controller
             'contracts' => $contracts,
             'estimates' => $estimates,
             'tasks' => $tasks,
-            'milestones' => $milestones
+            'milestones' => $milestones,
+            'timesheets' => $timesheets
         ]);
     }
 

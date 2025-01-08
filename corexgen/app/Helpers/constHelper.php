@@ -251,6 +251,13 @@ PermissionsHelper::initializePermissions();
         'for' => 'company',
         'is_feature' => true,
     ],
+    PermissionsHelper::$plansPermissionsKeys['TIMESHEETS'] => [
+        'name' => 'TIMESHEETS',
+        'id' => PermissionsHelper::getParentPermissionId('154'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['TIMESHEETS'],
+        'for' => 'company',
+        'is_feature' => false,
+    ],
 ]);
 
 // super panel menus

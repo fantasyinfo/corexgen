@@ -647,6 +647,19 @@ Route::middleware([
         Route::get('/milestones/edit/{id}', [ProjectController::class, 'editMilestones'])->name('editMilestones')->middleware('check.permission:MILESTONES.UPDATE');
         Route::delete('/milestones/destroy/{id}', [ProjectController::class, 'destroyMilestones'])->name('destroyMilestones')->middleware('check.permission:MILESTONES.DELETE');
 
+
+         // timesheets
+
+         Route::get('/timesheets', [ProjectController::class, 'indexTimesheets'])->name('indexTimesheets')->middleware('check.permission:TIMESHEETS.READ_ALL');
+         Route::post('/timesheets', [ProjectController::class, 'storeTimesheets'])->name('storeTimesheets')->middleware('check.permission:TIMESHEETS.CREATE');
+         Route::put('/timesheets', [ProjectController::class, 'updateTimesheets'])->name('updateTimesheets')->middleware('check.permission:TIMESHEETS.UPDATE');
+ 
+ 
+         // create, edit, change status, delete
+         Route::get('/timesheets/create', [ProjectController::class, 'createTimesheets'])->name('createTimesheets')->middleware('check.permission:TIMESHEETS.CREATE');
+         Route::get('/timesheets/edit/{id}', [ProjectController::class, 'editTimesheets'])->name('editTimesheets')->middleware('check.permission:TIMESHEETS.UPDATE');
+         Route::delete('/timesheets/destroy/{id}', [ProjectController::class, 'destroyTimesheets'])->name('destroyTimesheets')->middleware('check.permission:TIMESHEETS.DELETE');
+
     });
 
       // tasks routes
@@ -694,6 +707,9 @@ Route::middleware([
         Route::post('/attachment', [AttachmentController::class, 'addTasksAttachment'])->name('attachment.create')->middleware('check.permission:TASKS.CREATE');
         Route::delete('/attachment/destroy/{id}', [AttachmentController::class, 'destroyTasksAttachment'])->name('attachment.destroy')->middleware('check.permission:TASKS.DELETE');
 
+
+        // 
+        Route::get('/assignee/{taskid}', [TasksController::class, 'getAssignee'])->name('getAssignee');
     });
 });
 

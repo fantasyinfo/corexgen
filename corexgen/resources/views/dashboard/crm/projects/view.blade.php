@@ -440,6 +440,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#timesheets">
+                                <i class="fas fa-clock me-2"></i>Timesheets
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" data-bs-toggle="tab" href="#milestones">
                                 <i class="fas fa-rocket me-2"></i>Milestones
                             </a>
@@ -506,6 +511,9 @@
 
                         <div class="tab-pane fade" id="tasks">
                             @include('dashboard.crm.projects.components._tasks')
+                        </div>
+                        <div class="tab-pane fade" id="timesheets">
+                            @include('dashboard.crm.projects.components._timesheets')
                         </div>
                         <div class="tab-pane fade" id="milestones">
                             @include('dashboard.crm.projects.components._milestones')
