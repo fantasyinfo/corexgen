@@ -12,7 +12,11 @@
                 $dateFormat = getSettingValue('Date Format') ?: 'd M Y, h:i A';
             }
 
-            $initialTime = now()->setTimezone($timezone);
+            $initialTime = 'UTC';
+            if(in_array($timezone, timezone_identifiers_list())){
+
+                $initialTime = now()->setTimezone($timezone);
+            }
         @endphp
         <span id="live-datetime">{{ $initialTime->format($dateFormat) }}</span>
         <span>({{ $timezone }})</span>

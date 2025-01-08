@@ -1,8 +1,8 @@
 <div class="mt-4">
     <x-form-components.input-label for="detailsTextArea">
-        {{ __('leads.Additional Details') }}
+        {{ __('tasks.Description') }}
     </x-form-components.input-label>
-    <textarea name="details" id="detailsTextArea" class="form-control wysiwyg-editor" rows="5">{{ old('details') }}</textarea>
+    <textarea name="description" id="detailsTextArea" class="form-control wysiwyg-editor" rows="5">{{ old('description') }}</textarea>
 </div>
 
 @push('scripts')
@@ -20,7 +20,7 @@
                 content_css: currentTheme === 'dark' ? 'dark' : 'default',
                 setup: function(editor) {
                     editor.on('init', function() {
-                        editor.setContent(`{!! $lead->details !!}`);
+                        editor.setContent(`{!! $task->description !!}`);
                     });
                 },
                 menubar: true,

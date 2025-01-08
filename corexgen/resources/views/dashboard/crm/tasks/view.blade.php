@@ -416,7 +416,7 @@
         <!-- Lead Header -->
         <div class="card mb-4 border-0 pb-0 lead-header-card">
             <div class="card-body">
-                @include('dashboard.crm.leads.components._header')
+                @include('dashboard.crm.tasks.components._header')
             </div>
         </div>
 
@@ -434,21 +434,7 @@
                             </a>
                         </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#proposals">
-                                <i class="fas fa-flag me-2"></i>Proposals
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#estimates">
-                                <i class="fas fa-file-signature me-2"></i>Estimates
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#contracts">
-                                <i class="fas fa-file-contract me-2"></i>Contracts
-                            </a>
-                        </li>
+                      
                         <li class="nav-item">
                             <a class="nav-link" data-bs-toggle="tab" href="#activities">
                                 <i class="fas fa-history me-2"></i>Activities
@@ -486,40 +472,40 @@
                             <div class="row g-4" id="viewDetails">
                                 <div class="col-lg-7 main-content-view">
                                     <div class="row">
-                                        @include('dashboard.crm.leads.components.viewpartials._basic')
-                                        @include('dashboard.crm.leads.components.viewpartials._additional')
+                                        @include('dashboard.crm.tasks.components.viewpartials._basic')
+                                        @include('dashboard.crm.tasks.components.viewpartials._additional')
                                     </div>
-                                    @include('dashboard.crm.leads.components.viewpartials._address')
-                                    @include('dashboard.crm.leads.components.viewpartials._details')
+                                  
+                                    @include('dashboard.crm.tasks.components.viewpartials._details')
                                 </div>
                                 <div class="col-lg-1 divider-container">
                                     <div class="divider"></div>
                                 </div>
                                 <div class="col-lg-4 sidebar-view">
-                                    @include('dashboard.crm.leads.components.viewpartials._sidebar')
+                                    @include('dashboard.crm.tasks.components.viewpartials._sidebar')
                                 </div>
                             </div>
                             <!-- Edit Details -->
                             <div class="row g-4" id="editDetails">
-                                <form id="leadEditForm" method="POST" action="{{ route(getPanelRoutes('leads.update')) }}">
+                                <form id="leadEditForm" method="POST" action="{{ route(getPanelRoutes('tasks.update')) }}">
                                     @csrf
                                     @method('PUT')
-                                    <input type="hidden" name="id" value="{{ $lead->id }}" />
+                                    <input type="hidden" name="id" value="{{ $task->id }}" />
                                     <input type="hidden" name="from_view" value="true" />
                                     <div class="row">
                                         <div class="col-lg-7 main-content-view">
                                             <div class="row">
-                                                @include('dashboard.crm.leads.components.editpartials._basic')
-                                                @include('dashboard.crm.leads.components.editpartials._additional')
+                                                @include('dashboard.crm.tasks.components.editpartials._basic')
+                                                @include('dashboard.crm.tasks.components.editpartials._additional')
                                             </div>
-                                            @include('dashboard.crm.leads.components.editpartials._address')
-                                            @include('dashboard.crm.leads.components.editpartials._details')
+                          
+                                            @include('dashboard.crm.tasks.components.editpartials._details')
                                         </div>
                                         <div class="col-lg-1 divider-container">
                                             <div class="divider"></div>
                                         </div>
                                         <div class="col-lg-4 sidebar-view">
-                                            @include('dashboard.crm.leads.components.editpartials._sidebar')
+                                            @include('dashboard.crm.tasks.components.editpartials._sidebar')
                                         </div>
                                     </div>
                                 </form>
@@ -528,29 +514,19 @@
                         </div>
 
 
-                        <div class="tab-pane fade" id="proposals">
-                            @include('dashboard.crm.leads.components._proposals')
-                        </div>
-
-                        <div class="tab-pane fade" id="estimates">
-                            @include('dashboard.crm.leads.components._estimates')
-                        </div>
-                        <div class="tab-pane fade" id="contracts">
-                            @include('dashboard.crm.leads.components._contracts')
-                        </div>
 
                         <div class="tab-pane fade" id="activities">
-                            @include('dashboard.crm.leads.components._activity')
+                            @include('dashboard.crm.tasks.components._activity')
                         </div>
 
                         <!-- Notes Tab -->
                         <div class="tab-pane fade" id="notes">
-                            @include('dashboard.crm.leads.components._notes')
+                            @include('dashboard.crm.tasks.components._notes')
                         </div>
 
                         <!-- Files Tab -->
                         <div class="tab-pane fade" id="files">
-                            @include('dashboard.crm.leads.components._attachments')
+                            @include('dashboard.crm.tasks.components._attachments')
                         </div>
                     </div>
                 </div>

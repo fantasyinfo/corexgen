@@ -14,7 +14,7 @@ class UserSeeder extends Seeder
 
     protected $companyId;
 
-    public function __construct( int $companyId = 1) {
+    public function __construct( int $companyId = 10) {
         $this->companyId = $companyId;
     }
     public function run(): void
@@ -28,7 +28,7 @@ class UserSeeder extends Seeder
             $usersArray[] = [
                 'name' => fake()->name(),
                 'email' => fake()->safeEmail(), // Use static emails for debugging
-                'password' => bcrypt('password'), // Hash passwords
+                'password' => 1234, // Hash passwords
                 'role_id' => $rolesIds[array_rand($rolesIds)],
                 'is_tenant' => false,
                 'company_id' => $this->companyId,

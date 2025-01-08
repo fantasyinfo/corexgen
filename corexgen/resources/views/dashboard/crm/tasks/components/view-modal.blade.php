@@ -122,7 +122,7 @@
             <!-- Modal Header -->
             <div class="modal-header">
                 <div class="d-flex align-items-center">
-                    <h5 class="modal-title mb-0" id="title">Lead Title</h5>
+                    <h5 class="modal-title mb-0" id="title">Tasks Title</h5>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -133,9 +133,9 @@
 
                 <div class="mt-4">
 
-                    @include('dashboard.crm.leads.components.modal._detailsShow')
+                    @include('dashboard.crm.tasks.components.modal._detailsShow')
 
-                    @include('dashboard.crm.leads.components.modal._assignees')
+                    @include('dashboard.crm.tasks.components.modal._assignees')
 
                 </div>
                 

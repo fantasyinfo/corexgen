@@ -2,66 +2,64 @@
     <h6 class="detail-label">Basic Information (Edit)</h6>
 
     <div class="detail-group">
-        <x-form-components.input-label for="clientType" required>
-            {{ __('leads.Type') }}
-        </x-form-components.input-label>
-        <select class="form-select" name="type" id="clientType" required>
-            <option value="Individual" {{ $lead->type == 'Company' ? 'selected' : '' }}>Individual</option>
-            <option value="Company" {{ $lead->type == 'Company' ? 'selected' : '' }}>
-                Company</option>
-        </select>
-    </div>
-
-    <div class="detail-group">
         <x-form-components.input-label for="title" required>
-            {{ __('leads.Title') }}
+            {{ __('tasks.Title') }}
         </x-form-components.input-label>
-        <x-form-components.input-group type="text" name="title" id="title"
-            placeholder="{{ __('New Development Project Lead') }}" value="{{ old('title', $lead->title) }}" required />
+        <x-form-components.input-group type="text" name="title" id="title" placeholder="{{ __('Enter Title') }}"
+            value="{{ old('title', $task->title) }}" required class="custom-class" />
     </div>
-
     <div class="detail-group">
-        <x-form-components.input-label for="companyName" required>
-            {{ __('leads.Company Name') }}
+        <x-form-components.input-label for="hourly_rate">
+            {{ __('tasks.Hourly Rate') }}
         </x-form-components.input-label>
-
-        <x-form-components.input-group type="text" name="company_name" id="companyName"
-            placeholder="{{ __('Abc Pvt Ltd') }}" value="{{ old('company_name', $lead->company_name) }}" />
+        <x-form-components.input-group-prepend-append type="number" class="custom-class" id="hourly_rate"
+            step="0.001" prepend="{{ getSettingValue('Currency Symbol') }}"
+            append="{{ getSettingValue('Currency Code') }}" name="hourly_rate" placeholder="{{ __('99999') }}"
+            value="{{ old('hourly_rate', $task->hourly_rate) }}" />
     </div>
-
     <div class="detail-group">
-        <x-form-components.input-label for="firstName" required>
-            {{ __('leads.First Name') }}
+        <x-form-components.input-label for="start_date">
+            {{ __('tasks.Start Date') }}
         </x-form-components.input-label>
-        <x-form-components.input-group type="text" name="first_name" id="firstName"
-            placeholder="{{ __('First Name') }}" value="{{ old('first_name', $lead->first_name) }}" required />
+        <x-form-components.input-group type="date" placeholder="Select Date" name="start_date" id="start_date"
+            value="{{ old('start_date', $task->start_date) }}" class="custom-class" />
     </div>
-
     <div class="detail-group">
-        <x-form-components.input-label for="lastName" required>
-            {{ __('leads.Last Name') }}
+        <x-form-components.input-label for="due_date">
+            {{ __('tasks.Due Date') }}
         </x-form-components.input-label>
-        <x-form-components.input-group type="text" name="last_name" id="lastName"
-            placeholder="{{ __('Last Name') }}" value="{{ old('last_name', $lead->last_name) }}" required />
+        <x-form-components.input-group type="date" placeholder="Select Date" name="due_date" id="due_date"
+            value="{{ old('due_date', $task->due_date) }}" class="custom-class" />
     </div>
-
-
-
     <div class="detail-group">
-        <x-form-components.input-label for="emails">
-            {{ __('leads.Email') }}
+        <x-form-components.input-label for="related_to" required>
+            {{ __('tasks.Related To') }}
         </x-form-components.input-label>
-        <x-form-components.input-group type="email" name="email" id="email"
-            placeholder="{{ __('Email Address') }}" value="{{ old('email', $lead->email) }}" required />
+        <select class="form-select" name="related_to" id="related_to" required>
+            @foreach (TASKS_RELATED_TO['STATUS'] as $key => $pri)
+                <option value="{{ $key }}"
+                    {{ old('related_to', $task->related_to) == $key ? 'selected' : '' }}>
+                    {{ $pri }}</option>
+            @endforeach
+        </select>
+        @error('related_to')
+            <span class="text-danger">{{ $message }}</span>
+        @enderror
     </div>
-
-
     <div class="detail-group">
-        <x-form-components.input-label for="phones">
-            {{ __('leads.Phone') }}
+        <x-form-components.input-label for="project_id">
+            {{ __('tasks.Project') }}
         </x-form-components.input-label>
-        <x-form-components.input-group type="tel" name="phone" id="phone"
-            placeholder="{{ __('Phone Number') }}" value="{{ old('phone', $lead->phone) }}" required />
+        <select class="form-select searchSelectBox" name="project_id" id="project_id">
+            @foreach ($projects as $pro)
+                <option value="{{ $pro->id }}"
+                    {{ old('project_id', $task->project_id) == $pro->id ? 'selected' : '' }}>
+                    {{ $pro->title }}</option>
+            @endforeach
+        </select>
+        @error('project_id')
+            <span class="text-danger">{{ $message }}</span>
+        @enderror
     </div>
 
 </div>

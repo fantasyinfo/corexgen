@@ -4,9 +4,9 @@
 
 <div class="notes-section">
     <div class="mb-3">
-        <form id="commentForm" method="POST" action="{{ route(getPanelRoutes('leads.comment.create')) }}">
+        <form id="commentForm" method="POST" action="{{ route(getPanelRoutes('tasks.comment.create')) }}">
             @csrf
-            <input type="hidden" name="id" value="{{ $lead->id }}" />
+            <input type="hidden" name="id" value="{{ $task->id }}" />
             <textarea name='comment' class="form-control wysiwyg-editor-comment" rows="3" placeholder="Add a note..."></textarea>
             <div class="d-flex justify-content-center my-2">
                 <button form="commentForm" class="btn btn-primary mt-2" type="submit">Add Note</button>
@@ -23,8 +23,8 @@
                 $deletePermission = true;
             }
         @endphp
-        @if ($lead?->comments?->count() > 0)
-            @foreach ($lead?->comments as $comment)
+        @if ($task?->comments?->count() > 0)
+            @foreach ($task?->comments as $comment)
                 <div class="comment-item mb-4">
                     <div class="d-flex">
                         <!-- User Avatar -->
@@ -51,7 +51,7 @@
                                 </h6>
                                 @if ($deletePermission)
                                     <form id="deleteComment{{ $comment->id }}" method="POST"
-                                        action="{{ route(getPanelRoutes('leads.comment.destroy'), ['id' => $comment->id]) }}">
+                                        action="{{ route(getPanelRoutes('tasks.comment.destroy'), ['id' => $comment->id]) }}">
                                         @csrf
                                         @method('DELETE')
                                         <button title="Delete Comment" data-toggle="tooltip"

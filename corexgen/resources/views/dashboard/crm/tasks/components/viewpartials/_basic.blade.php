@@ -1,31 +1,27 @@
 <div class="col-md-6">
     <h6 class="detail-label">Basic Information</h6>
     <div class="detail-group">
-        <label>Type</label>
-        <p>{{ $lead->type }}</p>
-    </div>
-    <div class="detail-group">
         <label>Title</label>
-        <p>{{ $lead->title }}</p>
+        <p>{{ $task->title }}</p>
     </div>
     <div class="detail-group">
-        <label>Company Name</label>
-        <p>{{ $lead->company_name }}</p>
+        <label>Hourly Rate</label>
+        <p>{{ number_format($task->hourly_rate,2) }}</p>
     </div>
     <div class="detail-group">
-        <label>First Name</label>
-        <p>{{ $lead->first_name }}</p>
+        <label>Start Date</label>
+        <p>{{ formatDateTime($task->start_date) }}</p>
     </div>
     <div class="detail-group">
-        <label>Last Name</label>
-        <p>{{ $lead->last_name }}</p>
+        <label>Due Date</label>
+        <p>{{ formatDateTime($task->due_date) }}</p>
     </div>
     <div class="detail-group">
-        <label>Email</label>
-        <p><a href="mailto:{{ $lead->email }}">{{ $lead->email }}</a></p>
+        <label>Related to</label>
+        <p>{{ ucwords($task->related_to) }}</p>
     </div>
     <div class="detail-group">
-        <label>Phone</label>
-        <p><a href="tel:{{ $lead->phone }}">{{ $lead->phone }}</a></p>
+        <label>Project</label>
+        <p><a href="{{ route(getPanelRoutes('projects.view'),['id' => $task?->project?->id]) }}">{{ $task?->project?->title }}</a></p>
     </div>
 </div>
