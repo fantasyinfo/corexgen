@@ -9,6 +9,7 @@ use App\Http\Requests\InvoiceRequest;
 use App\Models\CRM\CRMClients;
 use App\Models\CRM\CRMLeads;
 use App\Models\Invoice;
+use App\Models\Timesheet;
 use App\Services\InvoiceService;
 use App\Services\ProductServicesService;
 use App\Services\TasksService;
@@ -173,9 +174,10 @@ class InvoiceController extends Controller
      */
     public function store(InvoiceRequest $request)
     {
-   
+
 
         $this->tenantRoute = $this->getTenantRoute();
+
 
         try {
 
@@ -187,6 +189,10 @@ class InvoiceController extends Controller
             $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['INVOICES']]), '+', '1');
 
 
+            if ($request->validated()['timesheet_id'] && $request->validated()['timesheet_id'] > 0) {
+                Timesheet::find($request->validated()['timesheet_id'])->update(['invoice_generated' => 1]);
+                return response()->json($invoice);
+            }
 
             return redirect()->route($this->tenantRoute . 'invoices.index')
                 ->with('success', 'Invoices created successfully.');
@@ -245,7 +251,7 @@ class InvoiceController extends Controller
 
         $clients = $this->applyTenantFilter(CRMClients::query())->select('id', 'first_name', 'last_name', 'type', 'company_name', 'primary_email')->get();
 
-    
+
         $tasks = collect();
         $tasks = $this->taskService->getAllTasks();
 
@@ -332,7 +338,7 @@ class InvoiceController extends Controller
             $invoice = $this->applyTenantFilter(Invoice::find($id));
 
             if ($action === 'SENT') {
-                return $this->sendContract($id);
+                return $this->sendInvoice($id);
             }
 
             // Handle other status changes
@@ -398,12 +404,16 @@ class InvoiceController extends Controller
     {
         $invoiceQuery = $this->applyTenantFilter(
             Invoice::query()
-                ->with(['client','task','project',
-                'company.addresses' => function ($query) {
-                    $query->with(['country', 'city'])
-                        ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
-                }
-                
+                ->with([
+                    'client',
+                    'task',
+                    'project',
+     
+                    'company.addresses' => function ($query) {
+                        $query->with(['country', 'city'])
+                            ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
+                    }
+
                 ])
                 ->where('id', '=', $id)
         );
@@ -430,12 +440,15 @@ class InvoiceController extends Controller
     {
         $invoiceQuery = $this->applyTenantFilter(
             Invoice::query()
-                ->with(['client','task','project',
-                'company.addresses' => function ($query) {
-                    $query->with(['country', 'city'])
-                        ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
-                }
-                
+                ->with([
+                    'client',
+                    'task',
+                    'project',
+                    'company.addresses' => function ($query) {
+                        $query->with(['country', 'city'])
+                            ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
+                    }
+
                 ])
                 ->where('id', '=', $id)
         );
@@ -463,12 +476,15 @@ class InvoiceController extends Controller
     {
         $invoiceQuery = $this->applyTenantFilter(
             Invoice::query()
-                ->with(['client','task','project',
-                'company.addresses' => function ($query) {
-                    $query->with(['country', 'city'])
-                        ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
-                }
-                
+                ->with([
+                    'client',
+                    'task',
+                    'project',
+                    'company.addresses' => function ($query) {
+                        $query->with(['country', 'city'])
+                            ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
+                    }
+
                 ])
                 ->where('id', '=', $id)
         );
@@ -492,7 +508,7 @@ class InvoiceController extends Controller
      * @param mixed $id
 
      */
-    public function sendContract($id)
+    public function sendInvoice($id)
     {
         $fromAPI = false;
         if (isset($_SERVER['QUERY_STRING']) && Str::contains($_SERVER['QUERY_STRING'], 'api=true')) {
@@ -500,38 +516,35 @@ class InvoiceController extends Controller
         }
 
         try {
-            $invoice = $this->applyTenantFilter(
+            $invoiceQuery = $this->applyTenantFilter(
                 Invoice::query()
                     ->with([
-                        'typable',
-                        'template',
+                        'client',
+                        'task',
+                        'project',
                         'company.addresses' => function ($query) {
                             $query->with(['country', 'city'])
                                 ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
                         }
+
                     ])
-            )->findOrFail($id);
+                    ->where('id', '=', $id)
+            );
+
+            $invoice = $invoiceQuery->firstOrFail();
 
             // Get recipient email based on typable type
-            $toEmail = $invoice->typable_type === CRMLeads::class
-                ? $invoice->typable->email
-                : $invoice->typable->primary_email;
+            $toEmail = $invoice->client->primary_email;
 
             if (empty($toEmail)) {
-                $errorResponse = ['error' => 'No email found for this client/lead'];
+                $errorResponse = ['error' => 'No email found for this client'];
                 return $fromAPI
                     ? response()->json($errorResponse)
                     : redirect()->back()->with('error', $errorResponse['error']);
             }
 
             // Send invoice email
-            $this->invoiceService->sendContractOnEmail($invoice, $this->getViewFilePath('print'));
-
-            // Update invoice status
-            // if($invoice->status != 'ACCEPTED'){
-
-            //     $invoice->update(['status' => 'SENT']);
-            // }
+            $this->invoiceService->sendInvoiceOnEmail($invoice, $this->getViewFilePath('print'));
 
             $successResponse = ['success' => 'Invoice has been sent in the background job and will be delivered soon.'];
             return $fromAPI

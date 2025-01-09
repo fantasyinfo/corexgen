@@ -1,7 +1,5 @@
-<!-- File: resources/views/proposals/print.blade.php -->
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -84,6 +82,11 @@
         }
 
         /* Table Styles */
+        .table-responsive {
+            width: 100%;
+            margin-bottom: 1cm;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -116,44 +119,26 @@
             text-align: right;
         }
 
+        .text-center {
+            text-align: center;
+        }
+
         /* Summary Section */
+        tfoot {
+            width: 100%;
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
+
         tfoot tr {
             background-color: #f8f9fa !important;
             font-weight: bold;
+            width: 100%;
         }
 
         tfoot td {
             padding: 0.3cm;
             border-top: 2px solid #dee2e6;
-        }
-
-        /* Signature Section */
-        .acceptance-details {
-            margin-top: 2cm;
-            page-break-before: always;
-            page-break-inside: avoid;
-        }
-
-        .signature-container {
-            margin-top: 1cm;
-            border: 1px solid #dee2e6;
-            padding: 0.5cm;
-            background-color: #fff;
-        }
-
-        .signature-image {
-            max-height: 4cm;
-            width: auto;
-            display: block;
-        }
-
-        /* Executive Summary */
-        .section-title {
-            font-size: 18pt;
-            color: #000;
-            margin-bottom: 0.8cm;
-            padding-bottom: 0.3cm;
-            border-bottom: 1px solid #dee2e6;
         }
 
         /* Status Badge */
@@ -166,6 +151,29 @@
             font-size: 10pt;
         }
 
+        /* Section Styles */
+        .section-title {
+            font-size: 18pt;
+            color: #000;
+            margin-bottom: 0.8cm;
+            padding-bottom: 0.3cm;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .card {
+            margin-bottom: 1cm;
+        }
+
+        .card-header {
+            padding: 0.5cm 0;
+            border-bottom: 2px solid #dee2e6;
+            margin-bottom: 0.5cm;
+        }
+
+        .card-body {
+            padding: 0.5cm 0;
+        }
+
         /* Print Optimizations */
         @media print {
             .no-print {
@@ -175,6 +183,31 @@
             a {
                 text-decoration: none;
                 color: #000;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            thead {
+                display: table-header-group;
+            }
+
+            tbody {
+                display: table-row-group;
+            }
+
+            tfoot {
+                display: table-row-group;
+            }
+
+            tr {
+                page-break-inside: avoid;
+            }
+
+            td {
+                page-break-inside: avoid;
             }
 
             .table-responsive {
@@ -191,16 +224,9 @@
                 border-bottom: 2px solid #dee2e6 !important;
                 padding: 0.5cm 0 !important;
             }
-
-            .alert {
-                border: 1px solid #28a745 !important;
-                padding: 0.5cm !important;
-                margin: 0.5cm 0 !important;
-            }
         }
     </style>
 </head>
-
 <body>
     <div class="invoice-container">
         <!-- Header Section -->
@@ -256,26 +282,24 @@
                 @endphp
 
                 @if (!empty($products))
-                    <div class="card mb-4">
-                        <div class="card-header table-bg">
+                    <div class="card">
+                        <div class="card-header">
                             <h5 class="mb-0">
                                 <i class="fas fa-file-invoice me-2"></i>
-                                Proposal Details
+                                Invoice Details
                             </h5>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
                                 <table class="table table-striped table-hover">
-                                    <thead class="table-primary">
+                                    <thead>
                                         <tr>
                                             <th>Title</th>
                                             <th>Description</th>
                                             <th class="text-center">Qty / Per Hr</th>
-                                            <th class="text-end" width="200px;">Rate
-                                                ({{ getSettingValue('Currency Symbol') }})</th>
+                                            <th class="text-end">Rate ({{ getSettingValue('Currency Symbol') }})</th>
                                             <th class="text-end">Tax</th>
-                                            <th class="text-end" width="200px;">Amount
-                                                ({{ getSettingValue('Currency Symbol') }})</th>
+                                            <th class="text-end">Amount ({{ getSettingValue('Currency Symbol') }})</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -288,37 +312,22 @@
                                                 $taxAmount = ($amount * $tax) / 100;
                                             @endphp
                                             <tr>
-                                                <td>
-                                                    <span class="fw-medium">{{ $product['title'] }}</span>
-                                                </td>
-                                                <td>
-                                                    <small class="text-muted">{{ $product['description'] }}</small>
-                                                </td>
-                                                <td class="text-center">
-                                                    <span class="badge bg-light text-dark">
-                                                        {{ number_format($qty) }}
-
-                                                    </span>
-                                                </td>
+                                                <td>{{ $product['title'] }}</td>
+                                                <td>{{ $product['description'] }}</td>
+                                                <td class="text-center">{{ number_format($qty) }}</td>
                                                 <td class="text-end">
                                                     {{ getSettingValue('Currency Symbol') }}
                                                     {{ number_format($rate, 2) }}
-                                                    {{ getSettingValue('Currency Code') }}
                                                 </td>
-                                                <td class="text-end">
-                                                    <span class="text-muted">
-                                                        {{ number_format($tax, 1) }}%
-                                                    </span>
-                                                </td>
+                                                <td class="text-end">{{ number_format($tax, 1) }}%</td>
                                                 <td class="text-end">
                                                     {{ getSettingValue('Currency Symbol') }}
                                                     {{ number_format($amount, 2) }}
-                                                    {{ getSettingValue('Currency Code') }}
                                                 </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
-                                    <tfoot class="table-bg">
+                                    <tfoot>
                                         @php
                                             $subTotal = array_reduce(
                                                 $products,
@@ -344,51 +353,46 @@
                                             $adjustment = floatval($additionalFields['adjustment'] ?? 0);
                                             $total = $subTotal - $discountAmount + $totalTax + $adjustment;
                                         @endphp
-
                                         <tr>
                                             <td colspan="5" class="text-end">Sub Total:</td>
-                                            <td class="text-end"> {{ getSettingValue('Currency Symbol') }}
+                                            <td class="text-end">
+                                                {{ getSettingValue('Currency Symbol') }}
                                                 {{ number_format($subTotal, 2) }}
-                                                {{ getSettingValue('Currency Code') }}</td>
+                                            </td>
                                         </tr>
                                         @if ($discount > 0)
                                             <tr>
-                                                <td colspan="5" class="text-end text-danger">
-                                                    Discount ({{ number_format($discount, 1) }}%):
-                                                </td>
-                                                <td class="text-end text-danger">
-                                                    {{ getSettingValue('Currency Symbol') }}
-                                                    -{{ number_format($discountAmount, 2) }}
-                                                    {{ getSettingValue('Currency Code') }}
+                                                <td colspan="5" class="text-end">Discount
+                                                    ({{ number_format($discount, 1) }}%):</td>
+                                                <td class="text-end">
+                                                    -{{ getSettingValue('Currency Symbol') }}
+                                                    {{ number_format($discountAmount, 2) }}
                                                 </td>
                                             </tr>
                                         @endif
                                         @if ($totalTax > 0)
                                             <tr>
                                                 <td colspan="5" class="text-end">Tax:</td>
-                                                <td class="text-end"> {{ getSettingValue('Currency Symbol') }}
+                                                <td class="text-end">
+                                                    {{ getSettingValue('Currency Symbol') }}
                                                     {{ number_format($totalTax, 2) }}
-                                                    {{ getSettingValue('Currency Code') }}</td>
+                                                </td>
                                             </tr>
                                         @endif
                                         @if ($adjustment != 0)
                                             <tr>
-                                                <td colspan="5"
-                                                    class="text-end {{ $adjustment < 0 ? 'text-danger' : 'text-success' }}">
-                                                    Adjustment:
-                                                </td>
-                                                <td
-                                                    class="text-end {{ $adjustment < 0 ? 'text-danger' : 'text-success' }}">
-                                                    {{ getSettingValue('Currency Symbol') }}
-                                                    {{ $adjustment > 0 ? '+' : '' }}{{ number_format($adjustment, 2) }}
-                                                    {{ getSettingValue('Currency Code') }}
+                                                <td colspan="5" class="text-end">Adjustment:</td>
+                                                <td class="text-end">
+                                                    {{ $adjustment > 0 ? '+' : '-' }}{{ getSettingValue('Currency Symbol') }}
+                                                    {{ number_format(abs($adjustment), 2) }}
                                                 </td>
                                             </tr>
                                         @endif
                                         <tr class="fw-bold">
                                             <td colspan="5" class="text-end">Total:</td>
-                                            <td class="text-end"> {{ getSettingValue('Currency Symbol') }}
-                                                {{ number_format($total, 2) }} {{ getSettingValue('Currency Code') }}
+                                            <td class="text-end">
+                                                {{ getSettingValue('Currency Symbol') }}
+                                                {{ number_format($total, 2) }}
                                             </td>
                                         </tr>
                                     </tfoot>
@@ -398,13 +402,12 @@
                     </div>
                 @endif
             @endif
+
+            <!-- Notes Section -->
             <section>
                 <h2 class="section-title">Notes</h2>
                 <div class="invoice-body">
-
-
                     @if (!is_null(trim($invoice?->notes)))
-                        <h3 class="mt-4 mb-3">Notes</h3>
                         <div class="additional-details">
                             {!! $invoice?->notes !!}
                         </div>
@@ -412,9 +415,6 @@
                 </div>
             </section>
         </div>
-
-
     </div>
 </body>
-
 </html>

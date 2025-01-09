@@ -21,6 +21,7 @@ use App\Traits\SubscriptionUsageFilter;
 use Illuminate\Support\Facades\Auth;
 use App\Services\ClientService;
 use App\Services\CustomFieldService;
+use App\Services\InvoiceService;
 use App\Services\ProjectService;
 use App\Services\TasksService;
 use Illuminate\Support\Facades\DB;
@@ -74,6 +75,7 @@ class ProjectController extends Controller
 
     protected $clientService;
     protected $tasksService;
+    protected $invoiceService;
 
     public function __construct(
         ProposalService $proposalService,
@@ -82,7 +84,8 @@ class ProjectController extends Controller
         CustomFieldService $customFieldService,
         ProjectService $projectService,
         ClientService $clientService,
-        TasksService $tasksService
+        TasksService $tasksService,
+        InvoiceService $invoiceService,
     ) {
 
 
@@ -93,6 +96,7 @@ class ProjectController extends Controller
         $this->projectService = $projectService;
         $this->clientService = $clientService;
         $this->tasksService = $tasksService;
+        $this->invoiceService = $invoiceService;
     }
 
 
@@ -424,7 +428,13 @@ class ProjectController extends Controller
         // timesheets
         $timesheets = collect();
         $taskIds = $tasks->pluck('id');
-        $timesheets = $this->applyTenantFilter(Timesheet::whereIn('task_id', $taskIds)->with('task', 'user'))->get();
+        $timesheets = $this->applyTenantFilter(Timesheet::whereIn('task_id', $taskIds)->with('task', 'user','invoice'))->get();
+
+
+        // invoices
+
+        $invoices = collect();
+        $invoices = $this->invoiceService->getInvoices($id);
 
 
 
@@ -443,7 +453,8 @@ class ProjectController extends Controller
             'estimates' => $estimates,
             'tasks' => $tasks,
             'milestones' => $milestones,
-            'timesheets' => $timesheets
+            'timesheets' => $timesheets,
+            'invoices' => $invoices
         ]);
     }
 

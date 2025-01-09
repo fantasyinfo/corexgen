@@ -357,11 +357,11 @@
                         class="dt-link btn btn-outline-dark me-2">
                         View as client
                     </a>
-                    <button class="btn btn-outline-secondary me-2" onclick="generatePDF()">
+                    <button class="btn btn-outline-secondary me-2" onclick="printInvoice()">
                         <i class="bi bi-download me-2"></i>Download PDF
                     </button>
                     @if ($invoice?->status !== 'SUCCESS')
-                        <button class="btn btn-primary" onclick="sendProposal('{{ $invoice?->id }}')">
+                        <button class="btn btn-primary" onclick="sendInvoice('{{ $invoice?->id }}')">
                             <i class="bi bi-send me-2"></i>Send Invoice
                         </button>
                     @endif
@@ -376,9 +376,9 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <script>
-        function printProposal() {
+        function printInvoice() {
             // Open print view in a new window
 
             let _id = "{{ $invoice->id }}";
@@ -399,66 +399,9 @@
             };
         }
 
-        function generatePDF() {
-            window.scrollTo(0, 0);
+      
 
-            const element = document.querySelector('#printDom');
-            if (!element) {
-                console.error('Container not found');
-                return;
-            }
-
-            // Adjust layout for PDF
-            const opt = {
-                margin: [10, 10, 10, 10], // Adjust margins as needed
-                filename: `invoice-${new Date().getTime()}.pdf`,
-                image: {
-                    type: 'jpeg',
-                    quality: 0.98
-                },
-                html2canvas: {
-                    scale: 2, // Higher scale for better resolution
-                    useCORS: true,
-                    logging: true,
-                    backgroundColor: '#ffffff',
-                    scrollX: 0,
-                    scrollY: 0,
-                },
-                jsPDF: {
-                    unit: 'mm',
-                    format: 'a4',
-                    orientation: 'portrait',
-                }
-            };
-
-            // Add loading indicator
-            const loadingDiv = document.createElement('div');
-            loadingDiv.style.position = 'fixed';
-            loadingDiv.style.top = '50%';
-            loadingDiv.style.left = '50%';
-            loadingDiv.style.transform = 'translate(-50%, -50%)';
-            loadingDiv.style.padding = '20px';
-            loadingDiv.style.background = 'rgba(0,0,0,0.7)';
-            loadingDiv.style.color = 'white';
-            loadingDiv.style.borderRadius = '5px';
-            loadingDiv.style.zIndex = '9999';
-            loadingDiv.innerHTML = 'Generating PDF...';
-            document.body.appendChild(loadingDiv);
-
-            // Generate PDF
-            html2pdf().from(element).set(opt).save()
-                .then(() => {
-                    console.log('PDF generated successfully');
-                    document.body.removeChild(loadingDiv);
-                })
-                .catch(error => {
-                    console.error('PDF generation failed:', error);
-                    alert('Failed to generate PDF. Please try again.');
-                    document.body.removeChild(loadingDiv);
-                });
-        }
-
-        function sendProposal($id) {
+        function sendInvoice($id) {
             // console.log($id)a
             let baseUrl =
                 "{{ route(getPanelRoutes($module . '.sendInvoice'), ['id' => ':id']) }}";

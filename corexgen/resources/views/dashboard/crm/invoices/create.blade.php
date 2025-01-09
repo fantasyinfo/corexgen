@@ -15,14 +15,16 @@
         // prePrintR($tax->toArray());
 
     @endphp
-    
+
     <div class="container-fluid">
         <div class="row">
             <div class="justify-content-md-center col-lg-12">
                 <div class="card stretch stretch-full">
                     <form id="invoiceFieldsForm" action="{{ route(getPanelRoutes('invoices.store')) }}" method="POST">
                         @csrf
-
+                        @if ($id && $id > 0)
+                            <input type="hidden" name="project_id" value="{{ $id }}" />
+                        @endif
                         <div class="card-body general-info">
                             <div class="mb-5 d-flex align-items-center justify-content-between">
                                 <p class="fw-bold mb-0 me-4">
@@ -47,8 +49,8 @@
                                 <div class="col-lg-8">
                                     <x-form-components.input-group-prepend-append
                                         prepend="{{ getSettingValue('Invoice Prefix') }}-" append="..." type="text"
-                                        class="custom-class" id="_id" name="_id"
-                                        placeholder="{{ __('0001') }}" value="{{ old('_id', $lastId) }}" required />
+                                        class="custom-class" id="_id" name="_id" placeholder="{{ __('0001') }}"
+                                        value="{{ old('_id', $lastId) }}" required />
                                 </div>
                                 <p class="offset-lg-4 font-12 my-2 text-secondary">
                                     <span class="text-success"> Auto-Increment (Last ID + 1)</span> by default. Can be
@@ -57,7 +59,7 @@
                             </div>
 
 
-                            <div class="row mb-3 align-items-center" >
+                            <div class="row mb-3 align-items-center">
                                 <div class="col-lg-4">
                                     <x-form-components.input-label for="client_id" required>
                                         {{ __('invoices.Select Client') }}
@@ -76,15 +78,14 @@
                                                     : " [ $item->primary_email ]";
                                             @endphp
                                             <option value="{{ $item->id }}"
-                                                {{ old('client_id') == $item->id ? 'selected' : '' }}
-                                                {{ $id == $item->id ? 'selected' : '' }}>{{ $nameAndEmail }}
+                                                {{ old('client_id') == $item->id ? 'selected' : '' }}>{{ $nameAndEmail }}
                                             </option>
                                         @endforeach
                                     </select>
                                 </div>
                             </div>
 
-                            <div class="row mb-3 align-items-center" >
+                            <div class="row mb-3 align-items-center">
                                 <div class="col-lg-4">
                                     <x-form-components.input-label for="task_id" required>
                                         {{ __('invoices.Select Task') }}
@@ -94,14 +95,13 @@
                                     <select name="task_id" id="task_id" class="form-select searchSelectBox">
                                         @foreach ($tasks as $item)
                                             <option value="{{ $item->id }}"
-                                                {{ old('task_id') == $item->id ? 'selected' : '' }}
-                                                {{ $id == $item->id ? 'selected' : '' }}>{{ $item->title }}
+                                                {{ old('task_id') == $item->id ? 'selected' : '' }}>{{ $item->title }}
                                             </option>
                                         @endforeach
                                     </select>
                                 </div>
                             </div>
-                          
+
 
                             <div class="row mb-4 align-items-center">
                                 <div class="col-lg-4">
@@ -111,8 +111,9 @@
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
-                                    <x-form-components.input-group type="date" placeholder="Select Date" class="custom-class" id="issue_date"
-                                        name="issue_date" value="{{ old('issue_date') }}" required />
+                                    <x-form-components.input-group type="date" placeholder="Select Date"
+                                        class="custom-class" id="issue_date" name="issue_date"
+                                        value="{{ old('issue_date') }}" required />
 
                                 </div>
                             </div>
@@ -124,28 +125,29 @@
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
-                                    <x-form-components.input-group type="date" placeholder="Select Date" class="custom-class" id="due_date"
-                                        name="due_date" value="{{ old('due_date') }}" />
+                                    <x-form-components.input-group type="date" placeholder="Select Date"
+                                        class="custom-class" id="due_date" name="due_date"
+                                        value="{{ old('due_date') }}" />
                                 </div>
                             </div>
 
 
-                            
 
-                        
-                           
+
+
+
 
                             <div class="row mb-4 align-items-center">
 
                                 <div class="col-lg-4">
-                                <x-form-components.input-label for="valid_date" class="custom-class">
-                                    {{ __('invoices.Details') }}
-                                </x-form-components.input-label>
-                            </div>
+                                    <x-form-components.input-label for="valid_date" class="custom-class">
+                                        {{ __('invoices.Details') }}
+                                    </x-form-components.input-label>
+                                </div>
                                 <div class="col-lg-8">
-                                <x-form-components.textarea-group name="notes" id="notes"
-                                    placeholder="Extra details, conditions, rules, commitments, products, services, discouts, tax ... if any"
-                                    value="{{ old('notes') }}" class="custom-class notes" />
+                                    <x-form-components.textarea-group name="notes" id="notes"
+                                        placeholder="Extra details, conditions, rules, commitments, products, services, discouts, tax ... if any"
+                                        value="{{ old('notes') }}" class="custom-class notes" />
                                 </div>
                             </div>
                             @include('dashboard.crm.invoices.components._itemCreate')
@@ -155,6 +157,4 @@
             </div>
         </div>
     </div>
-
-
 @endsection
