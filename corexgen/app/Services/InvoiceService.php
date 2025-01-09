@@ -11,6 +11,7 @@ use App\Traits\TenantFilter;
 use Yajra\DataTables\Facades\DataTables;
 use App\Helpers\PermissionsHelper;
 use App\Jobs\SendContract;
+use App\Models\Invoice;
 use App\Repositories\ContractRepository;
 use App\Repositories\InvoiceRepository;
 use Illuminate\Support\Facades\Auth;
@@ -34,54 +35,67 @@ class InvoiceService
     }
 
 
-    public function createContract($data)
+    public function createInvoice($data)
     {
-        // Generate a unique URL slug
-        $data['url'] = Str::slug($data['title'] . '-' . $data['_id'], '-');
 
-        // Handle `_id` and `_prefix`
-        if (isset($data['_prefix'], $data['_id']) && Str::contains($data['_id'], $data['_prefix'])) {
-            $data['_id'] = Str::replace($data['_prefix'], '', $data['_id']);
-        }
-
-        // Set the typable relationship data before creation
-        if ($data['type'] == 'client') {
-            $data['typable_type'] = CRMClients::class;
-            $data['typable_id'] = $data['client_id'];
-        } elseif ($data['type'] == 'lead') {
-            $data['typable_type'] = CRMLeads::class;
-            $data['typable_id'] = $data['lead_id'];
-        }
-
-        $data['company_id'] = Auth::user()->company_id;
         // Create the proposal with all required fields
-        $proposal = CRMContract::create($data);
-
-
-        return $proposal;
+        $invoice = Invoice::create($data);
+        $this->checkIFProductAddedThenAdd($data, $invoice);
+        return $invoice;
     }
-    public function updateContract($data)
+
+    public function checkIfProductAddedThenAdd($data, $invoice)
     {
+        $product_details = [];
+        $json_data = ['products' => []];
 
-        $query = $this->applyTenantFilter(CRMContract::where('id', $data['id']));
-        $proposal = $query->first();
+        if (
+            !empty($data['product_title']) &&
+            is_array($data['product_title']) &&
+            array_filter($data['product_title'], 'trim')
+        ) {
+            foreach ($data['product_title'] as $k => $title) {
+                $trimmedTitle = trim($title);
+                if ($trimmedTitle !== '') {
+                    $product_details[] = [
+                        'title' => $trimmedTitle,
+                        'description' => trim($data['product_description'][$k] ?? ''),
+                        'qty' => (float) ($data['product_qty'][$k] ?? 0),
+                        'rate' => (float) ($data['product_rate'][$k] ?? 0.00),
+                        'tax' => $data['product_tax'][$k] ?? null,
+                    ];
+                }
+            }
 
-
-        // Set the typable relationship data before creation
-        if ($data['type'] == 'client') {
-            $data['typable_type'] = CRMClients::class;
-            $data['typable_id'] = $data['client_id'];
-        } elseif ($data['type'] == 'lead') {
-            $data['typable_type'] = CRMLeads::class;
-            $data['typable_id'] = $data['lead_id'];
+            // Only add additional fields if there are valid products
+            if (!empty($product_details)) {
+                $json_data = [
+                    'products' => $product_details,
+                    'additional_fields' => [
+                        'discount' => (float) ($data['discount'] ?? 0),
+                        'adjustment' => (float) ($data['adjustment'] ?? 0),
+                    ],
+                ];
+            }
         }
 
-        // Create the proposal with all required fields
-        $proposal->update($data);
+        $invoice->update([
+            'product_details' => json_encode($json_data)
+        ]);
+    }
 
 
+    public function updateInvoice($data)
+    {
 
-        return $proposal;
+        $query = $this->applyTenantFilter(Invoice::where('id', $data['id']));
+        $invoice = $query->first();
+
+        $this->checkIFProductAddedThenAdd($data, $invoice);
+        // Create the invoice with all required fields
+        $invoice->update($data);
+
+        return $invoice;
     }
 
 
@@ -148,13 +162,29 @@ class InvoiceService
                 return $this->renderActionsColumn($invoice);
             })
             ->editColumn('task', function ($invoice) use ($tmodule) {
-                return "<a class='dt-link' href='" . route($this->tenantRoute . $tmodule . '.view', $invoice?->task?->id) . "' target='_blank'>$invoice?->task?->title</a>";
+                $taskId = $invoice?->task?->id;
+                $taskTitle = $invoice?->task?->title;
+
+                if ($taskId && $taskTitle) {
+                    return "<a class='dt-link' href='" . route($this->tenantRoute . $tmodule . '.view', $taskId) . "' target='_blank'>$taskTitle</a>";
+                }
+
+                return null; // Handle the case where task data is missing
             })
-            ->editColumn('client', function ($invoice) use ($cmodule) {
-                return "<a class='dt-link' href='" . route($this->tenantRoute . $cmodule . '.view', $invoice?->client?->id) . "' target='_blank'>$invoice?->client?->first_name</a>";
+
+            ->editColumn('to', function ($invoice) use ($cmodule) {
+                $clientId = $invoice?->client?->id;
+                $clientName = $invoice?->client?->first_name . " " . $invoice?->client?->last_name;
+
+                if ($clientId && $clientName) {
+                    return "<a class='dt-link' href='" . route($this->tenantRoute . $cmodule . '.view', $clientId) . "' target='_blank'>$clientName</a>";
+                }
+
+                return null; // Handle the case where client data is missing
             })
-            ->editColumn('_id', function ($invoice) use($module) {
-               return "<a class='dt-link' href='" . route($this->tenantRoute . $module . '.view', $invoice?->id) . "' target='_blank'>$invoice->_prefix  $invoice->_id</a>";
+
+            ->editColumn('_id', function ($invoice) use ($module) {
+                return "<a class='dt-link' href='" . route($this->tenantRoute . $module . '.view', $invoice?->id) . "' target='_blank'>$invoice->_prefix  $invoice->_id</a>";
             })
             ->editColumn('total_amount', function ($invoice) {
                 return $invoice?->total_amount ? number_format($invoice->total_amount) : "0";
@@ -165,7 +195,7 @@ class InvoiceService
             ->editColumn('status', function ($invoice) {
                 return "<span class='badge bg-" . CRM_STATUS_TYPES['INVOICES']['BT_CLASSES'][$invoice->status] . "'>$invoice->status</span>";
             })
-            ->rawColumns(['actions','client', 'value', 'to', 'title', 'status', 'name'])
+            ->rawColumns(['actions', 'client', 'value', '_id', 'to', 'task', 'status', 'name'])
             ->make(true);
     }
 

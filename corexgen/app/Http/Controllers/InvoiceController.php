@@ -6,6 +6,8 @@ namespace App\Http\Controllers;
 use App\Helpers\PermissionsHelper;
 use App\Http\Requests\ContractEditRequest;
 use App\Http\Requests\ContractRequest;
+use App\Http\Requests\InvoiceEditRequest;
+use App\Http\Requests\InvoiceRequest;
 use App\Models\CRM\CRMClients;
 use App\Models\CRM\CRMLeads;
 use App\Models\CRM\CRMTemplates;
@@ -169,17 +171,16 @@ class InvoiceController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(ContractRequest $request)
+    public function store(InvoiceRequest $request)
     {
-
-
+   
 
         $this->tenantRoute = $this->getTenantRoute();
 
         try {
 
 
-            $contract = $this->invoiceService->createContract($request->validated());
+            $invoice = $this->invoiceService->createInvoice($request->validated());
 
 
             // update current usage
@@ -206,7 +207,7 @@ class InvoiceController extends Controller
     {
 
         $this->checkCurrentUsage(strtolower(PLANS_FEATURES['INVOICES']));
-       
+
 
         $clients = $this->applyTenantFilter(CRMClients::query())->select('id', 'first_name', 'last_name', 'type', 'company_name', 'primary_email')->get();
 
@@ -239,25 +240,22 @@ class InvoiceController extends Controller
         $query = Invoice::query()
             ->where('id', $id);
         $query = $this->applyTenantFilter($query);
-        $contract = $query->firstOrFail();
+        $invoice = $query->firstOrFail();
 
-
-        // Regular view rendering
-        $templates = $this->applyTenantFilter(CRMTemplates::query()->select('id', 'title')->where('type', 'Invoices'))->get();
 
         $clients = $this->applyTenantFilter(CRMClients::query())->select('id', 'first_name', 'last_name', 'type', 'company_name', 'primary_email')->get();
 
-        $leads = $this->applyTenantFilter(CRMLeads::query())->select('id', 'first_name', 'last_name', 'type', 'company_name', 'email')->get();
+    
+        $tasks = collect();
+        $tasks = $this->taskService->getAllTasks();
 
         return view($this->getViewFilePath('edit'), [
-
             'title' => 'Edit Invoice',
-            'contract' => $contract,
-            'templates' => $templates,
+            'invoice' => $invoice,
             'clients' => $clients,
-            'leads' => $leads,
             'products' => $this->productServicesService->getAllProducts(),
-            'tax' => $this->productServicesService->getProductTaxes()
+            'tax' => $this->productServicesService->getProductTaxes(),
+            'tasks' => $tasks,
 
         ]);
     }
@@ -270,19 +268,19 @@ class InvoiceController extends Controller
      * @param Request $request [explicite description]
      *
      */
-    public function update(ContractEditRequest $request)
+    public function update(InvoiceEditRequest $request)
     {
 
         $this->tenantRoute = $this->getTenantRoute();
 
         try {
-            $contract = $this->invoiceService->updateContract($request->validated());
+            $invoice = $this->invoiceService->updateInvoice($request->validated());
 
             return redirect()->route($this->tenantRoute . 'invoices.index')
-                ->with('success', 'contract updated successfully.');
+                ->with('success', 'invoice updated successfully.');
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'An error occurred while updating the contract: ' . $e->getMessage());
+                ->with('error', 'An error occurred while updating the invoice: ' . $e->getMessage());
         }
     }
 
@@ -316,7 +314,7 @@ class InvoiceController extends Controller
 
         } catch (\Exception $e) {
             // Handle any exceptions
-            return redirect()->back()->with('error', 'Failed to delete the contract: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to delete the invoice: ' . $e->getMessage());
         }
     }
 
@@ -331,14 +329,14 @@ class InvoiceController extends Controller
     public function changeStatusAction($id, $action)
     {
         try {
-            $contract = $this->applyTenantFilter(Invoice::find($id));
+            $invoice = $this->applyTenantFilter(Invoice::find($id));
 
             if ($action === 'SENT') {
                 return $this->sendContract($id);
             }
 
             // Handle other status changes
-            $contract->update(['status' => $action]);
+            $invoice->update(['status' => $action]);
             return redirect()->back()->with('success', 'Invoice status updated successfully.');
 
         } catch (\Exception $e) {
@@ -439,12 +437,12 @@ class InvoiceController extends Controller
 
 
         $query = $this->applyTenantFilter($proposalQuery);
-        $contract = $query->firstOrFail();
+        $invoice = $query->firstOrFail();
 
 
         return view($this->getViewFilePath('view'), [
             'title' => 'View Invoice',
-            'contract' => $contract,
+            'invoice' => $invoice,
             'module' => PANEL_MODULES[$this->getPanelModule()]['invoices'],
 
         ]);
@@ -497,12 +495,12 @@ class InvoiceController extends Controller
 
 
         $query = $this->applyTenantFilter($proposalQuery);
-        $contract = $query->firstOrFail();
+        $invoice = $query->firstOrFail();
 
 
         return view($this->getViewFilePath('viewOpen'), [
             'title' => 'View Invoice',
-            'contract' => $contract,
+            'invoice' => $invoice,
             'module' => PANEL_MODULES[$this->getPanelModule()]['invoices'],
 
         ]);
@@ -555,12 +553,12 @@ class InvoiceController extends Controller
 
 
         $query = $this->applyTenantFilter($proposalQuery);
-        $contract = $query->firstOrFail();
+        $invoice = $query->firstOrFail();
 
 
         return view($this->getViewFilePath('print'), [
             'title' => 'Print Invoice',
-            'contract' => $contract,
+            'invoice' => $invoice,
             'module' => PANEL_MODULES[$this->getPanelModule()]['invoices'],
 
         ]);
@@ -579,7 +577,7 @@ class InvoiceController extends Controller
         }
 
         try {
-            $contract = $this->applyTenantFilter(
+            $invoice = $this->applyTenantFilter(
                 Invoice::query()
                     ->with([
                         'typable',
@@ -592,9 +590,9 @@ class InvoiceController extends Controller
             )->findOrFail($id);
 
             // Get recipient email based on typable type
-            $toEmail = $contract->typable_type === CRMLeads::class
-                ? $contract->typable->email
-                : $contract->typable->primary_email;
+            $toEmail = $invoice->typable_type === CRMLeads::class
+                ? $invoice->typable->email
+                : $invoice->typable->primary_email;
 
             if (empty($toEmail)) {
                 $errorResponse = ['error' => 'No email found for this client/lead'];
@@ -603,13 +601,13 @@ class InvoiceController extends Controller
                     : redirect()->back()->with('error', $errorResponse['error']);
             }
 
-            // Send contract email
-            $this->invoiceService->sendContractOnEmail($contract, $this->getViewFilePath('print'));
+            // Send invoice email
+            $this->invoiceService->sendContractOnEmail($invoice, $this->getViewFilePath('print'));
 
-            // Update contract status
-            // if($contract->status != 'ACCEPTED'){
+            // Update invoice status
+            // if($invoice->status != 'ACCEPTED'){
 
-            //     $contract->update(['status' => 'SENT']);
+            //     $invoice->update(['status' => 'SENT']);
             // }
 
             $successResponse = ['success' => 'Invoice has been sent in the background job and will be delivered soon.'];
@@ -634,22 +632,22 @@ class InvoiceController extends Controller
         try {
             // Validate the request data
             $validatedData = $request->validate([
-                'id' => 'required|exists:contract,id',
+                'id' => 'required|exists:invoice,id',
                 'first_name' => 'required|string|max:50',
                 'last_name' => 'required|string|max:50',
                 'email' => 'required|email|max:100',
                 'signature' => 'required|string',
             ]);
 
-            // Find the contract using the tenant filter
-            $contract = $this->applyTenantFilter(Invoice::find($validatedData['id']));
+            // Find the invoice using the tenant filter
+            $invoice = $this->applyTenantFilter(Invoice::find($validatedData['id']));
 
-            if (!$contract) {
+            if (!$invoice) {
                 throw new \Exception('Invoice not found.');
             }
 
-            // Update the contract status and acceptance details
-            $contract->update([
+            // Update the invoice status and acceptance details
+            $invoice->update([
                 'status' => 'ACCEPTED',
                 'accepted_details' => [
                     'first_name' => $validatedData['first_name'],
@@ -671,22 +669,22 @@ class InvoiceController extends Controller
         try {
             // Validate the request data
             $validatedData = $request->validate([
-                'id' => 'required|exists:contract,id',
+                'id' => 'required|exists:invoice,id',
                 'first_name' => 'required|string|max:50',
                 'last_name' => 'required|string|max:50',
                 'email' => 'required|email|max:100',
                 'signature' => 'required|string',
             ]);
 
-            // Find the contract using the tenant filter
-            $contract = $this->applyTenantFilter(Invoice::find($validatedData['id']));
+            // Find the invoice using the tenant filter
+            $invoice = $this->applyTenantFilter(Invoice::find($validatedData['id']));
 
-            if (!$contract) {
+            if (!$invoice) {
                 throw new \Exception('Invoice not found.');
             }
 
-            // Update the contract status and acceptance details
-            $contract->update([
+            // Update the invoice status and acceptance details
+            $invoice->update([
                 'company_accepted_details' => [
                     'first_name' => $validatedData['first_name'],
                     'last_name' => $validatedData['last_name'],

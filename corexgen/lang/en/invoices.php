@@ -27,7 +27,12 @@ return [
     'Valid Till' => 'Valid Till',
     'Details' => 'Details',
     'Value' => 'Value',
-    'To' => 'To'
+    'To' => 'To',
+    'Select Task' => 'Select Task',
+    'Issue Date' => 'Issue Date',
+    'Due Date' => 'Due Date',
+    'Total Amount' => 'Total Amount',
+    'Task' => 'Task',
 
 
 

@@ -11,6 +11,9 @@ class InvoiceEditRequest extends FormRequest
      */
     public function authorize(): bool
     {
+        if (hasPermission('INVOICES.UPDATE')) {
+            return true;
+        }
         return false;
     }
 
@@ -22,7 +25,30 @@ class InvoiceEditRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'id' => 'required|exists:invoices,id',
+            'client_id' => 'required|exists:clients,id',
+            'notes' => 'nullable|string',
+            'issue_date' => 'required|date',
+            'due_date' => 'nullable|date|after_or_equal:today',
+            'task_id' => 'nullable|exists:tasks,id',
+            'total_amount' => 'required|numeric|min:1',
+
+            // Ensure at least one product is provided
+            'product_title.0' => 'required|string',
+            'product_description.0' => 'nullable|string',
+            'product_qty.0' => 'required|numeric|min:1',
+            'product_rate.0' => 'required|numeric|min:0',
+            'product_tax.0' => 'nullable|string',
+
+            // Validation for all products
+            'product_title.*' => 'required|string',
+            'product_description.*' => 'nullable|string',
+            'product_qty.*' => 'required|numeric|min:1',
+            'product_rate.*' => 'required|numeric|min:0',
+            'product_tax.*' => 'nullable|string',
+
+            'discount' => 'nullable|numeric',
+            'adjustment' => 'nullable|numeric',
         ];
     }
 }
