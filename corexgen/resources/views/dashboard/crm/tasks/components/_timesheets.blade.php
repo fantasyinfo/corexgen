@@ -6,6 +6,10 @@
     </button>
 </div>
 
+@php
+    // prePrintR($taskUsers);
+@endphp
+
 <!-- Modal for Create/Edit -->
 <div class="modal fade" id="timesheetModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
@@ -18,11 +22,12 @@
                 <form id="TimesheetForm">
                     @csrf
                     <input type="hidden" id="timesheet_id" name="id">
+                    <input type="hidden" id="task_id" name="task_id" value="{{$task?->id}}">
                     <div class="mb-3">
                         <x-form-components.input-label for="name" class="custom-class" required>
                             Start Date & Time
                         </x-form-components.input-label>
-                        <x-form-components.input-group type="datetime-local" name="start_date" id="start_date"
+                        <x-form-components.input-group type="datetime-local" name="start_date" id="start_date_t"
                             placeholder="{{ __('Select Date & Time') }}" required class="custom-class" />
 
                     </div>
@@ -30,29 +35,20 @@
                         <x-form-components.input-label for="name" class="custom-class" required>
                             End Date & Time
                         </x-form-components.input-label>
-                        <x-form-components.input-group type="datetime-local" name="end_date" id="end_date"
+                        <x-form-components.input-group type="datetime-local" name="end_date" id="end_date_t"
                             placeholder="{{ __('Select Date & Time') }}" required class="custom-class" />
 
                     </div>
-                    <div class="mb-3">
-                        <x-form-components.input-label for="task_id" class="custom-class" required>
-                            Task
-                        </x-form-components.input-label>
-                        <select name="task_id" id="task_id" class="form-select ">
-                            <option>Select Tasks</option>
-                            @foreach ($tasks as $item)
-                                <option value="{{ $item->id }}" {{ old('task_id') == $item->id ? 'selected' : '' }}>
-                                    {{ $item->title }}</option>
-                            @endforeach
-                        </select>
-
-                    </div>
+                   
                     <div class="mb-3">
                         <x-form-components.input-label for="user_id" class="custom-class" required>
                             User
                         </x-form-components.input-label>
                         <select name="user_id" id="user_id" class="form-select ">
-
+                            <option>Select User</option>
+                            @foreach ($taskUsers as $item)
+                                <option value="{{$item->id}}">{{$item->name}}</option>
+                            @endforeach
                         </select>
 
                     </div>
@@ -165,40 +161,6 @@
         $(document).ready(function() {
 
 
-            $("#task_id").on('change', function(e) {
-                let taskId = $(this).val(); // Fixed: Use $(this).val() instead of this.val()
-                let baseUrl =
-                    "{{ route(getPanelRoutes('tasks' . '.getAssignee'), ['taskid' => ':taskid']) }}";
-                let taskURL = baseUrl.replace(':taskid', taskId);
-
-                $.ajax({
-                    url: taskURL,
-                    method: 'GET',
-                    success: function(response) {
-                        // Clear existing options
-                        $('#user_id').empty();
-
-                        // Add default empty option
-                        $('#user_id').append('<option value="">Select User</option>');
-
-                        // Assuming response contains the task with assignees
-                        if (response.length > 0) {
-                            response.forEach(function(assignee) {
-                                $('#user_id').append(
-                                    `<option value="${assignee.id}">${assignee.name}</option>`
-                                );
-                            });
-                        }
-                    },
-                    error: function(xhr) {
-                        showToast('Error fetching assignee data', 'error');
-                    }
-                });
-            });
-
-
-
-
             // Bootstrap Modal instance
             const timesheetModal = new bootstrap.Modal(document.getElementById('timesheetModal'));
             const deleteModal = new bootstrap.Modal(document.getElementById('deleteModalTimesheet'));
@@ -215,7 +177,7 @@
 
 
 
-            let TimesheetCreateRoute = "{{ route(getPanelRoutes($module . '.storeTimesheets')) }}";
+            let TimesheetCreateRoute = "{{ route(getPanelRoutes('projects' . '.storeTimesheets')) }}";
 
 
 
@@ -224,7 +186,7 @@
                 const id = $(this).data('id');
                 clearErrors();
 
-                let baseUrl = "{{ route(getPanelRoutes($module . '.editTimesheets'), ['id' => ':id']) }}";
+                let baseUrl = "{{ route(getPanelRoutes('projects' . '.editTimesheets'), ['id' => ':id']) }}";
                 let editURL = baseUrl.replace(':id', id);
                 // Fetch Timesheet data
                 $.ajax({
@@ -233,44 +195,12 @@
                     success: function(response) {
                         $('#modalTitle').text('Edit Timesheet');
                         $('#timesheet_id').val(response.id);
-                        $('#start_date').val(new Date(response.start_date).toISOString().slice(
+                        $('#start_date_t').val(new Date(response.start_date).toISOString().slice(
                             0, 16));
-                        $('#end_date').val(new Date(response.end_date).toISOString().slice(0,
+                        $('#end_date_t').val(new Date(response.end_date).toISOString().slice(0,
                             16));
-                        $('#task_id').val(response.task_id);
+                      
                         $('#notes').val(response.notes);
-
-                        let taskId = response
-                        .task_id; // Fixed: Use $(this).val() instead of this.val()
-                        let baseUrl =
-                            "{{ route(getPanelRoutes('tasks' . '.getAssignee'), ['taskid' => ':taskid']) }}";
-                        let taskURL = baseUrl.replace(':taskid', taskId);
-
-                        $.ajax({
-                            url: taskURL,
-                            method: 'GET',
-                            success: function(users) {
-                                // Clear existing options
-                                $('#user_id').empty();
-
-                                // Add default empty option
-                                $('#user_id').append(
-                                    '<option value="">Select User</option>');
-
-                                // Assuming users contains the task with assignees
-                                if (users.length > 0) {
-                                    users.forEach(function(assignee) {
-                                        $('#user_id').append(
-                                            `<option value="${assignee.id}" ${assignee.id == response.user_id ? 'selected' : ''}>${assignee.name}</option>`
-                                        );
-                                    });
-                                }
-                            },
-                            error: function(xhr) {
-                                showToast('Error fetching assignee data', 'error');
-                            }
-                        });
-
                         timesheetModal.show();
                     },
                     error: function(xhr) {
@@ -290,7 +220,7 @@
                 if (deleteId) {
 
                     let baseUrlD =
-                        "{{ route(getPanelRoutes($module . '.destroyTimesheets'), ['id' => ':id']) }}";
+                        "{{ route(getPanelRoutes('projects' . '.destroyTimesheets'), ['id' => ':id']) }}";
                     let deleteURL = baseUrlD.replace(':id', deleteId);
 
                     $.ajax({
@@ -317,8 +247,8 @@
                 const isEdit = !!id;
                 const formData = new FormData($('#TimesheetForm')[0]);
 
-                let storeURL = "{{ route(getPanelRoutes($module . '.storeTimesheets')) }}";
-                let updateURL = "{{ route(getPanelRoutes($module . '.updateTimesheets')) }}";
+                let storeURL = "{{ route(getPanelRoutes('projects' . '.storeTimesheets')) }}";
+                let updateURL = "{{ route(getPanelRoutes('projects' . '.updateTimesheets')) }}";
 
                 formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
 

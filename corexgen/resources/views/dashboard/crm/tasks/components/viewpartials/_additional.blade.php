@@ -2,12 +2,13 @@
     <h6 class="detail-label">Additional Information</h6>
 
     @php
-        // prePrintR($task->toArray());
+        //  prePrintR($task->toArray());
     @endphp
     <div class="detail-group">
         <label>Milestones</label>
        <p>{{$task?->milestone?->name}}</p>
     </div>
+
     <div class="detail-group">
         <label>Priority</label>
         <p>{{ $task?->priority ?? 'N/A' }}</p>

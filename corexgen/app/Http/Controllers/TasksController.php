@@ -9,6 +9,7 @@ use App\Http\Requests\TasksEditRequest;
 use App\Http\Requests\TasksRequest;
 use App\Models\Milestone;
 use App\Models\Tasks;
+use App\Models\Timesheet;
 use App\Services\ContractService;
 use App\Services\EstimateService;
 use App\Services\ProjectService;
@@ -377,6 +378,7 @@ class TasksController extends Controller
     {
         $query = Tasks::query()->with([
             'milestone',
+            'timeSheets',
             'project',
             'stage:id,name,color',
             'assignedBy:id,name',
@@ -412,6 +414,10 @@ class TasksController extends Controller
         $milestones = $this->applyTenantFilter(Milestone::query())->get();
         //  dd($activitesQuery->toArray());
 
+        // timesheets
+        $timesheets = collect();
+        $timesheets = $this->applyTenantFilter(Timesheet::where('task_id', $id)->with('task', 'user'))->get();
+
         return view($this->getViewFilePath('view'), [
             'title' => 'View Task',
             'task' => $task,
@@ -423,7 +429,9 @@ class TasksController extends Controller
             'activities' => $activitesQuery,
             'projects' => $this->projectService->getAllProjects(),
             'permissions' => PermissionsHelper::getPermissionsArray('TASKS'),
-            'milestones' => $milestones
+            'milestones' => $milestones,
+            'timesheets' => $timesheets,
+            'taskUsers' => $this->getAssignee($id,true)
 
         ]);
     }
@@ -576,13 +584,16 @@ class TasksController extends Controller
     }
 
 
-    public function getAssignee(int $taskid)
+    public function getAssignee(int $taskid, $isCollcet = false)
     {
         $task = $this->applyTenantFilter(Tasks::query()
             ->where('id', $taskid)
             ->with(['assignees:id,name']) // Only select needed fields
             ->first());
-        
+
+        if ($isCollcet) {
+            return $task->assignees;
+        }
         return response()->json($task ? $task->assignees : []);
     }
 

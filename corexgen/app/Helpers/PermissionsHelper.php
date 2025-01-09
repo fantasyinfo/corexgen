@@ -43,7 +43,8 @@ class PermissionsHelper
         'PROJECTS' => 'PROJECTS',
         'TASKS' => 'TASKS',
         'MILESTONES' => 'MILESTONES',
-        'TIMESHEETS' => 'TIMESHEETS'
+        'TIMESHEETS' => 'TIMESHEETS',
+        'INVOICES' => 'INVOICES',
 
 
     ];
@@ -137,8 +138,10 @@ class PermissionsHelper
 
             self::$plansPermissionsKeys['MILESTONES'] => [4301 => 'READ', 4302 => 'READ_ALL', 4303 => 'CREATE', 4304 => 'UPDATE', 4305 => 'DELETE'],
 
-            self::$plansPermissionsKeys['TIMESHEETS'] => [43511 => 'READ', 4352 => 'READ_ALL', 4353 => 'CREATE', 4354 => 'UPDATE', 4355 => 'DELETE'],
+            self::$plansPermissionsKeys['TIMESHEETS'] => [4351 => 'READ', 4352 => 'READ_ALL', 4353 => 'CREATE', 4354 => 'UPDATE', 4355 => 'DELETE'],
 
+
+            self::$plansPermissionsKeys['INVOICES'] => [4401 => 'CREATE', 4402 => 'READ', 4403 => 'READ_ALL', 4404 => 'UPDATE', 4405 => 'DELETE', 4406 => 'FILTER', 4407 => 'CHANGE_STATUS', 4408 => 'BULK_DELETE', 4409 => 'VIEW'],
         ];
     }
 

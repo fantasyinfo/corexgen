@@ -258,6 +258,13 @@ PermissionsHelper::initializePermissions();
         'for' => 'company',
         'is_feature' => false,
     ],
+    PermissionsHelper::$plansPermissionsKeys['INVOICES'] => [
+        'name' => 'INVOICES',
+        'id' => PermissionsHelper::getParentPermissionId('155'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['INVOICES'],
+        'for' => 'company',
+        'is_feature' => true,
+    ],
 ]);
 
 // super panel menus
@@ -471,6 +478,15 @@ PermissionsHelper::initializePermissions();
             'Templates' => ['menu_url' => 'contracts.indexContracts', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['CONTRACTS_TEMPLATES'], 'READ_ALL')],
         ]
     ],
+    'Invoices' => [
+        'menu_icon' => 'fa-receipt',
+        'feature_type' => PermissionsHelper::$plansPermissionsKeys['INVOICES'], // this need to match the PLANS_FEATURES key
+        'permission_plan' => PermissionsHelper::$plansPermissionsKeys['INVOICES'],
+        'permission_id' => PermissionsHelper::getParentPermissionId('155'),
+        'children' => [
+            'Invoice' => ['menu_url' => 'invoices.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['INVOICES'], 'READ_ALL')],
+        ]
+    ],
     'Products & Services' => [
         'menu_icon' => 'fa-boxes',
         'feature_type' => PermissionsHelper::$plansPermissionsKeys['PRODUCTS_SERVICES'], // this need to match the PLANS_FEATURES key
@@ -642,6 +658,7 @@ PermissionsHelper::initializePermissions();
         'projects' => 'projects',
         'tasks' => 'tasks',
         'milestones' => 'milestones',
+        'invoices' => 'invoices'
 
     ]
 ]);
@@ -674,6 +691,7 @@ PermissionsHelper::initializePermissions();
     PermissionsHelper::$plansPermissionsKeys['PROJECTS'] => PermissionsHelper::$plansPermissionsKeys['PROJECTS'],
     PermissionsHelper::$plansPermissionsKeys['TASKS'] => PermissionsHelper::$plansPermissionsKeys['TASKS'],
     PermissionsHelper::$plansPermissionsKeys['MILESTONES'] => PermissionsHelper::$plansPermissionsKeys['MILESTONES'],
+    PermissionsHelper::$plansPermissionsKeys['INVOICES'] => PermissionsHelper::$plansPermissionsKeys['INVOICES'],
 ]);
 
 
