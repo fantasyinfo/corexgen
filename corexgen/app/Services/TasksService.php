@@ -143,6 +143,7 @@ class TasksService
         return Tasks::with('assignees','stage:id,name,color',)->where('company_id', Auth::user()->company_id)->where('project_id', $project_id)->get();
     }
 
+ 
 
     public function getDatatablesResponse($request)
     {

@@ -445,7 +445,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#notes">
+                            <a class="nav-link" data-bs-toggle="tab" href="#notesTab">
                                 <i class="fas fa-sticky-note me-2"></i>Notes
                             </a>
                         </li>
@@ -527,7 +527,7 @@
                         </div>
 
                         <!-- Notes Tab -->
-                        <div class="tab-pane fade" id="notes">
+                        <div class="tab-pane fade" id="notesTab">
                             @include('dashboard.crm.tasks.components._notes')
                         </div>
 
