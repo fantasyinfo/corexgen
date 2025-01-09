@@ -4,13 +4,10 @@ namespace App\Http\Controllers;
 
 
 use App\Helpers\PermissionsHelper;
-use App\Http\Requests\ContractEditRequest;
-use App\Http\Requests\ContractRequest;
 use App\Http\Requests\InvoiceEditRequest;
 use App\Http\Requests\InvoiceRequest;
 use App\Models\CRM\CRMClients;
 use App\Models\CRM\CRMLeads;
-use App\Models\CRM\CRMTemplates;
 use App\Models\Invoice;
 use App\Services\InvoiceService;
 use App\Services\ProductServicesService;
@@ -147,6 +144,8 @@ class InvoiceController extends Controller
 
         $clients = $this->applyTenantFilter(CRMClients::query())->select('id', 'first_name', 'last_name', 'type', 'company_name', 'primary_email')->get();
 
+        $tasks = collect();
+        $tasks = $this->taskService->getAllTasks();
 
         return view($this->getViewFilePath('index'), [
             'filters' => $request->all(),
@@ -160,6 +159,7 @@ class InvoiceController extends Controller
             'total_inactive' => 0,
             'total_ussers' => 0,
             'clients' => $clients,
+            'tasks' => $tasks
 
         ]);
     }
@@ -393,50 +393,24 @@ class InvoiceController extends Controller
     /**
      * View Invoices
      * @param mixed $id
-     * @return \Illuminate\Invoices\View\Factory|\Illuminate\Invoices\View\View
      */
     public function view($id)
     {
-        $proposalQuery = $this->applyTenantFilter(
+        $invoiceQuery = $this->applyTenantFilter(
             Invoice::query()
-                ->with([
-                    'typable' => function ($query) {
-                        if (request('typable_type') === CRMClients::class) {
-                            // For Clients - many-to-many relationship
-                            $query->with([
-                                'addresses' => function ($addressQuery) {
-                                $addressQuery->select(
-                                    'addresses.id',
-                                    'addresses.street_address',
-                                    'addresses.postal_code',
-                                    'addresses.city_id',
-                                    'addresses.country_id'
-                                )
-                                    ->withPivot('type');
-                            }
-                            ]);
-                        } elseif (request('typable_type') === CRMLeads::class) {
-                            // For Leads - single address relationship
-                            $query->with([
-                                'address' => function ($addressQuery) {
-                                $addressQuery->with(['country', 'city'])
-                                    ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
-                            }
-                            ]);
-                        }
-                    },
-                    'template',
-                    'company.addresses' => function ($query) {
-                        $query->with(['country', 'city'])
-                            ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
-                    }
+                ->with(['client','task','project',
+                'company.addresses' => function ($query) {
+                    $query->with(['country', 'city'])
+                        ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
+                }
+                
                 ])
                 ->where('id', '=', $id)
         );
 
 
 
-        $query = $this->applyTenantFilter($proposalQuery);
+        $query = $this->applyTenantFilter($invoiceQuery);
         $invoice = $query->firstOrFail();
 
 
@@ -451,50 +425,24 @@ class InvoiceController extends Controller
     /**
      * View as client Invoices
      * @param mixed $id
-     * @return \Illuminate\Invoices\View\Factory|\Illuminate\Invoices\View\View
      */
     public function viewOpen($id)
     {
-        $proposalQuery = $this->applyTenantFilter(
+        $invoiceQuery = $this->applyTenantFilter(
             Invoice::query()
-                ->with([
-                    'typable' => function ($query) {
-                        if (request('typable_type') === CRMClients::class) {
-                            // For Clients - many-to-many relationship
-                            $query->with([
-                                'addresses' => function ($addressQuery) {
-                                $addressQuery->select(
-                                    'addresses.id',
-                                    'addresses.street_address',
-                                    'addresses.postal_code',
-                                    'addresses.city_id',
-                                    'addresses.country_id'
-                                )
-                                    ->withPivot('type');
-                            }
-                            ]);
-                        } elseif (request('typable_type') === CRMLeads::class) {
-                            // For Leads - single address relationship
-                            $query->with([
-                                'address' => function ($addressQuery) {
-                                $addressQuery->with(['country', 'city'])
-                                    ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
-                            }
-                            ]);
-                        }
-                    },
-                    'template',
-                    'company.addresses' => function ($query) {
-                        $query->with(['country', 'city'])
-                            ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
-                    }
+                ->with(['client','task','project',
+                'company.addresses' => function ($query) {
+                    $query->with(['country', 'city'])
+                        ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
+                }
+                
                 ])
                 ->where('id', '=', $id)
         );
 
 
 
-        $query = $this->applyTenantFilter($proposalQuery);
+        $query = $this->applyTenantFilter($invoiceQuery);
         $invoice = $query->firstOrFail();
 
 
@@ -509,50 +457,25 @@ class InvoiceController extends Controller
     /**
      * print Invoices
      * @param mixed $id
-     * @return \Illuminate\Invoices\View\Factory|\Illuminate\Invoices\View\View
+
      */
     public function print($id)
     {
-        $proposalQuery = $this->applyTenantFilter(
+        $invoiceQuery = $this->applyTenantFilter(
             Invoice::query()
-                ->with([
-                    'typable' => function ($query) {
-                        if (request('typable_type') === CRMClients::class) {
-                            // For Clients - many-to-many relationship
-                            $query->with([
-                                'addresses' => function ($addressQuery) {
-                                $addressQuery->select(
-                                    'addresses.id',
-                                    'addresses.street_address',
-                                    'addresses.postal_code',
-                                    'addresses.city_id',
-                                    'addresses.country_id'
-                                )
-                                    ->withPivot('type');
-                            }
-                            ]);
-                        } elseif (request('typable_type') === CRMLeads::class) {
-                            // For Leads - single address relationship
-                            $query->with([
-                                'address' => function ($addressQuery) {
-                                $addressQuery->with(['country', 'city'])
-                                    ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
-                            }
-                            ]);
-                        }
-                    },
-                    'template',
-                    'company.addresses' => function ($query) {
-                        $query->with(['country', 'city'])
-                            ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
-                    }
+                ->with(['client','task','project',
+                'company.addresses' => function ($query) {
+                    $query->with(['country', 'city'])
+                        ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
+                }
+                
                 ])
                 ->where('id', '=', $id)
         );
 
 
 
-        $query = $this->applyTenantFilter($proposalQuery);
+        $query = $this->applyTenantFilter($invoiceQuery);
         $invoice = $query->firstOrFail();
 
 
@@ -567,7 +490,7 @@ class InvoiceController extends Controller
     /**
      * send  Invoices
      * @param mixed $id
-     * @return \Illuminate\Invoices\View\Factory|\Illuminate\Invoices\View\View
+
      */
     public function sendContract($id)
     {
@@ -622,83 +545,5 @@ class InvoiceController extends Controller
         }
     }
 
-
-    /**
-        * accept Invoices
-
-        */
-    public function accept(Request $request)
-    {
-        try {
-            // Validate the request data
-            $validatedData = $request->validate([
-                'id' => 'required|exists:invoice,id',
-                'first_name' => 'required|string|max:50',
-                'last_name' => 'required|string|max:50',
-                'email' => 'required|email|max:100',
-                'signature' => 'required|string',
-            ]);
-
-            // Find the invoice using the tenant filter
-            $invoice = $this->applyTenantFilter(Invoice::find($validatedData['id']));
-
-            if (!$invoice) {
-                throw new \Exception('Invoice not found.');
-            }
-
-            // Update the invoice status and acceptance details
-            $invoice->update([
-                'status' => 'ACCEPTED',
-                'accepted_details' => [
-                    'first_name' => $validatedData['first_name'],
-                    'last_name' => $validatedData['last_name'],
-                    'email' => $validatedData['email'],
-                    'signature' => $validatedData['signature'],
-                    'accepted_at' => now()
-                ],
-            ]);
-
-            return redirect()->back()->with('success', 'Invoice status updated successfully.');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to process the request: ' . $e->getMessage());
-        }
-    }
-
-    public function acceptCompany(Request $request)
-    {
-        try {
-            // Validate the request data
-            $validatedData = $request->validate([
-                'id' => 'required|exists:invoice,id',
-                'first_name' => 'required|string|max:50',
-                'last_name' => 'required|string|max:50',
-                'email' => 'required|email|max:100',
-                'signature' => 'required|string',
-            ]);
-
-            // Find the invoice using the tenant filter
-            $invoice = $this->applyTenantFilter(Invoice::find($validatedData['id']));
-
-            if (!$invoice) {
-                throw new \Exception('Invoice not found.');
-            }
-
-            // Update the invoice status and acceptance details
-            $invoice->update([
-                'company_accepted_details' => [
-                    'first_name' => $validatedData['first_name'],
-                    'last_name' => $validatedData['last_name'],
-                    'email' => $validatedData['email'],
-                    'signature' => $validatedData['signature'],
-                    'accepted_at' => now()
-                ],
-                'statusCompany' => 1
-            ]);
-
-            return redirect()->back()->with('success', 'Invoice signed status updated successfully.');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to process the request: ' . $e->getMessage());
-        }
-    }
 
 }

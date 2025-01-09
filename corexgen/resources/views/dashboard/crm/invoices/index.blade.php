@@ -9,7 +9,7 @@
 
             <div class="shadow-sm rounded">
 
-                {{-- @include('dashboard.crm.invoices.components.invoice-filters') --}}
+                @include('dashboard.crm.invoices.components.invoice-filters')
 
                 @include('layout.components.header-stats')
 

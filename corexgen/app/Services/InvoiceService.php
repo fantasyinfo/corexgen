@@ -207,7 +207,7 @@ class InvoiceService
         $tenantRoute = $this->tenantRoute;
 
 
-        // ['DRAFT', 'SENT', 'OPEN', 'DECLINED', 'ACCEPTED', 'EXPIRED','REVISED']
+        // ['SENT','SUCCESS', 'OVERDUE', 'PENDING']
 
 
         $action = '<div class="dropdown text-end">
@@ -226,28 +226,13 @@ class InvoiceService
 
 
 
-        if ($contract->status !== 'ACCEPTED') {
-
-
+        if ($contract->status !== 'SUCCESS') {
             $action .= '<li class="m-1 p-1">
-            <a class="dropdown-item" href="' . route($tenantRoute . $module . '.changeStatusAction', ['id' => $id, 'action' => 'ACCEPTED']) . '" data-toggle="tooltip" title="Edit">
-            <i class="fas fa-check me-2"></i> Mark Accepted
-            </a>
-        </li>';
+                            <a class="dropdown-item" href="' . route($tenantRoute . $module . '.changeStatusAction', ['id' => $id, 'action' => 'SUCCESS']) . '" data-toggle="tooltip" title="Edit">
+                            <i class="fas fa-check me-2"></i> Mark Paid
+                            </a>
+                        </li>';
 
-
-            $action .= '<li class="m-1 p-1">
-            <a class="dropdown-item" href="' . route($tenantRoute . $module . '.changeStatusAction', ['id' => $id, 'action' => 'DECLINED']) . '" data-toggle="tooltip" title="Edit">
-            <i class="fas fa-times me-2"></i> Mark Decline
-            </a>
-        </li>';
-
-
-            $action .= '<li class="m-1 p-1">
-            <a class="dropdown-item" href="' . route($tenantRoute . $module . '.changeStatusAction', ['id' => $id, 'action' => 'REVISED']) . '" data-toggle="tooltip" title="Edit">
-            <i class="fas fa-file-alt me-2"></i>Mark Revised
-            </a>
-        </li>';
         }
 
 

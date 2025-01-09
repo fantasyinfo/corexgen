@@ -1041,7 +1041,7 @@ function getTeamMates()
 if (!function_exists('formatDateTime')) {
     function formatDateTime($date, $timezone = null, $format = null)
     {
-        if (Auth::user()->is_tenant) {
+        if (Auth::check() && Auth::user()->is_tenant) {
             $timezone = getSettingValue('Panel Time Zone') ?: config('app.timezone');
             $format = getSettingValue('Panel Date Format') ?: 'd M Y';
         } else {

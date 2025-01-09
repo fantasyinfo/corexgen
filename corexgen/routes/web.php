@@ -170,6 +170,9 @@ Route::get('/contract/print/{id}', [ContractsController::class, 'print'])->name(
 Route::post('/contract/accept', [ContractsController::class, 'accept'])->name('contract.accept');
 Route::post('/contract/acceptCompany', [ContractsController::class, 'acceptCompany'])->name('contract.acceptCompany');
 
+// invoices
+Route::get('/invoices/view/{id}', [InvoiceController::class, 'viewOpen'])->name('invoices.viewOpen');
+Route::get('/invoices/print/{id}', [InvoiceController::class, 'print'])->name('invoices.print');
 
 
 
@@ -598,8 +601,8 @@ Route::middleware([
     });
 
 
-     // projects routes
-     Route::prefix(PANEL_MODULES['COMPANY_PANEL']['projects'])->as(PANEL_MODULES['COMPANY_PANEL']['projects'] . '.')->group(function () {
+    // projects routes
+    Route::prefix(PANEL_MODULES['COMPANY_PANEL']['projects'])->as(PANEL_MODULES['COMPANY_PANEL']['projects'] . '.')->group(function () {
         // role for fetch, store, update
         Route::get('/', [ProjectController::class, 'index'])->name('index')->middleware('check.permission:PROJECTS.READ_ALL');
         Route::post('/', [ProjectController::class, 'store'])->name('store')->middleware('check.permission:PROJECTS.CREATE');
@@ -649,22 +652,22 @@ Route::middleware([
         Route::delete('/milestones/destroy/{id}', [ProjectController::class, 'destroyMilestones'])->name('destroyMilestones')->middleware('check.permission:MILESTONES.DELETE');
 
 
-         // timesheets
+        // timesheets
 
-         Route::get('/timesheets', [ProjectController::class, 'indexTimesheets'])->name('indexTimesheets')->middleware('check.permission:TIMESHEETS.READ_ALL');
-         Route::post('/timesheets', [ProjectController::class, 'storeTimesheets'])->name('storeTimesheets')->middleware('check.permission:TIMESHEETS.CREATE');
-         Route::put('/timesheets', [ProjectController::class, 'updateTimesheets'])->name('updateTimesheets')->middleware('check.permission:TIMESHEETS.UPDATE');
- 
- 
-         // create, edit, change status, delete
-         Route::get('/timesheets/create', [ProjectController::class, 'createTimesheets'])->name('createTimesheets')->middleware('check.permission:TIMESHEETS.CREATE');
-         Route::get('/timesheets/edit/{id}', [ProjectController::class, 'editTimesheets'])->name('editTimesheets')->middleware('check.permission:TIMESHEETS.UPDATE');
-         Route::delete('/timesheets/destroy/{id}', [ProjectController::class, 'destroyTimesheets'])->name('destroyTimesheets')->middleware('check.permission:TIMESHEETS.DELETE');
+        Route::get('/timesheets', [ProjectController::class, 'indexTimesheets'])->name('indexTimesheets')->middleware('check.permission:TIMESHEETS.READ_ALL');
+        Route::post('/timesheets', [ProjectController::class, 'storeTimesheets'])->name('storeTimesheets')->middleware('check.permission:TIMESHEETS.CREATE');
+        Route::put('/timesheets', [ProjectController::class, 'updateTimesheets'])->name('updateTimesheets')->middleware('check.permission:TIMESHEETS.UPDATE');
+
+
+        // create, edit, change status, delete
+        Route::get('/timesheets/create', [ProjectController::class, 'createTimesheets'])->name('createTimesheets')->middleware('check.permission:TIMESHEETS.CREATE');
+        Route::get('/timesheets/edit/{id}', [ProjectController::class, 'editTimesheets'])->name('editTimesheets')->middleware('check.permission:TIMESHEETS.UPDATE');
+        Route::delete('/timesheets/destroy/{id}', [ProjectController::class, 'destroyTimesheets'])->name('destroyTimesheets')->middleware('check.permission:TIMESHEETS.DELETE');
 
     });
 
-      // tasks routes
-      Route::prefix(PANEL_MODULES['COMPANY_PANEL']['tasks'])->as(PANEL_MODULES['COMPANY_PANEL']['tasks'] . '.')->group(function () {
+    // tasks routes
+    Route::prefix(PANEL_MODULES['COMPANY_PANEL']['tasks'])->as(PANEL_MODULES['COMPANY_PANEL']['tasks'] . '.')->group(function () {
         // role for fetch, store, update
         Route::get('/', [TasksController::class, 'index'])->name('index')->middleware('check.permission:TASKS.READ_ALL');
         Route::post('/', [TasksController::class, 'store'])->name('store')->middleware('check.permission:TASKS.CREATE');
@@ -713,30 +716,30 @@ Route::middleware([
         Route::get('/assignee/{taskid}', [TasksController::class, 'getAssignee'])->name('getAssignee');
     });
 
-        // invoices
+    // invoices
 
-        Route::prefix(PANEL_MODULES['COMPANY_PANEL']['invoices'])->as(PANEL_MODULES['COMPANY_PANEL']['invoices'] . '.')->group(function () {
-            // role for fetch, store, update
-            Route::get('/', [InvoiceController::class, 'index'])->name('index')->middleware('check.permission:INVOICES.READ_ALL');
-            Route::post('/', [InvoiceController::class, 'store'])->name('store')->middleware('check.permission:INVOICES.CREATE');
-            Route::put('/', [InvoiceController::class, 'update'])->name('update')->middleware('check.permission:INVOICES.UPDATE');
-    
-            // create, edit, change status, delete
-            Route::get('/create', [InvoiceController::class, 'create'])->name('create')->middleware('check.permission:INVOICES.CREATE');
-            Route::get('/edit/{id}', [InvoiceController::class, 'edit'])->name('edit')->middleware('check.permission:INVOICES.UPDATE');
-    
-            Route::get('/changeStatusAction/{id}/{action}', [InvoiceController::class, 'changeStatusAction'])->name('changeStatusAction')->middleware('check.permission:INVOICES.CHANGE_STATUS');
-    
-            Route::get('/sendInvoice/{id}', [InvoiceController::class, 'sendInvoice'])->name('sendInvoice')->middleware('check.permission:INVOICES.CHANGE_STATUS');
-    
-            Route::delete('/destroy/{id}', [InvoiceController::class, 'destroy'])->name('destroy')->middleware('check.permission:INVOICES.DELETE');
-    
-    
-            Route::post('/bulkDelete', [InvoiceController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:INVOICES.BULK_DELETE');
-    
-            Route::get('/view/{id}', [InvoiceController::class, 'view'])->name('view')->middleware('check.permission:INVOICES.VIEW');
-    
-        });
+    Route::prefix(PANEL_MODULES['COMPANY_PANEL']['invoices'])->as(PANEL_MODULES['COMPANY_PANEL']['invoices'] . '.')->group(function () {
+        // role for fetch, store, update
+        Route::get('/', [InvoiceController::class, 'index'])->name('index')->middleware('check.permission:INVOICES.READ_ALL');
+        Route::post('/', [InvoiceController::class, 'store'])->name('store')->middleware('check.permission:INVOICES.CREATE');
+        Route::put('/', [InvoiceController::class, 'update'])->name('update')->middleware('check.permission:INVOICES.UPDATE');
+
+        // create, edit, change status, delete
+        Route::get('/create', [InvoiceController::class, 'create'])->name('create')->middleware('check.permission:INVOICES.CREATE');
+        Route::get('/edit/{id}', [InvoiceController::class, 'edit'])->name('edit')->middleware('check.permission:INVOICES.UPDATE');
+
+        Route::get('/changeStatusAction/{id}/{action}', [InvoiceController::class, 'changeStatusAction'])->name('changeStatusAction')->middleware('check.permission:INVOICES.CHANGE_STATUS');
+
+        Route::get('/sendInvoice/{id}', [InvoiceController::class, 'sendInvoice'])->name('sendInvoice')->middleware('check.permission:INVOICES.CHANGE_STATUS');
+
+        Route::delete('/destroy/{id}', [InvoiceController::class, 'destroy'])->name('destroy')->middleware('check.permission:INVOICES.DELETE');
+
+
+        Route::post('/bulkDelete', [InvoiceController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:INVOICES.BULK_DELETE');
+
+        Route::get('/view/{id}', [InvoiceController::class, 'view'])->name('view')->middleware('check.permission:INVOICES.VIEW');
+
+    });
 });
 
 
