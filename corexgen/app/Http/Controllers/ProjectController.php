@@ -424,7 +424,7 @@ class ProjectController extends Controller
         // timesheets
         $timesheets = collect();
         $taskIds = $tasks->pluck('id');
-        $timesheets = $this->applyTenantFilter(Timesheet::whereIn('task_id', $taskIds))->get();
+        $timesheets = $this->applyTenantFilter(Timesheet::whereIn('task_id', $taskIds)->with('task', 'user'))->get();
 
 
 
@@ -496,7 +496,7 @@ class ProjectController extends Controller
 
     public function editMilestones($id)
     {
-        $milestone = Milestone::find($id);
+        $milestone = $this->applyTenantFilter(Milestone::find($id));
         return response()->json($milestone);
     }
 
@@ -509,15 +509,67 @@ class ProjectController extends Controller
             'project_id' => 'required|exists:projects,id',
         ]);
 
-        $milestone = Milestone::find($validated['id'])->update($validated);
+        $milestone = $this->applyTenantFilter(Milestone::find($validated['id']))->update($validated);
         return response()->json($milestone);
     }
 
     public function destroyMilestones($id)
     {
-        $milestone = Milestone::find($id)->delete();
+        $milestone = $this->applyTenantFilter(Milestone::find($id))->delete();
         return response()->json(['message' => 'Milestone deleted successfully']);
     }
 
+
+    // timesheets
+
+
+    public function storeTimesheets(Request $request)
+    {
+        $validated = $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after:start_date',
+            'task_id' => 'required|exists:tasks,id',
+            'user_id' => 'required|exists:users,id',
+            'notes' => 'nullable|string'
+        ]);
+
+        $duration = calculateTimeDifference($validated['start_date'], $validated['end_date']);
+
+        $validated['duration'] = $duration['duration'];
+
+        $timesheet = Timesheet::create($validated);
+        return response()->json($timesheet);
+    }
+
+    public function editTimesheets($id)
+    {
+        $timesheet = $this->applyTenantFilter(Timesheet::find($id));
+        return response()->json($timesheet);
+    }
+
+    public function updateTimesheets(Request $request)
+    {
+        $validated = $request->validate([
+            'id' => 'required|exists:timesheets,id',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after:start_date',
+            'task_id' => 'required|exists:tasks,id',
+            'user_id' => 'required|exists:users,id',
+            'notes' => 'nullable|string'
+        ]);
+
+        $duration = calculateTimeDifference($validated['start_date'], $validated['end_date']);
+
+        $validated['duration'] = $duration['duration'];
+
+        $timeSheet = $this->applyTenantFilter(Timesheet::find($validated['id']))->update($validated);
+        return response()->json($timeSheet);
+    }
+
+    public function destroyTimesheets($id)
+    {
+        $timeSheet = $this->applyTenantFilter(Timesheet::find($id))->delete();
+        return response()->json(['message' => 'TimeSheet deleted successfully']);
+    }
 
 }

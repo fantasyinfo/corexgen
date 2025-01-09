@@ -10,6 +10,7 @@ use App\Models\CRM\CRMSettings;
 use Illuminate\Support\Facades\DB;
 use App\Models\Media;
 use App\Models\Plans;
+use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
@@ -1054,19 +1055,52 @@ if (!function_exists('formatDateTime')) {
 }
 
 
-function truncateFileName($filename) {
+function truncateFileName($filename)
+{
     // Get file extension
     $extension = pathinfo($filename, PATHINFO_EXTENSION);
     $nameWithoutExt = pathinfo($filename, PATHINFO_FILENAME);
-    
+
     // If filename is too short, return as is
-    if(strlen($nameWithoutExt) <= 6) {
+    if (strlen($nameWithoutExt) <= 6) {
         return $filename;
     }
-    
+
     // Get first 3 and last 3 chars of the name without extension
     $first = substr($nameWithoutExt, 0, 3);
     $last = substr($nameWithoutExt, -3);
-    
+
     return $first . '...' . $last . '.' . $extension;
 }
+
+
+function calculateTimeDifference($start_date, $end_date)
+{
+    // Convert the dates to Carbon instances
+    $start = Carbon::parse($start_date);
+    $end = Carbon::parse($end_date);
+
+    // Calculate the difference in total minutes
+    $totalMinutes = $end->diffInMinutes($start);
+
+    // Convert minutes to hours and minutes
+    $hours = intdiv($totalMinutes, 60);
+    $minutes = $totalMinutes % 60;
+
+    return [
+        'hours' => $hours,
+        'minutes' => $minutes,
+        'duration' => $totalMinutes
+    ];
+}
+
+ function convertMinutesToHoursAndMinutes($totalMinutes)
+{
+    // Convert minutes to hours and remaining minutes
+    $hours = intdiv($totalMinutes, 60);
+    $minutes = $totalMinutes % 60;
+
+    // Format as "X hours and Y minutes"
+    return sprintf("%d hours and %d minutes", $hours, $minutes);
+}
+

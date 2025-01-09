@@ -3,6 +3,25 @@
 <div class="card  border-2 mb-4">
     <div class="card-body d-flex gap-2">
         <div class="stat-icon">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div>
+            <h6 class="stat-label">Timesheets</h6>
+            <div class="detail-group">
+                <ul>
+                    @if ($task?->timeSheets && $task?->timeSheets?->isNotEmpty())
+                        @foreach ($task?->timeSheets as $tm)
+                            <li>{{ convertMinutesToHoursAndMinutes($tm?->duration) }} By {{ $tm?->user?->name }}</li>
+                        @endforeach
+                    @endif
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card  border-2 mb-4">
+    <div class="card-body d-flex gap-2">
+        <div class="stat-icon">
             <i class="fas fa-chart-line"></i>
         </div>
         <div>
@@ -31,7 +50,7 @@
                 @endphp
                 <div class="detail-group">
                     <label>{{ ucfirst($cf['field_label']) }}</label>
-                    <p>{{ trim($fieldValue) != '' || null ? $fieldValue :  'NA'}}</p>
+                    <p>{{ trim($fieldValue) != '' || null ? $fieldValue : 'NA' }}</p>
                 </div>
             @endforeach
         </div>

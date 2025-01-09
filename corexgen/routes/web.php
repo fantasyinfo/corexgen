@@ -12,6 +12,7 @@ use App\Http\Controllers\ContractsController;
 use App\Http\Controllers\CompaniesController;
 use App\Http\Controllers\CRM\ClientsController;
 use App\Http\Controllers\CRM\LeadsController;
+use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\CustomFieldController;
 use App\Http\Controllers\DownloadController;
@@ -711,6 +712,31 @@ Route::middleware([
         // 
         Route::get('/assignee/{taskid}', [TasksController::class, 'getAssignee'])->name('getAssignee');
     });
+
+        // invoices
+
+        Route::prefix(PANEL_MODULES['COMPANY_PANEL']['invoices'])->as(PANEL_MODULES['COMPANY_PANEL']['invoices'] . '.')->group(function () {
+            // role for fetch, store, update
+            Route::get('/', [InvoiceController::class, 'index'])->name('index')->middleware('check.permission:INVOICES.READ_ALL');
+            Route::post('/', [InvoiceController::class, 'store'])->name('store')->middleware('check.permission:INVOICES.CREATE');
+            Route::put('/', [InvoiceController::class, 'update'])->name('update')->middleware('check.permission:INVOICES.UPDATE');
+    
+            // create, edit, change status, delete
+            Route::get('/create', [InvoiceController::class, 'create'])->name('create')->middleware('check.permission:INVOICES.CREATE');
+            Route::get('/edit/{id}', [InvoiceController::class, 'edit'])->name('edit')->middleware('check.permission:INVOICES.UPDATE');
+    
+            Route::get('/changeStatusAction/{id}/{action}', [InvoiceController::class, 'changeStatusAction'])->name('changeStatusAction')->middleware('check.permission:INVOICES.CHANGE_STATUS');
+    
+            Route::get('/sendInvoice/{id}', [InvoiceController::class, 'sendInvoice'])->name('sendInvoice')->middleware('check.permission:INVOICES.CHANGE_STATUS');
+    
+            Route::delete('/destroy/{id}', [InvoiceController::class, 'destroy'])->name('destroy')->middleware('check.permission:INVOICES.DELETE');
+    
+    
+            Route::post('/bulkDelete', [InvoiceController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:INVOICES.BULK_DELETE');
+    
+            Route::get('/view/{id}', [InvoiceController::class, 'view'])->name('view')->middleware('check.permission:INVOICES.VIEW');
+    
+        });
 });
 
 

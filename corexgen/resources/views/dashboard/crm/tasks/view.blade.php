@@ -13,11 +13,11 @@
         .card {
             background-color: var(--card-bg);
             box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-            transition: all 0.3s ease;
+            /* transition: all 0.3s ease; */
         }
 
         .card:hover {
-            transform: translateY(-2px);
+            /* transform: translateY(-2px); */
             box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
         }
 
@@ -329,7 +329,7 @@
             padding: 0.5rem 1rem;
             font-weight: 500;
             border-radius: 0.5rem;
-            transition: all 0.3s ease;
+            /* transition: all 0.3s ease; */
         }
 
         .btn-primary {
@@ -374,7 +374,7 @@
         .card,
         .btn,
         .badge {
-            transition: all 0.3s ease;
+            /* transition: all 0.3s ease; */
         }
 
         .divider-container {
@@ -433,7 +433,11 @@
                                 <i class="fas fa-info-circle me-2"></i>Details
                             </a>
                         </li>
-
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#timesheets">
+                                <i class="fas fa-clock me-2"></i>Timesheets
+                            </a>
+                        </li>
                       
                         <li class="nav-item">
                             <a class="nav-link" data-bs-toggle="tab" href="#activities">
@@ -515,6 +519,9 @@
 
 
 
+                        <div class="tab-pane fade" id="timesheets">
+                            @include('dashboard.crm.tasks.components._timesheets')
+                        </div>
                         <div class="tab-pane fade" id="activities">
                             @include('dashboard.crm.tasks.components._activity')
                         </div>
