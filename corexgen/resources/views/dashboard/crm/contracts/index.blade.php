@@ -11,7 +11,7 @@
 
                 @include('dashboard.crm.contracts.components.contract-filters')
 
-                @include('layout.components.header-stats')
+                @include('layout.components.header-stats-new')
 
 
 

@@ -36,6 +36,7 @@ class Invoice extends Model implements Auditable
         'company_id',
         'project_id',
         'task_id',
+        'timesheet_id'
     ];
 
     protected $casts = [
@@ -63,6 +64,10 @@ class Invoice extends Model implements Auditable
     public function client()
     {
         return $this->belongsTo(CRMClients::class, 'client_id');
+    }
+    public function timesheet()
+    {
+        return $this->belongsTo(Timesheet::class, 'timesheet_id');
     }
 
 

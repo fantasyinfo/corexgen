@@ -3,19 +3,16 @@
 namespace App\Services;
 
 
-use App\Models\CRM\CRMClients;
+use App\Jobs\SendInvoice;
 use App\Models\CRM\CRMContract;
 use App\Models\CRM\CRMLeads;
 use App\Traits\IsSMTPValid;
 use App\Traits\TenantFilter;
 use Yajra\DataTables\Facades\DataTables;
 use App\Helpers\PermissionsHelper;
-use App\Jobs\SendContract;
 use App\Models\Invoice;
-use App\Repositories\ContractRepository;
 use App\Repositories\InvoiceRepository;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class InvoiceService
 {
@@ -37,11 +34,30 @@ class InvoiceService
 
     public function createInvoice($data)
     {
+        // First, let's log or dd the incoming data
+        // dd($data);  // Uncomment to check input
 
-        // Create the proposal with all required fields
-        $invoice = Invoice::create($data);
-        $this->checkIFProductAddedThenAdd($data, $invoice);
-        return $invoice;
+        DB::beginTransaction();
+        try {
+            // Create invoice
+            $invoice = Invoice::create($data);
+
+            // Store the ID in case we need it
+            $invoiceId = $invoice->id;
+
+            // Add your products
+            $this->checkIFProductAddedThenAdd($data, $invoice);
+
+            DB::commit();
+
+            // Return the fresh instance
+            return Invoice::find($invoiceId);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            // Log the error or handle it appropriately
+            throw $e;
+        }
     }
 
     public function checkIfProductAddedThenAdd($data, $invoice)
@@ -100,43 +116,43 @@ class InvoiceService
 
 
 
-    public function getContracts($typable_type, $typable_id)
+    public function getInvoices($project_id = null)
     {
-        return $this->applyTenantFilter(CRMContract::query()->where('typable_type', $typable_type)->where('typable_id', $typable_id)->latest()->get());
+        if ($project_id == null) {
+            return $this->applyTenantFilter(Invoice::query()->with(['task', 'timesheet', 'client', 'company'])->latest()->get());
+        }
+        return $this->applyTenantFilter(Invoice::query()->with(['task', 'timesheet', 'client', 'company'])->where('project_id', $project_id)->latest()->get());
     }
 
 
-    public function sendContractOnEmail(CRMContract $contract, $view = "dashboard.crm.invoices.print"): bool
+    public function sendInvoiceOnEmail(Invoice $invoice, $view = "dashboard.crm.invoices.print"): bool
     {
         try {
             $mailSettings = $this->_getMailSettings();
 
-            $toEmail = $contract->typable_type === CRMLeads::class
-                ? $contract->typable->email
-                : $contract->typable->primary_email;
+            $toEmail = $invoice->client->primary_email;
 
             // Prepare email details
             $emailDetails = [
                 'from' => $mailSettings['Mail From Address'],
                 'to' => $toEmail,
-                'subject' => $contract->title,
-                'details' => $contract->details,
-                'template' => $contract->template?->template_details
+                'subject' => $invoice->title,
+                'details' => $invoice->details
             ];
 
             // Dispatch the job
-            SendContract::dispatch(
+            SendInvoice::dispatch(
                 $mailSettings,
                 $emailDetails,
-                $contract,
+                $invoice,
                 $view
             );
             return true;
         } catch (\Throwable $e) {
             // Log the error or handle it as needed
-            \Log::error('Failed to send contract email', [
+            \Log::error('Failed to send invoice email', [
                 'error' => $e->getMessage(),
-                'contract_id' => $contract->id ?? null,
+                'invoice_id' => $invoice->id ?? null,
             ]);
 
             // Optionally, you can rethrow the exception if needed
@@ -207,7 +223,7 @@ class InvoiceService
         $tenantRoute = $this->tenantRoute;
 
 
-        // ['DRAFT', 'SENT', 'OPEN', 'DECLINED', 'ACCEPTED', 'EXPIRED','REVISED']
+        // ['SENT','SUCCESS', 'OVERDUE', 'PENDING']
 
 
         $action = '<div class="dropdown text-end">
@@ -226,28 +242,13 @@ class InvoiceService
 
 
 
-        if ($contract->status !== 'ACCEPTED') {
-
-
+        if ($contract->status !== 'SUCCESS') {
             $action .= '<li class="m-1 p-1">
-            <a class="dropdown-item" href="' . route($tenantRoute . $module . '.changeStatusAction', ['id' => $id, 'action' => 'ACCEPTED']) . '" data-toggle="tooltip" title="Edit">
-            <i class="fas fa-check me-2"></i> Mark Accepted
-            </a>
-        </li>';
+                            <a class="dropdown-item" href="' . route($tenantRoute . $module . '.changeStatusAction', ['id' => $id, 'action' => 'SUCCESS']) . '" data-toggle="tooltip" title="Edit">
+                            <i class="fas fa-check me-2"></i> Mark Paid
+                            </a>
+                        </li>';
 
-
-            $action .= '<li class="m-1 p-1">
-            <a class="dropdown-item" href="' . route($tenantRoute . $module . '.changeStatusAction', ['id' => $id, 'action' => 'DECLINED']) . '" data-toggle="tooltip" title="Edit">
-            <i class="fas fa-times me-2"></i> Mark Decline
-            </a>
-        </li>';
-
-
-            $action .= '<li class="m-1 p-1">
-            <a class="dropdown-item" href="' . route($tenantRoute . $module . '.changeStatusAction', ['id' => $id, 'action' => 'REVISED']) . '" data-toggle="tooltip" title="Edit">
-            <i class="fas fa-file-alt me-2"></i>Mark Revised
-            </a>
-        </li>';
         }
 
 

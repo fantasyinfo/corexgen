@@ -10,7 +10,7 @@
                 @include('dashboard.crm.leads.components.leads-filters')
                 @include('layout.components.bulk-import-modal')
 
-                @include('layout.components.header-stats')
+                @include('layout.components.header-stats-new')
 
 
                 @if (hasPermission('LEADS.READ_ALL') || hasPermission('LEADS.READ'))

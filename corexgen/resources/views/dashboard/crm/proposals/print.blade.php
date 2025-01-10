@@ -29,26 +29,26 @@
         }
 
         /* Container */
-        .proposal-container {
+        .invoice-container {
             width: 100%;
             margin: 0 auto;
             background: white;
         }
 
         /* Header Styles */
-        .proposal-header {
+        .invoice-header {
             padding: 0 0 1.5cm 0;
             margin-bottom: 1cm;
             border-bottom: 1px solid #dee2e6;
         }
 
-        .proposal-id {
+        .invoice-id {
             font-size: 10pt;
             color: #666;
             margin-bottom: 0.5cm;
         }
 
-        .proposal-title {
+        .invoice-title {
             font-size: 24pt;
             font-weight: 700;
             margin-bottom: 0.5cm;
@@ -84,6 +84,11 @@
         }
 
         /* Table Styles */
+        .table-responsive {
+            width: 100%;
+            margin-bottom: 1cm;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -116,44 +121,26 @@
             text-align: right;
         }
 
+        .text-center {
+            text-align: center;
+        }
+
         /* Summary Section */
+        tfoot {
+            width: 100%;
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
+
         tfoot tr {
             background-color: #f8f9fa !important;
             font-weight: bold;
+            width: 100%;
         }
 
         tfoot td {
             padding: 0.3cm;
             border-top: 2px solid #dee2e6;
-        }
-
-        /* Signature Section */
-        .acceptance-details {
-            margin-top: 2cm;
-            page-break-before: always;
-            page-break-inside: avoid;
-        }
-
-        .signature-container {
-            margin-top: 1cm;
-            border: 1px solid #dee2e6;
-            padding: 0.5cm;
-            background-color: #fff;
-        }
-
-        .signature-image {
-            max-height: 4cm;
-            width: auto;
-            display: block;
-        }
-
-        /* Executive Summary */
-        .section-title {
-            font-size: 18pt;
-            color: #000;
-            margin-bottom: 0.8cm;
-            padding-bottom: 0.3cm;
-            border-bottom: 1px solid #dee2e6;
         }
 
         /* Status Badge */
@@ -166,6 +153,29 @@
             font-size: 10pt;
         }
 
+        /* Section Styles */
+        .section-title {
+            font-size: 18pt;
+            color: #000;
+            margin-bottom: 0.8cm;
+            padding-bottom: 0.3cm;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .card {
+            margin-bottom: 1cm;
+        }
+
+        .card-header {
+            padding: 0.5cm 0;
+            border-bottom: 2px solid #dee2e6;
+            margin-bottom: 0.5cm;
+        }
+
+        .card-body {
+            padding: 0.5cm 0;
+        }
+
         /* Print Optimizations */
         @media print {
             .no-print {
@@ -175,6 +185,31 @@
             a {
                 text-decoration: none;
                 color: #000;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            thead {
+                display: table-header-group;
+            }
+
+            tbody {
+                display: table-row-group;
+            }
+
+            tfoot {
+                display: table-row-group;
+            }
+
+            tr {
+                page-break-inside: avoid;
+            }
+
+            td {
+                page-break-inside: avoid;
             }
 
             .table-responsive {
@@ -190,12 +225,6 @@
                 background-color: transparent !important;
                 border-bottom: 2px solid #dee2e6 !important;
                 padding: 0.5cm 0 !important;
-            }
-
-            .alert {
-                border: 1px solid #28a745 !important;
-                padding: 0.5cm !important;
-                margin: 0.5cm 0 !important;
             }
         }
     </style>
@@ -248,141 +277,156 @@
 
         <!-- Main Content -->
         <div class="proposal-content">
-            @if (!empty($proposal?->product_details) && $proposal?->product_details != NULL)
-            @php
-                $details = json_decode($proposal->product_details, true);
-                $products = $details['products'] ?? [];
-                $additionalFields = $details['additional_fields'] ?? [];
-            @endphp
+            @if (!empty($proposal?->product_details) && $proposal?->product_details != null)
+                @php
+                    $details = json_decode($proposal->product_details, true);
+                    $products = $details['products'] ?? [];
+                    $additionalFields = $details['additional_fields'] ?? [];
+                @endphp
 
-            @if(!empty($products))
-            <div class="card mb-4">
-                <div class="card-header table-bg">
-                    <h5 class="mb-0">
-                        <i class="fas fa-file-invoice me-2"></i>
-                        Proposal Details
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover">
-                            <thead class="table-primary">
-                                <tr>
-                                    <th>Title</th>
-                                    <th>Description</th>
-                                    <th class="text-center">Qty / Per Hr</th>
-                                    <th class="text-end" width="200px;">Rate ({{ getSettingValue('Currency Symbol') }})</th>
-                                    <th class="text-end">Tax</th>
-                                    <th class="text-end" width="200px;">Amount ({{ getSettingValue('Currency Symbol') }})</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($products as $product)
-                                    @php
-                                        $qty = floatval($product['qty']);
-                                        $rate = floatval($product['rate']);
-                                        $tax = floatval($product['tax']);
-                                        $amount = $qty * $rate;
-                                        $taxAmount = ($amount * $tax) / 100;
-                                    @endphp
-                                    <tr>
-                                        <td>
-                                            <span class="fw-medium">{{ $product['title'] }}</span>
-                                        </td>
-                                        <td>
-                                            <small class="text-muted">{{ $product['description'] }}</small>
-                                        </td>
-                                        <td class="text-center">
-                                            <span class="badge bg-light text-dark">
-                                                {{ number_format($qty) }} 
-                                               
-                                            </span>
-                                        </td>
-                                        <td class="text-end">
-                                            {{ getSettingValue('Currency Symbol') }} {{ number_format($rate, 2) }} {{ getSettingValue('Currency Code') }}
-                                        </td>
-                                        <td class="text-end">
-                                            <span class="text-muted">
-                                                {{ number_format($tax, 1) }}%
-                                            </span>
-                                        </td>
-                                        <td class="text-end">
-                                            {{ getSettingValue('Currency Symbol') }} {{ number_format($amount, 2) }} {{ getSettingValue('Currency Code') }}
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                            <tfoot class="table-bg">
-                                @php
-                                    $subTotal = array_reduce(
-                                        $products,
-                                        function ($carry, $product) {
-                                            return $carry +
-                                                floatval($product['qty']) * floatval($product['rate']);
-                                        },
-                                        0,
-                                    );
+                @if (!empty($products))
+                    <div class="card mb-4">
+                        <div class="card-header table-bg">
+                            <h5 class="mb-0">
+                                <i class="fas fa-file-invoice me-2"></i>
+                                Proposal Details
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead class="table-primary">
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>Description</th>
+                                            <th class="text-center">Qty / Per Hr</th>
+                                            <th class="text-end" width="200px;">Rate
+                                                ({{ getSettingValue('Currency Symbol') }})</th>
+                                            <th class="text-end">Tax</th>
+                                            <th class="text-end" width="200px;">Amount
+                                                ({{ getSettingValue('Currency Symbol') }})</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($products as $product)
+                                            @php
+                                                $qty = floatval($product['qty']);
+                                                $rate = floatval($product['rate']);
+                                                $tax = floatval($product['tax']);
+                                                $amount = $qty * $rate;
+                                                $taxAmount = ($amount * $tax) / 100;
+                                            @endphp
+                                            <tr>
+                                                <td>
+                                                    <span class="fw-medium">{{ $product['title'] }}</span>
+                                                </td>
+                                                <td>
+                                                    <small class="text-muted">{{ $product['description'] }}</small>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span class="badge bg-light text-dark">
+                                                        {{ number_format($qty) }}
 
-                                    $totalTax = array_reduce(
-                                        $products,
-                                        function ($carry, $product) {
-                                            $amount =
-                                                floatval($product['qty']) * floatval($product['rate']);
-                                            return $carry + ($amount * floatval($product['tax'])) / 100;
-                                        },
-                                        0,
-                                    );
+                                                    </span>
+                                                </td>
+                                                <td class="text-end">
+                                                    {{ getSettingValue('Currency Symbol') }}
+                                                    {{ number_format($rate, 2) }}
+                                                    {{ getSettingValue('Currency Code') }}
+                                                </td>
+                                                <td class="text-end">
+                                                    <span class="text-muted">
+                                                        {{ number_format($tax, 1) }}%
+                                                    </span>
+                                                </td>
+                                                <td class="text-end">
+                                                    {{ getSettingValue('Currency Symbol') }}
+                                                    {{ number_format($amount, 2) }}
+                                                    {{ getSettingValue('Currency Code') }}
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                    <tfoot class="table-bg">
+                                        @php
+                                            $subTotal = array_reduce(
+                                                $products,
+                                                function ($carry, $product) {
+                                                    return $carry +
+                                                        floatval($product['qty']) * floatval($product['rate']);
+                                                },
+                                                0,
+                                            );
 
-                                    $discount = floatval($additionalFields['discount'] ?? 0);
-                                    $discountAmount = ($subTotal * $discount) / 100;
+                                            $totalTax = array_reduce(
+                                                $products,
+                                                function ($carry, $product) {
+                                                    $amount = floatval($product['qty']) * floatval($product['rate']);
+                                                    return $carry + ($amount * floatval($product['tax'])) / 100;
+                                                },
+                                                0,
+                                            );
 
-                                    $adjustment = floatval($additionalFields['adjustment'] ?? 0);
-                                    $total = $subTotal - $discountAmount + $totalTax + $adjustment;
-                                @endphp
+                                            $discount = floatval($additionalFields['discount'] ?? 0);
+                                            $discountAmount = ($subTotal * $discount) / 100;
 
-                                <tr>
-                                    <td colspan="5" class="text-end">Sub Total:</td>
-                                    <td class="text-end"> {{ getSettingValue('Currency Symbol') }} {{ number_format($subTotal, 2) }} {{ getSettingValue('Currency Code') }}</td>
-                                </tr>
-                                @if ($discount > 0)
-                                    <tr>
-                                        <td colspan="5" class="text-end text-danger">
-                                            Discount ({{ number_format($discount, 1) }}%):
-                                        </td>
-                                        <td class="text-end text-danger">
-                                            {{ getSettingValue('Currency Symbol') }}  -{{ number_format($discountAmount, 2) }} {{ getSettingValue('Currency Code') }}
-                                        </td>
-                                    </tr>
-                                @endif
-                                @if ($totalTax > 0)
-                                    <tr>
-                                        <td colspan="5" class="text-end">Tax:</td>
-                                        <td class="text-end"> {{ getSettingValue('Currency Symbol') }} {{ number_format($totalTax, 2) }} {{ getSettingValue('Currency Code') }}</td>
-                                    </tr>
-                                @endif
-                                @if ($adjustment != 0)
-                                    <tr>
-                                        <td colspan="5"
-                                            class="text-end {{ $adjustment < 0 ? 'text-danger' : 'text-success' }}">
-                                            Adjustment:
-                                        </td>
-                                        <td
-                                            class="text-end {{ $adjustment < 0 ? 'text-danger' : 'text-success' }}">
-                                            {{ getSettingValue('Currency Symbol') }}  {{ $adjustment > 0 ? '+' : '' }}{{ number_format($adjustment, 2) }} {{ getSettingValue('Currency Code') }}
-                                        </td>
-                                    </tr>
-                                @endif
-                                <tr class="fw-bold">
-                                    <td colspan="5" class="text-end">Total:</td>
-                                    <td class="text-end"> {{ getSettingValue('Currency Symbol') }} {{ number_format($total, 2) }} {{ getSettingValue('Currency Code') }} </td>
-                                </tr>
-                            </tfoot>
-                        </table>
+                                            $adjustment = floatval($additionalFields['adjustment'] ?? 0);
+                                            $total = $subTotal - $discountAmount + $totalTax + $adjustment;
+                                        @endphp
+
+                                        <tr>
+                                            <td colspan="5" class="text-end">Sub Total:</td>
+                                            <td class="text-end"> {{ getSettingValue('Currency Symbol') }}
+                                                {{ number_format($subTotal, 2) }}
+                                                {{ getSettingValue('Currency Code') }}</td>
+                                        </tr>
+                                        @if ($discount > 0)
+                                            <tr>
+                                                <td colspan="5" class="text-end text-danger">
+                                                    Discount ({{ number_format($discount, 1) }}%):
+                                                </td>
+                                                <td class="text-end text-danger">
+                                                    {{ getSettingValue('Currency Symbol') }}
+                                                    -{{ number_format($discountAmount, 2) }}
+                                                    {{ getSettingValue('Currency Code') }}
+                                                </td>
+                                            </tr>
+                                        @endif
+                                        @if ($totalTax > 0)
+                                            <tr>
+                                                <td colspan="5" class="text-end">Tax:</td>
+                                                <td class="text-end"> {{ getSettingValue('Currency Symbol') }}
+                                                    {{ number_format($totalTax, 2) }}
+                                                    {{ getSettingValue('Currency Code') }}</td>
+                                            </tr>
+                                        @endif
+                                        @if ($adjustment != 0)
+                                            <tr>
+                                                <td colspan="5"
+                                                    class="text-end {{ $adjustment < 0 ? 'text-danger' : 'text-success' }}">
+                                                    Adjustment:
+                                                </td>
+                                                <td
+                                                    class="text-end {{ $adjustment < 0 ? 'text-danger' : 'text-success' }}">
+                                                    {{ getSettingValue('Currency Symbol') }}
+                                                    {{ $adjustment > 0 ? '+' : '' }}{{ number_format($adjustment, 2) }}
+                                                    {{ getSettingValue('Currency Code') }}
+                                                </td>
+                                            </tr>
+                                        @endif
+                                        <tr class="fw-bold">
+                                            <td colspan="5" class="text-end">Total:</td>
+                                            <td class="text-end"> {{ getSettingValue('Currency Symbol') }}
+                                                {{ number_format($total, 2) }} {{ getSettingValue('Currency Code') }}
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
+                @endif
             @endif
-        @endif
             <section>
                 <h2 class="section-title">Executive Summary</h2>
                 <div class="proposal-body">
@@ -399,65 +443,65 @@
         </div>
 
         <div class="proposal-content">
-        @if ($proposal->status === 'ACCEPTED')
-            <div class="container mt-4">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-primary text-white">
-                        <h4 class="mb-0">Proposal Acceptance Details</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-4">
-                                    <h5 class="text-muted mb-3">Client Information</h5>
-                                    <div class="table-responsive">
-                                        <table class="table table-borderless">
-                                            <tbody>
-                                                <tr>
-                                                    <td class="text-muted" style="width: 140px;">Name:</td>
-                                                    <td class="font-weight-bold">
-                                                        {{ $proposal->accepted_details['first_name'] }}
-                                                        {{ $proposal->accepted_details['last_name'] }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="text-muted">Email:</td>
-                                                    <td class="font-weight-bold">
-                                                        {{ $proposal->accepted_details['email'] }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="text-muted">Accepted On:</td>
-                                                    <td class="font-weight-bold">
-                                                        {{formatDateTime($proposal->accepted_at) }}
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-4">
-                                    <h5 class="text-muted mb-3">Digital Signature</h5>
-                                    <div class="border rounded p-3 bg-light">
-                                        <img src="{{ $proposal->accepted_details['signature'] }}"
-                                            alt="Digital Signature" class="img-fluid" style="max-height: 150px;">
-                                    </div>
-                                </div>
-                            </div>
+            @if ($proposal->status === 'ACCEPTED')
+                <div class="container mt-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0">Proposal Acceptance Details</h4>
                         </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-4">
+                                        <h5 class="text-muted mb-3">Client Information</h5>
+                                        <div class="table-responsive">
+                                            <table class="table table-borderless">
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="text-muted" style="width: 140px;">Name:</td>
+                                                        <td class="font-weight-bold">
+                                                            {{ $proposal->accepted_details['first_name'] }}
+                                                            {{ $proposal->accepted_details['last_name'] }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-muted">Email:</td>
+                                                        <td class="font-weight-bold">
+                                                            {{ $proposal->accepted_details['email'] }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-muted">Accepted On:</td>
+                                                        <td class="font-weight-bold">
+                                                            {{ formatDateTime($proposal->accepted_at) }}
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-4">
+                                        <h5 class="text-muted mb-3">Digital Signature</h5>
+                                        <div class="border rounded p-3 bg-light">
+                                            <img src="{{ $proposal->accepted_details['signature'] }}"
+                                                alt="Digital Signature" class="img-fluid" style="max-height: 150px;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-                        <div class="mt-3">
-                            <div class="alert alert-success d-flex align-items-center" role="alert">
-                                <i class="fas fa-check-circle me-2"></i>
-                                <div>
-                                    This proposal has been officially accepted and signed by the client.
+                            <div class="mt-3">
+                                <div class="alert alert-success d-flex align-items-center" role="alert">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    <div>
+                                        This proposal has been officially accepted and signed by the client.
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        @endif
+            @endif
         </div>
     </div>
 </body>

@@ -16,12 +16,13 @@ class Timesheet extends Model
 
     protected $table = self::table;
 
-    protected $fillable = ['start_date', 'end_date', 'duration', 'notes', 'company_id', 'task_id', 'user_id', 'created_by', 'updated_by'];
+    protected $fillable = ['start_date', 'end_date', 'duration', 'notes', 'company_id', 'task_id', 'user_id', 'created_by', 'updated_by','invoice_generated'];
 
 
     protected $casts = [
         'start_date' => 'datetime',
         'end_date' => 'datetime',
+        'invoice_generated' => 'boolean'
     ];
 
     public function task()
@@ -49,6 +50,11 @@ class Timesheet extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    public function invoice()
+    {
+        return $this->hasOne(Invoice::class, 'timesheet_id');
+    }
+  
     protected static function boot()
     {
         parent::boot();

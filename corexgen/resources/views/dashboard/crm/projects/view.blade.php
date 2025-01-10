@@ -445,6 +445,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#invoicesTab">
+                                <i class="fas fa-receipt me-2"></i>Invoices
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" data-bs-toggle="tab" href="#milestones">
                                 <i class="fas fa-rocket me-2"></i>Milestones
                             </a>
@@ -471,7 +476,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#notes">
+                            <a class="nav-link" data-bs-toggle="tab" href="#notesTab">
                                 <i class="fas fa-sticky-note me-2"></i>Notes
                             </a>
                         </li>
@@ -515,6 +520,9 @@
                         <div class="tab-pane fade" id="timesheets">
                             @include('dashboard.crm.projects.components._timesheets')
                         </div>
+                        <div class="tab-pane fade" id="invoicesTab">
+                            @include('dashboard.crm.projects.components._invoices')
+                        </div>
                         <div class="tab-pane fade" id="milestones">
                             @include('dashboard.crm.projects.components._milestones')
                         </div>
@@ -535,7 +543,7 @@
                         </div>
 
                         <!-- Notes Tab -->
-                        <div class="tab-pane fade" id="notes">
+                        <div class="tab-pane fade" id="notesTab">
                             @include('dashboard.crm.projects.components._notes')
                         </div>
 

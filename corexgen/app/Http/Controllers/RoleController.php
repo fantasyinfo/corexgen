@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RoleRequest;
+use App\Traits\StatusStatsFilter;
 use Illuminate\Http\Request;
 use App\Models\CRM\CRMRole;
 use Illuminate\Support\Facades\Validator;
@@ -30,6 +31,7 @@ class RoleController extends Controller
 {
     use TenantFilter;
     use SubscriptionUsageFilter;
+    use StatusStatsFilter;
 
     /**
      * Number of items per page for pagination
@@ -122,36 +124,7 @@ class RoleController extends Controller
         }
 
 
-        // Build base query for user totals
-        $user = Auth::user();
-        $userQuery = CRMRole::query();
-
-        $userQuery = $this->applyTenantFilter($userQuery);
-
-        // Get all totals in a single query
-        $usersTotals = $userQuery->select([
-            DB::raw('COUNT(*) as totalUsers'),
-            DB::raw(sprintf(
-                'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalActive',
-                CRM_STATUS_TYPES['CRM_ROLES']['STATUS']['ACTIVE']
-            )),
-            DB::raw(sprintf(
-                'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalInactive',
-                CRM_STATUS_TYPES['CRM_ROLES']['STATUS']['DEACTIVE']
-            ))
-        ])->first();
-
-        // fetch usage
-
-        if (!$user->is_tenant && !is_null($user->company_id)) {
-            $usages = $this->fetchTotalAllowAndUsedUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['ROLE']]));
-        } else if ($user->is_tenant) {
-            $usages = [
-                'totalAllow' => '-1',
-                'currentUsage' => $usersTotals->totalUsers,
-                
-            ];
-        }
+        $headerStatus = $this->getHeaderStatus(\App\Models\CRM\CRMRole::class, PermissionsHelper::$plansPermissionsKeys['ROLE'],false);
 
 
 
@@ -163,12 +136,34 @@ class RoleController extends Controller
             'permissions' => PermissionsHelper::getPermissionsArray('ROLE'),
             'module' => PANEL_MODULES[$this->getPanelModule()]['role'],
             'type' => 'Roles',
-            'total_allow' => $usages['totalAllow'],
-            'total_used' => $usages['currentUsage'],
-            'total_active' => $usersTotals->totalActive,
-            'total_inactive' => $usersTotals->totalInactive,
-            'total_ussers' => $usersTotals->totalUsers,
+            'headerStatus' => $headerStatus,
         ]);
+    }
+
+    private function getHeaderStatus($model, $permission,$isSeftDelete = true)
+    {
+        $user = Auth::user();
+
+        // fetch totals status by clause
+        $statusQuery = $this->getGroupByStatusQuery($model,$isSeftDelete);
+        $groupData = $this->applyTenantFilter($statusQuery['groupQuery'])->get()->toArray();
+        $totalData = $this->applyTenantFilter($statusQuery['totalQuery'])->count();
+        // fetch usage
+
+        if (!$user->is_tenant && !is_null($user->company_id)) {
+            $usages = $this->fetchTotalAllowAndUsedUsage(strtolower(PLANS_FEATURES[$permission]));
+        } else if ($user->is_tenant) {
+            $usages = [
+                'totalAllow' => '-1',
+                'currentUsage' => $totalData,
+            ];
+        }
+
+        return [
+            'totalAllow' => $usages['totalAllow'],
+            'currentUsage' => $totalData,
+            'groupData' => $groupData
+        ];
     }
 
     /**
@@ -190,8 +185,8 @@ class RoleController extends Controller
 
             CRMRole::create($validated);
 
-                    // update current usage
-            $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['ROLE']]), '+','1');
+            // update current usage
+            $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['ROLE']]), '+', '1');
 
             // Redirect with success message
             return redirect()->route($this->tenantRoute . 'role.index')
@@ -313,7 +308,8 @@ class RoleController extends Controller
             ->header('Content-Disposition', "attachment; filename={$fileName}");
     }
 
-    public function importView(){
+    public function importView()
+    {
         $expectedHeaders = [
             'Role Name' => [
                 'key' => 'Role Name',
@@ -336,7 +332,7 @@ class RoleController extends Controller
             [
                 'Role Name' => 'Ditial Manager',
                 'Role Description' => 'to manager ditial',
-             
+
             ],
         ];
 
@@ -384,7 +380,7 @@ class RoleController extends Controller
                 CRMRole::updateOrCreate(
                     [
                         'role_name' => $row['Role Name'] ?? '',
-                        'company_id' => Auth::user()->company_id ?? null, 
+                        'company_id' => Auth::user()->company_id ?? null,
                     ],
                     [
                         'role_desc' => $row['Role Description'] ?? '',
@@ -394,7 +390,7 @@ class RoleController extends Controller
                 $totalAdd++;
             }
 
-            $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['ROLE']]), '+',$totalAdd);
+            $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['ROLE']]), '+', $totalAdd);
 
             return response()->json([
                 'success' => true,
@@ -422,7 +418,7 @@ class RoleController extends Controller
             $query = $this->applyTenantFilter($query);
             $query->delete();
 
-            $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['ROLE']]), '-','1');
+            $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['ROLE']]), '-', '1');
             // Redirect with success message
             return redirect()->back()->with('success', 'Role deleted successfully.');
         } catch (\Exception $e) {
@@ -468,7 +464,7 @@ class RoleController extends Controller
             if (is_array($ids) && count($ids) > 0) {
                 // Validate ownership/permissions if necessary
                 $this->applyTenantFilter(CRMRole::query()->whereIn('id', $ids))->delete();
-                $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['ROLE']]), '-',count($ids));
+                $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['ROLE']]), '-', count($ids));
                 return response()->json(['message' => 'Selected roles deleted successfully.'], 200);
             }
 

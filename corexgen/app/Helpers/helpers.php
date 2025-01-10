@@ -1041,7 +1041,7 @@ function getTeamMates()
 if (!function_exists('formatDateTime')) {
     function formatDateTime($date, $timezone = null, $format = null)
     {
-        if (Auth::user()->is_tenant) {
+        if (Auth::check() && Auth::user()->is_tenant) {
             $timezone = getSettingValue('Panel Time Zone') ?: config('app.timezone');
             $format = getSettingValue('Panel Date Format') ?: 'd M Y';
         } else {
@@ -1094,7 +1094,7 @@ function calculateTimeDifference($start_date, $end_date)
     ];
 }
 
- function convertMinutesToHoursAndMinutes($totalMinutes)
+function convertMinutesToHoursAndMinutes($totalMinutes)
 {
     // Convert minutes to hours and remaining minutes
     $hours = intdiv($totalMinutes, 60);
@@ -1103,4 +1103,22 @@ function calculateTimeDifference($start_date, $end_date)
     // Format as "X hours and Y minutes"
     return sprintf("%d hours and %d minutes", $hours, $minutes);
 }
+
+function calculateCostFromMinutes($totalMinutes, $ratePerHour)
+{
+    // Convert minutes to hours and remaining minutes
+    $hours = intdiv($totalMinutes, 60);
+    $minutes = $totalMinutes % 60;
+
+    // Calculate cost
+    $totalCost = ($totalMinutes / 60) * $ratePerHour;
+
+    // Format cost with breakdown
+    $breakdown = sprintf("%d hours and %d minutes", $hours, $minutes);
+    $formattedCost = number_format($totalCost, 2);
+
+    return $totalCost;
+}
+
+
 

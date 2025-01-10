@@ -1,20 +1,7 @@
 @extends('layout.app')
 
 @section('content')
-    @php
-
-        $type = null;
-        $id = null;
-        $refrer = null;
-        if (isset($_GET['type']) && isset($_GET['id']) && isset($_GET['refrer'])) {
-            $type = trim($_GET['type']);
-            $id = trim($_GET['id']);
-            $refrer = trim($_GET['refrer']);
-        }
-
-        // prePrintR($tax->toArray());
-
-    @endphp
+   
     
     <div class="container-fluid">
         <div class="row">
@@ -78,7 +65,7 @@
                                             @endphp
                                             <option value="{{ $item->id }}"
                                                 {{ old('client_id',$invoice->client_id) == $item->id ? 'selected' : '' }}
-                                                {{ $id == $item->id ? 'selected' : '' }}>{{ $nameAndEmail }}
+                                                >{{ $nameAndEmail }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -96,7 +83,7 @@
                                         @foreach ($tasks as $item)
                                             <option value="{{ $item->id }}"
                                                 {{ old('task_id',$invoice->task_id) == $item->id ? 'selected' : '' }}
-                                                {{ $id == $item->id ? 'selected' : '' }}>{{ $item->title }}
+                                                >{{ $item->title }}
                                             </option>
                                         @endforeach
                                     </select>

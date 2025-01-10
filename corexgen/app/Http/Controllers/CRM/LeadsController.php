@@ -15,6 +15,7 @@ use App\Services\EstimateService;
 use App\Services\ProposalService;
 use App\Traits\AuditFilter;
 use App\Traits\CategoryGroupTagsFilter;
+use App\Traits\StatusStatsFilter;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
 use App\Traits\SubscriptionUsageFilter;
@@ -35,6 +36,7 @@ class LeadsController extends Controller
     use SubscriptionUsageFilter;
     use CategoryGroupTagsFilter;
     use AuditFilter;
+    use StatusStatsFilter;
     //
     /**
      * Number of items per page for pagination
@@ -82,7 +84,7 @@ class LeadsController extends Controller
         EstimateService $estimateService,
         CustomFieldService $customFieldService
     ) {
-   
+
         $this->leadsService = $leadsService;
         $this->customFieldService = $customFieldService;
         $this->proposalService = $proposalService;
@@ -103,34 +105,13 @@ class LeadsController extends Controller
 
 
 
-        $user = Auth::user();
-        $userQuery = CRMLeads::query();
-
-        $userQuery = $this->applyTenantFilter($userQuery);
-
-        // Get all totals in a single query
-        $usersTotals = $userQuery->select([
-            DB::raw('COUNT(*) as totalUsers'),
-            DB::raw(sprintf(
-                'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalActive',
-                CRM_STATUS_TYPES['LEADS']['STATUS']['ACTIVE']
-            )),
-            DB::raw(sprintf(
-                'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalInactive',
-                CRM_STATUS_TYPES['LEADS']['STATUS']['DEACTIVE']
-            ))
-        ])->first();
-
-        // fetch usage
-
-        if (!$user->is_tenant && !is_null($user->company_id)) {
-            $usages = $this->fetchTotalAllowAndUsedUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['LEADS']]));
-        } else if ($user->is_tenant) {
-            $usages = [
-                'totalAllow' => '-1',
-                'currentUsage' => $usersTotals->totalUsers,
-            ];
-        }
+        $headerStatus = $this->getHeaderStages(
+            \App\Models\CRM\CRMLeads::class,
+            CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_status'],
+            CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads'],
+            'leads',
+            PermissionsHelper::$plansPermissionsKeys['LEADS']
+        );
 
 
         return view($this->getViewFilePath('index'), [
@@ -139,11 +120,7 @@ class LeadsController extends Controller
             'permissions' => PermissionsHelper::getPermissionsArray('LEADS'),
             'module' => PANEL_MODULES[$this->getPanelModule()]['leads'],
             'type' => 'Leads',
-            'total_allow' => $usages['totalAllow'],
-            'total_used' => $usages['currentUsage'],
-            'total_active' => $usersTotals->totalActive,
-            'total_inactive' => $usersTotals->totalInactive,
-            'total_ussers' => $usersTotals->totalUsers,
+            'headerStatus' => $headerStatus,
             'leadsGroups' => $this->leadsService->getLeadsGroups(),
             'leadsSources' => $this->leadsService->getLeadsSources(),
             'leadsStatus' => $this->leadsService->getLeadsStatus(),
@@ -152,7 +129,31 @@ class LeadsController extends Controller
     }
 
 
+    private function getHeaderStages($model, $type, $relation, $table, $permission)
+    {
+        $user = Auth::user();
 
+        // fetch totals status by clause
+        $statusQuery = $this->getGroupByStageQuery($model, $type, $relation);
+        $groupData = $this->applyTenantFilter($statusQuery['groupQuery'], $table)->get()->toArray();
+        $totalData = $this->applyTenantFilter($statusQuery['totalQuery'], $table)->count();
+        // fetch usage
+
+        if (!$user->is_tenant && !is_null($user->company_id)) {
+            $usages = $this->fetchTotalAllowAndUsedUsage(strtolower(PLANS_FEATURES[$permission]));
+        } else if ($user->is_tenant) {
+            $usages = [
+                'totalAllow' => '-1',
+                'currentUsage' => $totalData,
+            ];
+        }
+
+        return [
+            'totalAllow' => $usages['totalAllow'],
+            'currentUsage' => $totalData,
+            'groupData' => $groupData
+        ];
+    }
     public function store(LeadsRequest $request)
     {
 
@@ -734,7 +735,7 @@ class LeadsController extends Controller
         $proposals = collect();
         $proposals = $this->proposalService->getProposals(\App\Models\CRM\CRMLeads::class, $id);
 
-       // estimates
+        // estimates
         $estimates = collect();
         $estimates = $this->estimateService->getEstimates(\App\Models\CRM\CRMLeads::class, $id);
 

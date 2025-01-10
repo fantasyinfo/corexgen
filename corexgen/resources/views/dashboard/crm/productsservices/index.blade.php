@@ -11,7 +11,7 @@
 
                 @include('dashboard.crm.productsservices.components.products-filters')
 
-                @include('layout.components.header-stats')
+                @include('layout.components.header-stats-new')
 
 
                 @if (hasPermission('PRODUCTS_SERVICES.READ_ALL') || hasPermission('PRODUCTS_SERVICES.READ'))

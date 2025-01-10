@@ -8,7 +8,7 @@
             <div class="shadow-sm rounded">
 
                 @include('dashboard.crm.tasks.components.tasks-filters')
-                @include('layout.components.header-stats')
+                @include('layout.components.header-stats-new')
 
 
                 @if (hasPermission('TASKS.READ_ALL') || hasPermission('TASKS.READ'))

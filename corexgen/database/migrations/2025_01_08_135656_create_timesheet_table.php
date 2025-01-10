@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->dateTime('end_date');
             $table->unsignedInteger('duration')->nullable(); // Duration in minutes
             $table->text('notes')->nullable();
+            $table->boolean('invoice_generated')->default(false);
   
             $table->unsignedBigInteger('company_id');
             $table->unsignedBigInteger('task_id');

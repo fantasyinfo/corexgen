@@ -32,6 +32,8 @@ class InvoiceRequest extends FormRequest
             'due_date' => 'nullable|date|after_or_equal:today',
             'task_id' => 'nullable|exists:tasks,id',
             'total_amount' => 'required|numeric|min:1',
+            'project_id' => 'nullable|exists:projects,id',
+            'timesheet_id' => 'nullable|exists:timesheets,id',
 
             // Ensure at least one product is provided
             'product_title.0' => 'required|string',

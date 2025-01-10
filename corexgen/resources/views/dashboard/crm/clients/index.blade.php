@@ -10,7 +10,7 @@
                 @include('dashboard.crm.clients.components.clients-filters')
                 @include('layout.components.bulk-import-modal')
 
-                @include('layout.components.header-stats')
+                @include('layout.components.header-stats-new')
 
 
                 @if (hasPermission('CLIENTS.READ_ALL') || hasPermission('CLIENTS.READ'))

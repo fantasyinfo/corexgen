@@ -17,6 +17,7 @@ use App\Services\ProposalService;
 use App\Services\TasksService;
 use App\Traits\AuditFilter;
 use App\Traits\CategoryGroupTagsFilter;
+use App\Traits\StatusStatsFilter;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
 use App\Traits\SubscriptionUsageFilter;
@@ -33,7 +34,9 @@ class TasksController extends Controller
     use SubscriptionUsageFilter;
     use CategoryGroupTagsFilter;
     use AuditFilter;
+    use StatusStatsFilter;
     //
+
     /**
      * Number of items per page for pagination
      * @var int
@@ -103,37 +106,13 @@ class TasksController extends Controller
             return $this->tasksService->getDatatablesResponse($request);
         }
 
-
-
-        $user = Auth::user();
-        $userQuery = Tasks::query();
-
-        $userQuery = $this->applyTenantFilter($userQuery);
-
-        // Get all totals in a single query
-        // $usersTotals = $userQuery->select([
-        //     DB::raw('COUNT(*) as totalUsers'),
-        //     DB::raw(sprintf(
-        //         'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalActive',
-        //         CRM_STATUS_TYPES['TASKS']['STATUS']['ACTIVE']
-        //     )),
-        //     DB::raw(sprintf(
-        //         'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalInactive',
-        //         CRM_STATUS_TYPES['TASKS']['STATUS']['DEACTIVE']
-        //     ))
-        // ])->first();
-
-        // fetch usage
-
-        if (!$user->is_tenant && !is_null($user->company_id)) {
-            $usages = $this->fetchTotalAllowAndUsedUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['TASKS']]));
-        } else if ($user->is_tenant) {
-            $usages = [
-                'totalAllow' => '-1',
-                'currentUsage' => 0,
-            ];
-        }
-
+        $headerStatus = $this->getHeaderStages(
+            \App\Models\Tasks::class,
+            CATEGORY_GROUP_TAGS_TYPES['KEY']['tasks_status'],
+            CATEGORY_GROUP_TAGS_RELATIONS['KEY']['tasks'],
+            'tasks',
+            PermissionsHelper::$plansPermissionsKeys['TASKS']
+        );
 
         return view($this->getViewFilePath('index'), [
             'filters' => $request->all(),
@@ -141,11 +120,7 @@ class TasksController extends Controller
             'permissions' => PermissionsHelper::getPermissionsArray('TASKS'),
             'module' => PANEL_MODULES[$this->getPanelModule()]['tasks'],
             'type' => 'Tasks',
-            'total_allow' => $usages['totalAllow'],
-            'total_used' => $usages['currentUsage'],
-            'total_active' => 0,
-            'total_inactive' => 0,
-            'total_ussers' => 0,
+            'headerStatus' => $headerStatus,
             'tasksStatus' => $this->tasksService->getTasksStatus(),
             'projects' => $this->projectService->getAllProjects(),
             'teamMates' => getTeamMates(),
@@ -153,6 +128,32 @@ class TasksController extends Controller
     }
 
 
+
+    private function getHeaderStages($model, $type, $relation, $table, $permission)
+    {
+        $user = Auth::user();
+
+        // fetch totals status by clause
+        $statusQuery = $this->getGroupByStageQuery($model, $type, $relation);
+        $groupData = $this->applyTenantFilter($statusQuery['groupQuery'], $table)->get()->toArray();
+        $totalData = $this->applyTenantFilter($statusQuery['totalQuery'], $table)->count();
+        // fetch usage
+
+        if (!$user->is_tenant && !is_null($user->company_id)) {
+            $usages = $this->fetchTotalAllowAndUsedUsage(strtolower(PLANS_FEATURES[$permission]));
+        } else if ($user->is_tenant) {
+            $usages = [
+                'totalAllow' => '-1',
+                'currentUsage' => $totalData,
+            ];
+        }
+
+        return [
+            'totalAllow' => $usages['totalAllow'],
+            'currentUsage' => $totalData,
+            'groupData' => $groupData
+        ];
+    }
 
     public function store(TasksRequest $request)
     {
@@ -431,7 +432,7 @@ class TasksController extends Controller
             'permissions' => PermissionsHelper::getPermissionsArray('TASKS'),
             'milestones' => $milestones,
             'timesheets' => $timesheets,
-            'taskUsers' => $this->getAssignee($id,true)
+            'taskUsers' => $this->getAssignee($id, true)
 
         ]);
     }

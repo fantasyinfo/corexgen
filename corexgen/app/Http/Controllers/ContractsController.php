@@ -14,6 +14,7 @@ use App\Services\ContractService;
 use App\Services\ProductServicesService;
 use App\Traits\IsSMTPValid;
 use App\Traits\MediaTrait;
+use App\Traits\StatusStatsFilter;
 use App\Traits\SubscriptionUsageFilter;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
@@ -41,6 +42,8 @@ class ContractsController extends Controller
     use SubscriptionUsageFilter;
     use MediaTrait;
     use IsSMTPValid;
+    use StatusStatsFilter;
+
 
     /**
      * Number of items per page for pagination
@@ -106,38 +109,7 @@ class ContractsController extends Controller
 
 
         // Fetch the totals in a single query
-
-        // Build base query for Contracts totals
-        $user = Auth::user();
-        $proposalQuery = CRMContract::query();
-
-        $proposalQuery = $this->applyTenantFilter($proposalQuery);
-
-        // Get all totals in a single query
-        $usersTotals = $proposalQuery->select([
-            DB::raw('COUNT(*) as totalUsers'),
-            DB::raw(sprintf(
-                'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalActive',
-                CRM_STATUS_TYPES['CONTRACTS']['STATUS']['OPEN']
-            )),
-            DB::raw(sprintf(
-                'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalInactive',
-                CRM_STATUS_TYPES['CONTRACTS']['STATUS']['DECLINED']
-            ))
-        ])->first();
-
-
-
-        // fetch usage
-
-        if (!$user->is_tenant && !is_null($user->company_id)) {
-            $usages = $this->fetchTotalAllowAndUsedUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['CONTRACTS']]));
-        } else if ($user->is_tenant) {
-            $usages = [
-                'totalAllow' => '-1',
-                'currentUsage' => $usersTotals->totalUsers,
-            ];
-        }
+        $headerStatus = $this->getHeaderStatus(\App\Models\CRM\CRMContract::class, PermissionsHelper::$plansPermissionsKeys['CONTRACTS']);
 
         $templates = $this->applyTenantFilter(CRMTemplates::query()->where('type', 'Contracts'))->get();
 
@@ -153,11 +125,7 @@ class ContractsController extends Controller
             'permissions' => PermissionsHelper::getPermissionsArray('CONTRACTS'),
             'module' => PANEL_MODULES[$this->getPanelModule()]['contracts'],
             'type' => 'Contracts',
-            'total_allow' => $usages['totalAllow'],
-            'total_used' => $usages['currentUsage'],
-            'total_active' => $usersTotals->totalActive,
-            'total_inactive' => $usersTotals->totalInactive,
-            'total_ussers' => $usersTotals->totalUsers,
+            'headerStatus' => $headerStatus,
             'clients' => $clients,
             'leads' => $leads,
 
@@ -165,6 +133,33 @@ class ContractsController extends Controller
     }
 
 
+
+    private function getHeaderStatus($model, $permission)
+    {
+        $user = Auth::user();
+
+        // fetch totals status by clause
+        $statusQuery = $this->getGroupByStatusQuery($model);
+        $groupData = $this->applyTenantFilter($statusQuery['groupQuery'])->get()->toArray();
+        $totalData = $this->applyTenantFilter($statusQuery['totalQuery'])->count();
+        // fetch usage
+
+        if (!$user->is_tenant && !is_null($user->company_id)) {
+            $usages = $this->fetchTotalAllowAndUsedUsage(strtolower(PLANS_FEATURES[$permission]));
+        } else if ($user->is_tenant) {
+            $usages = [
+                'totalAllow' => '-1',
+                'currentUsage' => $totalData,
+            ];
+        }
+
+        return [
+            'totalAllow' => $usages['totalAllow'],
+            'currentUsage' => $totalData,
+            'groupData' => $groupData
+        ];
+    }
+    
 
     /**
      * Storing the data of Contracts into db

@@ -596,9 +596,9 @@ PermissionsHelper::initializePermissions();
         'BT_CLASSES' => ['SUCCESS' => 'success', 'FAILED' => 'danger', 'PENDING' => 'warning'],
     ],
     'INVOICES' => [
-        'TABLE_STATUS' => ['SUCCESS', 'OVERDUE', 'PENDING'],
-        'STATUS' => ['SUCCESS' => 'SUCCESS', 'OVERDUE' => 'OVERDUE', 'PENDING' => 'PENDING'],
-        'BT_CLASSES' => ['SUCCESS' => 'success', 'OVERDUE' => 'danger', 'PENDING' => 'warning'],
+        'TABLE_STATUS' => ['SENT','SUCCESS', 'OVERDUE', 'PENDING'],
+        'STATUS' => ['SENT' => 'SENT','SUCCESS' => 'PAID', 'OVERDUE' => 'OVERDUE', 'PENDING' => 'PENDING'],
+        'BT_CLASSES' => ['SENT' => 'info','SUCCESS' => 'success', 'OVERDUE' => 'danger', 'PENDING' => 'warning'],
     ],
 
     'PROJECTS' => [

@@ -27,11 +27,13 @@ return new class extends Migration {
             $table->unsignedBigInteger('company_id');
             $table->unsignedBigInteger('project_id')->nullable();
             $table->unsignedBigInteger('task_id')->nullable();
+            $table->unsignedBigInteger('timesheet_id')->nullable();
 
             $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
             $table->foreign('project_id')->references('id')->on('projects')->onDelete('set null');
             $table->foreign('task_id')->references('id')->on('tasks')->onDelete('set null');
+            $table->foreign('timesheet_id')->references('id')->on('timesheets')->onDelete('set null');
 
             $table->softDeletes();
             $table->timestamps();

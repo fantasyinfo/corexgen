@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\PermissionsHelper;
 use App\Services\CustomFieldService;
+use App\Traits\StatusStatsFilter;
 use App\Traits\SubscriptionUsageFilter;
 use App\Traits\TenantFilter;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +19,7 @@ class CustomFieldController extends Controller
 
     use TenantFilter;
     use SubscriptionUsageFilter;
+    use StatusStatsFilter;
     /**
      * Number of items per page for pagination
      * @var int

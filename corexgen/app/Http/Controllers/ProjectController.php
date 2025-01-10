@@ -15,12 +15,14 @@ use App\Services\EstimateService;
 use App\Services\ProposalService;
 use App\Traits\AuditFilter;
 use App\Traits\CategoryGroupTagsFilter;
+use App\Traits\StatusStatsFilter;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
 use App\Traits\SubscriptionUsageFilter;
 use Illuminate\Support\Facades\Auth;
 use App\Services\ClientService;
 use App\Services\CustomFieldService;
+use App\Services\InvoiceService;
 use App\Services\ProjectService;
 use App\Services\TasksService;
 use Illuminate\Support\Facades\DB;
@@ -33,6 +35,7 @@ class ProjectController extends Controller
     use SubscriptionUsageFilter;
     use CategoryGroupTagsFilter;
     use AuditFilter;
+    use StatusStatsFilter;
     //
     /**
      * Number of items per page for pagination
@@ -74,6 +77,7 @@ class ProjectController extends Controller
 
     protected $clientService;
     protected $tasksService;
+    protected $invoiceService;
 
     public function __construct(
         ProposalService $proposalService,
@@ -82,7 +86,8 @@ class ProjectController extends Controller
         CustomFieldService $customFieldService,
         ProjectService $projectService,
         ClientService $clientService,
-        TasksService $tasksService
+        TasksService $tasksService,
+        InvoiceService $invoiceService,
     ) {
 
 
@@ -93,6 +98,7 @@ class ProjectController extends Controller
         $this->projectService = $projectService;
         $this->clientService = $clientService;
         $this->tasksService = $tasksService;
+        $this->invoiceService = $invoiceService;
     }
 
 
@@ -107,36 +113,7 @@ class ProjectController extends Controller
         }
 
 
-
-        $user = Auth::user();
-        $userQuery = Project::query();
-
-        $userQuery = $this->applyTenantFilter($userQuery);
-
-        // Get all totals in a single query
-        $usersTotals = $userQuery->select([
-            DB::raw('COUNT(*) as totalUsers'),
-            DB::raw(sprintf(
-                'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalActive',
-                CRM_STATUS_TYPES['PROJECTS']['STATUS']['ACTIVE']
-            )),
-            DB::raw(sprintf(
-                'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalInactive',
-                CRM_STATUS_TYPES['PROJECTS']['STATUS']['CANCELED']
-            ))
-        ])->first();
-
-        // fetch usage
-
-        if (!$user->is_tenant && !is_null($user->company_id)) {
-            $usages = $this->fetchTotalAllowAndUsedUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['PROJECTS']]));
-        } else if ($user->is_tenant) {
-            $usages = [
-                'totalAllow' => '-1',
-                'currentUsage' => $usersTotals->totalUsers,
-            ];
-        }
-
+        $headerStatus = $this->getHeaderStatus(\App\Models\Project::class, PermissionsHelper::$plansPermissionsKeys['PROJECTS']);
 
         return view($this->getViewFilePath('index'), [
             'filters' => $request->all(),
@@ -144,17 +121,39 @@ class ProjectController extends Controller
             'permissions' => PermissionsHelper::getPermissionsArray('PROJECTS'),
             'module' => PANEL_MODULES[$this->getPanelModule()]['projects'],
             'type' => 'Projects',
-            'total_allow' => $usages['totalAllow'],
-            'total_used' => $usages['currentUsage'],
-            'total_active' => $usersTotals->totalActive,
-            'total_inactive' => $usersTotals->totalInactive,
-            'total_ussers' => $usersTotals->totalUsers,
+            'headerStatus' => $headerStatus,
             'teamMates' => getTeamMates(),
             'clients' => $this->clientService->getAllClients()
         ]);
     }
 
 
+
+    private function getHeaderStatus($model, $permission)
+    {
+        $user = Auth::user();
+
+        // fetch totals status by clause
+        $statusQuery = $this->getGroupByStatusQuery($model);
+        $groupData = $this->applyTenantFilter($statusQuery['groupQuery'])->get()->toArray();
+        $totalData = $this->applyTenantFilter($statusQuery['totalQuery'])->count();
+        // fetch usage
+
+        if (!$user->is_tenant && !is_null($user->company_id)) {
+            $usages = $this->fetchTotalAllowAndUsedUsage(strtolower(PLANS_FEATURES[$permission]));
+        } else if ($user->is_tenant) {
+            $usages = [
+                'totalAllow' => '-1',
+                'currentUsage' => $totalData,
+            ];
+        }
+
+        return [
+            'totalAllow' => $usages['totalAllow'],
+            'currentUsage' => $totalData,
+            'groupData' => $groupData
+        ];
+    }
 
     public function store(ProjectRequest $request)
     {
@@ -424,7 +423,13 @@ class ProjectController extends Controller
         // timesheets
         $timesheets = collect();
         $taskIds = $tasks->pluck('id');
-        $timesheets = $this->applyTenantFilter(Timesheet::whereIn('task_id', $taskIds)->with('task', 'user'))->get();
+        $timesheets = $this->applyTenantFilter(Timesheet::whereIn('task_id', $taskIds)->with('task', 'user','invoice'))->get();
+
+
+        // invoices
+
+        $invoices = collect();
+        $invoices = $this->invoiceService->getInvoices($id);
 
 
 
@@ -443,7 +448,8 @@ class ProjectController extends Controller
             'estimates' => $estimates,
             'tasks' => $tasks,
             'milestones' => $milestones,
-            'timesheets' => $timesheets
+            'timesheets' => $timesheets,
+            'invoices' => $invoices
         ]);
     }
 

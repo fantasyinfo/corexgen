@@ -9,7 +9,7 @@
 
                 @include('dashboard.companies.components.companies-filters')
                 @include('layout.components.bulk-import-modal')
-                @include('layout.components.header-stats')
+                @include('layout.components.header-stats-new')
 
                 @if (hasPermission('COMPANIES.READ_ALL') || hasPermission('COMPANIES.READ'))
 

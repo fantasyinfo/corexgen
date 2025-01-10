@@ -1,3 +1,7 @@
+@php
+    // prePrintR($timesheets->toArray());
+@endphp
+
 <!-- Add this button above your table -->
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h5 class="mb-0">Timesheets Lists</h5>
@@ -105,9 +109,10 @@
                         <th>Start Date</th>
                         <th>End Date</th>
                         <th>Duration</th>
+                        <th>Invoice</th>
                         <th>Task</th>
                         <th>User</th>
-                        <th>Created Date</th>
+                        {{-- <th>Created Date</th> --}}
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -117,6 +122,26 @@
                             <td>{{ formatDateTime($tm?->start_date) }}</td>
                             <td>{{ formatDateTime($tm?->end_date) }}</td>
                             <td>{{ convertMinutesToHoursAndMinutes($tm?->duration) }}</td>
+                            <td>
+
+                                @if ($tm?->invoice_generated && $tm?->invoice_generated == true && $tm?->invoice)
+                                    <a class="dt-link"
+                                        href="{{ route(getPanelRoutes('invoices.view'), $tm?->invoice?->id) }}"
+                                        target="_blank">
+                                        {{ $tm?->invoice?->_id }}
+                                    </a>
+                                @else
+                                    <button class="btn btn-success generateInvoice"
+                                        data-title="{{ $tm?->task?->title }}" data-start="{{ $tm?->start_date }}"
+                                        data-duration="{{ $tm?->duration }}" data-taskid="{{ $tm?->task?->id }}"
+                                        data-hourly_rate="{{ $tm?->task?->hourly_rate }}"
+                                        data-cost="{{ calculateCostFromMinutes($tm?->duration, $tm?->task?->hourly_rate) }}"
+                                        data-end="{{ $tm?->end_date }}" data-project="{{ $project->id }}"
+                                        data-task="{{ $tm?->task?->id }}" data-timesheet="{{ $tm->id }}"
+                                        data-client="{{ $project->client->id }}"><span class="fas fa-reciept"></span>
+                                        Generate Invoice</button>
+                                @endif
+                            </td>
                             <td>
                                 <a class="dt-link" href="{{ route(getPanelRoutes('tasks.view'), $tm?->task?->id) }}"
                                     target="_blank">
@@ -132,7 +157,7 @@
                                         :title="$tm?->user?->name" />
                                 </a>
                             </td>
-                            <td>{{ formatDateTime($tm?->created_at) }}</td>
+                            {{-- <td>{{ formatDateTime($tm?->created_at) }}</td> --}}
                             <td>
                                 <button class="btn btn-sm btn-primary edit-Timesheet" data-id="{{ $tm->id }}">
                                     <i class="fas fa-edit"></i>
@@ -163,6 +188,85 @@
     <script>
         // Add this to your JavaScript file
         $(document).ready(function() {
+
+            function convertToYMD(datetime) {
+                const date = new Date(datetime);
+
+                if (isNaN(date.getTime())) {
+                    return "Invalid date"; // Handle invalid datetime input
+                }
+
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+                const year = date.getFullYear();
+
+                return `${year}-${month}-${day}`; // Corrected format: YYYY-MM-DD
+            }
+
+
+
+
+
+            $(".generateInvoice").click(function(e) {
+                let startDate = $(this).data('start');
+                let endDate = $(this).data('end');
+                let project = $(this).data('project');
+                let task = $(this).data('task');
+                let timesheet = $(this).data('timesheet');
+                let client = $(this).data('client');
+                let cost = $(this).data('cost');
+                let duration = $(this).data('duration');
+                let title = $(this).data('title');
+                let hourly_rate = $(this).data('hourly_rate');
+                let taskid = $(this).data('taskid');
+
+                let storeInvoiceURL = "{{ route(getPanelRoutes('invoices' . '.store')) }}";
+                formData = new FormData();
+
+                // '_id' => 'required|string|max:10',
+                let _id = `Task-${taskid}`;
+                formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
+                formData.append('_id', _id);
+                formData.append('client_id', client);
+                formData.append('project_id', project);
+                formData.append('task_id', task);
+                formData.append('total_amount', cost);
+                formData.append('issue_date', convertToYMD(startDate));
+                formData.append('due_date', convertToYMD(endDate));
+                formData.append('timesheet_id', timesheet);
+                // products
+                formData.append('product_title[0]', title);
+                formData.append('product_description[0]', `Tasks Invoice ${duration} Minutes Work`);
+                formData.append('product_qty[0]', (duration / 60));
+                formData.append('product_rate[0]', hourly_rate);
+                formData.append('product_tax[0]', null);
+
+
+
+                $.ajax({
+                    url: storeInvoiceURL,
+                    method: 'POST', // Always use POST for both
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        console.log(response)
+                        showToast(`Invoice Generated successfully`, 'success');
+                        refreshTable();
+
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 422) {
+                            const errors = xhr.responseJSON.errors;
+                            showErrors(errors);
+                        } else {
+                            showToast('An error occurred', 'error');
+                        }
+                    }
+                });
+
+                console.log(formData);
+            });
 
 
             $("#task_id").on('change', function(e) {
@@ -241,7 +345,7 @@
                         $('#notes').val(response.notes);
 
                         let taskId = response
-                        .task_id; // Fixed: Use $(this).val() instead of this.val()
+                            .task_id; // Fixed: Use $(this).val() instead of this.val()
                         let baseUrl =
                             "{{ route(getPanelRoutes('tasks' . '.getAssignee'), ['taskid' => ':taskid']) }}";
                         let taskURL = baseUrl.replace(':taskid', taskId);

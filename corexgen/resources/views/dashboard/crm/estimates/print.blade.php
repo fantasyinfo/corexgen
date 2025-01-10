@@ -29,26 +29,26 @@
         }
 
         /* Container */
-        .proposal-container {
+        .invoice-container {
             width: 100%;
             margin: 0 auto;
             background: white;
         }
 
         /* Header Styles */
-        .proposal-header {
+        .invoice-header {
             padding: 0 0 1.5cm 0;
             margin-bottom: 1cm;
             border-bottom: 1px solid #dee2e6;
         }
 
-        .proposal-id {
+        .invoice-id {
             font-size: 10pt;
             color: #666;
             margin-bottom: 0.5cm;
         }
 
-        .proposal-title {
+        .invoice-title {
             font-size: 24pt;
             font-weight: 700;
             margin-bottom: 0.5cm;
@@ -84,6 +84,11 @@
         }
 
         /* Table Styles */
+        .table-responsive {
+            width: 100%;
+            margin-bottom: 1cm;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -116,44 +121,26 @@
             text-align: right;
         }
 
+        .text-center {
+            text-align: center;
+        }
+
         /* Summary Section */
+        tfoot {
+            width: 100%;
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
+
         tfoot tr {
             background-color: #f8f9fa !important;
             font-weight: bold;
+            width: 100%;
         }
 
         tfoot td {
             padding: 0.3cm;
             border-top: 2px solid #dee2e6;
-        }
-
-        /* Signature Section */
-        .acceptance-details {
-            margin-top: 2cm;
-            page-break-before: always;
-            page-break-inside: avoid;
-        }
-
-        .signature-container {
-            margin-top: 1cm;
-            border: 1px solid #dee2e6;
-            padding: 0.5cm;
-            background-color: #fff;
-        }
-
-        .signature-image {
-            max-height: 4cm;
-            width: auto;
-            display: block;
-        }
-
-        /* Executive Summary */
-        .section-title {
-            font-size: 18pt;
-            color: #000;
-            margin-bottom: 0.8cm;
-            padding-bottom: 0.3cm;
-            border-bottom: 1px solid #dee2e6;
         }
 
         /* Status Badge */
@@ -166,6 +153,29 @@
             font-size: 10pt;
         }
 
+        /* Section Styles */
+        .section-title {
+            font-size: 18pt;
+            color: #000;
+            margin-bottom: 0.8cm;
+            padding-bottom: 0.3cm;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .card {
+            margin-bottom: 1cm;
+        }
+
+        .card-header {
+            padding: 0.5cm 0;
+            border-bottom: 2px solid #dee2e6;
+            margin-bottom: 0.5cm;
+        }
+
+        .card-body {
+            padding: 0.5cm 0;
+        }
+
         /* Print Optimizations */
         @media print {
             .no-print {
@@ -175,6 +185,31 @@
             a {
                 text-decoration: none;
                 color: #000;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            thead {
+                display: table-header-group;
+            }
+
+            tbody {
+                display: table-row-group;
+            }
+
+            tfoot {
+                display: table-row-group;
+            }
+
+            tr {
+                page-break-inside: avoid;
+            }
+
+            td {
+                page-break-inside: avoid;
             }
 
             .table-responsive {
@@ -190,12 +225,6 @@
                 background-color: transparent !important;
                 border-bottom: 2px solid #dee2e6 !important;
                 padding: 0.5cm 0 !important;
-            }
-
-            .alert {
-                border: 1px solid #28a745 !important;
-                padding: 0.5cm !important;
-                margin: 0.5cm 0 !important;
             }
         }
     </style>
