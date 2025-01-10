@@ -426,6 +426,7 @@
                                 <i class="fas fa-info-circle me-2"></i>Details
                             </a>
                         </li>
+                        @if(!$user?->is_tenant)
                         <li class="nav-item">
                             <a class="nav-link" data-bs-toggle="tab" href="#leads">
                                 <i class="fas fa-phone-volume me-2"></i>Leads
@@ -439,9 +440,10 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" data-bs-toggle="tab" href="#projects">
-                                <i class="fas fa-file me-2"></i>Projects
+                                <i class="fas fa-folder-plus me-2"></i>Projects
                             </a>
                         </li>
+                        @endif
                         
                     </ul>
                 </div>
@@ -474,9 +476,11 @@
                                 <div class="col-lg-1 divider-container">
                                     <div class="divider"></div>
                                 </div>
+                                @if(!$user?->is_tenant)
                                 <div class="col-lg-4 sidebar-view">
                                     @include('dashboard.users.components.viewpartials._sidebar')
                                 </div>
+                                @endif
                             </div>
                             <!-- Edit Details -->
                             <div class="row g-4" id="editDetails">
@@ -498,15 +502,17 @@
                                         <div class="col-lg-1 divider-container">
                                             <div class="divider"></div>
                                         </div>
+                                        @if(!$user?->is_tenant)
                                         <div class="col-lg-4 sidebar-view">
                                             @include('dashboard.users.components.editpartials._sidebar')
                                         </div>
+                                        @endif
                                     </div>
                                 </form>
                             </div>
 
                         </div>
-
+                        @if(!$user?->is_tenant)
                         <div class="tab-pane fade" id="leads">
                             @include('dashboard.users.components._leads')
                         </div>
@@ -517,7 +523,7 @@
                         <div class="tab-pane fade" id="projects">
                             @include('dashboard.users.components._projects')
                         </div>
-
+                        @endif
                        
                     </div>
                 </div>

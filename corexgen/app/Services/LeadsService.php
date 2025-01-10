@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 
 class LeadsService
 {
+    
 
     use TenantFilter;
     use MediaTrait;

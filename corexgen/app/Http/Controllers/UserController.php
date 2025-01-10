@@ -25,7 +25,8 @@ use Illuminate\Support\Facades\Hash;
 
 use Illuminate\Support\Facades\Auth;
 use App\Models\Media;
-
+use App\Services\ProjectService;
+use App\Services\TasksService;
 
 /**
  * UserController handles CRUD operations for Users
@@ -83,18 +84,24 @@ class UserController extends Controller
 
     protected $customFieldService;
     protected $leadService;
+    protected $tasksService;
+    protected $projectService;
 
     public function __construct(
         UserRepository $userRepository,
         UserService $userService,
         CustomFieldService $customFieldService,
-        LeadsService $leadService
+        LeadsService $leadService,
+        TasksService $tasksService,
+        ProjectService $projectService,
 
     ) {
         $this->userRepository = $userRepository;
         $this->userService = $userService;
         $this->customFieldService = $customFieldService;
         $this->leadService = $leadService;
+        $this->tasksService = $tasksService;
+        $this->projectService = $projectService;
     }
 
     /**
@@ -810,8 +817,18 @@ class UserController extends Controller
         }
 
 
+
+        // leads
         $leads = collect();
         $leads = $this->leadService->getLeadsByUser($id);
+
+        // taks
+        $tasks = collect();
+        $tasks = $this->tasksService->getTasksByUser($id);
+
+        // projects
+        $projects = collect();
+        $projects = $this->projectService->getProjectsByUser($id);
 
         return view($this->getViewFilePath('view'), [
 
@@ -823,7 +840,9 @@ class UserController extends Controller
             'roles' => $roles,
             'countries' => $country,
             'cfOldValues' => $cfOldValues,
-            'leads' => $leads
+            'leads' => $leads,
+            'tasks' => $tasks,
+            'projects' => $projects
 
         ]);
     }
