@@ -12,6 +12,7 @@ use App\Http\Controllers\ContractsController;
 use App\Http\Controllers\CompaniesController;
 use App\Http\Controllers\CRM\ClientsController;
 use App\Http\Controllers\CRM\LeadsController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\CustomFieldController;
@@ -226,14 +227,8 @@ Route::middleware([
     'company.timezone'
 ])->prefix(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']))->as(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']) . '.')->group(function () {
 
-    Route::get('/', function () {
-        // dd('Company Panel Home');
-        return redirect()->route(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']) . '.role.index');
-    })->name('home');
-
-
-
-
+    // home routes
+    Route::get('/', [DashboardController::class, 'companyHome'])->name('home');
 
     // role routes
     Route::prefix(PANEL_MODULES['COMPANY_PANEL']['role'])->as(PANEL_MODULES['COMPANY_PANEL']['role'] . '.')->group(function () {
@@ -752,10 +747,8 @@ Route::middleware([
     'check.installation'
 ])->prefix(getPanelUrl(PANEL_TYPES['SUPER_PANEL']))->as(getPanelUrl(PANEL_TYPES['SUPER_PANEL']) . '.')->group(function () {
 
-    Route::get('/', function () {
-        // dd('Super Panel Home');
-        return redirect()->route(getPanelUrl(PANEL_TYPES['SUPER_PANEL']) . '.companies.index');
-    })->name('home');
+    // home routes
+    Route::get('/', [DashboardController::class, 'superHome'])->name('home');
     // role routes
     Route::prefix('role')->as('role.')->group(function () {
         // role for fetch, store, update
