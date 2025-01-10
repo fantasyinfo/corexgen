@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 
 class LeadsService
 {
+    
 
     use TenantFilter;
     use MediaTrait;
@@ -339,6 +340,21 @@ class LeadsService
         $leadsGroups = $this->applyTenantFilter($leadsGroups);
         return $leadsGroups->get();
     }
+
+
+
+    public function getLeadsByUser(int $user_id)
+    {
+        // Get leads assigned to the given user
+        $leads = CRMLeads::with(['assignedBy','stage'])->whereHas('assignees', function ($query) use ($user_id) {
+            $query->where('user_id', $user_id);
+        })->with('assignees')->get();
+
+        // Apply tenant filter (ensure this function modifies or filters the results as intended)
+        return $this->applyTenantFilter($leads);
+    }
+
+
 
 
     public function getDatatablesResponse($request)

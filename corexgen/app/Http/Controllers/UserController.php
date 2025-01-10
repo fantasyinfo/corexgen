@@ -11,6 +11,7 @@ use App\Models\CRM\CRMRole;
 use App\Repositories\UserRepository;
 use App\Services\Csv\UsersCsvRowProcessor;
 use App\Services\CustomFieldService;
+use App\Services\LeadsService;
 use App\Services\UserService;
 use App\Traits\MediaTrait;
 use App\Traits\StatusStatsFilter;
@@ -24,6 +25,9 @@ use Illuminate\Support\Facades\Hash;
 
 use Illuminate\Support\Facades\Auth;
 use App\Models\Media;
+use App\Services\ProjectService;
+use App\Services\TasksService;
+
 /**
  * UserController handles CRUD operations for Users
  * 
@@ -79,16 +83,25 @@ class UserController extends Controller
     protected $userService;
 
     protected $customFieldService;
+    protected $leadService;
+    protected $tasksService;
+    protected $projectService;
 
     public function __construct(
         UserRepository $userRepository,
         UserService $userService,
-        CustomFieldService $customFieldService
+        CustomFieldService $customFieldService,
+        LeadsService $leadService,
+        TasksService $tasksService,
+        ProjectService $projectService,
 
     ) {
         $this->userRepository = $userRepository;
         $this->userService = $userService;
         $this->customFieldService = $customFieldService;
+        $this->leadService = $leadService;
+        $this->tasksService = $tasksService;
+        $this->projectService = $projectService;
     }
 
     /**
@@ -274,7 +287,7 @@ class UserController extends Controller
      *
      * @param Request $request [explicite description]
      *
-     * @return void
+
      */
     public function update(UserRequest $request, UserService $userService)
     {
@@ -345,7 +358,7 @@ class UserController extends Controller
      *
      * @param Request $request [exporting the users]
      *
-     * @return void
+
      */
     public function export(Request $request)
     {
@@ -597,7 +610,7 @@ class UserController extends Controller
      * @param $id $id [explicite id of user]
      * @param $status $status [explicite status to change]
      *
-     * @return void
+
      */
     public function changeStatus($id, $status)
     {
@@ -770,6 +783,7 @@ class UserController extends Controller
     {
         $query = User::query()
             ->with([
+                'company',
                 'addresses' => function ($query) {
                     $query->with('country')
 
@@ -785,14 +799,50 @@ class UserController extends Controller
 
         // dd($user);
 
-        $customFields = $this->customFieldService->getValuesForEntity($user);
+        $roles = $this->applyTenantFilter(CRMRole::query())->get();
+
+        $country = Country::all();
+
+
+
+        // custom fields
+        $customFields = collect();
+        $cfOldValues = collect();
+        if (!is_null(Auth::user()->company_id)) {
+            $customFields = $this->customFieldService->getFieldsForEntity(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['user'], Auth::user()->company_id);
+
+            // fetch already existing values
+
+            $cfOldValues = $this->customFieldService->getValuesForEntity($user);
+        }
+
+
+
+        // leads
+        $leads = collect();
+        $leads = $this->leadService->getLeadsByUser($id);
+
+        // taks
+        $tasks = collect();
+        $tasks = $this->tasksService->getTasksByUser($id);
+
+        // projects
+        $projects = collect();
+        $projects = $this->projectService->getProjectsByUser($id);
 
         return view($this->getViewFilePath('view'), [
 
             'title' => 'View User',
             'user' => $user,
             'module' => PANEL_MODULES[$this->getPanelModule()]['users'],
-            'customFields' => $customFields
+            'permissions' => PermissionsHelper::getPermissionsArray('USERS'),
+            'customFields' => $customFields,
+            'roles' => $roles,
+            'countries' => $country,
+            'cfOldValues' => $cfOldValues,
+            'leads' => $leads,
+            'tasks' => $tasks,
+            'projects' => $projects
 
         ]);
     }

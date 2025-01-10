@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\View;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\DB;
 
+
 class TasksService
 {
     use CategoryGroupTagsFilter;
@@ -134,7 +135,16 @@ class TasksService
         }
     }
 
+    public function getTasksByUser(int $user_id)
+    {
+        // Get leads assigned to the given user
+        $leads = Tasks::with(['assignedBy','stage'])->whereHas('assignees', function ($query) use ($user_id) {
+            $query->where('user_id', $user_id);
+        })->with('assignees')->get();
 
+        // Apply tenant filter (ensure this function modifies or filters the results as intended)
+        return $this->applyTenantFilter($leads);
+    }
     public function getAllTasks(int $project_id = null)
     {
         if ($project_id == null) {

@@ -251,7 +251,7 @@ class CompaniesController extends Controller
      *
      * @param Request $request [explicite description]
      *
-     * @return void
+
      */
     public function update(CompaniesRequest $request, CompanyService $companyService)
     {
@@ -589,7 +589,7 @@ class CompaniesController extends Controller
      * @param $id $id [explicite id of company]
      * @param $status $status [explicite status to change]
      *
-     * @return void
+
      */
     public function changeStatus($id, $status)
     {
@@ -800,6 +800,9 @@ class CompaniesController extends Controller
         $query = Company::query()
             ->with([
                 'plans',
+                'latestSubscription',
+                'paymentTransactions',
+                'subscriptions',
                 'users' => function ($query) use ($id) {
                     $query->where('role_id', null)
                         ->where('company_id', $id)
