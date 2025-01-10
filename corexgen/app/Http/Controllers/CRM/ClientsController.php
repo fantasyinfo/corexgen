@@ -14,6 +14,7 @@ use App\Services\ClientService;
 use App\Services\ProposalService;
 use App\Traits\AuditFilter;
 use App\Traits\CategoryGroupTagsFilter;
+use App\Traits\StatusStatsFilter;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
 use App\Traits\SubscriptionUsageFilter;
@@ -33,6 +34,7 @@ class ClientsController extends Controller
     use SubscriptionUsageFilter;
     use CategoryGroupTagsFilter;
     use AuditFilter;
+    use StatusStatsFilter;
     //
     /**
      * Number of items per page for pagination
@@ -101,34 +103,7 @@ class ClientsController extends Controller
 
 
 
-        $user = Auth::user();
-        $userQuery = CRMClients::query();
-
-        $userQuery = $this->applyTenantFilter($userQuery);
-
-        // Get all totals in a single query
-        $usersTotals = $userQuery->select([
-            DB::raw('COUNT(*) as totalUsers'),
-            DB::raw(sprintf(
-                'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalActive',
-                CRM_STATUS_TYPES['CLIENTS']['STATUS']['ACTIVE']
-            )),
-            DB::raw(sprintf(
-                'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalInactive',
-                CRM_STATUS_TYPES['CLIENTS']['STATUS']['DEACTIVE']
-            ))
-        ])->first();
-
-        // fetch usage
-
-        if (!$user->is_tenant && !is_null($user->company_id)) {
-            $usages = $this->fetchTotalAllowAndUsedUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['CLIENTS']]));
-        } else if ($user->is_tenant) {
-            $usages = [
-                'totalAllow' => '-1',
-                'currentUsage' => $usersTotals->totalUsers,
-            ];
-        }
+        $headerStatus = $this->getHeaderStatus(\App\Models\CRM\CRMClients::class, PermissionsHelper::$plansPermissionsKeys['CLIENTS']);
 
 
         return view($this->getViewFilePath('index'), [
@@ -137,12 +112,35 @@ class ClientsController extends Controller
             'permissions' => PermissionsHelper::getPermissionsArray('CLIENTS'),
             'module' => PANEL_MODULES[$this->getPanelModule()]['clients'],
             'type' => 'Clients',
-            'total_allow' => $usages['totalAllow'],
-            'total_used' => $usages['currentUsage'],
-            'total_active' => $usersTotals->totalActive,
-            'total_inactive' => $usersTotals->totalInactive,
-            'total_ussers' => $usersTotals->totalUsers,
+            'headerStatus' => $headerStatus
+
         ]);
+    }
+
+    private function getHeaderStatus($model, $permission)
+    {
+        $user = Auth::user();
+
+        // fetch totals status by clause
+        $statusQuery = $this->getGroupByStatusQuery($model);
+        $groupData = $this->applyTenantFilter($statusQuery['groupQuery'])->get()->toArray();
+        $totalData = $this->applyTenantFilter($statusQuery['totalQuery'])->count();
+        // fetch usage
+
+        if (!$user->is_tenant && !is_null($user->company_id)) {
+            $usages = $this->fetchTotalAllowAndUsedUsage(strtolower(PLANS_FEATURES[$permission]));
+        } else if ($user->is_tenant) {
+            $usages = [
+                'totalAllow' => '-1',
+                'currentUsage' => $totalData,
+            ];
+        }
+
+        return [
+            'totalAllow' => $usages['totalAllow'],
+            'currentUsage' => $totalData,
+            'groupData' => $groupData
+        ];
     }
     public function store(ClientRequest $request)
     {

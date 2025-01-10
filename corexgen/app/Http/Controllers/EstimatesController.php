@@ -13,6 +13,7 @@ use App\Models\CRM\CRMTemplates;
 use App\Services\ProductServicesService;
 use App\Traits\IsSMTPValid;
 use App\Traits\MediaTrait;
+use App\Traits\StatusStatsFilter;
 use App\Traits\SubscriptionUsageFilter;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
@@ -41,6 +42,7 @@ class EstimatesController extends Controller
     use SubscriptionUsageFilter;
     use MediaTrait;
     use IsSMTPValid;
+    use StatusStatsFilter;
 
     /**
      * Number of items per page for pagination
@@ -107,37 +109,7 @@ class EstimatesController extends Controller
 
         // Fetch the totals in a single query
 
-        // Build base query for Estimates totals
-        $user = Auth::user();
-        $estimateQuery = CRMEstimate::query();
-
-        $estimateQuery = $this->applyTenantFilter($estimateQuery);
-
-        // Get all totals in a single query
-        $usersTotals = $estimateQuery->select([
-            DB::raw('COUNT(*) as totalUsers'),
-            DB::raw(sprintf(
-                'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalActive',
-                CRM_STATUS_TYPES['ESTIMATES']['STATUS']['OPEN']
-            )),
-            DB::raw(sprintf(
-                'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalInactive',
-                CRM_STATUS_TYPES['ESTIMATES']['STATUS']['DECLINED']
-            ))
-        ])->first();
-
-
-
-        // fetch usage
-
-        if (!$user->is_tenant && !is_null($user->company_id)) {
-            $usages = $this->fetchTotalAllowAndUsedUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['ESTIMATES']]));
-        } else if ($user->is_tenant) {
-            $usages = [
-                'totalAllow' => '-1',
-                'currentUsage' => $usersTotals->totalUsers,
-            ];
-        }
+        $headerStatus = $this->getHeaderStatus(\App\Models\CRM\CRMEstimate::class, PermissionsHelper::$plansPermissionsKeys['ESTIMATES']);
 
         $templates = $this->applyTenantFilter(CRMTemplates::query()->where('type', 'Estimates'))->get();
 
@@ -153,11 +125,7 @@ class EstimatesController extends Controller
             'permissions' => PermissionsHelper::getPermissionsArray('ESTIMATES'),
             'module' => PANEL_MODULES[$this->getPanelModule()]['estimates'],
             'type' => 'Estimates',
-            'total_allow' => $usages['totalAllow'],
-            'total_used' => $usages['currentUsage'],
-            'total_active' => $usersTotals->totalActive,
-            'total_inactive' => $usersTotals->totalInactive,
-            'total_ussers' => $usersTotals->totalUsers,
+            'headerStatus' => $headerStatus,
             'clients' => $clients,
             'leads' => $leads,
 
@@ -165,6 +133,31 @@ class EstimatesController extends Controller
     }
 
 
+    private function getHeaderStatus($model, $permission)
+    {
+        $user = Auth::user();
+
+        // fetch totals status by clause
+        $statusQuery = $this->getGroupByStatusQuery($model);
+        $groupData = $this->applyTenantFilter($statusQuery['groupQuery'])->get()->toArray();
+        $totalData = $this->applyTenantFilter($statusQuery['totalQuery'])->count();
+        // fetch usage
+
+        if (!$user->is_tenant && !is_null($user->company_id)) {
+            $usages = $this->fetchTotalAllowAndUsedUsage(strtolower(PLANS_FEATURES[$permission]));
+        } else if ($user->is_tenant) {
+            $usages = [
+                'totalAllow' => '-1',
+                'currentUsage' => $totalData,
+            ];
+        }
+
+        return [
+            'totalAllow' => $usages['totalAllow'],
+            'currentUsage' => $totalData,
+            'groupData' => $groupData
+        ];
+    }
 
     /**
      * Storing the data of Estimates into db

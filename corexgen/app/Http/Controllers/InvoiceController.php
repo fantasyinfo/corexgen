@@ -7,7 +7,6 @@ use App\Helpers\PermissionsHelper;
 use App\Http\Requests\InvoiceEditRequest;
 use App\Http\Requests\InvoiceRequest;
 use App\Models\CRM\CRMClients;
-use App\Models\CRM\CRMLeads;
 use App\Models\Invoice;
 use App\Models\Timesheet;
 use App\Services\InvoiceService;
@@ -15,6 +14,7 @@ use App\Services\ProductServicesService;
 use App\Services\TasksService;
 use App\Traits\IsSMTPValid;
 use App\Traits\MediaTrait;
+use App\Traits\StatusStatsFilter;
 use App\Traits\SubscriptionUsageFilter;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
@@ -42,6 +42,7 @@ class InvoiceController extends Controller
     use SubscriptionUsageFilter;
     use MediaTrait;
     use IsSMTPValid;
+    use StatusStatsFilter;
 
     /**
      * Number of items per page for pagination
@@ -110,38 +111,7 @@ class InvoiceController extends Controller
 
 
         // Fetch the totals in a single query
-
-        // Build base query for Invoices totals
-        $user = Auth::user();
-        $proposalQuery = Invoice::query();
-
-        $proposalQuery = $this->applyTenantFilter($proposalQuery);
-
-        // Get all totals in a single query
-        // $usersTotals = $proposalQuery->select([
-        //     DB::raw('COUNT(*) as totalUsers'),
-        //     DB::raw(sprintf(
-        //         'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalActive',
-        //         CRM_STATUS_TYPES['INVOICES']['STATUS']['OPEN']
-        //     )),
-        //     DB::raw(sprintf(
-        //         'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalInactive',
-        //         CRM_STATUS_TYPES['INVOICES']['STATUS']['DECLINED']
-        //     ))
-        // ])->first();
-
-
-
-        // fetch usage
-
-        if (!$user->is_tenant && !is_null($user->company_id)) {
-            $usages = $this->fetchTotalAllowAndUsedUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['INVOICES']]));
-        } else if ($user->is_tenant) {
-            $usages = [
-                'totalAllow' => '-1',
-                'currentUsage' => 0,
-            ];
-        }
+        $headerStatus = $this->getHeaderStatus(\App\Models\Invoice::class, PermissionsHelper::$plansPermissionsKeys['INVOICES']);
 
         $clients = $this->applyTenantFilter(CRMClients::query())->select('id', 'first_name', 'last_name', 'type', 'company_name', 'primary_email')->get();
 
@@ -154,17 +124,40 @@ class InvoiceController extends Controller
             'permissions' => PermissionsHelper::getPermissionsArray('INVOICES'),
             'module' => PANEL_MODULES[$this->getPanelModule()]['invoices'],
             'type' => 'Invoices',
-            'total_allow' => $usages['totalAllow'],
-            'total_used' => $usages['currentUsage'],
-            'total_active' => 0,
-            'total_inactive' => 0,
-            'total_ussers' => 0,
+            'headerStatus' => $headerStatus,
             'clients' => $clients,
             'tasks' => $tasks
 
         ]);
     }
 
+
+
+    private function getHeaderStatus($model, $permission)
+    {
+        $user = Auth::user();
+
+        // fetch totals status by clause
+        $statusQuery = $this->getGroupByStatusQuery($model);
+        $groupData = $this->applyTenantFilter($statusQuery['groupQuery'])->get()->toArray();
+        $totalData = $this->applyTenantFilter($statusQuery['totalQuery'])->count();
+        // fetch usage
+
+        if (!$user->is_tenant && !is_null($user->company_id)) {
+            $usages = $this->fetchTotalAllowAndUsedUsage(strtolower(PLANS_FEATURES[$permission]));
+        } else if ($user->is_tenant) {
+            $usages = [
+                'totalAllow' => '-1',
+                'currentUsage' => $totalData,
+            ];
+        }
+
+        return [
+            'totalAllow' => $usages['totalAllow'],
+            'currentUsage' => $totalData,
+            'groupData' => $groupData
+        ];
+    }
 
 
     /**

@@ -11,7 +11,7 @@
 
                 @include('dashboard.crm.estimates.components.estimate-filters')
 
-                @include('layout.components.header-stats')
+                @include('layout.components.header-stats-new')
 
 
 

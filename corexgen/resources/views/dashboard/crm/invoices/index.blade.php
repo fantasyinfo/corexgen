@@ -11,7 +11,7 @@
 
                 @include('dashboard.crm.invoices.components.invoice-filters')
 
-                @include('layout.components.header-stats')
+                @include('layout.components.header-stats-new')
 
 
 

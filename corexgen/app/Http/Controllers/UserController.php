@@ -13,6 +13,7 @@ use App\Services\Csv\UsersCsvRowProcessor;
 use App\Services\CustomFieldService;
 use App\Services\UserService;
 use App\Traits\MediaTrait;
+use App\Traits\StatusStatsFilter;
 use App\Traits\SubscriptionUsageFilter;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
@@ -42,6 +43,7 @@ class UserController extends Controller
     use TenantFilter;
     use SubscriptionUsageFilter;
     use MediaTrait;
+    use StatusStatsFilter;
 
     /**
      * Number of items per page for pagination
@@ -105,43 +107,7 @@ class UserController extends Controller
         // Regular view rendering
         $roles = $this->applyTenantFilter(CRMRole::query())->get();
 
-
-
-
-        // Fetch the totals in a single query
-
-        // Build base query for user totals
-        $user = Auth::user();
-        $userQuery = User::where('deleted_at', null)->whereNot('id', $user->id);
-
-        $userQuery = $this->applyTenantFilter($userQuery);
-
-        // Get all totals in a single query
-        $usersTotals = $userQuery->select([
-            DB::raw('COUNT(*) as totalUsers'),
-            DB::raw(sprintf(
-                'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalActive',
-                CRM_STATUS_TYPES['USERS']['STATUS']['ACTIVE']
-            )),
-            DB::raw(sprintf(
-                'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalInactive',
-                CRM_STATUS_TYPES['USERS']['STATUS']['DEACTIVE']
-            ))
-        ])->first();
-
-        
-
-        // fetch usage
-
-        if (!$user->is_tenant && !is_null($user->company_id)) {
-            $usages = $this->fetchTotalAllowAndUsedUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['USERS']]));
-        } else if ($user->is_tenant) {
-            $usages = [
-                'totalAllow' => '-1',
-                'currentUsage' => $usersTotals->totalUsers,
-            ];
-        }
-
+        $headerStatus = $this->getHeaderStatus(\App\Models\User::class, PermissionsHelper::$plansPermissionsKeys['USERS']);
 
 
         return view($this->getViewFilePath('index'), [
@@ -151,15 +117,37 @@ class UserController extends Controller
             'permissions' => PermissionsHelper::getPermissionsArray('USERS'),
             'module' => PANEL_MODULES[$this->getPanelModule()]['users'],
             'type' => 'Users',
-            'total_allow' => $usages['totalAllow'],
-            'total_used' => $usages['currentUsage'],
-            'total_active' => $usersTotals->totalActive,
-            'total_inactive' => $usersTotals->totalInactive,
-            'total_ussers' => $usersTotals->totalUsers,
+            'headerStatus' => $headerStatus,
         ]);
     }
 
 
+
+    private function getHeaderStatus($model, $permission)
+    {
+        $user = Auth::user();
+
+        // fetch totals status by clause
+        $statusQuery = $this->getGroupByStatusQuery($model);
+        $groupData = $this->applyTenantFilter($statusQuery['groupQuery'])->get()->toArray();
+        $totalData = $this->applyTenantFilter($statusQuery['totalQuery'])->count();
+        // fetch usage
+
+        if (!$user->is_tenant && !is_null($user->company_id)) {
+            $usages = $this->fetchTotalAllowAndUsedUsage(strtolower(PLANS_FEATURES[$permission]));
+        } else if ($user->is_tenant) {
+            $usages = [
+                'totalAllow' => '-1',
+                'currentUsage' => $totalData,
+            ];
+        }
+
+        return [
+            'totalAllow' => $usages['totalAllow'],
+            'currentUsage' => $totalData,
+            'groupData' => $groupData
+        ];
+    }
 
     /**
      * Storing the data of user into db
@@ -291,7 +279,7 @@ class UserController extends Controller
     public function update(UserRequest $request, UserService $userService)
     {
 
-    
+
 
         $this->tenantRoute = $this->getTenantRoute();
 

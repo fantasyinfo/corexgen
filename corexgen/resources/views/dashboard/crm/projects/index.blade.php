@@ -10,7 +10,7 @@
                 @include('dashboard.crm.projects.components.projects-filters')
                 @include('layout.components.bulk-import-modal')
 
-                @include('layout.components.header-stats')
+                @include('layout.components.header-stats-new')
 
 
                 @if (hasPermission('PROJECTS.READ_ALL') || hasPermission('PROJECTS.READ'))

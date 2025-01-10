@@ -5,14 +5,13 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Helpers\PermissionsHelper;
 use App\Http\Requests\CompaniesRequest;
-use App\Http\Requests\UserRequest;
 use App\Jobs\CsvImportJob;
 use App\Models\Company;
 use App\Models\Country;
-use App\Models\CRM\CRMRole;
 use App\Models\Plans;
 use App\Services\CompanyService;
 use App\Services\Csv\CompaniesCsvRowProcessor;
+use App\Traits\StatusStatsFilter;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -20,8 +19,6 @@ use App\Repositories\CompanyRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
-use Yajra\DataTables\Facades\DataTables;
-use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
@@ -42,6 +39,7 @@ class CompaniesController extends Controller
 {
     //
     use TenantFilter;
+    use StatusStatsFilter;
 
     /**
      * Number of items per page for pagination
@@ -108,34 +106,8 @@ class CompaniesController extends Controller
         $country = Country::all();
 
 
-        $user = Auth::user();
 
-        $userQuery = Company::query();
-        // $userQuery = $this->applyTenantFilter($userQuery);
-
-        // Get all totals in a single query
-        $usersTotals = $userQuery->select([
-            DB::raw('COUNT(*) as totalUsers'),
-            DB::raw(sprintf(
-                'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalActive',
-                CRM_STATUS_TYPES['COMPANIES']['STATUS']['ACTIVE']
-            )),
-            DB::raw(sprintf(
-                'SUM(CASE WHEN status = "%s" THEN 1 ELSE 0 END) as totalInactive',
-                CRM_STATUS_TYPES['COMPANIES']['STATUS']['DEACTIVE']
-            ))
-        ])->first();
-
-        // fetch usage
-
-        if (!$user->is_tenant && !is_null($user->company_id)) {
-            $usages = $this->fetchTotalAllowAndUsedUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['COMPANIES']]));
-        } else if ($user->is_tenant) {
-            $usages = [
-                'totalAllow' => '-1',
-                'currentUsage' => $usersTotals->totalUsers,
-            ];
-        }
+        $headerStatus = $this->getHeaderStatus(\App\Models\Company::class, PermissionsHelper::$plansPermissionsKeys['COMPANIES']);
 
         return view($this->getViewFilePath('index'), [
             'filters' => $request->all(),
@@ -145,15 +117,36 @@ class CompaniesController extends Controller
             'plans' => $plans,
             'country' => $country,
             'type' => 'Companies',
-            'total_allow' => $usages['totalAllow'],
-            'total_used' => $usages['currentUsage'],
-            'total_active' => $usersTotals->totalActive,
-            'total_inactive' => $usersTotals->totalInactive,
-            'total_ussers' => $usersTotals->totalUsers,
+            'headerStatus' => $headerStatus
         ]);
     }
 
 
+    private function getHeaderStatus($model, $permission, $isSeftDelete = true)
+    {
+        $user = Auth::user();
+
+        // fetch totals status by clause
+        $statusQuery = $this->getGroupByStatusQuery($model, $isSeftDelete);
+        $groupData = $statusQuery['groupQuery']->get()->toArray();
+        $totalData = $statusQuery['totalQuery']->count();
+        // fetch usage
+
+        if (!$user->is_tenant && !is_null($user->company_id)) {
+            $usages = $this->fetchTotalAllowAndUsedUsage(strtolower(PLANS_FEATURES[$permission]));
+        } else if ($user->is_tenant) {
+            $usages = [
+                'totalAllow' => '-1',
+                'currentUsage' => $totalData,
+            ];
+        }
+
+        return [
+            'totalAllow' => $usages['totalAllow'],
+            'currentUsage' => $totalData,
+            'groupData' => $groupData
+        ];
+    }
 
     /**
      * Storing the data of user into db
@@ -549,7 +542,7 @@ class CompaniesController extends Controller
             DB::beginTransaction();
 
             $company = Company::findOrFail($id);
-   
+
 
             $company->delete();
 
@@ -557,7 +550,7 @@ class CompaniesController extends Controller
             return redirect()->back()->with('success', 'Company deleted successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-          
+
             return redirect()->back()->with('error', 'Failed to delete the company: ' . $e->getMessage());
         }
     }

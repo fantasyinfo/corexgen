@@ -11,7 +11,8 @@
 
                 @include('dashboard.users.components.users-filters')
                 
-                @include('layout.components.header-stats')
+                {{-- @include('layout.components.header-stats') --}}
+                @include('layout.components.header-stats-new')
                 @include('layout.components.bulk-import-modal')
 
 

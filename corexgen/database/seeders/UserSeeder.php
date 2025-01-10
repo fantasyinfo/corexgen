@@ -14,7 +14,7 @@ class UserSeeder extends Seeder
 
     protected $companyId;
 
-    public function __construct( int $companyId = 10) {
+    public function __construct( int $companyId = null) {
         $this->companyId = $companyId;
     }
     public function run(): void
@@ -30,7 +30,7 @@ class UserSeeder extends Seeder
                 'email' => fake()->safeEmail(), // Use static emails for debugging
                 'password' => 1234, // Hash passwords
                 'role_id' => $rolesIds[array_rand($rolesIds)],
-                'is_tenant' => false,
+                'is_tenant' => true,
                 'company_id' => $this->companyId,
                 'status' => CRM_STATUS_TYPES['USERS']['STATUS']['ACTIVE'],
                 'updated_at' => now(),
