@@ -81,6 +81,12 @@ class Company extends Model implements Auditable
         return $this->hasMany(CRMLeads::class, 'company_id');
     }
 
+
+    public function totalCompany()
+    {
+        return self::count();
+    }
+    
     /**
      * Boot method to handle model events
      */

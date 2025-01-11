@@ -30,32 +30,41 @@ class Subscription extends Model
     ];
 
 
-    public function company(){
-        return $this->belongsTo(Company::class,'company_id');
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'company_id');
     }
 
-    public function plans(){
-        return $this->belongsTo(Plans::class,'plan_id');
+    public function plans()
+    {
+        return $this->belongsTo(Plans::class, 'plan_id');
     }
 
-    public function payment_transaction(){
-        return $this->belongsTo(PaymentTransaction::class,'payment_id');
+    public function payment_transaction()
+    {
+        return $this->belongsTo(PaymentTransaction::class, 'payment_id');
     }
 
     public function usages()
     {
-        return $this->hasMany(SubscriptionUsage::class,'subscription_id');
+        return $this->hasMany(SubscriptionUsage::class, 'subscription_id');
     }
 
-     // boot method
-     protected static function boot()
-     {
-         parent::boot();
- 
-         static::creating(function ($paymentTransaction) {
-             // Set default values
-             $paymentTransaction->status = $paymentTransaction->status ?? CRM_STATUS_TYPES['SUBSCRIPTION']['STATUS']['ACTIVE'];
-         });
-     }
+    public function totalSubscriptions($status = CRM_STATUS_TYPES['SUBSCRIPTION']['STATUS']['ACTIVE'])
+    {
+        return self::where('status', $status)->count();
+
+    }
+
+    // boot method
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($paymentTransaction) {
+            // Set default values
+            $paymentTransaction->status = $paymentTransaction->status ?? CRM_STATUS_TYPES['SUBSCRIPTION']['STATUS']['ACTIVE'];
+        });
+    }
 }
 
