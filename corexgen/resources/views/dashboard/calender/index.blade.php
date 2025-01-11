@@ -56,10 +56,31 @@
                 <div class="modal-body">
                     <!-- Details will be loaded here -->
                 </div>
-                <div class="modal-footer">
-                    <a href="" class="btn btn-warning" id="event_id">Edit</a>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <div class="modal-footer d-flex justify-content-between align-items-center bg-light border-top">
+                    <div class="d-flex gap-2">
+                        @if (isset($permissions['UPDATE']) && hasPermission(strtoupper($module) . '.' . $permissions['UPDATE']['KEY']))
+                            <a href="" class="btn btn-warning d-flex align-items-center gap-1" id="event_id_edit">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        @endif
+                        @if (isset($permissions['DELETE']) && hasPermission(strtoupper($module) . '.' . $permissions['DELETE']['KEY']))
+                            <form method="POST" id="event_id_delete" action="" class="d-inline-block">
+                                @csrf
+                                @method('DELETE')
+                                <button type="button" class="btn btn-danger d-flex align-items-center gap-1"
+                                    id="confirm_delete">
+                                    <i class="fas fa-trash-alt"></i> Delete
+                                </button>
+                            </form>
+                        @endif
+                    </div>
+                    <button type="button" class="btn btn-secondary d-flex align-items-center gap-1"
+                        data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> Close
+                    </button>
                 </div>
+
+
             </div>
         </div>
     </div>
@@ -124,7 +145,14 @@
                         "{{ route(getPanelRoutes($module . '.edit'), ['id' => ':id']) }}";
                     let urlEdit = baseEditUrl.replace(':id', info.event.id);
 
-                    $("#event_id").attr("href", urlEdit)
+                    $("#event_id_edit").attr("href", urlEdit)
+
+                    let baseDelUrl =
+                        "{{ route(getPanelRoutes($module . '.destroy'), ['id' => ':id']) }}";
+                    let urlDel = baseDelUrl.replace(':id', info.event.id);
+
+
+                    $("#event_id_delete").attr("action", urlDel)
 
                     $.ajax({
                         url: url,
@@ -138,7 +166,7 @@
                         <h4><i class="fas fa-calendar-alt"></i> ${event.title}</h4>
                         <span class="badge bg-${
                           event.priority === 'high' ? 'danger' : 'primary'
-                        }">${event.priority || 'Normal'}</span>
+                        }">${event.priority.toUpperCase() || 'NORMAL'}</span>
                         <span class="badge bg-${
                           event.status === 'upcoming' ? 'success' : 'secondary'
                         }">${event.status.toUpperCase()}</span>
@@ -273,6 +301,16 @@
                 });
             }
 
+        });
+
+        document.getElementById('confirm_delete').addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent form submission
+
+            // Show confirmation dialog
+            if (confirm('Are you sure you want to delete this item? This action cannot be undone.')) {
+                // Submit the form if confirmed
+                document.getElementById('event_id_delete').submit();
+            }
         });
     </script>
 @endpush

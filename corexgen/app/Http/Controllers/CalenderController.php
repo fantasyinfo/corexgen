@@ -161,25 +161,32 @@ class CalenderController extends Controller
 
             $event->update($validated);
 
-            // if ($event->is_recurring && $event->wasChanged(['recurrence_pattern', 'recurrence_interval'])) {
-            //     Calender::where('parent_id', $event->id)->delete();
-            //     $recurringEvents = $event->generateRecurringEvents();
-            //     foreach ($recurringEvents as $recurringEvent) {
-            //         $recurringEvent->save();
-            //     }
-            // }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Event updated successfully',
-                'event' => $this->formatEventForCalendar($event)
-            ]);
+            if ($request->ajax()) {
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Event updated successfully',
+                    'event' => $this->formatEventForCalendar($event)
+                ]);
+            }
+
+            return redirect()
+                ->route($this->getTenantRoute() . 'calender.index')
+                ->with('success', 'Event updated successfully.');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error updating event: ' . $e->getMessage()
-            ], 500);
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error updating event: ' . $e->getMessage()
+                ], 500);
+            }
+
+            return redirect()
+                ->back()
+                ->with('error', 'An error occurred while updating the event. ' . $e->getMessage());
         }
     }
 
@@ -240,16 +247,15 @@ class CalenderController extends Controller
                 '1'
             );
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Event deleted successfully'
-            ]);
+
+            return redirect()
+                ->route($this->getTenantRoute() . 'calender.index')
+                ->with('success', 'Event deleted successfully.');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error deleting event: ' . $e->getMessage()
-            ], 500);
+            return redirect()
+                ->back()
+                ->with('error', 'An error occurred while deleting the event. ' . $e->getMessage());
         }
     }
 

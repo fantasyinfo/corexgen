@@ -1,30 +1,25 @@
 @extends('layout.app')
 
 @section('content')
-    @php
-        $date = now();
-        if (isset($_GET['date'])) {
-            $date = \Carbon\Carbon::parse($_GET['date']); // Parse the provided date
-        }
-        $formattedDate = $date->format('Y-m-d\TH:i'); // Format to datetime-local value
-    @endphp
     <div class="container-fluid">
         <div class="row">
             <div class="justify-content-md-center col-lg-9">
                 <div class="card stretch stretch-full">
-                    <form id="calenderEventForm" action="{{ route(getPanelRoutes('calender.store')) }}" method="POST"
+                    <form id="calenderEventForm" action="{{ route(getPanelRoutes('calender.update')) }}" method="POST"
                         enctype="multipart/form-data">
                         @csrf
+                        @method('PUT')
+                        <input type="hidden" name="id" value="{{ $event->id }}">
                         <div class="card-body general-info">
                             <div class="mb-5 d-flex align-items-center justify-content-between">
                                 <p class="fw-bold mb-0 me-4">
-                                    <span class="d-block">{{ __('Create New Event') }}</span>
+                                    <span class="d-block">{{ __('Update Event') }}</span>
                                     <span class="fs-12 fw-normal text-muted text-truncate-1-line">
                                         {{ __('crud.Please add correct information') }}
                                     </span>
                                 </p>
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-plus"></i> <span>{{ __('Create Event') }}</span>
+                                    <i class="fas fa-plus"></i> <span>{{ __('Update Event') }}</span>
                                 </button>
                             </div>
 
@@ -36,7 +31,7 @@
                                 </div>
                                 <div class="col-lg-8">
                                     <input type="text" class="form-control" name="title" id="title"
-                                        value="{{ old('title') }}" required placeholder="Enter event title">
+                                        value="{{ old('title', $event->title) }}" required placeholder="Enter event title">
                                 </div>
                             </div>
 
@@ -46,7 +41,7 @@
                                     <label for="description" class="form-label">{{ __('Description') }}</label>
                                 </div>
                                 <div class="col-lg-8">
-                                    <textarea class="form-control" name="description" id="description" rows="3" placeholder="Enter description">{{ old('description') }}</textarea>
+                                    <textarea class="form-control" name="description" id="description" rows="3" placeholder="Enter description">{{ old('description', $event->description) }}</textarea>
                                 </div>
                             </div>
 
@@ -57,9 +52,13 @@
                                 </div>
                                 <div class="col-lg-8">
                                     <select name="event_type" id="event_type" class="form-select">
-                                        <option value="meeting">{{ __('Meeting') }}</option>
-                                        <option value="task">{{ __('Task') }}</option>
-                                        <option value="appointment">{{ __('Appointment') }}</option>
+                                        <option value="meeting" {{ $event->event_type == 'meeting' ? 'selected' : '' }}>
+                                            {{ __('Meeting') }}</option>
+                                        <option value="task" {{ $event->event_type == 'task' ? 'selected' : '' }}>
+                                            {{ __('Task') }}</option>
+                                        <option value="appointment"
+                                            {{ $event->event_type == 'appointment' ? 'selected' : '' }}>
+                                            {{ __('Appointment') }}</option>
                                     </select>
                                 </div>
                             </div>
@@ -71,9 +70,12 @@
                                 </div>
                                 <div class="col-lg-8">
                                     <select name="priority" id="priority" class="form-select">
-                                        <option value="high">{{ __('High') }}</option>
-                                        <option value="medium" selected>{{ __('Medium') }}</option>
-                                        <option value="low">{{ __('Low') }}</option>
+                                        <option value="high" {{ $event->priority == 'high' ? 'selected' : '' }}>
+                                            {{ __('High') }}</option>
+                                        <option value="medium" {{ $event->priority == 'medium' ? 'selected' : '' }}>
+                                            {{ __('Medium') }}</option>
+                                        <option value="low" {{ $event->priority == 'low' ? 'selected' : '' }}>
+                                            {{ __('Low') }}</option>
                                     </select>
                                 </div>
                             </div>
@@ -86,7 +88,7 @@
                                 </div>
                                 <div class="col-lg-8">
                                     <input type="datetime-local" class="form-control" name="start_date" id="start_date"
-                                        value="{{ old('start_date', $formattedDate) }}" required>
+                                        value="{{ old('start_date', $event->start_date) }}" required>
                                 </div>
                             </div>
 
@@ -97,7 +99,7 @@
                                 </div>
                                 <div class="col-lg-8">
                                     <input type="datetime-local" class="form-control" name="end_date" id="end_date"
-                                        value="{{ old('end_date') }}">
+                                        value="{{ old('end_date', $event->end_date) }}">
                                 </div>
                             </div>
 
@@ -108,16 +110,17 @@
                                 </div>
                                 <div class="col-lg-8">
                                     <input type="text" class="form-control" name="location" id="location"
-                                        value="{{ old('location') }}" placeholder="Enter location">
+                                        value="{{ old('location', $event->location) }}" placeholder="Enter location">
                                 </div>
                             </div>
+
                             <div class="row mb-4 align-items-center">
                                 <div class="col-lg-4">
                                     <label for="color" class="form-label">{{ __('Color') }}</label>
                                 </div>
                                 <div class="col-lg-8">
                                     <input type="color" class="form-control" name="color" id="color"
-                                        value="{{ old('color') }}" placeholder="Enter Color">
+                                        value="{{ old('color', $event->color) }}" placeholder="Enter Color">
                                 </div>
                             </div>
 
@@ -128,7 +131,8 @@
                                 </div>
                                 <div class="col-lg-8">
                                     <input type="url" class="form-control" name="meeting_link" id="meeting_link"
-                                        value="{{ old('meeting_link') }}" placeholder="Enter meeting link">
+                                        value="{{ old('meeting_link', $event->meeting_link) }}"
+                                        placeholder="Enter meeting link">
                                 </div>
                             </div>
 
@@ -141,13 +145,14 @@
                                     <select name="timezone" id="timezone" class="form-select">
                                         @foreach (timezone_identifiers_list() as $timezone)
                                             <option value="{{ $timezone }}"
-                                                {{ $timezone == 'UTC' ? 'selected' : '' }}>{{ $timezone }}</option>
+                                                {{ $event->timezone == $timezone ? 'selected' : '' }}>{{ $timezone }}
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
                             </div>
 
-                           
+
 
                             {{-- Status --}}
                             <div class="row mb-4 align-items-center">
@@ -156,11 +161,17 @@
                                 </div>
                                 <div class="col-lg-8">
                                     <select name="status" id="status" class="form-select">
-                                        <option value="upcoming" selected>{{ __('Upcoming') }}</option>
-                                        <option value="in_progress">{{ __('In Progress') }}</option>
-                                        <option value="completed">{{ __('Completed') }}</option>
-                                        <option value="canceled">{{ __('Canceled') }}</option>
-                                        <option value="postponed">{{ __('Postponed') }}</option>
+                                        <option value="upcoming" {{ $event->status == 'upcoming' ? 'selected' : '' }}>
+                                            {{ __('Upcoming') }}</option>
+                                        <option value="in_progress"
+                                            {{ $event->status == 'in_progress' ? 'selected' : '' }}>
+                                            {{ __('In Progress') }}</option>
+                                        <option value="completed" {{ $event->status == 'completed' ? 'selected' : '' }}>
+                                            {{ __('Completed') }}</option>
+                                        <option value="canceled" {{ $event->status == 'canceled' ? 'selected' : '' }}>
+                                            {{ __('Canceled') }}</option>
+                                        <option value="postponed" {{ $event->status == 'postponed' ? 'selected' : '' }}>
+                                            {{ __('Postponed') }}</option>
                                     </select>
                                 </div>
                             </div>
@@ -173,7 +184,8 @@
                                 </div>
                                 <div class="col-lg-8">
                                     <input type="checkbox" name="send_notifications" id="send_notifications"
-                                        value="1" {{ old('send_notifications', true) ? 'checked' : '' }}>
+                                        value="1"
+                                        {{ old('send_notifications', $event->send_notifications) ? 'checked' : '' }}>
                                 </div>
                             </div>
 

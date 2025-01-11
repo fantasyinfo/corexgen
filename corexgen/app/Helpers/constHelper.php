@@ -527,7 +527,7 @@ PermissionsHelper::initializePermissions();
         ]
     ],
     'Calender' => [
-        'menu_icon' => 'fa-calender-alt',
+        'menu_icon' => 'fa-calendar-week',
         'feature_type' => PermissionsHelper::$plansPermissionsKeys['CALENDER'], // this need to match the PLANS_FEATURES key
         'permission_plan' => PermissionsHelper::$plansPermissionsKeys['CALENDER'],
         'permission_id' => PermissionsHelper::getParentPermissionId('156'),

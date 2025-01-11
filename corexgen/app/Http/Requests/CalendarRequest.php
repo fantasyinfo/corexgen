@@ -26,6 +26,7 @@ class CalendarRequest extends FormRequest
     {
         return [
             // Event Details
+            'id' => 'nullable|exists:calendars,id',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'event_type' => 'nullable|string|in:meeting,task,appointment',
