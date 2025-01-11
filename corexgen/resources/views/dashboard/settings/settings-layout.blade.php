@@ -170,17 +170,18 @@
                                 @foreach (SETTINGS_MENU_ITEMS as $key => $item)
                                     @if ($item['for'] === 'both')
                                         <a class="nav-link {{ request()->routeIs(getPanelRoutes('settings.' . $item['link'])) ? 'active' : '' }}"
-                                            href="{{ route(getPanelRoutes('settings.' . $item['link'])) }}">
+                                            href="{{ route(getPanelRoutes($item['module'] . '.' . $item['link'])) }}">
                                             <i class="fas {{ $item['icon'] }}"></i> {{ $item['name'] }}
                                         </a>
                                     @elseif($item['for'] === 'tenant' && panelAccess() == PANEL_TYPES['SUPER_PANEL'])
-                                        <a class="nav-link {{ request()->routeIs(getPanelRoutes('settings.' . $item['link'])) ? 'active' : '' }}"
-                                            href="{{ route(getPanelRoutes('settings.' . $item['link'])) }}">
+                                        <a class="nav-link {{ request()->routeIs(getPanelRoutes($item['module'] . '.' . $item['link'])) ? 'active' : '' }}"
+                                            href="{{ route(getPanelRoutes($item['module'] . '.' . $item['link'])) }}">
                                             <i class="fas {{ $item['icon'] }}"></i> {{ $item['name'] }}
                                         </a>
                                     @elseif ($item['for'] === 'company' && panelAccess() == PANEL_TYPES['COMPANY_PANEL'])
-                                        <a class="nav-link {{ request()->routeIs(getPanelRoutes('settings.' . $item['link'])) ? 'active' : '' }}"
-                                            href="{{ route(getPanelRoutes('settings.' . $item['link'])) }}">
+                                       
+                                        <a class="nav-link {{ request()->routeIs(getPanelRoutes($item['module'] . '.' . $item['link'])) ? 'active' : '' }}"
+                                            href="{{ route(getPanelRoutes($item['module'] . '.' . $item['link'])) }}">
                                             <i class="fas {{ $item['icon'] }}"></i> {{ $item['name'] }}
                                         </a>
                                     @endif

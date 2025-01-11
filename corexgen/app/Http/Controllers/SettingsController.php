@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Helpers\PermissionsHelper;
 use App\Http\Controllers\Controller;
+use App\Models\Address;
+use App\Models\City;
 use App\Models\Company;
 use App\Models\CompanyOnboarding;
+use App\Models\Country;
 use App\Models\CRM\CRMSettings;
 use App\Models\Media;
 use App\Models\Tenant;
@@ -80,7 +83,8 @@ class SettingsController extends Controller
             'is_tenant' => Auth::user()->is_tenant,
             'company_id' => Auth::user()->company_id,
             'dateTimeFormats' => $this->defaultDateTimeFormats(),
-            'company' => $company
+            'company' => $company,
+            'countries' => Country::all(),
         ]);
     }
 
@@ -143,6 +147,10 @@ class SettingsController extends Controller
                 'client_company_currency_symbol' => 'required|string|max:10',
                 'client_company_currency_code' => 'required|string|max:10',
                 'client_company_logo' => 'nullable|image|max:2048',
+                'client_company_address_street_address' => 'required|string|max:255',
+                'client_company_address_city_name' => 'required|string|max:100',
+                'client_company_address_pincode' => 'required|string|max:10',
+                'client_company_address_country_id' => 'required|exists:countries,id',
             ]);
 
             // Update the settings in the database
@@ -153,7 +161,21 @@ class SettingsController extends Controller
                 'client_company_time_zone' => $request->input('client_company_time_zone'),
                 'client_company_currency_symbol' => $request->input('client_company_currency_symbol'),
                 'client_company_currency_code' => $request->input('client_company_currency_code'),
+                'client_company_address_street_address' => $request->input('client_company_address_street_address'),
+                'client_company_address_city_name' => $request->input('client_company_address_city_name'),
+                'client_company_address_pincode' => $request->input('client_company_address_pincode'),
+                'client_company_address_country_id' => $request->input('client_company_address_country_id'),
             ];
+
+
+            $addressData = [
+                'address_street_address' => $request->input('client_company_address_street_address'),
+                'address_city_name' => $request->input('client_company_address_city_name'),
+                'address_pincode' => $request->input('client_company_address_pincode'),
+                'address_country_id' => $request->input('client_company_address_country_id'),
+            ];
+            $this->createAddressIfProvided($addressData);
+
 
             foreach ($settings as $key => $value) {
                 $setting = CRMSettings::where('name', $key)->where('company_id', Auth::user()->company_id)->first();
@@ -505,6 +527,46 @@ class SettingsController extends Controller
         } else {
             return redirect()->back()->withErrors('No settings were updated.');
         }
+    }
+
+
+    private function findOrCreateCity($cityName, $countryId)
+    {
+        $city = City::firstOrCreate(
+            ['name' => $cityName, 'country_id' => $countryId],
+            ['name' => $cityName, 'country_id' => $countryId]
+        );
+
+        return $city->id;
+    }
+
+    private function createAddressIfProvided(array $data)
+    {
+        // Find or create the city ID
+        $cityId = $this->findOrCreateCity($data['address_city_name'], $data['address_country_id']);
+
+        // Check if the address already exists
+        $address = Address::where([
+            'street_address' => $data['address_street_address'],
+            'postal_code' => $data['address_pincode'],
+            'city_id' => $cityId,
+            'country_id' => $data['address_country_id'],
+            'address_type' => ADDRESS_TYPES['USER']['SHOW']['HOME'],
+        ])->first();
+
+        // If the address doesn't exist, create it
+        if (!$address) {
+            $address = Address::create([
+                'street_address' => $data['address_street_address'],
+                'postal_code' => $data['address_pincode'],
+                'city_id' => $cityId,
+                'country_id' => $data['address_country_id'],
+                'address_type' => ADDRESS_TYPES['USER']['SHOW']['HOME'],
+            ]);
+        }
+
+        // Update the company's address_id
+        Company::find(Auth::user()->company_id)->update(['address_id' => $address->id]);
     }
 
 

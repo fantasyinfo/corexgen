@@ -16,7 +16,8 @@ class CategoryGroupTag extends Model
 
     protected $table = self::table;
 
-    protected $fillable = ['name', 'color', 'type', 'status', 'company_id'];
+    protected $fillable = 
+    ['name', 'color', 'type','relation_type', 'status', 'company_id'];
 
 
     public function clients()

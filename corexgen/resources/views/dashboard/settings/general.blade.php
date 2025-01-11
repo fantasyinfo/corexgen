@@ -62,6 +62,17 @@
                                     value="{{ old($item['name'], $item['value']) }}" required />
                             </div>
                         @break
+                        @case('textarea')
+                        <div class="row mb-4 align-items-center">
+                            <x-form-components.input-label for="{{ $item['key'] }}" class="custom-class" required>
+                                {{ $item['key'] }}
+                            </x-form-components.input-label>
+
+                            <x-form-components.textarea-group type="{{ $item['input_type'] }}" class="custom-class"
+                                id="{{ $item['key'] }}" name="{{ $item['name'] }}" placeholder="{{ $item['placeholder'] }}"
+                                value="{{ old($item['name'], $item['value']) }}" required />
+                        </div>
+                    @break
 
                         @case('dropdown')
                             <div class="row mb-4 align-items-center">
@@ -82,6 +93,12 @@
                                             <option value="{{ $option }}" {{ $option == $item['value'] ? 'selected' : '' }}>
                                                 {{ $option }}
                                             </option>
+                                        @endforeach
+                                    @elseif($item['name'] == 'tenant_company_time_zone' || $item['name'] == 'client_company_address_country_id')
+                                        @foreach ($countries as $option)
+                                        <option value="{{ $option->id }}" {{ $option->id == $item['value'] ? 'selected' : '' }}>
+                                            {{ $option->name }}
+                                        </option>
                                         @endforeach
                                     @endif
                                 </select>
