@@ -46,6 +46,7 @@ class PermissionsHelper
         'TIMESHEETS' => 'TIMESHEETS',
         'INVOICES' => 'INVOICES',
         'SETTINGS_CTG' => 'SETTINGS_CTG',
+        'CALENDER' => 'CALENDER',
 
 
     ];
@@ -147,6 +148,8 @@ class PermissionsHelper
 
 
             self::$plansPermissionsKeys['SETTINGS_CTG'] => [4501 => 'CREATE', 4502 => 'READ', 4503 => 'READ_ALL', 4504 => 'UPDATE', 4505 => 'DELETE'],
+
+            self::$plansPermissionsKeys['CALENDER'] => [4551 => 'CREATE', 4552 => 'READ', 4553 => 'READ_ALL', 4554 => 'UPDATE', 4555 => 'DELETE'],
         ];
     }
 

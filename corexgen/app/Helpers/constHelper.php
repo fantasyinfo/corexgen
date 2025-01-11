@@ -272,6 +272,13 @@ PermissionsHelper::initializePermissions();
         'for' => 'company',
         'is_feature' => true,
     ],
+    PermissionsHelper::$plansPermissionsKeys['CALENDER'] => [
+        'name' => 'CALENDER',
+        'id' => PermissionsHelper::getParentPermissionId('156'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['CALENDER'],
+        'for' => 'company',
+        'is_feature' => true,
+    ],
 ]);
 
 // super panel menus
@@ -519,6 +526,15 @@ PermissionsHelper::initializePermissions();
             'Custom Fields' => ['menu_url' => 'customfields.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['CUSTOM_FIELDS'], 'READ_ALL')],
         ]
     ],
+    'Calender' => [
+        'menu_icon' => 'fa-calender-alt',
+        'feature_type' => PermissionsHelper::$plansPermissionsKeys['CALENDER'], // this need to match the PLANS_FEATURES key
+        'permission_plan' => PermissionsHelper::$plansPermissionsKeys['CALENDER'],
+        'permission_id' => PermissionsHelper::getParentPermissionId('156'),
+        'children' => [
+            'Calender' => ['menu_url' => 'calender.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['CALENDER'], 'READ_ALL')],
+        ]
+    ],
 ]);
 
 
@@ -673,7 +689,8 @@ PermissionsHelper::initializePermissions();
         'tasks' => 'tasks',
         'milestones' => 'milestones',
         'invoices' => 'invoices',
-        'cgt' => 'cgt'
+        'cgt' => 'cgt',
+        'calender' => 'calender',
 
     ]
 ]);
@@ -707,6 +724,7 @@ PermissionsHelper::initializePermissions();
     PermissionsHelper::$plansPermissionsKeys['TASKS'] => PermissionsHelper::$plansPermissionsKeys['TASKS'],
     PermissionsHelper::$plansPermissionsKeys['MILESTONES'] => PermissionsHelper::$plansPermissionsKeys['MILESTONES'],
     PermissionsHelper::$plansPermissionsKeys['INVOICES'] => PermissionsHelper::$plansPermissionsKeys['INVOICES'],
+    PermissionsHelper::$plansPermissionsKeys['CALENDER'] => PermissionsHelper::$plansPermissionsKeys['CALENDER'],
 ]);
 
 
