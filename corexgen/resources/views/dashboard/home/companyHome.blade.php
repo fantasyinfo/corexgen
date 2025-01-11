@@ -52,7 +52,7 @@
         <!-- Welcome Section -->
         <div class="row mb-4">
             <div class="col-12">
-                <h1 class="h3 mb-2 text-gray-800">Company Dashboard</h1>
+                <h1 class="h3 mb-2 text-gray-800">Dashboard</h1>
                 <p class="text-muted">Welcome back, {{ Auth::user()->name }}</p>
             </div>
         </div>
@@ -60,14 +60,18 @@
         <!-- Primary Stats Cards Row -->
         <div class="row mb-4">
             <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-primary shadow h-100 py-2 stat-card" style="border-left: 4px solid #4e73df;">
+                <div class="card border-left-primary shadow h-100 py-2 stat-card" style="border-bottom: 2px solid #4e73df;">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
                                 <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Active Projects</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $activeProjects ?? 0 }}</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                    {{ $activeProjects['current_month'] ?? 0 }}</div>
                                 <div class="mini-stat">
-                                    <span class="trend-indicator trend-up">↑ 12% vs last month</span>
+                                    <span class="trend-indicator trend-{{ $activeProjects['trend'] }}">
+                                        {{ $activeProjects['trend'] === 'up' ? '↑' : '↓' }}
+                                        {{ abs($activeProjects['percentage_change']) }}% vs last month
+                                    </span>
                                 </div>
                             </div>
                             <div class="col-auto">
@@ -78,16 +82,20 @@
                 </div>
             </div>
 
+
             <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-success shadow h-100 py-2 stat-card" style="border-left: 4px solid #1cc88a;">
+                <div class="card border-left-success shadow h-100 py-2 stat-card" style="border-bottom: 2px solid #1cc88a;">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Revenue</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">${{ number_format($totalRevenue ?? 0) }}
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Revenue</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $revenue['current_month'] ?? 0 }}
                                 </div>
                                 <div class="mini-stat">
-                                    <span class="trend-indicator trend-up">↑ 8.5% vs last month</span>
+                                    <span class="trend-indicator trend-{{ $revenue['trend'] }}">
+                                        {{ $revenue['trend'] === 'up' ? '↑' : '↓' }}
+                                        {{ abs($revenue['percentage_change']) }}% vs last month
+                                    </span>
                                 </div>
                             </div>
                             <div class="col-auto">
@@ -99,14 +107,17 @@
             </div>
 
             <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-info shadow h-100 py-2 stat-card" style="border-left: 4px solid #36b9cc;">
+                <div class="card border-left-info shadow h-100 py-2 stat-card" style="border-bottom: 2px solid #36b9cc;">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Active Tasks</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $activeTasks ?? 0 }}</div>
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Active Tasks</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $tasks['current_month'] ?? 0 }}</div>
                                 <div class="mini-stat">
-                                    <span class="trend-indicator trend-down">↓ 3% vs last month</span>
+                                    <span class="trend-indicator trend-{{ $tasks['trend'] }}">
+                                        {{ $tasks['trend'] === 'up' ? '↑' : '↓' }}
+                                        {{ abs($tasks['percentage_change']) }}% vs last month
+                                    </span>
                                 </div>
                             </div>
                             <div class="col-auto">
@@ -118,91 +129,22 @@
             </div>
 
             <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-warning shadow h-100 py-2 stat-card" style="border-left: 4px solid #f6c23e;">
+                <div class="card border-left-warning shadow h-100 py-2 stat-card" style="border-bottom: 2px solid #f6c23e;">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Total Clients</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalClients ?? 0 }}</div>
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Clients</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $clients['current_month'] ?? 0 }}
+                                </div>
                                 <div class="mini-stat">
-                                    <span class="trend-indicator trend-up">↑ 5% vs last month</span>
+                                    <span class="trend-indicator trend-{{ $clients['trend'] }}">
+                                        {{ $clients['trend'] === 'up' ? '↑' : '↓' }}
+                                        {{ abs($clients['percentage_change']) }}% vs last month
+                                    </span>
                                 </div>
                             </div>
                             <div class="col-auto">
                                 <i class="fas fa-users fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Secondary Stats Cards Row -->
-        <div class="row mb-4">
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-primary shadow h-100 py-2 stat-card" style="border-left: 4px solid #4e73df;">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Pending Proposals
-                                </div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $pendingProposals ?? 0 }}</div>
-                                <div class="mini-stat">Value: ${{ number_format($proposalValue ?? 0) }}</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-file-signature fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-success shadow h-100 py-2 stat-card" style="border-left: 4px solid #1cc88a;">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Active Contracts
-                                </div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $activeContracts ?? 0 }}</div>
-                                <div class="mini-stat">Value: ${{ number_format($contractValue ?? 0) }}</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-file-contract fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-info shadow h-100 py-2 stat-card" style="border-left: 4px solid #36b9cc;">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Hours Logged</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $hoursLogged ?? 0 }}h</div>
-                                <div class="mini-stat">This Month</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-clock fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-warning shadow h-100 py-2 stat-card" style="border-left: 4px solid #f6c23e;">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Open Leads</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $openLeads ?? 0 }}</div>
-                                <div class="mini-stat">Potential: ${{ number_format($leadValue ?? 0) }}</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-funnel-dollar fa-2x text-gray-300"></i>
                             </div>
                         </div>
                     </div>
@@ -286,8 +228,8 @@
                                 </div>
                                 <div class="progress project-progress">
                                     <div class="progress-bar bg-primary" role="progressbar"
-                                        style="width: {{ $project->progress }}%"
-                                        aria-valuenow="{{ $project->progress }}" aria-valuemin="0" aria-valuemax="100">
+                                        style="width: {{ $project->progress }}%" aria-valuenow="{{ $project->progress }}"
+                                        aria-valuemin="0" aria-valuemax="100">
                                     </div>
                                 </div>
                             </div>
@@ -399,22 +341,23 @@
 @endsection
 
 @push('scripts')
-<script src="{{ asset('js/chart2/chart2.js') }}"></script>
+    <script src="{{ asset('js/chart2/chart2.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Project Timeline Chart
             const timelineCtx = document.getElementById('projectTimeline').getContext('2d');
+            const projectTimelines = @json($projectsTimelines);
             new Chart(timelineCtx, {
                 type: 'bar',
                 data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    labels: projectTimelines.labels,
                     datasets: [{
                         label: 'Completed Projects',
-                        data: [4, 6, 5, 8, 7, 9],
+                        data: projectTimelines.completedProjects,
                         backgroundColor: '#4e73df'
                     }, {
                         label: 'New Projects',
-                        data: [6, 4, 7, 5, 8, 6],
+                        data: projectTimelines.newProjects,
                         backgroundColor: '#1cc88a'
                     }]
                 },
@@ -438,13 +381,30 @@
 
             // Task Distribution Chart
             const taskCtx = document.getElementById('taskDistribution').getContext('2d');
+            const tasksCounts = @json($tasksCounts);
+
+            const generateColors = (count) => {
+                const colors = [
+                    '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b',
+                    '#858796', '#6f42c1', '#fd7e14', '#20c997', '#dc3545'
+                ]; // Pool of colors
+                const result = [];
+                for (let i = 0; i < count; i++) {
+                    result.push(colors[i % colors.length]); // Reuse colors if plans exceed the pool size
+                }
+                return result;
+            };
+
+            const backgroundColors = generateColors(tasksCounts.labels.length);
+
+
             new Chart(taskCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Completed', 'In Progress', 'Pending'],
+                    labels: tasksCounts.labels,
                     datasets: [{
-                        data: [45, 35, 20],
-                        backgroundColor: ['#1cc88a', '#4e73df', '#f6c23e'],
+                        data: tasksCounts.data,
+                        backgroundColor: backgroundColors,
                         hoverOffset: 4
                     }]
                 },

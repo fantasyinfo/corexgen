@@ -72,13 +72,13 @@ class Tasks extends Model implements Auditable
 
     public function milestone()
     {
-        return $this->hasOne(Milestone::class, 'id','milestone_id');
+        return $this->hasOne(Milestone::class, 'id', 'milestone_id');
     }
 
 
     public function timeSheets()
     {
-        return $this->hasMany(Timesheet::class,'task_id');
+        return $this->hasMany(Timesheet::class, 'task_id');
     }
 
     // Belongs to user who assigned it
@@ -109,6 +109,61 @@ class Tasks extends Model implements Auditable
 
     }
 
+
+
+    public function getActiveTasks()
+    {
+        $currentMonth = now()->startOfMonth();
+        $lastMonth = now()->subMonth()->startOfMonth();
+
+        // Check current month's tasks
+        $thisMonthCount = self::whereHas('stage', function ($query) {
+            $query->where('name', 'New') // Ensure 'New' exists in the related table
+                ->where('type', 'tasks_status'); // Ensure 'tasks' exists in the related table
+        })
+            ->where('company_id', Auth::user()->company_id)
+            ->whereBetween('start_date', [$currentMonth, now()]) // Check 'start_date' is valid
+            ->count();
+
+        // Check last month's tasks
+        $lastMonthCount = self::whereHas('stage', function ($query) {
+            $query->where('name', 'New')
+                ->where('type', 'tasks_status');
+        })
+            ->where('company_id', Auth::user()->company_id)
+            ->whereBetween('start_date', [$lastMonth, $currentMonth]) // Use correct date field
+            ->count();
+
+        // Calculate percentage change
+        $percentageChange = $lastMonthCount > 0
+            ? (($thisMonthCount - $lastMonthCount) / $lastMonthCount) * 100
+            : 100; // Handle no tasks last month
+
+        return [
+            'current_month' => $thisMonthCount,
+            'last_month' => $lastMonthCount,
+            'percentage_change' => round($percentageChange, 2),
+            'trend' => $percentageChange >= 0 ? 'up' : 'down',
+        ];
+    }
+
+
+
+    public function getTasksCounts()
+    {
+        $taskStages = CategoryGroupTag::where('type', 'tasks_status') // Filter only task-related stages
+            ->withCount([
+                'tasks as task_count' => function ($query) {
+                    $query->whereNull('deleted_at'); // Exclude soft-deleted tasks
+                }
+            ])
+            ->get();
+
+        return [
+            'labels' => $taskStages->pluck('name')->toArray(), // Stage names
+            'data' => $taskStages->pluck('task_count')->toArray(), // Task counts
+        ];
+    }
 
 
 

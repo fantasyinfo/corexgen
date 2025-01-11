@@ -71,6 +71,42 @@ class Invoice extends Model implements Auditable
     }
 
 
+    /**
+     * Get total revenue stats for this month and last month.
+     *
+     * @return array
+     */
+    public function getTotalRevenueStats()
+    {
+        $currentMonth = now()->startOfMonth();
+        $lastMonth = now()->subMonth()->startOfMonth();
+
+        // Calculate revenue for this month
+        $thisMonthRevenue = self::where('status', 'SUCCESS')
+        ->where('company_id', Auth::user()->company_id)
+            ->whereBetween('issue_date', [$currentMonth, now()])
+            ->sum('total_amount');
+
+        // Calculate revenue for last month
+        $lastMonthRevenue = self::where('status', 'SUCCESS')
+        ->where('company_id', Auth::user()->company_id)
+            ->whereBetween('issue_date', [$lastMonth, $currentMonth])
+            ->sum('total_amount');
+
+        // Calculate percentage change
+        $percentageChange = $lastMonthRevenue > 0
+            ? (($thisMonthRevenue - $lastMonthRevenue) / $lastMonthRevenue) * 100
+            : 100; // 100% increase if no revenue last month
+
+        return [
+            'current_month' => $thisMonthRevenue,
+            'last_month' => $lastMonthRevenue,
+            'percentage_change' => round($percentageChange, 2),
+            'trend' => $percentageChange >= 0 ? 'up' : 'down',
+        ];
+    }
+
+
     protected static function boot()
     {
         parent::boot();

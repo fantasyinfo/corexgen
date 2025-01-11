@@ -94,6 +94,32 @@ class CRMClients extends Model implements Auditable
 
     }
 
+    public  function getActiveClientsStats()
+    {
+        $currentMonth = now()->startOfMonth();
+        $lastMonth = now()->subMonth()->startOfMonth();
+
+        $thisMonthCount = self::where('status',  CRM_STATUS_TYPES['CLIENTS']['STATUS']['ACTIVE'])
+            ->where('company_id', Auth::user()->company_id)
+            ->whereBetween('created_at', [$currentMonth, now()])
+            ->count();
+
+        $lastMonthCount = self::where('status',  CRM_STATUS_TYPES['CLIENTS']['STATUS']['ACTIVE'])
+            ->where('company_id', Auth::user()->company_id)
+            ->whereBetween('created_at', [$lastMonth, $currentMonth])
+            ->count();
+
+        $percentageChange = $lastMonthCount > 0
+            ? (($thisMonthCount - $lastMonthCount) / $lastMonthCount) * 100
+            : 100; // 100% increase if no projects last month
+
+        return [
+            'current_month' => $thisMonthCount,
+            'last_month' => $lastMonthCount,
+            'percentage_change' => round($percentageChange, 2),
+            'trend' => $percentageChange >= 0 ? 'up' : 'down',
+        ];
+    }
 
     protected static function boot()
     {

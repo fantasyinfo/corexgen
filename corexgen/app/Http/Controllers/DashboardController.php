@@ -5,9 +5,13 @@ namespace App\Http\Controllers;
 use App\Helpers\PermissionsHelper;
 use App\Models\Audit;
 use App\Models\Company;
+use App\Models\CRM\CRMClients;
+use App\Models\Invoice;
 use App\Models\PaymentTransaction;
 use App\Models\Plans;
+use App\Models\Project;
 use App\Models\Subscription;
+use App\Models\Tasks;
 use App\Models\User;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
@@ -46,6 +50,10 @@ class DashboardController extends Controller
     protected $subscriptionModel;
     protected $userModel;
     protected $plansModel;
+    protected $projectModel;
+    protected $invoiceModel;
+    protected $tasksModel;
+    protected $clientModelModel;
 
 
     public function __construct(
@@ -54,12 +62,20 @@ class DashboardController extends Controller
         Subscription $subscriptionModel,
         User $userModel,
         Plans $plansModel,
+        Project $projectModel,
+        Invoice $invoiceModel,
+        Tasks $tasksModel,
+        CRMClients $clientModelModel,
     ) {
         $this->companyModel = $companyModel;
         $this->paymentTransactionModel = $paymentTransactionModel;
         $this->subscriptionModel = $subscriptionModel;
         $this->userModel = $userModel;
         $this->plansModel = $plansModel;
+        $this->projectModel = $projectModel;
+        $this->invoiceModel = $invoiceModel;
+        $this->tasksModel = $tasksModel;
+        $this->clientModelModel = $clientModelModel;
     }
 
     public function companyHome()
@@ -69,6 +85,12 @@ class DashboardController extends Controller
             'permissions' => PermissionsHelper::getPermissionsArray('DASHBOARD'),
             'module' => PANEL_MODULES[$this->getPanelModule()]['dashboard'],
             'type' => 'Dashboard',
+            'activeProjects' => $this->projectModel->getActiveProjectsStats(),
+            'projectsTimelines' => $this->projectModel->getProjectTimelineData(),
+            'revenue' => $this->invoiceModel->getTotalRevenueStats(),
+            'tasks' => $this->tasksModel->getActiveTasks(),
+            'tasksCounts' => $this->tasksModel->getTasksCounts(),
+            'clients' => $this->clientModelModel->getActiveClientsStats(),
         ]);
     }
 

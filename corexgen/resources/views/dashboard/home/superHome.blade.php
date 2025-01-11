@@ -34,7 +34,7 @@
         <!-- Stats Cards -->
         <div class="row mb-4">
             <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-primary shadow h-100 py-2 stat-card" style="border-left: 4px solid #4e73df;">
+                <div class="card border-left-primary shadow h-100 py-2 stat-card" style="border-bottom: 2px solid #4e73df;">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
@@ -50,7 +50,7 @@
             </div>
 
             <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-success shadow h-100 py-2 stat-card" style="border-left: 4px solid #1cc88a;">
+                <div class="card border-left-success shadow h-100 py-2 stat-card" style="border-bottom: 2px solid #1cc88a;">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
@@ -67,7 +67,7 @@
             </div>
 
             <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-info shadow h-100 py-2 stat-card" style="border-left: 4px solid #36b9cc;">
+                <div class="card border-left-info shadow h-100 py-2 stat-card" style="border-bottom: 2px solid #36b9cc;">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
@@ -84,7 +84,7 @@
             </div>
 
             <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-warning shadow h-100 py-2 stat-card" style="border-left: 4px solid #f6c23e;">
+                <div class="card border-left-warning shadow h-100 py-2 stat-card" style="border-bottom: 2px solid #f6c23e;">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
