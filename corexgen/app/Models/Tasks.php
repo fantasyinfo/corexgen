@@ -157,6 +157,7 @@ class Tasks extends Model implements Auditable
                     $query->whereNull('deleted_at'); // Exclude soft-deleted tasks
                 }
             ])
+            ->where('company_id',Auth::user()->company_id)
             ->get();
 
         return [

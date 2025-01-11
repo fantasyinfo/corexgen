@@ -91,6 +91,8 @@ class DashboardController extends Controller
             'tasks' => $this->tasksModel->getActiveTasks(),
             'tasksCounts' => $this->tasksModel->getTasksCounts(),
             'clients' => $this->clientModelModel->getActiveClientsStats(),
+            'recentActivities' => Audit::with('user')->latest()->limit(5)->get(),
+            'recentInvoices' => $this->invoiceModel->getRecentInvoices(5)
         ]);
     }
 

@@ -83,13 +83,13 @@ class Invoice extends Model implements Auditable
 
         // Calculate revenue for this month
         $thisMonthRevenue = self::where('status', 'SUCCESS')
-        ->where('company_id', Auth::user()->company_id)
+            ->where('company_id', Auth::user()->company_id)
             ->whereBetween('issue_date', [$currentMonth, now()])
             ->sum('total_amount');
 
         // Calculate revenue for last month
         $lastMonthRevenue = self::where('status', 'SUCCESS')
-        ->where('company_id', Auth::user()->company_id)
+            ->where('company_id', Auth::user()->company_id)
             ->whereBetween('issue_date', [$lastMonth, $currentMonth])
             ->sum('total_amount');
 
@@ -106,6 +106,11 @@ class Invoice extends Model implements Auditable
         ];
     }
 
+
+    public function getRecentInvoices($limit = 10)
+    {
+        return self::with(['client', 'task', 'timesheet', 'project'])->where('company_id', Auth::user()->company_id)->latest()->limit($limit)->get();
+    }
 
     protected static function boot()
     {
