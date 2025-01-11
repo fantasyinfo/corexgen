@@ -137,6 +137,13 @@ PermissionsHelper::initializePermissions();
         'for' => 'company',
         'is_feature' => false
     ],
+    PermissionsHelper::$plansPermissionsKeys['SETTINGS_CTG'] => [
+        'name' => 'SETTINGS_CTG',
+        'id' => PermissionsHelper::getParentPermissionId('21'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['SETTINGS_CTG'],
+        'for' => 'company',
+        'is_feature' => false
+    ],
     PermissionsHelper::$plansPermissionsKeys['EVENTS_AUDIT_LOG'] => [
         'name' => 'EVENTS_AUDIT_LOG',
         'id' => PermissionsHelper::getParentPermissionId('16'),
@@ -371,6 +378,13 @@ PermissionsHelper::initializePermissions();
             'General' => ['menu_url' => 'settings.general', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS'], 'READ')],
             'Mail' => ['menu_url' => 'settings.mail', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_MAIL'], 'READ')],
             'One Word' => ['menu_url' => 'settings.oneWord', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_ONEWORD'], 'READ')],
+            'Clients Category' => ['menu_url' => 'cgt.indexClientCategory', 'menu_icon' => 'fa-cog', 'permission_id' => 2000],
+            'Leads Groups' => ['menu_url' => 'cgt.indexLeadsGroups', 'menu_icon' => 'fa-cog', 'permission_id' => 2001],
+            'Leads Status' => ['menu_url' => 'cgt.indexLeadsStatus', 'menu_icon' => 'fa-cog', 'permission_id' => 2002],
+            'Leads Sources' => ['menu_url' => 'cgt.indexLeadsSources', 'menu_icon' => 'fa-cog', 'permission_id' => 2003],
+            'Produc Categories' => ['menu_url' => 'cgt.indexProductCategories', 'menu_icon' => 'fa-cog', 'permission_id' => 2004],
+            'Product Taxes' => ['menu_url' => 'cgt.indexProductTaxes', 'menu_icon' => 'fa-cog', 'permission_id' => 2005],
+            'Tasks Status' => ['menu_url' => 'cgt.indexTasksStatus', 'menu_icon' => 'fa-cog', 'permission_id' => 2006],
         ]
     ],
     'Roles & Permissions' => [
@@ -596,9 +610,9 @@ PermissionsHelper::initializePermissions();
         'BT_CLASSES' => ['SUCCESS' => 'success', 'FAILED' => 'danger', 'PENDING' => 'warning'],
     ],
     'INVOICES' => [
-        'TABLE_STATUS' => ['SENT','SUCCESS', 'OVERDUE', 'PENDING'],
-        'STATUS' => ['SENT' => 'SENT','SUCCESS' => 'PAID', 'OVERDUE' => 'OVERDUE', 'PENDING' => 'PENDING'],
-        'BT_CLASSES' => ['SENT' => 'info','SUCCESS' => 'success', 'OVERDUE' => 'danger', 'PENDING' => 'warning'],
+        'TABLE_STATUS' => ['SENT', 'SUCCESS', 'OVERDUE', 'PENDING'],
+        'STATUS' => ['SENT' => 'SENT', 'SUCCESS' => 'PAID', 'OVERDUE' => 'OVERDUE', 'PENDING' => 'PENDING'],
+        'BT_CLASSES' => ['SENT' => 'info', 'SUCCESS' => 'success', 'OVERDUE' => 'danger', 'PENDING' => 'warning'],
     ],
 
     'PROJECTS' => [
@@ -658,7 +672,8 @@ PermissionsHelper::initializePermissions();
         'projects' => 'projects',
         'tasks' => 'tasks',
         'milestones' => 'milestones',
-        'invoices' => 'invoices'
+        'invoices' => 'invoices',
+        'cgt' => 'cgt'
 
     ]
 ]);
@@ -726,25 +741,78 @@ PermissionsHelper::initializePermissions();
         'link' => 'general',
         'icon' => 'fa-cog',
         'for' => 'both',
+        'module' => 'settings',
     ],
     'Mail' => [
         'name' => 'Mail',
         'link' => 'mail',
         'icon' => 'fa-envelope',
         'for' => 'both',
+        'module' => 'settings',
     ],
     'Cron' => [
         'name' => 'Cron Job',
         'link' => 'cron',
         'icon' => 'fa-hourglass-half',
         'for' => 'tenant',
+        'module' => 'settings',
     ],
     'One Word' => [
         'name' => 'One Word',
         'link' => 'oneWord',
         'icon' => 'fa-file-word',
         'for' => 'company',
-    ]
+        'module' => 'settings',
+    ],
+    'Clients Category' => [
+        'name' => 'Clients Category',
+        'link' => 'indexClientCategory',
+        'icon' => 'fa-tags',
+        'for' => 'company',
+        'module' => 'cgt',
+    ],
+    'Leads Groups' => [
+        'name' => 'Leads Groups',
+        'link' => 'indexLeadsGroups',
+        'icon' => 'fa-tags',
+        'for' => 'company',
+        'module' => 'cgt',
+    ],
+    'Leads Status' => [
+        'name' => 'Leads Status',
+        'link' => 'indexLeadsStatus',
+        'icon' => 'fa-tags',
+        'for' => 'company',
+        'module' => 'cgt',
+    ],
+    'Leads Sources' => [
+        'name' => 'Leads Sources',
+        'link' => 'indexLeadsSources',
+        'icon' => 'fa-tags',
+        'for' => 'company',
+        'module' => 'cgt',
+    ],
+    'Products Categories' => [
+        'name' => 'Products Categories',
+        'link' => 'indexProductCategories',
+        'icon' => 'fa-tags',
+        'for' => 'company',
+        'module' => 'cgt',
+    ],
+    'Products Taxes' => [
+        'name' => 'Products Taxes',
+        'link' => 'indexProductTaxes',
+        'icon' => 'fa-tags',
+        'for' => 'company',
+        'module' => 'cgt',
+    ],
+    'Tasks Status' => [
+        'name' => 'Tasks Status',
+        'link' => 'indexTasksStatus',
+        'icon' => 'fa-tags',
+        'for' => 'company',
+        'module' => 'cgt',
+    ],
 ]);
 
 // general settings 
@@ -910,6 +978,50 @@ PermissionsHelper::initializePermissions();
         'name' => 'client_company_currency_code'
     ],
 
+    'STREET_ADDRESS' => [
+        'key' => 'Street Address',
+        'value' => 'Street 1st, Twins Tower Building, Office No 007',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'textarea',
+        'is_tenant' => false,
+        'placeholder' => 'Street Address',
+        'name' => 'client_company_address_street_address'
+    ],
+    'CITY' => [
+        'key' => 'City',
+        'value' => 'New Delhi',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'text',
+        'is_tenant' => false,
+        'placeholder' => 'City name',
+        'name' => 'client_company_address_city_name'
+    ],
+    'PINCODE' => [
+        'key' => 'Pincode',
+        'value' => '110006',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'text',
+        'is_tenant' => false,
+        'placeholder' => 'Pincode',
+        'name' => 'client_company_address_pincode'
+    ],
+    'COUNTRY' => [
+        'key' => 'Country',
+        'value' => 'India',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'dropdown',
+        'is_tenant' => false,
+        'placeholder' => 'Country',
+        'name' => 'client_company_address_country_id'
+    ],
 
 
 ]);

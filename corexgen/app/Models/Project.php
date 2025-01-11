@@ -46,7 +46,7 @@ class Project extends Model implements Auditable
         'progress'
     ];
 
-  
+
 
     /**
      * Relationships
@@ -135,7 +135,40 @@ class Project extends Model implements Auditable
         return $this->comments()->count();
     }
 
-  
+
+    /**
+     * Get active project stats for this month and last month.
+     *
+     * @return array
+     */
+    public function getActiveProjectsStats()
+    {
+        $currentMonth = now()->startOfMonth();
+        $lastMonth = now()->subMonth()->startOfMonth();
+
+        $thisMonthCount = self::where('status', 'active')
+            ->where('company_id', Auth::user()->company_id)
+            ->whereBetween('created_at', [$currentMonth, now()])
+            ->count();
+
+        $lastMonthCount = self::where('status', 'active')
+            ->where('company_id', Auth::user()->company_id)
+            ->whereBetween('created_at', [$lastMonth, $currentMonth])
+            ->count();
+
+        $percentageChange = $lastMonthCount > 0
+            ? (($thisMonthCount - $lastMonthCount) / $lastMonthCount) * 100
+            : 100; // 100% increase if no projects last month
+
+        return [
+            'current_month' => $thisMonthCount,
+            'last_month' => $lastMonthCount,
+            'percentage_change' => round($percentageChange, 2),
+            'trend' => $percentageChange >= 0 ? 'up' : 'down',
+        ];
+    }
+
+
     public function getFilteredData(array $filters = [])
     {
         $tasksQuery = $this->tasks();
@@ -163,7 +196,44 @@ class Project extends Model implements Auditable
         return $this->hasMany(Tasks::class, 'project_id');
     }
 
-  
+
+
+
+    public  function getProjectTimelineData($year = null)
+    {
+        $year = $year ?? now()->year;
+
+        // Fetch data for completed and new projects grouped by month
+        $timelineData = self::select(
+            DB::raw('MONTH(created_at) as month'),
+            DB::raw('COUNT(*) as count'),
+            'status'
+        )
+            ->whereYear('created_at', $year) // Filter by the given year
+            ->groupBy('month', 'status')
+            ->get();
+
+        // Initialize data structure
+        $completedProjects = array_fill(1, 12, 0); // Jan-Dec
+        $newProjects = array_fill(1, 12, 0);       // Jan-Dec
+
+        // Map data to the appropriate arrays
+        foreach ($timelineData as $data) {
+            if ($data->status === CRM_STATUS_TYPES['PROJECTS']['STATUS']['COMPLETED']) {
+                $completedProjects[$data->month] = $data->count;
+            } elseif ($data->status === CRM_STATUS_TYPES['PROJECTS']['STATUS']['ACTIVE']) {
+                $newProjects[$data->month] = $data->count;
+            }
+        }
+
+        return [
+            'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            'completedProjects' => array_values($completedProjects),
+            'newProjects' => array_values($newProjects),
+        ];
+    }
+
+
 
 
     /**
@@ -185,10 +255,10 @@ class Project extends Model implements Auditable
 
             if (Auth::check()) {
                 $project->company_id = $project->company_id ?? Auth::user()->company_id;
-           
+
             } else {
                 $project->company_id = $project->company_id ?? null;
-        
+
             }
         });
     }

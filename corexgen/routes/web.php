@@ -5,6 +5,7 @@ use App\Http\Controllers\AppUpdateController;
 use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\AuditController;
 use App\Http\Controllers\BackupController;
+use App\Http\Controllers\CategoryGroupTagControllerSettings;
 use App\Http\Controllers\CommentsController;
 use App\Http\Controllers\CompanyOnboardingController;
 use App\Http\Controllers\CompanyRegisterController;
@@ -733,6 +734,41 @@ Route::middleware([
         Route::post('/bulkDelete', [InvoiceController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:INVOICES.BULK_DELETE');
 
         Route::get('/view/{id}', [InvoiceController::class, 'view'])->name('view')->middleware('check.permission:INVOICES.VIEW');
+
+    });
+
+    // category group tags settins
+    Route::prefix(PANEL_MODULES['COMPANY_PANEL']['cgt'])->as(PANEL_MODULES['COMPANY_PANEL']['cgt'] . '.')->group(function () {
+        // role for fetch, store, update
+        Route::get('/', [CategoryGroupTagControllerSettings::class, 'index'])->name('index')->middleware('check.permission:SETTINGS_CTG.READ_ALL');
+
+        Route::post('/', [CategoryGroupTagControllerSettings::class, 'store'])->name('store')->middleware('check.permission:SETTINGS_CTG.CREATE');
+        Route::put('/', [CategoryGroupTagControllerSettings::class, 'update'])->name('update')->middleware('check.permission:SETTINGS_CTG.UPDATE');
+
+        Route::delete('/destroy/{id}', [CategoryGroupTagControllerSettings::class, 'destroy'])->name('destroy')->middleware('check.permission:SETTINGS_CTG.DELETE');
+
+
+        // 
+        Route::get('/clients-category', [CategoryGroupTagControllerSettings::class, 'indexClientCategory'])->name('indexClientCategory')->middleware('check.permission:SETTINGS_CTG.READ_ALL');
+
+        Route::get('/leads-groups', [CategoryGroupTagControllerSettings::class, 'indexLeadsGroups'])->name('indexLeadsGroups')->middleware('check.permission:SETTINGS_CTG.READ_ALL');
+
+        Route::get('/leads-status', [CategoryGroupTagControllerSettings::class, 'indexLeadsStatus'])->name('indexLeadsStatus')->middleware('check.permission:SETTINGS_CTG.READ_ALL');
+
+        Route::get('/leads-sources', [CategoryGroupTagControllerSettings::class, 'indexLeadsSources'])->name('indexLeadsSources')->middleware('check.permission:SETTINGS_CTG.READ_ALL');
+
+        Route::get('/products-categories', [CategoryGroupTagControllerSettings::class, 'indexProductCategories'])->name('indexProductCategories')->middleware('check.permission:SETTINGS_CTG.READ_ALL');
+
+        Route::get('/products-taxes', [CategoryGroupTagControllerSettings::class, 'indexProductTaxes'])->name('indexProductTaxes')->middleware('check.permission:SETTINGS_CTG.READ_ALL');
+
+        Route::get('/tasks-status', [CategoryGroupTagControllerSettings::class, 'indexTasksStatus'])->name('indexTasksStatus')->middleware('check.permission:SETTINGS_CTG.READ_ALL');
+
+
+
+
+
+
+
 
     });
 });

@@ -26,7 +26,7 @@
         <!-- Welcome Section -->
         <div class="row mb-4">
             <div class="col-12">
-                <h1 class="h3 mb-2 text-gray-800">SAAS Overview</h1>
+                <h1 class="h3 mb-2 text-gray-800">Dashboard</h1>
                 <p class="text-muted">Welcome back, {{ Auth::user()->name }}</p>
             </div>
         </div>
@@ -34,7 +34,7 @@
         <!-- Stats Cards -->
         <div class="row mb-4">
             <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-primary shadow h-100 py-2 stat-card" style="border-left: 4px solid #4e73df;">
+                <div class="card border-left-primary shadow h-100 py-2 stat-card" style="border-bottom: 2px solid #4e73df;">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
@@ -50,13 +50,13 @@
             </div>
 
             <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-success shadow h-100 py-2 stat-card" style="border-left: 4px solid #1cc88a;">
+                <div class="card border-left-success shadow h-100 py-2 stat-card" style="border-bottom: 2px solid #1cc88a;">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
                                 <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Monthly Revenue</div>
                                 <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                    ${{ number_format($monthlyRevenue ?? 0) }}</div>
+                                    {{ getSettingValue('Panel Currency Symbol') }}{{ number_format($monthlyRevenue ?? 0) }}</div>
                             </div>
                             <div class="col-auto">
                                 <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
@@ -67,7 +67,7 @@
             </div>
 
             <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-info shadow h-100 py-2 stat-card" style="border-left: 4px solid #36b9cc;">
+                <div class="card border-left-info shadow h-100 py-2 stat-card" style="border-bottom: 2px solid #36b9cc;">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
@@ -84,7 +84,7 @@
             </div>
 
             <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-warning shadow h-100 py-2 stat-card" style="border-left: 4px solid #f6c23e;">
+                <div class="card border-left-warning shadow h-100 py-2 stat-card" style="border-bottom: 2px solid #f6c23e;">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
@@ -131,44 +131,7 @@
             </div>
         </div>
 
-        <!-- Recent Activity Table -->
-        <div class="row">
-            <div class="col-12">
-                <div class="card shadow mb-4">
-                    <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">Recent Activities</h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Company</th>
-                                        <th>Action</th>
-                                        <th>Date</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($recentActivities ?? [] as $activity)
-                                        <tr>
-                                            <td>{{ $activity->company_name }}</td>
-                                            <td>{{ $activity->action }}</td>
-                                            <td>{{ $activity->created_at->format('M d, Y') }}</td>
-                                            <td>
-                                                <span class="badge badge-{{ $activity->status_color }}">
-                                                    {{ $activity->status }}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+       @include('dashboard.home.components.super._recentActivity')
     </div>
 @endsection
 
@@ -179,13 +142,14 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Revenue Chart
             const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            const revenueData = @json($revenueData);
             new Chart(revenueCtx, {
                 type: 'line',
                 data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    labels: revenueData.labels,
                     datasets: [{
                         label: 'Monthly Revenue',
-                        data: [12000, 19000, 15000, 25000, 22000, 30000],
+                        data: revenueData.data,
                         fill: true,
                         borderColor: '#4e73df',
                         backgroundColor: 'rgba(78, 115, 223, 0.05)',
@@ -217,13 +181,29 @@
 
             // Plan Distribution Chart
             const planCtx = document.getElementById('planDistribution').getContext('2d');
+            const planData = @json($planData);
+
+            const generateColors = (count) => {
+                const colors = [
+                    '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b',
+                    '#858796', '#6f42c1', '#fd7e14', '#20c997', '#dc3545'
+                ]; // Pool of colors
+                const result = [];
+                for (let i = 0; i < count; i++) {
+                    result.push(colors[i % colors.length]); // Reuse colors if plans exceed the pool size
+                }
+                return result;
+            };
+
+
+            const backgroundColors = generateColors(planData.labels.length);
             new Chart(planCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Basic', 'Pro', 'Enterprise'],
+                    labels: planData.labels,
                     datasets: [{
-                        data: [30, 50, 20],
-                        backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc'],
+                        data: planData.data,
+                        backgroundColor: backgroundColors,
                         hoverOffset: 4
                     }]
                 },
@@ -236,6 +216,11 @@
                     }
                 }
             });
+
+           
+
+            // Generate colors dynamically for the chart
+          
         });
     </script>
 @endpush

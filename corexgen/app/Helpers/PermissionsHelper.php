@@ -45,6 +45,7 @@ class PermissionsHelper
         'MILESTONES' => 'MILESTONES',
         'TIMESHEETS' => 'TIMESHEETS',
         'INVOICES' => 'INVOICES',
+        'SETTINGS_CTG' => 'SETTINGS_CTG',
 
 
     ];
@@ -121,6 +122,7 @@ class PermissionsHelper
             self::$plansPermissionsKeys['PROPOSALS_TEMPLATES'] => [3201 => 'CREATE', 3202 => 'READ', 3203 => 'READ_ALL', 3204 => 'UPDATE', 3205 => 'DELETE', 3206 => 'CHANGE_STATUS'],
 
 
+
             self::$plansPermissionsKeys['PRODUCTS_SERVICES'] => [3251 => 'CREATE', 3252 => 'READ', 3253 => 'READ_ALL', 3254 => 'UPDATE', 3255 => 'DELETE', 3258 => 'FILTER', 3259 => 'CHANGE_STATUS', 3260 => 'BULK_DELETE', 3261 => 'VIEW'],
 
             self::$plansPermissionsKeys['ESTIMATES'] => [3301 => 'CREATE', 3302 => 'READ', 3303 => 'READ_ALL', 3304 => 'UPDATE', 3305 => 'DELETE', 3306 => 'FILTER', 3307 => 'CHANGE_STATUS', 3308 => 'BULK_DELETE', 3309 => 'VIEW'],
@@ -142,6 +144,9 @@ class PermissionsHelper
 
 
             self::$plansPermissionsKeys['INVOICES'] => [4401 => 'CREATE', 4402 => 'READ', 4403 => 'READ_ALL', 4404 => 'UPDATE', 4405 => 'DELETE', 4406 => 'FILTER', 4407 => 'CHANGE_STATUS', 4408 => 'BULK_DELETE', 4409 => 'VIEW'],
+
+
+            self::$plansPermissionsKeys['SETTINGS_CTG'] => [4501 => 'CREATE', 4502 => 'READ', 4503 => 'READ_ALL', 4504 => 'UPDATE', 4505 => 'DELETE'],
         ];
     }
 
@@ -161,7 +166,8 @@ class PermissionsHelper
             'PROPOSALS_TEMPLATES' => 'PROPOSALS_TEMPLATES',
             'ESTIMATES_TEMPLATES' => 'ESTIMATES_TEMPLATES',
             'CONTRACTS_TEMPLATES' => 'CONTRACTS_TEMPLATES',
-            'TIMESHEETS' => 'TIMESHEETS'
+            'TIMESHEETS' => 'TIMESHEETS',
+            'SETTINGS_CTG' => 'SETTINGS_CTG',
         ];
     }
 

@@ -57,7 +57,7 @@ class User extends Authenticatable implements Auditable
         'two_factor_secret',
     ];
 
-   
+
 
     /**
      * The attributes that should be cast.
@@ -111,7 +111,10 @@ class User extends Authenticatable implements Auditable
             ->withPivot('company_id');
     }
 
-
+    public function totalUsers($company_id = null)
+    {
+        return self::where('company_id', $company_id)->count();
+    }
 
     protected static function boot()
     {

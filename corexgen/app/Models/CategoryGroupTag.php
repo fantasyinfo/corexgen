@@ -16,7 +16,8 @@ class CategoryGroupTag extends Model
 
     protected $table = self::table;
 
-    protected $fillable = ['name', 'color', 'type', 'status', 'company_id'];
+    protected $fillable = 
+    ['name', 'color', 'type','relation_type', 'status', 'company_id'];
 
 
     public function clients()
@@ -50,14 +51,21 @@ class CategoryGroupTag extends Model
         return $this->hasMany(CRMLeads::class, 'tax_id');
     }
 
+
+    public function tasks()
+    {
+        return $this->hasMany(Tasks::class, 'status_id');
+    }
+
+
     protected static function boot()
     {
         parent::boot();
 
-            // Add a global scope to filter by status = 'active'
+        // Add a global scope to filter by status = 'active'
         static::addGlobalScope('active', function (Builder $builder) {
-                $builder->where('status', 'active');
-            });
+            $builder->where('status', 'active');
+        });
 
         static::creating(function ($cgt) {
             // Set default values

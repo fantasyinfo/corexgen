@@ -30,7 +30,7 @@ class TasksEditRequest extends FormRequest
             "priority" => "required|in:Low,Medium,High,Urgent",
             "related_to" => "required",
             "project_id" => "nullable|exists:projects,id",
-                  "milestone_id" => "nullable|exists:milestones,id",
+
             "files" => "nullable|array",
             "description" => "nullable|string",
             "assign_to" => "nullable|array",
