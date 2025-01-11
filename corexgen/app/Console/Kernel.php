@@ -11,7 +11,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         \App\Console\Commands\MakeServiceCommand::class,
     ];
-    
+
     /**
      * Define the application's command schedule.
      */
@@ -24,6 +24,7 @@ class Kernel extends ConsoleKernel
 
         // check company subscription 
         $schedule->command('app:subscription-check')->daily();
+        $schedule->command('app:docs-check')->daily();
         $schedule->command('queue:listen --sleep=3 --tries=3')->everyMinute();
     }
 
@@ -32,7 +33,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands(): void
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }
