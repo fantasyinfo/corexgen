@@ -91,6 +91,9 @@ class ClientsController extends Controller
     }
 
 
+    /**
+     * index function to handle the get clients lists and view
+     */
     public function index(Request $request)
     {
         $this->tenantRoute = $this->getTenantRoute();
@@ -117,6 +120,9 @@ class ClientsController extends Controller
         ]);
     }
 
+    /**
+     * get header status
+     */
     private function getHeaderStatus($model, $permission)
     {
         $user = Auth::user();
@@ -142,6 +148,10 @@ class ClientsController extends Controller
             'groupData' => $groupData
         ];
     }
+
+    /**
+     * store the client
+     */
     public function store(ClientRequest $request)
     {
 
@@ -186,6 +196,9 @@ class ClientsController extends Controller
         }
 
     }
+    /**
+     * create new client view
+     */
     public function create()
     {
         $this->checkCurrentUsage(strtolower(PermissionsHelper::$plansPermissionsKeys['CLIENTS']));
@@ -211,6 +224,9 @@ class ClientsController extends Controller
         ]);
     }
 
+    /**
+     * update client
+     */
     public function update(ClientsEditRequest $request)
     {
         $this->tenantRoute = $this->getTenantRoute();
@@ -260,6 +276,10 @@ class ClientsController extends Controller
         }
 
     }
+
+    /**
+     * edit client
+     */
     public function edit($id)
     {
         $query = CRMClients::query()->with([
@@ -309,6 +329,9 @@ class ClientsController extends Controller
     }
 
 
+    /**
+     * delete client
+     */
     public function destroy($id)
     {
         try {
@@ -335,6 +358,10 @@ class ClientsController extends Controller
             return redirect()->back()->with('error', 'Failed to delete the client: ' . $e->getMessage());
         }
     }
+
+    /**
+     * export client
+     */
     public function export(Request $request)
     {
         // Apply filters and fetch clients
@@ -382,6 +409,9 @@ class ClientsController extends Controller
             ->header('Content-Disposition', "attachment; filename={$csvData['file']}");
     }
 
+    /**
+     * generate csv file for clients
+     */
     public function generateCSVForClients($clients)
     {
 
@@ -457,7 +487,9 @@ class ClientsController extends Controller
             'csvContent' => $csvContent
         ];
     }
-
+    /**
+     * import view for clients
+     */
     public function importView()
     {
 
@@ -568,6 +600,10 @@ class ClientsController extends Controller
             'module' => PANEL_MODULES[$this->getPanelModule()]['clients'],
         ]);
     }
+
+    /**
+     * import clients
+     */
     public function import(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -657,7 +693,9 @@ class ClientsController extends Controller
     }
 
 
-
+    /**
+     * bulk delete the clients
+     */
     public function bulkDelete(Request $request)
     {
         $ids = $request->input('ids');
@@ -696,6 +734,10 @@ class ClientsController extends Controller
             );
         }
     }
+
+    /**
+     * view client
+     */
     public function view($id)
     {
         $query = CRMClients::query()->with([
@@ -776,11 +818,18 @@ class ClientsController extends Controller
             'categories' => $categories
         ]);
     }
+
+    /**
+     * client profile (future for see the projects outside the panel)
+     */
     public function profile()
     {
 
     }
 
+    /**
+     * change status of clients
+     */
     public function changeStatus($id, $status)
     {
         try {

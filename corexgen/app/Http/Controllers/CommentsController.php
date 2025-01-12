@@ -24,6 +24,10 @@ class CommentsController extends Controller
     {
         $this->commentService = $commentService;
     }
+
+    /**
+     * add leads comments
+     */
     public function addLeadsComment(CommentRequest $request)
     {
 
@@ -60,6 +64,9 @@ class CommentsController extends Controller
 
     }
 
+    /**
+     * destroy leads comments
+     */
     public function destroyLeadsComment($id)
     {
         try {
@@ -76,6 +83,9 @@ class CommentsController extends Controller
 
     }
 
+    /**
+     * add clients comments
+     */
     public function addClientsComment(CommentRequest $request)
     {
 
@@ -112,6 +122,9 @@ class CommentsController extends Controller
 
     }
 
+    /**
+     * destroy clients comments
+     */
     public function destroyClientsComment($id)
     {
         try {
@@ -129,6 +142,9 @@ class CommentsController extends Controller
     }
 
     // projects
+    /**
+     * add projects comments
+     */
     public function addProjectsComment(CommentRequest $request)
     {
 
@@ -165,6 +181,9 @@ class CommentsController extends Controller
 
     }
 
+    /**
+     * destory projects comments
+     */
     public function destroyProjectsComment($id)
     {
         try {
@@ -182,7 +201,9 @@ class CommentsController extends Controller
     }
 
     // tasks
-
+    /**
+     * add tasks comments
+     */
     public function addTasksComment(CommentRequest $request)
     {
 
@@ -219,6 +240,9 @@ class CommentsController extends Controller
 
     }
 
+    /**
+     * destory tasks comments
+     */
     public function destroyTasksComment($id)
     {
         try {

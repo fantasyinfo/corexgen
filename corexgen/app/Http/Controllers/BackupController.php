@@ -30,6 +30,10 @@ class BackupController extends Controller
     {
         return $this->viewDir . $filename;
     }
+
+        /**
+     * load all backups
+     */
     public function index()
     {
         $backupDestinations = BackupDestinationFactory::createFromArray(config('backup.backup'));
@@ -126,6 +130,10 @@ class BackupController extends Controller
         }
     }
 
+
+        /**
+     * create backup
+     */
     public function createBackup()
     {
 

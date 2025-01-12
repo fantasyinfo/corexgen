@@ -6,18 +6,7 @@
                 <div class="toggle-btn me-2" id="sidebarToggle">
                     <i class="fas fa-bars fa-lg"></i>
                 </div>
-                <span class="badge badge-pill badge-primary me-2">
-                    @if (Auth::user()->is_tenant && Auth::user()->role_id == null)
-                        Super Admin
-                    @elseif(Auth::user()->is_tenant && Auth::user()->role_id != null)
-                        Super Employee
-                    @elseif(!Auth::user()->is_tenant && Auth::user()->role_id == null)
-                        Company Admin ['ci' => {{Auth::user()->company_id}}] & ['ui' => {{Auth::id()}}]
-                    @elseif(!Auth::user()->is_tenant && Auth::user()->role_id != null)
-                        Company Employee
-                    @endif
-                    {{ getCompanyName() }}
-                </span>
+             
             </div>
             <!-- Right Section -->
             <div class="col-12 col-md-6 d-flex justify-content-end align-items-center flex-wrap">

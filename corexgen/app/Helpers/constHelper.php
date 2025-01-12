@@ -7,15 +7,23 @@ use App\Helpers\PermissionsHelper;
  * Constant Helpers Inside the APP
  */
 
-
+/**
+ * cache default hours to cache the items
+ */
 !defined('CACHE_DEFAULT_HOURS') && define('CACHE_DEFAULT_HOURS', 24);
 
+/**
+ * csv max file upload size
+ */
 !defined('BULK_CSV_UPLOAD_FILE_SIZE') && define('BULK_CSV_UPLOAD_FILE_SIZE', 2048);
 
 // initilize the permissions with matching keys for plans and permissions of menus
 PermissionsHelper::initializePermissions();
 
 
+/**
+ * permissions values of app
+ */
 
 !defined('CRMPERMISSIONS') && define('CRMPERMISSIONS', [
     // Core Settings - Starting from 1
@@ -579,7 +587,9 @@ PermissionsHelper::initializePermissions();
 ]);
 
 
-
+/**
+ * status of all the tables inside the software
+ */
 !defined('CRM_STATUS_TYPES') && define('CRM_STATUS_TYPES', [
     'TENANTS' => [
         'TABLE_STATUS' => ['ACTIVE', 'DEACTIVE'],
@@ -684,12 +694,19 @@ PermissionsHelper::initializePermissions();
     ],
 ]);
 
+/**
+ * admin panel types
+ */
+
 !defined('PANEL_TYPES') && define('PANEL_TYPES', [
     'SUPER_PANEL' => 'SUPER_PANEL',
     'COMPANY_PANEL' => 'COMPANY_PANEL'
 ]);
 
 // web.php file prefix for routes
+/**
+ * panel modules should match the web.php file to handle the routes dynamically
+ */
 !defined('PANEL_MODULES') && define('PANEL_MODULES', [
     'SUPER_PANEL' => [
         'dashboard' => 'dashboard',
@@ -736,7 +753,9 @@ PermissionsHelper::initializePermissions();
     ]
 ]);
 
-
+/**
+ * plans billing cycles
+ */
 !defined('PLANS_BILLING_CYCLES') && define('PLANS_BILLING_CYCLES', [
     'BILLINGS_TABLE' => ['1 MONTH', '3 MONTHS', '6 MONTHS', '1 YEAR', 'UNLIMITED'],
     'BILLINGS' => [
@@ -751,6 +770,9 @@ PermissionsHelper::initializePermissions();
 
 
 // these values must match with permissionHelper::PERMISSIONS_IDS keys otherwise permission not working properly
+/**
+ * plans features
+ */
 !defined('PLANS_FEATURES') && define('PLANS_FEATURES', [
     PermissionsHelper::$plansPermissionsKeys['USERS'] => PermissionsHelper::$plansPermissionsKeys['USERS'],
     PermissionsHelper::$plansPermissionsKeys['ROLE'] => PermissionsHelper::$plansPermissionsKeys['ROLE'],
@@ -769,6 +791,9 @@ PermissionsHelper::initializePermissions();
 ]);
 
 
+/**
+ * address types to store
+ */
 !defined('ADDRESS_TYPES') && define('ADDRESS_TYPES', [
     'COMPANY' => [
         'TABLE' => ['HOME', 'OFFICE'],
@@ -780,6 +805,9 @@ PermissionsHelper::initializePermissions();
     ],
 ]);
 
+/**
+ * default payment gateways
+ */
 !defined('PAYMENT_GATEWAYS') && define('PAYMENT_GATEWAYS', [
     'STRIPE' => [
         'name' => 'Stripe',
@@ -793,7 +821,9 @@ PermissionsHelper::initializePermissions();
     ]
 ]);
 
-
+/**
+ * settings menu items
+ */
 !defined('SETTINGS_MENU_ITEMS') && define('SETTINGS_MENU_ITEMS', [
     'General' => [
         'name' => 'General',
@@ -957,7 +987,9 @@ PermissionsHelper::initializePermissions();
 
 
 ]);
-
+/**
+ * company general settings
+ */
 !defined('CRM_COMPANY_GENERAL_SETTINGS') && define('CRM_COMPANY_GENERAL_SETTINGS', [
 
     'COMPANY_NAME' => [
@@ -1178,6 +1210,9 @@ PermissionsHelper::initializePermissions();
     ],
 ]);
 
+/**
+ * company mail settings
+ */
 !defined('CRM_COMPANY_MAIL_SETTINGS') && define('CRM_COMPANY_MAIL_SETTINGS', [
 
     'MAIL_PROVIDER' => [
@@ -1323,7 +1358,9 @@ PermissionsHelper::initializePermissions();
 ]);
 
 
-
+/**
+ *  custom fields input types
+ */
 !defined('CUSTOM_FIELDS_INPUT_TYPES') && define('CUSTOM_FIELDS_INPUT_TYPES', [
 
     'text' => 'Text',
@@ -1339,12 +1376,17 @@ PermissionsHelper::initializePermissions();
 
 
 // kyes must match the model name in lowercase
+/**
+ * custom fields relation types
+ */
 !defined('CUSTOM_FIELDS_RELATION_TYPES') && define('CUSTOM_FIELDS_RELATION_TYPES', [
     'KEYS' => ['crmclients' => 'crmclients', 'user' => 'user', 'crmleads' => 'crmleads', 'productsservices' => 'productsservices', 'project' => 'project', 'tasks' => 'tasks'],
     'VALUES' => ['crmclients' => 'Clients', 'user' => 'Users & Employees', 'crmleads' => 'Leads', 'productsservices' => 'Products & Services', 'project' => 'Projects', 'tasks' => 'Tasks'],
 ]);
 
-
+/**
+ * category group tags types
+ */
 !defined('CATEGORY_GROUP_TAGS_TYPES') && define('CATEGORY_GROUP_TAGS_TYPES', [
     'TABLE_STATUS' => [
         'categories',
@@ -1381,6 +1423,9 @@ PermissionsHelper::initializePermissions();
     ],
 ]);
 
+/**
+ * category groups tags relationships
+ */
 !defined('CATEGORY_GROUP_TAGS_RELATIONS') && define('CATEGORY_GROUP_TAGS_RELATIONS', [
     'TABLE_STATUS' => [
         'clients',
@@ -1402,6 +1447,9 @@ PermissionsHelper::initializePermissions();
     ],
 ]);
 
+/**
+ * tasks related to
+ */
 !defined('TASKS_RELATED_TO') && define('TASKS_RELATED_TO', [
     'TABLE_STATUS' => [
         'clients',

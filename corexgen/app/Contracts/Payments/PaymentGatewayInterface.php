@@ -5,6 +5,9 @@ namespace App\Contracts\Payments;
 
 use Illuminate\Http\Request;
 
+/**
+ * Interface Design for Payment Gateway PaymentGatewayInterface
+ */
 interface PaymentGatewayInterface
 {
     /**

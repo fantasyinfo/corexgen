@@ -115,6 +115,10 @@ class CategoryGroupTagControllerSettings extends Controller
         return response()->json(['success' => true, 'message' => 'Deleted successfully']);
     }
 
+
+    /**
+     * get all clients category
+     */
     public function indexClientCategory(Request $request)
     {
         return view($this->getViewFilePath('ctgSettings'), [
@@ -126,6 +130,9 @@ class CategoryGroupTagControllerSettings extends Controller
         ]);
 
     }
+    /**
+     * get all leads groups
+     */
     public function indexLeadsGroups(Request $request)
     {
         return view($this->getViewFilePath('ctgSettings'), [
@@ -139,7 +146,9 @@ class CategoryGroupTagControllerSettings extends Controller
 
     }
 
-
+    /**
+     * get all leads status
+     */
     public function indexLeadsStatus(Request $request)
     {
         return view($this->getViewFilePath('ctgSettings'), [
@@ -152,7 +161,9 @@ class CategoryGroupTagControllerSettings extends Controller
         ]);
 
     }
-
+    /**
+     * get all leads sources
+     */
     public function indexLeadsSources(Request $request)
     {
         return view($this->getViewFilePath('ctgSettings'), [
@@ -165,6 +176,9 @@ class CategoryGroupTagControllerSettings extends Controller
         ]);
 
     }
+    /**
+     * get all products categories
+     */
     public function indexProductCategories(Request $request)
     {
         return view($this->getViewFilePath('ctgSettings'), [
@@ -177,6 +191,10 @@ class CategoryGroupTagControllerSettings extends Controller
         ]);
 
     }
+
+    /**
+     * get all products tax
+     */
     public function indexProductTaxes(Request $request)
     {
         return view($this->getViewFilePath('ctgSettings'), [
@@ -189,6 +207,9 @@ class CategoryGroupTagControllerSettings extends Controller
         ]);
 
     }
+    /**
+     * get all tasks status
+     */
     public function indexTasksStatus(Request $request)
     {
         return view($this->getViewFilePath('ctgSettings'), [

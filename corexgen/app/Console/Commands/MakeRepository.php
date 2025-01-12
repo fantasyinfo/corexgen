@@ -5,6 +5,9 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 
+/**
+ * creaet repository class MakeRepository
+ */
 class MakeRepository extends Command
 {
     protected $signature = 'make:repository {name}';
