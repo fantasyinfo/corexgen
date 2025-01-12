@@ -52,8 +52,8 @@
         <!-- Welcome Section -->
         <div class="row mb-4">
             <div class="col-12">
-                <h1 class="h3 mb-2 text-gray-800">Dashboard</h1>
-                <p class="text-muted">Welcome back, {{ Auth::user()->name }}</p>
+                <h1 class="h3 mb-2 text-gray-800">{{__("general.Dashboard")}}</h1>
+                <p class="text-muted">{{__("general.Welcome back")}}, {{ Auth::user()->name }}</p>
             </div>
         </div>
 
@@ -64,13 +64,13 @@
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Active Projects</div>
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">{{__("general.Active Projects")}}</div>
                                 <div class="h5 mb-0 font-weight-bold text-gray-800">
                                     {{ $activeProjects['current_month'] ?? 0 }}</div>
                                 <div class="mini-stat">
                                     <span class="trend-indicator trend-{{ $activeProjects['trend'] }}">
                                         {{ $activeProjects['trend'] === 'up' ? '↑' : '↓' }}
-                                        {{ abs($activeProjects['percentage_change']) }}% vs last month
+                                        {{ abs($activeProjects['percentage_change']) }}% {{__("general.vs last month")}}
                                     </span>
                                 </div>
                             </div>
@@ -88,13 +88,13 @@
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Revenue</div>
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">{{__("general.Total Revenue")}}</div>
                                 <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $revenue['current_month'] ?? 0 }}
                                 </div>
                                 <div class="mini-stat">
                                     <span class="trend-indicator trend-{{ $revenue['trend'] }}">
                                         {{ $revenue['trend'] === 'up' ? '↑' : '↓' }}
-                                        {{ abs($revenue['percentage_change']) }}% vs last month
+                                        {{ abs($revenue['percentage_change']) }}% {{__("general.vs last month")}}
                                     </span>
                                 </div>
                             </div>
@@ -111,12 +111,12 @@
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Active Tasks</div>
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">{{__("general.Active Tasks")}}</div>
                                 <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $tasks['current_month'] ?? 0 }}</div>
                                 <div class="mini-stat">
                                     <span class="trend-indicator trend-{{ $tasks['trend'] }}">
                                         {{ $tasks['trend'] === 'up' ? '↑' : '↓' }}
-                                        {{ abs($tasks['percentage_change']) }}% vs last month
+                                        {{ abs($tasks['percentage_change']) }}% {{__("general.vs last month")}}
                                     </span>
                                 </div>
                             </div>
@@ -133,13 +133,13 @@
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Clients</div>
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">{{__("general.Total Clients")}}</div>
                                 <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $clients['current_month'] ?? 0 }}
                                 </div>
                                 <div class="mini-stat">
                                     <span class="trend-indicator trend-{{ $clients['trend'] }}">
                                         {{ $clients['trend'] === 'up' ? '↑' : '↓' }}
-                                        {{ abs($clients['percentage_change']) }}% vs last month
+                                        {{ abs($clients['percentage_change']) }}% {{__("general.vs last month")}}
                                     </span>
                                 </div>
                             </div>
@@ -158,7 +158,7 @@
             <div class="col-xl-8 col-lg-7">
                 <div class="card shadow mb-4">
                     <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">Project Timeline</h6>
+                        <h6 class="m-0 font-weight-bold text-primary">{{__("general.Project Timeline")}}</h6>
                     </div>
                     <div class="card-body">
                         <div class="chart-container">
@@ -172,7 +172,7 @@
             <div class="col-xl-4 col-lg-5">
                 <div class="card shadow mb-4">
                     <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">Task Status</h6>
+                        <h6 class="m-0 font-weight-bold text-primary">{{__("general.Task Status")}}</h6>
                     </div>
                     <div class="card-body">
                         <div class="chart-container">

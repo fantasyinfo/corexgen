@@ -18,6 +18,7 @@ PermissionsHelper::initializePermissions();
 
 
 !defined('CRMPERMISSIONS') && define('CRMPERMISSIONS', [
+    // Core Settings - Starting from 1
     PermissionsHelper::$plansPermissionsKeys['DASHBOARD'] => [
         'name' => 'DASHBOARD',
         'id' => PermissionsHelper::getParentPermissionId('1'),
@@ -25,148 +26,133 @@ PermissionsHelper::initializePermissions();
         'for' => 'both',
         'is_feature' => false
     ],
-    PermissionsHelper::$plansPermissionsKeys['ROLE'] => [
-        'name' => 'ROLE',
+    PermissionsHelper::$plansPermissionsKeys['COMPANIES'] => [
+        'name' => 'COMPANIES',
         'id' => PermissionsHelper::getParentPermissionId('2'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['ROLE'],
-        'for' => 'both',
-        'is_feature' => true
-    ],
-    PermissionsHelper::$plansPermissionsKeys['USERS'] => [
-        'name' => 'USERS',
-        'id' => PermissionsHelper::getParentPermissionId('3'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['USERS'],
-        'for' => 'both',
-        'is_feature' => true
-    ],
-    PermissionsHelper::$plansPermissionsKeys['PERMISSIONS'] => [
-        'name' => 'PERMISSIONS',
-        'id' => PermissionsHelper::getParentPermissionId('4'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['PERMISSIONS'],
-        'for' => 'both',
-        'is_feature' => false
-    ],
-    PermissionsHelper::$plansPermissionsKeys['SETTINGS'] => [
-        'name' => 'SETTINGS',
-        'id' => PermissionsHelper::getParentPermissionId('5'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['SETTINGS'],
-        'for' => 'both',
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['COMPANIES'],
+        'for' => 'tenant',
         'is_feature' => false
     ],
     PermissionsHelper::$plansPermissionsKeys['PLANS'] => [
         'name' => 'PLANS',
-        'id' => PermissionsHelper::getParentPermissionId('6'),
+        'id' => PermissionsHelper::getParentPermissionId('3'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['PLANS'],
-        'for' => 'tenant',
-        'is_feature' => false
-    ],
-    PermissionsHelper::$plansPermissionsKeys['MODULES'] => [
-        'name' => 'MODULES',
-        'id' => PermissionsHelper::getParentPermissionId('7'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['MODULES'],
-        'for' => 'tenant',
-        'is_feature' => false
-    ],
-    PermissionsHelper::$plansPermissionsKeys['APPUPDATES'] => [
-        'name' => 'APPUPDATES',
-        'id' => PermissionsHelper::getParentPermissionId('8'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['APPUPDATES'],
-        'for' => 'tenant',
-        'is_feature' => false
-    ],
-    PermissionsHelper::$plansPermissionsKeys['COMPANIES'] => [
-        'name' => 'COMPANIES',
-        'id' => PermissionsHelper::getParentPermissionId('9'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['COMPANIES'],
         'for' => 'tenant',
         'is_feature' => false
     ],
     PermissionsHelper::$plansPermissionsKeys['PAYMENTSTRANSACTIONS'] => [
         'name' => 'PAYMENTSTRANSACTIONS',
-        'id' => PermissionsHelper::getParentPermissionId('10'),
+        'id' => PermissionsHelper::getParentPermissionId('4'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['PAYMENTSTRANSACTIONS'],
         'for' => 'tenant',
         'is_feature' => false
     ],
-    PermissionsHelper::$plansPermissionsKeys['PLANUPGRADE'] => [
-        'name' => 'PLANUPGRADE',
-        'id' => PermissionsHelper::getParentPermissionId('11'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['PLANUPGRADE'],
-        'for' => 'company',
-        'is_feature' => false
-    ],
     PermissionsHelper::$plansPermissionsKeys['PAYMENTGATEWAYS'] => [
         'name' => 'PAYMENTGATEWAYS',
-        'id' => PermissionsHelper::getParentPermissionId('12'),
+        'id' => PermissionsHelper::getParentPermissionId('5'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['PAYMENTGATEWAYS'],
         'for' => 'tenant',
         'is_feature' => false
     ],
     PermissionsHelper::$plansPermissionsKeys['SUBSCRIPTIONS'] => [
         'name' => 'SUBSCRIPTIONS',
-        'id' => PermissionsHelper::getParentPermissionId('13'),
+        'id' => PermissionsHelper::getParentPermissionId('6'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['SUBSCRIPTIONS'],
         'for' => 'tenant',
         'is_feature' => false
     ],
+
+    // User Management - Starting from 10
+    PermissionsHelper::$plansPermissionsKeys['USERS'] => [
+        'name' => 'USERS',
+        'id' => PermissionsHelper::getParentPermissionId('200'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['USERS'],
+        'for' => 'both',
+        'is_feature' => true
+    ],
+    PermissionsHelper::$plansPermissionsKeys['ROLE'] => [
+        'name' => 'ROLE',
+        'id' => PermissionsHelper::getParentPermissionId('201'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['ROLE'],
+        'for' => 'both',
+        'is_feature' => true
+    ],
+    PermissionsHelper::$plansPermissionsKeys['PERMISSIONS'] => [
+        'name' => 'PERMISSIONS',
+        'id' => PermissionsHelper::getParentPermissionId('202'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['PERMISSIONS'],
+        'for' => 'both',
+        'is_feature' => false
+    ],
+
+    // System Settings - Starting from 20
+    PermissionsHelper::$plansPermissionsKeys['MODULES'] => [
+        'name' => 'MODULES',
+        'id' => PermissionsHelper::getParentPermissionId('203'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['MODULES'],
+        'for' => 'tenant',
+        'is_feature' => false
+    ],
+    PermissionsHelper::$plansPermissionsKeys['APPUPDATES'] => [
+        'name' => 'APPUPDATES',
+        'id' => PermissionsHelper::getParentPermissionId('21'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['APPUPDATES'],
+        'for' => 'tenant',
+        'is_feature' => false
+    ],
+    PermissionsHelper::$plansPermissionsKeys['DOWNLOAD_BACKUP'] => [
+        'name' => 'DOWNLOAD_BACKUP',
+        'id' => PermissionsHelper::getParentPermissionId('22'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['DOWNLOAD_BACKUP'],
+        'for' => 'tenant',
+        'is_feature' => false
+    ],
+
+    // General Settings - Starting from 30
+    PermissionsHelper::$plansPermissionsKeys['SETTINGS'] => [
+        'name' => 'SETTINGS',
+        'id' => PermissionsHelper::getParentPermissionId('204'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['SETTINGS'],
+        'for' => 'both',
+        'is_feature' => false
+    ],
     PermissionsHelper::$plansPermissionsKeys['SETTINGS_GENERAL'] => [
         'name' => 'SETTINGS_GENERAL',
-        'id' => PermissionsHelper::getParentPermissionId('14'),
+        'id' => PermissionsHelper::getParentPermissionId('31'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['SETTINGS_GENERAL'],
         'for' => 'both',
         'is_feature' => false
     ],
     PermissionsHelper::$plansPermissionsKeys['SETTINGS_MAIL'] => [
         'name' => 'SETTINGS_MAIL',
-        'id' => PermissionsHelper::getParentPermissionId('15'),
+        'id' => PermissionsHelper::getParentPermissionId('32'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['SETTINGS_MAIL'],
         'for' => 'both',
         'is_feature' => false
     ],
     PermissionsHelper::$plansPermissionsKeys['SETTINGS_CRON'] => [
         'name' => 'SETTINGS_CRON',
-        'id' => PermissionsHelper::getParentPermissionId('19'),
+        'id' => PermissionsHelper::getParentPermissionId('33'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['SETTINGS_CRON'],
         'for' => 'tenant',
         'is_feature' => false
     ],
     PermissionsHelper::$plansPermissionsKeys['SETTINGS_ONEWORD'] => [
         'name' => 'SETTINGS_ONEWORD',
-        'id' => PermissionsHelper::getParentPermissionId('20'),
+        'id' => PermissionsHelper::getParentPermissionId('34'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['SETTINGS_ONEWORD'],
         'for' => 'company',
         'is_feature' => false
     ],
     PermissionsHelper::$plansPermissionsKeys['SETTINGS_CTG'] => [
         'name' => 'SETTINGS_CTG',
-        'id' => PermissionsHelper::getParentPermissionId('21'),
+        'id' => PermissionsHelper::getParentPermissionId('35'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['SETTINGS_CTG'],
         'for' => 'company',
         'is_feature' => false
     ],
-    PermissionsHelper::$plansPermissionsKeys['EVENTS_AUDIT_LOG'] => [
-        'name' => 'EVENTS_AUDIT_LOG',
-        'id' => PermissionsHelper::getParentPermissionId('16'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['EVENTS_AUDIT_LOG'],
-        'for' => 'both',
-        'is_feature' => false
-    ],
-    PermissionsHelper::$plansPermissionsKeys['DOWNLOAD_BACKUP'] => [
-        'name' => 'DOWNLOAD_BACKUP',
-        'id' => PermissionsHelper::getParentPermissionId('17'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['DOWNLOAD_BACKUP'],
-        'for' => 'tenant',
-        'is_feature' => false
-    ],
-    PermissionsHelper::$plansPermissionsKeys['BULK_IMPORT_STATUS'] => [
-        'name' => 'BULK_IMPORT_STATUS',
-        'id' => PermissionsHelper::getParentPermissionId('18'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['BULK_IMPORT_STATUS'],
-        'for' => 'both',
-        'is_feature' => false
-    ],
 
-    // starting from 100
+    // CRM Core Features - Starting from 100
     PermissionsHelper::$plansPermissionsKeys['CLIENTS'] => [
         'name' => 'CLIENTS',
         'id' => PermissionsHelper::getParentPermissionId('100'),
@@ -174,111 +160,144 @@ PermissionsHelper::initializePermissions();
         'for' => 'company',
         'is_feature' => true
     ],
+    PermissionsHelper::$plansPermissionsKeys['LEADS'] => [
+        'name' => 'LEADS',
+        'id' => PermissionsHelper::getParentPermissionId('101'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['LEADS'],
+        'for' => 'company',
+        'is_feature' => true
+    ],
+
+    // Sales Features - Starting from 110
+    PermissionsHelper::$plansPermissionsKeys['PROPOSALS'] => [
+        'name' => 'PROPOSALS',
+        'id' => PermissionsHelper::getParentPermissionId('110'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['PROPOSALS'],
+        'for' => 'company',
+        'is_feature' => true
+    ],
+    PermissionsHelper::$plansPermissionsKeys['ESTIMATES'] => [
+        'name' => 'ESTIMATES',
+        'id' => PermissionsHelper::getParentPermissionId('111'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['ESTIMATES'],
+        'for' => 'company',
+        'is_feature' => true
+    ],
+    PermissionsHelper::$plansPermissionsKeys['CONTRACTS'] => [
+        'name' => 'CONTRACTS',
+        'id' => PermissionsHelper::getParentPermissionId('112'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['CONTRACTS'],
+        'for' => 'company',
+        'is_feature' => true
+    ],
+    PermissionsHelper::$plansPermissionsKeys['PRODUCTS_SERVICES'] => [
+        'name' => 'PRODUCTS_SERVICES',
+        'id' => PermissionsHelper::getParentPermissionId('113'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['PRODUCTS_SERVICES'],
+        'for' => 'company',
+        'is_feature' => true
+    ],
+    PermissionsHelper::$plansPermissionsKeys['INVOICES'] => [
+        'name' => 'INVOICES',
+        'id' => PermissionsHelper::getParentPermissionId('114'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['INVOICES'],
+        'for' => 'company',
+        'is_feature' => true
+    ],
+
+    // Project Management - Starting from 120
+    PermissionsHelper::$plansPermissionsKeys['PROJECTS'] => [
+        'name' => 'PROJECTS',
+        'id' => PermissionsHelper::getParentPermissionId('120'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['PROJECTS'],
+        'for' => 'company',
+        'is_feature' => true
+    ],
+    PermissionsHelper::$plansPermissionsKeys['TASKS'] => [
+        'name' => 'TASKS',
+        'id' => PermissionsHelper::getParentPermissionId('121'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['TASKS'],
+        'for' => 'company',
+        'is_feature' => true
+    ],
+    PermissionsHelper::$plansPermissionsKeys['MILESTONES'] => [
+        'name' => 'MILESTONES',
+        'id' => PermissionsHelper::getParentPermissionId('122'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['MILESTONES'],
+        'for' => 'company',
+        'is_feature' => true
+    ],
+    PermissionsHelper::$plansPermissionsKeys['TIMESHEETS'] => [
+        'name' => 'TIMESHEETS',
+        'id' => PermissionsHelper::getParentPermissionId('123'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['TIMESHEETS'],
+        'for' => 'company',
+        'is_feature' => false
+    ],
+
+    // Additional Features - Starting from 130
     PermissionsHelper::$plansPermissionsKeys['CUSTOM_FIELDS'] => [
         'name' => 'CUSTOM_FIELDS',
-        'id' => PermissionsHelper::getParentPermissionId('101'),
+        'id' => PermissionsHelper::getParentPermissionId('130'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['CUSTOM_FIELDS'],
         'for' => 'company',
         'is_feature' => true
     ],
-    PermissionsHelper::$plansPermissionsKeys['LEADS'] => [
-        'name' => 'LEADS',
-        'id' => PermissionsHelper::getParentPermissionId('102'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['LEADS'],
+    PermissionsHelper::$plansPermissionsKeys['CALENDER'] => [
+        'name' => 'CALENDER',
+        'id' => PermissionsHelper::getParentPermissionId('131'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['CALENDER'],
         'for' => 'company',
-        'is_feature' => true,
+        'is_feature' => true
     ],
-    PermissionsHelper::$plansPermissionsKeys['PROPOSALS'] => [
-        'name' => 'PROPOSALS',
-        'id' => PermissionsHelper::getParentPermissionId('103'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['PROPOSALS'],
-        'for' => 'company',
-        'is_feature' => true,
-    ],
+
+    // Templates - Starting from 140
     PermissionsHelper::$plansPermissionsKeys['PROPOSALS_TEMPLATES'] => [
         'name' => 'PROPOSALS_TEMPLATES',
-        'id' => PermissionsHelper::getParentPermissionId('104'),
+        'id' => PermissionsHelper::getParentPermissionId('140'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['PROPOSALS_TEMPLATES'],
         'for' => 'company',
-        'is_feature' => false,
-    ],
-    PermissionsHelper::$plansPermissionsKeys['PRODUCTS_SERVICES'] => [
-        'name' => 'PRODUCTS_SERVICES',
-        'id' => PermissionsHelper::getParentPermissionId('105'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['PRODUCTS_SERVICES'],
-        'for' => 'company',
-        'is_feature' => true,
-    ],
-    PermissionsHelper::$plansPermissionsKeys['ESTIMATES'] => [
-        'name' => 'ESTIMATES',
-        'id' => PermissionsHelper::getParentPermissionId('106'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['ESTIMATES'],
-        'for' => 'company',
-        'is_feature' => true,
-    ],
-    PermissionsHelper::$plansPermissionsKeys['CONTRACTS'] => [
-        'name' => 'CONTRACTS',
-        'id' => PermissionsHelper::getParentPermissionId('107'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['CONTRACTS'],
-        'for' => 'company',
-        'is_feature' => true,
+        'is_feature' => false
     ],
     PermissionsHelper::$plansPermissionsKeys['ESTIMATES_TEMPLATES'] => [
         'name' => 'ESTIMATES_TEMPLATES',
-        'id' => PermissionsHelper::getParentPermissionId('108'),
+        'id' => PermissionsHelper::getParentPermissionId('141'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['ESTIMATES_TEMPLATES'],
         'for' => 'company',
-        'is_feature' => false,
+        'is_feature' => false
     ],
     PermissionsHelper::$plansPermissionsKeys['CONTRACTS_TEMPLATES'] => [
         'name' => 'CONTRACTS_TEMPLATES',
-        'id' => PermissionsHelper::getParentPermissionId('109'),
+        'id' => PermissionsHelper::getParentPermissionId('142'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['CONTRACTS_TEMPLATES'],
         'for' => 'company',
-        'is_feature' => false,
+        'is_feature' => false
     ],
-    PermissionsHelper::$plansPermissionsKeys['PROJECTS'] => [
-        'name' => 'PROJECTS',
-        'id' => PermissionsHelper::getParentPermissionId('151'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['PROJECTS'],
+
+    // Miscellaneous - Starting from 150
+    PermissionsHelper::$plansPermissionsKeys['PLANUPGRADE'] => [
+        'name' => 'PLANUPGRADE',
+        'id' => PermissionsHelper::getParentPermissionId('150'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['PLANUPGRADE'],
         'for' => 'company',
-        'is_feature' => true,
+        'is_feature' => false
     ],
-    PermissionsHelper::$plansPermissionsKeys['TASKS'] => [
-        'name' => 'TASKS',
-        'id' => PermissionsHelper::getParentPermissionId('152'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['TASKS'],
+
+    // Logs and Events - Starting from 160
+    PermissionsHelper::$plansPermissionsKeys['EVENTS_AUDIT_LOG'] => [
+        'name' => 'EVENTS_AUDIT_LOG',
+        'id' => PermissionsHelper::getParentPermissionId('160'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['EVENTS_AUDIT_LOG'],
+        'for' => 'both',
+        'is_feature' => false
+    ],
+    PermissionsHelper::$plansPermissionsKeys['BULK_IMPORT_STATUS'] => [
+        'name' => 'BULK_IMPORT_STATUS',
+        'id' => PermissionsHelper::getParentPermissionId('161'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['BULK_IMPORT_STATUS'],
         'for' => 'company',
-        'is_feature' => true,
-    ],
-    PermissionsHelper::$plansPermissionsKeys['MILESTONES'] => [
-        'name' => 'MILESTONES',
-        'id' => PermissionsHelper::getParentPermissionId('153'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['MILESTONES'],
-        'for' => 'company',
-        'is_feature' => true,
-    ],
-    PermissionsHelper::$plansPermissionsKeys['TIMESHEETS'] => [
-        'name' => 'TIMESHEETS',
-        'id' => PermissionsHelper::getParentPermissionId('154'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['TIMESHEETS'],
-        'for' => 'company',
-        'is_feature' => false,
-    ],
-    PermissionsHelper::$plansPermissionsKeys['INVOICES'] => [
-        'name' => 'INVOICES',
-        'id' => PermissionsHelper::getParentPermissionId('155'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['INVOICES'],
-        'for' => 'company',
-        'is_feature' => true,
-    ],
-    PermissionsHelper::$plansPermissionsKeys['CALENDER'] => [
-        'name' => 'CALENDER',
-        'id' => PermissionsHelper::getParentPermissionId('156'),
-        'children' => PermissionsHelper::$PERMISSIONS_IDS['CALENDER'],
-        'for' => 'company',
-        'is_feature' => true,
-    ],
+        'is_feature' => false
+    ]
 ]);
 
 // super panel menus
@@ -294,71 +313,67 @@ PermissionsHelper::initializePermissions();
             ]
         ]
     ],
-    'Roles & Permissions' => [
-        'menu_icon' => 'fa-users',
-        'permission_id' => PermissionsHelper::getParentPermissionId('2'),
-        'children' => [
-            'Role' => ['menu_url' => 'role.index', 'menu_icon' => 'fa-users', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['ROLE'], 'READ_ALL')],
-            'Permissions' => ['menu_url' => 'permissions.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PERMISSIONS'], 'READ_ALL')],
-        ]
-    ],
-    'Users & Employees' => [
-        'menu_icon' => 'fa-user',
-        'permission_id' => PermissionsHelper::getParentPermissionId('3'),
-        'children' => [
-            'Users' => ['menu_url' => 'users.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['USERS'], 'READ_ALL')],
-        ]
-    ],
     'Companies' => [
         'menu_icon' => 'fa-building',
-        'permission_id' => PermissionsHelper::getParentPermissionId('4'),
+        'permission_id' => PermissionsHelper::getParentPermissionId('2'),
         'children' => [
-            'Companies' => ['menu_url' => 'companies.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['COMPANIES'], 'READ_ALL')],
+            'Companies' => ['menu_url' => 'companies.index', 'menu_icon' => 'fa-building', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['COMPANIES'], 'READ_ALL')],
         ]
     ],
     'Plans' => [
         'menu_icon' => 'fa-clipboard-list',
-        'permission_id' => PermissionsHelper::getParentPermissionId('5'),
+        'permission_id' => PermissionsHelper::getParentPermissionId('3'),
         'children' => [
-            'Plans' => ['menu_url' => 'plans.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PLANS'], 'READ_ALL')],
-
+            'Plans' => ['menu_url' => 'plans.index', 'menu_icon' => 'fa-clipboard-list', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PLANS'], 'READ_ALL')],
         ]
     ],
     'Gateway & Transactions' => [
         'menu_icon' => 'fas fa-file-invoice-dollar',
-        'permission_id' => PermissionsHelper::getParentPermissionId('10'),
+        'permission_id' => PermissionsHelper::getParentPermissionId('4'),
         'children' => [
-            'Gateways' => ['menu_url' => 'paymentGateway.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PAYMENTGATEWAYS'], 'READ_ALL')],
-            'Transactions' => ['menu_url' => 'planPaymentTransaction.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PAYMENTSTRANSACTIONS'], 'READ_ALL')],
-            'Subscriptions' => ['menu_url' => 'subscriptions.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SUBSCRIPTIONS'], 'READ_ALL')],
-
+            'Gateways' => ['menu_url' => 'paymentGateway.index', 'menu_icon' => 'fa-credit-card', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PAYMENTGATEWAYS'], 'READ_ALL')],
+            'Transactions' => ['menu_url' => 'planPaymentTransaction.index', 'menu_icon' => 'fa-money-bill-wave', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PAYMENTSTRANSACTIONS'], 'READ_ALL')],
+            'Subscriptions' => ['menu_url' => 'subscriptions.index', 'menu_icon' => 'fa-sync', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SUBSCRIPTIONS'], 'READ_ALL')],
         ]
     ],
-    'Settings' => [
-        'menu_icon' => 'fa-cog',
-        'permission_id' => PermissionsHelper::getParentPermissionId('6'),
+    'Users & Employees' => [
+        'menu_icon' => 'fa-users',
+        'permission_id' => PermissionsHelper::getParentPermissionId('200'),
         'children' => [
-            'General' => ['menu_url' => 'settings.general', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_GENERAL'], 'READ')],
-            'Mail' => ['menu_url' => 'settings.mail', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_MAIL'], 'READ')],
-            'Cron' => ['menu_url' => 'settings.cron', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_CRON'], 'READ')],
+            'Users' => ['menu_url' => 'users.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['USERS'], 'READ_ALL')],
+        ]
+    ],
+    'Roles & Permissions' => [
+        'menu_icon' => 'fa-user-shield',
+        'permission_id' => PermissionsHelper::getParentPermissionId('201'),
+        'children' => [
+            'Role' => ['menu_url' => 'role.index', 'menu_icon' => 'fa-user-tag', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['ROLE'], 'READ_ALL')],
+            'Permissions' => ['menu_url' => 'permissions.index', 'menu_icon' => 'fa-key', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PERMISSIONS'], 'READ_ALL')],
         ]
     ],
     'System Settings' => [
         'menu_icon' => 'fa-box',
-        'permission_id' => PermissionsHelper::getParentPermissionId('7'),
+        'permission_id' => PermissionsHelper::getParentPermissionId('203'),
         'children' => [
-            'Modules' => ['menu_url' => 'modules.index', 'menu_icon' => 'fa-box', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['MODULES'], 'READ_ALL')],
-            'AppUpdates' => ['menu_url' => 'appupdates.index', 'menu_icon' => 'fa-box', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['APPUPDATES'], 'READ_ALL')],
-            'Backups' => ['menu_url' => 'backup.index', 'menu_icon' => 'fa-box', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['DOWNLOAD_BACKUP'], 'READ_ALL')],
+            'Modules' => ['menu_url' => 'modules.index', 'menu_icon' => 'fa-puzzle-piece', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['MODULES'], 'READ_ALL')],
+            'AppUpdates' => ['menu_url' => 'appupdates.index', 'menu_icon' => 'fa-sync', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['APPUPDATES'], 'READ_ALL')],
+            'Backups' => ['menu_url' => 'backup.index', 'menu_icon' => 'fa-database', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['DOWNLOAD_BACKUP'], 'READ_ALL')],
+        ]
+    ],
+    'Settings' => [
+        'menu_icon' => 'fa-cog',
+        'permission_id' => PermissionsHelper::getParentPermissionId('204'),
+        'children' => [
+            'General' => ['menu_url' => 'settings.general', 'menu_icon' => 'fa-sliders-h', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_GENERAL'], 'READ')],
+            'Mail' => ['menu_url' => 'settings.mail', 'menu_icon' => 'fa-envelope', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_MAIL'], 'READ')],
+            'Cron' => ['menu_url' => 'settings.cron', 'menu_icon' => 'fa-clock', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_CRON'], 'READ')],
         ]
     ],
     'Logs & Events' => [
         'menu_icon' => 'fa-list-ul',
-        'permission_id' => PermissionsHelper::getParentPermissionId('16'),
+        'permission_id' => PermissionsHelper::getParentPermissionId('160'),
         'children' => [
-            'Audit' => ['menu_url' => 'audit.index', 'menu_icon' => 'fa-box', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['EVENTS_AUDIT_LOG'], 'READ_ALL')],
-            'Bulk Import' => ['menu_url' => 'audit.bulkimport', 'menu_icon' => 'fa-box', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['BULK_IMPORT_STATUS'], 'READ_ALL')],
-
+            'Audit' => ['menu_url' => 'audit.index', 'menu_icon' => 'fa-history', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['EVENTS_AUDIT_LOG'], 'READ_ALL')],
         ]
     ],
 ]);
@@ -380,7 +395,7 @@ PermissionsHelper::initializePermissions();
     'Settings' => [
         'menu_icon' => 'fa-cog',
         'is_default' => true,
-        'permission_id' => PermissionsHelper::getParentPermissionId('6'),
+        'permission_id' => PermissionsHelper::getParentPermissionId('204'),
         'children' => [
             'General' => ['menu_url' => 'settings.general', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS'], 'READ')],
             'Mail' => ['menu_url' => 'settings.mail', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_MAIL'], 'READ')],
@@ -389,7 +404,7 @@ PermissionsHelper::initializePermissions();
             'Leads Groups' => ['menu_url' => 'cgt.indexLeadsGroups', 'menu_icon' => 'fa-cog', 'permission_id' => 2001],
             'Leads Status' => ['menu_url' => 'cgt.indexLeadsStatus', 'menu_icon' => 'fa-cog', 'permission_id' => 2002],
             'Leads Sources' => ['menu_url' => 'cgt.indexLeadsSources', 'menu_icon' => 'fa-cog', 'permission_id' => 2003],
-            'Produc Categories' => ['menu_url' => 'cgt.indexProductCategories', 'menu_icon' => 'fa-cog', 'permission_id' => 2004],
+            'Product Categories' => ['menu_url' => 'cgt.indexProductCategories', 'menu_icon' => 'fa-cog', 'permission_id' => 2004],
             'Product Taxes' => ['menu_url' => 'cgt.indexProductTaxes', 'menu_icon' => 'fa-cog', 'permission_id' => 2005],
             'Tasks Status' => ['menu_url' => 'cgt.indexTasksStatus', 'menu_icon' => 'fa-cog', 'permission_id' => 2006],
         ]
@@ -398,7 +413,7 @@ PermissionsHelper::initializePermissions();
         'menu_icon' => 'fa-users',
         'feature_type' => PermissionsHelper::$plansPermissionsKeys['ROLE'], // this need to match the PLANS_FEATURES key
         'permission_plan' => PermissionsHelper::$plansPermissionsKeys['ROLE'],
-        'permission_id' => PermissionsHelper::getParentPermissionId('2'),
+        'permission_id' => PermissionsHelper::getParentPermissionId('201'),
         'children' => [
             'Role' => ['menu_url' => 'role.index', 'menu_icon' => 'fa-users', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['ROLE'], 'READ_ALL')],
             'Permissions' => ['menu_url' => 'permissions.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PERMISSIONS'], 'READ_ALL')],
@@ -408,7 +423,7 @@ PermissionsHelper::initializePermissions();
         'menu_icon' => 'fa-user',
         'feature_type' => PermissionsHelper::$plansPermissionsKeys['USERS'], // this need to match the PLANS_FEATURES key
         'permission_plan' => PermissionsHelper::$plansPermissionsKeys['USERS'],
-        'permission_id' => PermissionsHelper::getParentPermissionId('3'),
+        'permission_id' => PermissionsHelper::getParentPermissionId('200'),
         'children' => [
             'Users' => ['menu_url' => 'users.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['USERS'], 'READ_ALL')],
         ]
@@ -417,7 +432,7 @@ PermissionsHelper::initializePermissions();
         'menu_icon' => 'fa-paper-plane',
         'is_default' => true,
         'permission_plan' => PermissionsHelper::$plansPermissionsKeys['PLANUPGRADE'],
-        'permission_id' => PermissionsHelper::getParentPermissionId('11'),
+        'permission_id' => PermissionsHelper::getParentPermissionId('150'),
         'children' => [
             'Membership' => ['menu_url' => 'planupgrade.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PLANUPGRADE'], 'READ_ALL')],
         ]
@@ -425,7 +440,7 @@ PermissionsHelper::initializePermissions();
     'Logs & Events' => [
         'menu_icon' => 'fa-list-ul',
         'is_default' => true,
-        'permission_id' => PermissionsHelper::getParentPermissionId('16'),
+        'permission_id' => PermissionsHelper::getParentPermissionId('160'),
         'children' => [
             'Audit' => ['menu_url' => 'audit.index', 'menu_icon' => 'fa-box', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['EVENTS_AUDIT_LOG'], 'READ_ALL')],
             'Bulk Import' => ['menu_url' => 'audit.bulkimport', 'menu_icon' => 'fa-box', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['BULK_IMPORT_STATUS'], 'READ_ALL')],
@@ -446,7 +461,7 @@ PermissionsHelper::initializePermissions();
         'menu_icon' => 'fa-phone-volume',
         'feature_type' => PermissionsHelper::$plansPermissionsKeys['LEADS'], // this need to match the PLANS_FEATURES key
         'permission_plan' => PermissionsHelper::$plansPermissionsKeys['LEADS'],
-        'permission_id' => PermissionsHelper::getParentPermissionId('102'),
+        'permission_id' => PermissionsHelper::getParentPermissionId('101'),
         'children' => [
             'Leads' => ['menu_url' => 'leads.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['LEADS'], 'READ_ALL')],
         ]
@@ -455,7 +470,7 @@ PermissionsHelper::initializePermissions();
         'menu_icon' => 'fa-folder-plus',
         'feature_type' => PermissionsHelper::$plansPermissionsKeys['PROJECTS'], // this need to match the PLANS_FEATURES key
         'permission_plan' => PermissionsHelper::$plansPermissionsKeys['PROJECTS'],
-        'permission_id' => PermissionsHelper::getParentPermissionId('151'),
+        'permission_id' => PermissionsHelper::getParentPermissionId('120'),
         'children' => [
             'Projects' => ['menu_url' => 'projects.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PROJECTS'], 'READ_ALL')],
         ]
@@ -464,7 +479,7 @@ PermissionsHelper::initializePermissions();
         'menu_icon' => 'fa-tasks',
         'feature_type' => PermissionsHelper::$plansPermissionsKeys['TASKS'], // this need to match the PLANS_FEATURES key
         'permission_plan' => PermissionsHelper::$plansPermissionsKeys['TASKS'],
-        'permission_id' => PermissionsHelper::getParentPermissionId('152'),
+        'permission_id' => PermissionsHelper::getParentPermissionId('121'),
         'children' => [
             'Tasks' => ['menu_url' => 'tasks.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['TASKS'], 'READ_ALL')],
         ]
@@ -473,7 +488,7 @@ PermissionsHelper::initializePermissions();
         'menu_icon' => 'fa-flag',
         'feature_type' => PermissionsHelper::$plansPermissionsKeys['PROPOSALS'], // this need to match the PLANS_FEATURES key
         'permission_plan' => PermissionsHelper::$plansPermissionsKeys['PROPOSALS'],
-        'permission_id' => PermissionsHelper::getParentPermissionId('103'),
+        'permission_id' => PermissionsHelper::getParentPermissionId('110'),
         'children' => [
             'Proposals' => ['menu_url' => 'proposals.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PROPOSALS'], 'READ_ALL')],
             'Templates' => ['menu_url' => 'proposals.indexProposals', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PROPOSALS_TEMPLATES'], 'READ_ALL')],
@@ -483,7 +498,7 @@ PermissionsHelper::initializePermissions();
         'menu_icon' => 'fa-file-signature',
         'feature_type' => PermissionsHelper::$plansPermissionsKeys['ESTIMATES'], // this need to match the PLANS_FEATURES key
         'permission_plan' => PermissionsHelper::$plansPermissionsKeys['ESTIMATES'],
-        'permission_id' => PermissionsHelper::getParentPermissionId('106'),
+        'permission_id' => PermissionsHelper::getParentPermissionId('111'),
         'children' => [
             'Estimates' => ['menu_url' => 'estimates.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['ESTIMATES'], 'READ_ALL')],
             'Templates' => ['menu_url' => 'estimates.indexEstimates', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['ESTIMATES_TEMPLATES'], 'READ_ALL')],
@@ -493,7 +508,7 @@ PermissionsHelper::initializePermissions();
         'menu_icon' => 'fa-file-contract',
         'feature_type' => PermissionsHelper::$plansPermissionsKeys['CONTRACTS'], // this need to match the PLANS_FEATURES key
         'permission_plan' => PermissionsHelper::$plansPermissionsKeys['CONTRACTS'],
-        'permission_id' => PermissionsHelper::getParentPermissionId('107'),
+        'permission_id' => PermissionsHelper::getParentPermissionId('112'),
         'children' => [
             'Contracts' => ['menu_url' => 'contracts.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['CONTRACTS'], 'READ_ALL')],
             'Templates' => ['menu_url' => 'contracts.indexContracts', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['CONTRACTS_TEMPLATES'], 'READ_ALL')],
@@ -503,7 +518,7 @@ PermissionsHelper::initializePermissions();
         'menu_icon' => 'fa-receipt',
         'feature_type' => PermissionsHelper::$plansPermissionsKeys['INVOICES'], // this need to match the PLANS_FEATURES key
         'permission_plan' => PermissionsHelper::$plansPermissionsKeys['INVOICES'],
-        'permission_id' => PermissionsHelper::getParentPermissionId('155'),
+        'permission_id' => PermissionsHelper::getParentPermissionId('114'),
         'children' => [
             'Invoice' => ['menu_url' => 'invoices.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['INVOICES'], 'READ_ALL')],
         ]
@@ -512,16 +527,16 @@ PermissionsHelper::initializePermissions();
         'menu_icon' => 'fa-boxes',
         'feature_type' => PermissionsHelper::$plansPermissionsKeys['PRODUCTS_SERVICES'], // this need to match the PLANS_FEATURES key
         'permission_plan' => PermissionsHelper::$plansPermissionsKeys['PRODUCTS_SERVICES'],
-        'permission_id' => PermissionsHelper::getParentPermissionId('104'),
+        'permission_id' => PermissionsHelper::getParentPermissionId('113'),
         'children' => [
-            'Products & Sercices' => ['menu_url' => 'products_services.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PRODUCTS_SERVICES'], 'READ_ALL')],
+            'Products & Services' => ['menu_url' => 'products_services.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PRODUCTS_SERVICES'], 'READ_ALL')],
         ]
     ],
     'Custom Fields' => [
         'menu_icon' => 'fa-plus-square',
         'feature_type' => PermissionsHelper::$plansPermissionsKeys['CUSTOM_FIELDS'], // this need to match the PLANS_FEATURES key
         'permission_plan' => PermissionsHelper::$plansPermissionsKeys['CUSTOM_FIELDS'],
-        'permission_id' => PermissionsHelper::getParentPermissionId('101'),
+        'permission_id' => PermissionsHelper::getParentPermissionId('130'),
         'children' => [
             'Custom Fields' => ['menu_url' => 'customfields.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['CUSTOM_FIELDS'], 'READ_ALL')],
         ]
@@ -530,7 +545,7 @@ PermissionsHelper::initializePermissions();
         'menu_icon' => 'fa-calendar-week',
         'feature_type' => PermissionsHelper::$plansPermissionsKeys['CALENDER'], // this need to match the PLANS_FEATURES key
         'permission_plan' => PermissionsHelper::$plansPermissionsKeys['CALENDER'],
-        'permission_id' => PermissionsHelper::getParentPermissionId('156'),
+        'permission_id' => PermissionsHelper::getParentPermissionId('131'),
         'children' => [
             'Calender' => ['menu_url' => 'calender.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['CALENDER'], 'READ_ALL')],
         ]

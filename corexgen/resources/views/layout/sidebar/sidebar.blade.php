@@ -31,7 +31,7 @@
                 <li class="nav-item">
                     <a title="Upgrade Your Plan to Use this feature" data-toggle="tooltip"
                         href="{{ route(getPanelRoutes('planupgrade.index')) }}" class="nav-link">
-                        <i class="fas {{ $parentMenu->menu_icon }}"></i> {{ $parentMenu->menu_name }} <span class='pro'>PRO</span>
+                        <i class="fas {{ $parentMenu->menu_icon }}"></i> {{ __("menus.".$parentMenu->menu_name) }} <span class='pro'>PRO</span>
                     </a>
                 </li>
                 @continue
@@ -56,7 +56,7 @@
                     <a href="#menu_item_{{ $parentMenu->id }}"
                         class="nav-link {{ $hasActiveChild ? 'active' : '' }}" data-bs-toggle="collapse"
                         aria-expanded="{{ $hasActiveChild ? 'true' : 'false' }}">
-                        <i class="fas {{ $parentMenu->menu_icon }}"></i> {{ $parentMenu->menu_name }}
+                        <i class="fas {{ $parentMenu->menu_icon }}"></i> {{ __("menus.".$parentMenu->menu_name) }}
                     </a>
         
                     @if ($childMenus->count())
@@ -69,7 +69,8 @@
                                             <a class="nav-link font-12 {{ $currentRoute === getPanelRoutes($childMenu->menu_url) ? 'active' : '' }}"
                                                 href="{{ route(getPanelRoutes($childMenu->menu_url)) }}">
                                                 <i class="fas fa-angle-double-right"></i>
-                                                {{ $childMenu->menu_name }}
+                                               
+                                                {{ __("menus.".$childMenu->menu_name) }}
                                             </a>
                                         </li>
                                     @endif

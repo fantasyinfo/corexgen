@@ -108,8 +108,14 @@ class CompanyService
                 }
             }
 
+
             // Create CRM setting
-            CRMSettings::create([
+            CRMSettings::updateOrCreate([
+                'key' => $setting['key'],
+                'name' => $setting['name'],
+                'company_id' => $companyid,
+                'type' => 'General',
+            ], [
                 'key' => $setting['key'],
                 'value' => $setting['value'],
                 'is_media_setting' => $setting['is_media_setting'],
@@ -130,7 +136,12 @@ class CompanyService
     {
         foreach (CRM_COMPANY_MAIL_SETTINGS as $setting) {
             // Create CRM setting
-            CRMSettings::create([
+            CRMSettings::updateOrCreate([
+                'key' => $setting['key'],
+                'name' => $setting['name'],
+                'company_id' => $companyid,
+                'type' => 'Mail',
+            ], [
                 'key' => $setting['key'],
                 'value' => $setting['value'],
                 'is_media_setting' => $setting['is_media_setting'],
@@ -152,7 +163,12 @@ class CompanyService
     {
         foreach (CRM_COMPANY_ONE_WORD_SETTINGS as $setting) {
             // Create CRM setting
-            CRMSettings::create([
+            CRMSettings::updateOrCreate([
+                'key' => $setting['key'],
+                'name' => $setting['name'],
+                'company_id' => $companyid,
+                'type' => 'OneWord',
+            ], [
                 'key' => $setting['key'],
                 'value' => $setting['value'],
                 'is_media_setting' => $setting['is_media_setting'],
@@ -172,7 +188,7 @@ class CompanyService
 
     public function generateCategoryGroupsTags($companyid)
     {
-        $insertArray = [];
+        // Clients Category
         $clientsCategory = [
             'warning' => 'VIP',
             'info' => 'Normal',
@@ -181,20 +197,23 @@ class CompanyService
         ];
 
         foreach ($clientsCategory as $color => $cc) {
-            $insertArray[] = [
-                'name' => $cc,
-                'color' => $color, // Assign unique color
-                'relation_type' => CATEGORY_GROUP_TAGS_RELATIONS['KEY']['clients'],
-                'type' => CATEGORY_GROUP_TAGS_TYPES['KEY']['categories'],
-                'status' => 'active',
-                'company_id' => $companyid,
-                'created_at' => now(),
-                'updated_at' => now()
-            ];
+            CategoryGroupTag::updateOrCreate(
+                [
+                    'name' => $cc,
+                    'relation_type' => CATEGORY_GROUP_TAGS_RELATIONS['KEY']['clients'],
+                    'type' => CATEGORY_GROUP_TAGS_TYPES['KEY']['categories'],
+                    'company_id' => $companyid,
+                ],
+                [
+                    'color' => $color,
+                    'status' => 'active',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
         }
 
-
-        // leads groups
+        // Leads Groups
         $leadsGroups = [
             'danger' => 'Hot',
             'warning' => 'Warm',
@@ -202,20 +221,23 @@ class CompanyService
         ];
 
         foreach ($leadsGroups as $color => $cc) {
-            $insertArray[] = [
-                'name' => $cc,
-                'color' => $color,
-                'relation_type' => CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads'],
-                'type' => CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_groups'],
-                'status' => 'active',
-                'company_id' => $companyid,
-                'created_at' => now(),
-                'updated_at' => now()
-            ];
+            CategoryGroupTag::updateOrCreate(
+                [
+                    'name' => $cc,
+                    'relation_type' => CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads'],
+                    'type' => CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_groups'],
+                    'company_id' => $companyid,
+                ],
+                [
+                    'color' => $color,
+                    'status' => 'active',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
         }
 
-
-        // leads status
+        // Leads Status
         $leadsStatus = [
             'info' => 'New',
             'secondary' => 'Qualified',
@@ -226,19 +248,23 @@ class CompanyService
         ];
 
         foreach ($leadsStatus as $color => $cc) {
-            $insertArray[] = [
-                'name' => $cc,
-                'color' => $color,
-                'relation_type' => CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads'],
-                'type' => CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_status'],
-                'status' => 'active',
-                'company_id' => $companyid,
-                'created_at' => now(),
-                'updated_at' => now()
-            ];
+            CategoryGroupTag::updateOrCreate(
+                [
+                    'name' => $cc,
+                    'relation_type' => CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads'],
+                    'type' => CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_status'],
+                    'company_id' => $companyid,
+                ],
+                [
+                    'color' => $color,
+                    'status' => 'active',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
         }
 
-        // leads sources
+        // Leads Sources
         $leadsSources = [
             'info' => 'Social Media',
             'primary' => 'Website',
@@ -248,20 +274,23 @@ class CompanyService
         ];
 
         foreach ($leadsSources as $color => $cc) {
-            $insertArray[] = [
-                'name' => $cc,
-                'color' => $color,
-                'relation_type' => CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads'],
-                'type' => CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_sources'],
-                'status' => 'active',
-                'company_id' => $companyid,
-                'created_at' => now(),
-                'updated_at' => now()
-            ];
+            CategoryGroupTag::updateOrCreate(
+                [
+                    'name' => $cc,
+                    'relation_type' => CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads'],
+                    'type' => CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_sources'],
+                    'company_id' => $companyid,
+                ],
+                [
+                    'color' => $color,
+                    'status' => 'active',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
         }
 
-        // products categories
-
+        // Products Categories
         $productsCategories = [
             'warning' => 'Electronics',
             'info' => 'Cloths',
@@ -270,20 +299,23 @@ class CompanyService
         ];
 
         foreach ($productsCategories as $color => $cc) {
-            $insertArray[] = [
-                'name' => $cc,
-                'color' => $color, // Assign unique color
-                'relation_type' => CATEGORY_GROUP_TAGS_RELATIONS['KEY']['products_services'],
-                'type' => CATEGORY_GROUP_TAGS_TYPES['KEY']['products_categories'],
-                'status' => 'active',
-                'company_id' => $companyid,
-                'created_at' => now(),
-                'updated_at' => now()
-            ];
+            CategoryGroupTag::updateOrCreate(
+                [
+                    'name' => $cc,
+                    'relation_type' => CATEGORY_GROUP_TAGS_RELATIONS['KEY']['products_services'],
+                    'type' => CATEGORY_GROUP_TAGS_TYPES['KEY']['products_categories'],
+                    'company_id' => $companyid,
+                ],
+                [
+                    'color' => $color,
+                    'status' => 'active',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
         }
 
-        // products taxes
-
+        // Products Taxes
         $productTaxes = [
             'dark' => '0%',
             'warning' => '5%',
@@ -293,20 +325,23 @@ class CompanyService
         ];
 
         foreach ($productTaxes as $color => $cc) {
-            $insertArray[] = [
-                'name' => $cc,
-                'color' => $color, // Assign unique color
-                'relation_type' => CATEGORY_GROUP_TAGS_RELATIONS['KEY']['products_services'],
-                'type' => CATEGORY_GROUP_TAGS_TYPES['KEY']['products_taxs'],
-                'status' => 'active',
-                'company_id' => $companyid,
-                'created_at' => now(),
-                'updated_at' => now()
-            ];
+            CategoryGroupTag::updateOrCreate(
+                [
+                    'name' => $cc,
+                    'relation_type' => CATEGORY_GROUP_TAGS_RELATIONS['KEY']['products_services'],
+                    'type' => CATEGORY_GROUP_TAGS_TYPES['KEY']['products_taxs'],
+                    'company_id' => $companyid,
+                ],
+                [
+                    'color' => $color,
+                    'status' => 'active',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
         }
 
-
-        // tasks status
+        // Tasks Status
         $tasksStatus = [
             'info' => 'New',
             'secondary' => 'In Progress',
@@ -317,20 +352,23 @@ class CompanyService
         ];
 
         foreach ($tasksStatus as $color => $cc) {
-            $insertArray[] = [
-                'name' => $cc,
-                'color' => $color,
-                'relation_type' => CATEGORY_GROUP_TAGS_RELATIONS['KEY']['tasks'],
-                'type' => CATEGORY_GROUP_TAGS_TYPES['KEY']['tasks_status'],
-                'status' => 'active',
-                'company_id' => $companyid,
-                'created_at' => now(),
-                'updated_at' => now()
-            ];
+            CategoryGroupTag::updateOrCreate(
+                [
+                    'name' => $cc,
+                    'relation_type' => CATEGORY_GROUP_TAGS_RELATIONS['KEY']['tasks'],
+                    'type' => CATEGORY_GROUP_TAGS_TYPES['KEY']['tasks_status'],
+                    'company_id' => $companyid,
+                ],
+                [
+                    'color' => $color,
+                    'status' => 'active',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
         }
-
-        CategoryGroupTag::insert($insertArray);
     }
+
 
 
 

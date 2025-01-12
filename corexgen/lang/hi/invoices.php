@@ -1,0 +1,37 @@
+<?php
+
+return [
+
+    'Invoice' => "चालान",
+    'Invoice Management' => 'चालान प्रबंधन',
+    'Create Invoice' => 'चालान बनाएं',
+    'Invoice Name' => 'चालान का नाम',
+    'All Statuses' => 'सभी स्थिति',
+    'Description' => 'विवरण',
+    'Create New Invoice' => 'नया चालान बनाएं',
+    'Update Invoice' => 'चालान अपडेट करें',
+    'No Estimates Found' => 'कोई अनुमान नहीं मिला',
+    'Invoice Rate' => 'चालान दर',
+    'Invoice Type' => 'चालान प्रकार',
+    'Country' => 'देश',
+    'Select Country' => 'देश चुनें',
+    'Name' => 'नाम',
+    'Select Type' => 'प्रकार चुनें',
+    'Select Client' => 'ग्राहक चुनें',
+    'Select Lead' => 'लीड चुनें',
+    'Title' => 'शीर्षक',
+    'Prefix' => 'प्रारंभिक',
+    'ID' => 'आईडी',
+    'Select Template' => 'टेम्पलेट चुनें',
+    'Date' => 'तारीख',
+    'Valid Till' => 'मान्य तक',
+    'Details' => 'विवरण',
+    'Value' => 'मूल्य',
+    'To' => 'से',
+    'Select Task' => 'कार्य चुनें',
+    'Issue Date' => 'जारी करने की तिथि',
+    'Due Date' => 'नियत तारीख',
+    'Total Amount' => 'कुल राशि',
+    'Task' => 'कार्य',
+
+];
