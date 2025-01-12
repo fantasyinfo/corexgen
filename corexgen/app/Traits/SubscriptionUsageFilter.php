@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Cache;
 trait SubscriptionUsageFilter
 {
 
+    /**
+     * check current subscription usage 
+     */
 
     public function checkCurrentUsage($module)
     {
@@ -48,6 +51,9 @@ trait SubscriptionUsageFilter
     }
 
 
+    /**
+     * update  subscription usage 
+     */
     public function updateUsage($module, $sign, $value)
     {
         if ($this->isTenantUser()) {
@@ -99,6 +105,9 @@ trait SubscriptionUsageFilter
     }
 
 
+    /**
+     *get total allowed subscription usage 
+     */
     private function getTotalAllowed($module)
     {
         if ($this->isTenantUser()) {
@@ -129,6 +138,9 @@ trait SubscriptionUsageFilter
     }
 
 
+    /**
+     * get current sub id
+     */
     private function getCurrentSubscriptionId()
     {
         if (Auth::user()->is_tenant) {
@@ -144,6 +156,9 @@ trait SubscriptionUsageFilter
 
     }
 
+    /**
+     * get current usage
+     */
     private function getCurrentUsage(int $subId, $module): int
     {
         // Find existing usage
@@ -159,10 +174,17 @@ trait SubscriptionUsageFilter
         return 0;
     }
 
+    /**
+     * check is tenant / saas owner
+     */
     private function isTenantUser()
     {
         return Auth::check() && Auth::user()->is_tenant;
     }
+
+    /**
+     * get company id
+     */
     private function getCompanyId()
     {
         if (Auth::check()) {
@@ -171,6 +193,9 @@ trait SubscriptionUsageFilter
         return null;
     }
 
+    /**
+     * fetch total allowed usage of a plan
+     */
     public function fetchTotalAllowAndUsedUsage($module)
     {
 

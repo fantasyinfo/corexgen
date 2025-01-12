@@ -10,6 +10,9 @@ trait TenantFilter
     private $panelAccess;
 
 
+    /**
+     * apply user scope filters by company id or either tenant id 
+     */
 
     public function applyTenantFilter($query, $table = null)
     {
@@ -34,6 +37,9 @@ trait TenantFilter
         return $query;
     }
 
+    /**
+     * get tenant route as per login admin panel
+     */
     public function getTenantRoute()
     {
         $this->user = Auth::user();
@@ -48,6 +54,9 @@ trait TenantFilter
         return getPanelUrl(PANEL_TYPES['COMPANY_PANEL']) . '.';
     }
 
+    /**
+     * get current panel module name
+     */
     public function getPanelModule()
     {
         $this->user = Auth::user();

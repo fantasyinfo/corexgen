@@ -9,11 +9,18 @@ use Illuminate\Support\Facades\Mail;
 
 trait IsSMTPValid
 {
+
+    /**
+     * check smtp working
+     */
     public function checkSMTPWorking()
     {
         return $this->_isSMTPValid($this->_getMailSettings());
     }
 
+    /**
+     * check is smtp is valid and working
+     */
     public function _isSMTPValid($mailSettings)
     {
         try {
@@ -47,6 +54,9 @@ trait IsSMTPValid
         }
     }
 
+    /**
+     * get smtp settings from settings tbl
+     */
     public function _getMailSettings($companyId = null)
     {
         return CRMSettings::where('company_id', is_null($companyId) ? Auth::user()->company_id : $companyId)

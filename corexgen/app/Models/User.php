@@ -18,6 +18,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 use App\Traits\HasCustomFields;
 
+/**
+ * Users table model handle all filters, observers, evenets, relatioships
+ */
 class User extends Authenticatable implements Auditable
 {
     use HasApiTokens;
@@ -77,33 +80,51 @@ class User extends Authenticatable implements Auditable
         'profile_photo_url',
     ];
 
+    /**
+     * role relations with users table
+     */
     public function role()
     {
         return $this->belongsTo(CRMRole::class, 'role_id');  // The correct foreign key is 'role_id'
     }
 
+    /**
+     * tenant relations with users table
+     */
     public function tenant()
     {
         return $this->belongsTo(Tenant::class);
     }
 
+    /**
+     * company relations with users table
+     */
     public function company()
     {
         return $this->belongsTo(Company::class);
     }
 
+    /**
+     * address relations with users table
+     */
     public function addresses()
     {
         return $this->belongsTo(Address::class, 'address_id');
     }
 
     // Leads assigned by this user
+    /**
+     * leads assing users relations with users table
+     */
     public function assignedLeads()
     {
         return $this->hasMany(CRMLeads::class, 'assign_by');
     }
 
     // Leads this user is associated with (via pivot table)
+    /**
+     * associated leads relations with users table
+     */
     public function associatedLeads()
     {
         return $this->belongsToMany(CRMLeads::class, 'lead_user', 'user_id', 'lead_id')
@@ -111,11 +132,18 @@ class User extends Authenticatable implements Auditable
             ->withPivot('company_id');
     }
 
+    /**
+     * get total users
+     */
     public function totalUsers($company_id = null)
     {
         return self::where('company_id', $company_id)->count();
     }
 
+    /**
+     * boot method
+
+     */
     protected static function boot()
     {
         parent::boot();

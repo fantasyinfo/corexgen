@@ -5,6 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+
+/**
+ * Tenant table model handle all filters, observers, evenets, relatioships
+ */
 class Tenant extends Model
 {
     use HasFactory;
@@ -15,11 +19,18 @@ class Tenant extends Model
 
     protected $fillable = ['name', 'domain', 'settings', 'status', 'currency_code', 'currency_symbol', 'timezone'];
 
+
+    /**
+     * companies relations with Tennant table
+     */
     public function companies()
     {
         return $this->hasMany(Company::class);
     }
 
+    /**
+     * users relations with Tennant table
+     */
     public function users()
     {
         return $this->hasMany(User::class);

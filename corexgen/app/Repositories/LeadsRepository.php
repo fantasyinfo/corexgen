@@ -12,6 +12,9 @@ class LeadsRepository
 {
     // Your repository methods
 
+    /**
+     * get leads lists query
+     */
     public function getLeadsQuery($request)
     {
 
@@ -61,6 +64,10 @@ class LeadsRepository
 
         return $this->applyFilters($query, $request);
     }
+
+    /**
+     * get leads lists query filter
+     */
 
     protected function applyFilters($query, $request)
     {
@@ -150,6 +157,9 @@ class LeadsRepository
             );
     }
 
+    /**
+     * get kanban lists query
+     */
 
     public function getKanbanLoad($request)
     {
@@ -203,6 +213,9 @@ class LeadsRepository
         return $this->applyKanbanFilters($query, $request['filters']);
     }
 
+    /**
+     * get kanban lists query filters
+     */
     protected function applyKanbanFilters($query, $request)
     {
 

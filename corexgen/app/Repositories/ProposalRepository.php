@@ -13,6 +13,9 @@ class ProposalRepository
 
     use TenantFilter;
     // Your repository methods
+    /**
+     * get proposal lists query
+     */
     public function getProposalQuery($request)
     {
         $query = CRMProposals::query();
@@ -23,6 +26,9 @@ class ProposalRepository
         return $this->applyFilters($query, $request);
     }
 
+    /**
+     * get proposal lists query filters
+     */
     protected function applyFilters($query, $request)
     {
         return $query

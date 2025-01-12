@@ -15,6 +15,10 @@ use Illuminate\Support\Facades\Auth;
 use OwenIt\Auditing\Contracts\Auditable;
 
 
+
+/**
+ * Tasks table model handle all filters, observers, evenets, relatioships
+ */
 class Tasks extends Model implements Auditable
 {
     use HasFactory;
@@ -52,35 +56,51 @@ class Tasks extends Model implements Auditable
      */
 
     // Belongs to company
+
+    /**
+     * company relations with Tasks table
+     */
     public function company()
     {
         return $this->belongsTo(Company::class, 'company_id');
     }
 
-
+    /**
+     * project relations with Tasks table
+     */
     public function project()
     {
         return $this->belongsTo(Project::class, 'project_id');
     }
 
     // Belongs to status
+    /**
+     * stage relations with Tasks table
+     */
     public function stage()
     {
         return $this->belongsTo(CategoryGroupTag::class, 'status_id');
     }
 
-
+    /**
+     * milestone relations with Tasks table
+     */
     public function milestone()
     {
         return $this->hasOne(Milestone::class, 'id', 'milestone_id');
     }
 
-
+    /**
+     * timesheet relations with Tasks table
+     */
     public function timeSheets()
     {
         return $this->hasMany(Timesheet::class, 'task_id');
     }
 
+    /**
+     * assigned by user relations with Tasks table
+     */
     // Belongs to user who assigned it
     public function assignedBy()
     {
@@ -88,6 +108,9 @@ class Tasks extends Model implements Auditable
     }
 
     // Many-to-many relationship for multiple assignees
+    /**
+     * assignees user relations with Tasks table
+     */
     public function assignees()
     {
         return $this->belongsToMany(User::class, 'task_user', 'task_id', 'user_id')
@@ -95,7 +118,9 @@ class Tasks extends Model implements Auditable
             ->withPivot('company_id');
     }
 
-
+    /**
+     * comments relations with Tasks table
+     */
     public function comments()
     {
         return $this->morphMany(CommentNote::class, 'commentable')
@@ -103,6 +128,9 @@ class Tasks extends Model implements Auditable
             ->latest('created_at');
     }
 
+    /**
+     * attachments relations with Tasks table
+     */
     public function attachments()
     {
         return $this->morphMany(Attachments::class, 'attachable')->latest('created_at');
@@ -111,6 +139,10 @@ class Tasks extends Model implements Auditable
 
 
 
+    /**
+     * get Active tasks
+
+     */
     public function getActiveTasks()
     {
         $currentMonth = now()->startOfMonth();
@@ -149,6 +181,10 @@ class Tasks extends Model implements Auditable
 
 
 
+    /**
+     * 
+     * get tasks counts
+     */
     public function getTasksCounts()
     {
         $taskStages = CategoryGroupTag::where('type', 'tasks_status') // Filter only task-related stages
@@ -157,7 +193,7 @@ class Tasks extends Model implements Auditable
                     $query->whereNull('deleted_at'); // Exclude soft-deleted tasks
                 }
             ])
-            ->where('company_id',Auth::user()->company_id)
+            ->where('company_id', Auth::user()->company_id)
             ->get();
 
         return [

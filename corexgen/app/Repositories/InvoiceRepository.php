@@ -13,6 +13,9 @@ class InvoiceRepository
 
     use TenantFilter;
     // Your repository methods
+    /**
+     * get invoice lists query
+     */
     public function getInvoiceQuery($request)
     {
         $query = Invoice::query()->with(['task', 'client', 'project']);
@@ -21,9 +24,12 @@ class InvoiceRepository
 
         // Dynamic filters
         //return $query;
-         return $this->applyFilters($query, $request);
+        return $this->applyFilters($query, $request);
     }
 
+    /**
+     * get invoice lists query filter
+     */
     protected function applyFilters($query, $request)
     {
         return $query

@@ -10,6 +10,9 @@ class TasksRepository
 {
     // Your repository methods
 
+    /**
+     * get tasks lists query
+     */
     public function getTasksQuery($request)
     {
 
@@ -49,6 +52,9 @@ class TasksRepository
         //return $query;
     }
 
+    /**
+     * get tasks lists query filtes
+     */
     protected function applyFilters($query, $request)
     {
         return $query
@@ -72,7 +78,7 @@ class TasksRepository
             )
             ->when(
                 $request->filled('status_id') && $request->project_id != 0,
-                fn($q) => $q->where('tasks.status_id', $request->project_id )
+                fn($q) => $q->where('tasks.status_id', $request->project_id)
             )
             ->when(
                 $request->filled('project_id') && $request->project_id != 0,
@@ -109,6 +115,9 @@ class TasksRepository
     }
 
 
+    /**
+     * get kanban load lists query
+     */
     public function getKanbanLoad($request)
     {
         $wantCurrentUserItems = false;
@@ -149,6 +158,9 @@ class TasksRepository
         //return $query;
     }
 
+    /**
+     * get kanban lists query filters
+     */
     protected function applyKanbanFilters($query, $request)
     {
 
@@ -171,7 +183,7 @@ class TasksRepository
                 isset($request['title']) && !empty($request['title']),
                 fn($q) => $q->where('tasks.title', 'LIKE', "%{$request['title']}%")
             )->when(
-                isset($request['status_id']) && $request['status_id']!= 0,
+                isset($request['status_id']) && $request['status_id'] != 0,
                 fn($q) => $q->where('tasks.status_id', $request['status_id'])
             )
             ->when(
@@ -206,7 +218,7 @@ class TasksRepository
                     $assignByQuery->where('users.id', $request['assign_by'])
                 )
             )
-            ;
+        ;
     }
 
 }

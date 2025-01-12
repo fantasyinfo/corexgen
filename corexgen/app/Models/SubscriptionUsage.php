@@ -5,6 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+
+
+/**
+ * Subscriptions Usage table model handle all filters, observers, evenets, relatioships
+ */
 class SubscriptionUsage extends Model
 {
     use HasFactory;

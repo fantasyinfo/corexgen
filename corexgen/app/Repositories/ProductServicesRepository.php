@@ -9,6 +9,10 @@ class ProductServicesRepository
 {
     use TenantFilter;
     // Your repository methods
+
+    /**
+     * get products lists query
+     */
     public function getProductsQuery($request)
     {
         $query = ProductsServices::query()->with(['category', 'tax']);
@@ -20,6 +24,9 @@ class ProductServicesRepository
         return $this->applyFilters($query, $request);
     }
 
+    /**
+     * get products lists query filters
+     */
     protected function applyFilters($query, $request)
     {
         return $query

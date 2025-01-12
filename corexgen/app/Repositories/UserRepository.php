@@ -10,6 +10,9 @@ class UserRepository
     use TenantFilter;
     // Your repository methods
 
+    /**
+     * get users lists query
+     */
     public function getUsersQuery($request)
     {
         $query = User::query()->with('role')
@@ -27,6 +30,9 @@ class UserRepository
         return $this->applyFilters($query, $request);
     }
 
+    /**
+     * get users lists query filters
+     */
     protected function applyFilters($query, $request)
     {
         return $query
