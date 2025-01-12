@@ -6,6 +6,9 @@ use App\Models\CRM\CRMClients;
 
 class ClientRepository
 {
+    /**
+     * get clients lists query
+     */
     public function getClientsQuery($request)
     {
         $query = CRMClients::query()
@@ -27,6 +30,9 @@ class ClientRepository
         return $this->applyFilters($query, $request);
     }
 
+    /**
+     * filters clients lists query
+     */
     protected function applyFilters($query, $request)
     {
 

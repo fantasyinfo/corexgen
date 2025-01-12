@@ -23,6 +23,9 @@ trait QueueSubscriptionUsageFilter
         $this->isTenant = $userData['is_tenant'] ?? false;
     }
 
+    /**
+     * check current usage of plan features
+     */
     public function checkCurrentUsage($module)
     {
         if ($this->isTenant) {
@@ -54,6 +57,9 @@ trait QueueSubscriptionUsageFilter
         return true;
     }
 
+    /**
+     * update plans usage
+     */
     public function updateUsage($module, $sign, $value)
     {
         if ($this->isTenant) {
@@ -98,6 +104,9 @@ trait QueueSubscriptionUsageFilter
         return true;
     }
 
+    /**
+     * get total allowed features counts
+     */
     private function getTotalAllowed($module)
     {
         if ($this->isTenant) {
@@ -120,6 +129,9 @@ trait QueueSubscriptionUsageFilter
         return $currentSubscriptionsAllowed->plans->planFeatures[0]->value;
     }
 
+    /**
+     * get current subscription id of a company
+     */
     private function getCurrentSubscriptionId()
     {
         if ($this->isTenant) {
@@ -133,6 +145,9 @@ trait QueueSubscriptionUsageFilter
         return $subscription->id;
     }
 
+    /**
+     * get current usage private
+     */
     private function getCurrentUsage(int $subId, $module): int
     {
         $subUsageFind = SubscriptionUsage::where('subscription_id', $subId)

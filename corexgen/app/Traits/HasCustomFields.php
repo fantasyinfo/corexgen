@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Traits;
 
@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Log;
 
 trait HasCustomFields
 {
+
+    /**
+     * custom fields raltionships
+     */
     public function customFields()
     {
         return $this->hasMany(CustomFieldValue::class, 'entity_id')
@@ -15,6 +19,9 @@ trait HasCustomFields
             });
     }
 
+    /**
+     * get custom fields entity
+     */
     public function getCustomFieldEntityType(): string
     {
         $entityType = strtolower(class_basename($this));

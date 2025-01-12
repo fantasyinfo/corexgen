@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * Subscriptions table model handle all filters, observers, evenets, relatioships
+ */
 class Subscription extends Model
 {
     use HasFactory;
@@ -30,26 +33,41 @@ class Subscription extends Model
     ];
 
 
+    /**
+     * company relations with subscriptions table
+     */
     public function company()
     {
         return $this->belongsTo(Company::class, 'company_id');
     }
 
+    /**
+     * plans relations with subscriptions table
+     */
     public function plans()
     {
         return $this->belongsTo(Plans::class, 'plan_id');
     }
 
+    /**
+     * payment transactions relations with subscriptions table
+     */
     public function payment_transaction()
     {
         return $this->belongsTo(PaymentTransaction::class, 'payment_id');
     }
 
+    /**
+     * usage relations with subscriptions table
+     */
     public function usages()
     {
         return $this->hasMany(SubscriptionUsage::class, 'subscription_id');
     }
 
+    /**
+     * total Subscriptions relations with subscriptions table
+     */
     public function totalSubscriptions($status = CRM_STATUS_TYPES['SUBSCRIPTION']['STATUS']['ACTIVE'])
     {
         return self::where('status', $status)->count();

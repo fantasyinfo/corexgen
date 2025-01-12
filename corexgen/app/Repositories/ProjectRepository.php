@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Auth;
 class ProjectRepository
 {
     // Your repository methods
+    /**
+     * get projects lists query
+     */
     public function getProjectsQuery($request)
     {
 
@@ -34,6 +37,9 @@ class ProjectRepository
         return $this->applyFilters($query, $request);
     }
 
+    /**
+     * get projects lists query filtes
+     */
     protected function applyFilters($query, $request)
     {
         return $query
@@ -45,7 +51,7 @@ class ProjectRepository
                         ->orWhere('projects.title', 'LIKE', "%{$searchTerm}%")
                         ->orWhere('projects.client_id', '=', "%{$searchTerm}%")
                         ->orWhere('projects.created_at', 'LIKE', "%{$searchTerm}%")
-                        ;
+                    ;
                 })
             )
             ->when(

@@ -13,6 +13,10 @@ class ContractRepository
 
     use TenantFilter;
     // Your repository methods
+
+    /**
+     * get contracts lists query
+     */
     public function getContractQuery($request)
     {
         $query = CRMContract::query();
@@ -23,6 +27,9 @@ class ContractRepository
         return $this->applyFilters($query, $request);
     }
 
+    /**
+     * get contracts lists query filtes
+     */
     protected function applyFilters($query, $request)
     {
         return $query

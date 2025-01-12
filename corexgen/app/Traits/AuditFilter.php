@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Cache;
 trait AuditFilter
 {
 
+    /**
+     * get activites lists
+     */
     public function getActivites($model, $id)
     {
         // Generate a unique cache key based on model and ID

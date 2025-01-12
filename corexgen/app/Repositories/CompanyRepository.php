@@ -11,6 +11,9 @@ class CompanyRepository
     use TenantFilter;
     // Your repository methods
 
+    /**
+     * get company lists query
+     */
     public function getCompanyQuery($request)
     {
         $query = Company::query()
@@ -22,6 +25,9 @@ class CompanyRepository
         return $this->applyFilters($query, $request);
     }
 
+    /**
+     * filtes company lists query
+     */
     protected function applyFilters($query, $request)
     {
 

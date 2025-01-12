@@ -7,15 +7,21 @@ class CustomFieldsRepository
 {
     // Your repository methods
 
+    /**
+     * get custom fields lists query
+     */
     public function getCustomFieldsQuery($request)
     {
         $query = CustomFieldDefinition::query();
 
         // Apply dynamic filters if any
-       // return $this->applyFilters($query, $request);
-       return  $query;
+        // return $this->applyFilters($query, $request);
+        return $query;
     }
 
+    /**
+     * get custom fields lists query filters
+     */
     protected function applyFilters($query, $request)
     {
 

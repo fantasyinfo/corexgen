@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Log;
 
 trait StatusStatsFilter
 {
+    /**
+     * stage/staus filters query
+     */
     public function getGroupByStatusQuery($model, $isSoftDelete = true)
     {
         // Instantiate the model if a class name is passed
@@ -35,36 +38,39 @@ trait StatusStatsFilter
         ];
     }
 
+    /**
+     * get category group tags query fiilter
+     */
     public function getGroupByStageQuery($model, $type, $relation)
     {
         // Instantiate the model if a class name is passed
         if (is_string($model)) {
             $model = resolve($model);
         }
-    
+
         // Build the query for CategoryGroupTag
         $cgt = CategoryGroupTag::query()
             ->where('type', $type)
             ->where('relation_type', $relation);
         $cgt = $this->applyTenantFilter($cgt);
-    
+
         // Base query for the main model
         $baseQuery = $model->query()
             ->joinSub($cgt, 'cgt', 'cgt.id', '=', "{$model->getTable()}.status_id");
-    
+
         // Query for grouped counts with ORDER BY clause
         $groupedQuery = $baseQuery->clone()
             ->selectRaw('cgt.name as status, COUNT(*) as count')
             ->groupBy('cgt.name')
             ->orderBy('cgt.name', 'asc'); // Add ORDER BY clause here
-    
+
         // Total count query for all status_id entries in the model
         $totalQuery = $baseQuery->clone();
-    
+
         return [
             'groupQuery' => $groupedQuery,
             'totalQuery' => $totalQuery,
         ];
     }
-    
+
 }

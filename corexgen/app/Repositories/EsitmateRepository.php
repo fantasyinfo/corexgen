@@ -13,6 +13,10 @@ class EsitmateRepository
 
     use TenantFilter;
     // Your repository methods
+
+    /**
+     * get estimate lists query
+     */
     public function getEstimateQuery($request)
     {
         $query = CRMEstimate::query();
@@ -22,6 +26,10 @@ class EsitmateRepository
         // Dynamic filters
         return $this->applyFilters($query, $request);
     }
+
+    /**
+     * get estimate lists query filtes
+     */
 
     protected function applyFilters($query, $request)
     {
