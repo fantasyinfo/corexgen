@@ -6,6 +6,9 @@ use OwenIt\Auditing\Models\Audit as BaseAudit;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * Audit table model handle all filters, observers, evenets, relatioships
+ */
 class Audit extends BaseAudit
 {
 
@@ -26,6 +29,10 @@ class Audit extends BaseAudit
         'tags',
     ];
 
+    /**
+     * Audit table boot method
+
+     */
     protected static function booted()
     {
         // Creating callback

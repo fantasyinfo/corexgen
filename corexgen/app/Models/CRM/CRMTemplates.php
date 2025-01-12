@@ -7,6 +7,10 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+
+/**
+ * Template table model handle all filters, observers, evenets, relatioships
+ */
 class CRMTemplates extends Model
 {
     use HasFactory;
@@ -24,14 +28,21 @@ class CRMTemplates extends Model
     ];
 
 
+    /**
+     * company relations with template table
+     */
     public function company()
     {
         return $this->belongsTo(Company::class);
     }
 
+
+    /**
+     * create by user relations with template table
+     */
     public function createdBy()
     {
-        return $this->belongsTo(User::class,'created_by');
+        return $this->belongsTo(User::class, 'created_by');
     }
 
 

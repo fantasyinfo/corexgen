@@ -14,6 +14,9 @@ class DownloadController extends Controller
     use TenantFilter;
     use CategoryGroupTagsFilter;
 
+    /**
+     * download countires lists in csv
+     */
     public function countries()
     {
         $countries = Country::all(['id', 'name']);
@@ -30,6 +33,9 @@ class DownloadController extends Controller
     }
 
 
+    /**
+     * download group category tags lists in csv
+     */
     public function cgt($type, $relation)
     {
 
@@ -49,6 +55,9 @@ class DownloadController extends Controller
     }
 
 
+    /**
+     * get file name with company
+     */
     private function getFileNameWithCompany($filename)
     {
         $company_id = !is_null(Auth::user()->company_id) ? Auth::user()->company_id : time(); // time for tenant

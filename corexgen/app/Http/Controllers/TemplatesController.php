@@ -56,7 +56,9 @@ class TemplatesController extends Controller
     }
 
 
-
+    /**
+     * index view of proposal fetch and view
+     */
     public function indexProposals(Request $request)
     {
         $this->tenantRoute = $this->getTenantRoute();
@@ -64,7 +66,7 @@ class TemplatesController extends Controller
 
         // Server-side DataTables response
         if ($request->ajax()) {
-            return $this->templateService->getDatatablesResponse($request, 'Proposals','proposals','PROPOSALS_TEMPLATES','viewProposals','editProposals','destroyProposals');
+            return $this->templateService->getDatatablesResponse($request, 'Proposals', 'proposals', 'PROPOSALS_TEMPLATES', 'viewProposals', 'editProposals', 'destroyProposals');
         }
 
         return view($this->getViewFilePath('index'), [
@@ -77,6 +79,9 @@ class TemplatesController extends Controller
         ]);
     }
 
+    /**
+     * create proposal
+     */
     public function createProposals()
     {
         return view($this->getViewFilePath('create'), [
@@ -86,6 +91,9 @@ class TemplatesController extends Controller
         ]);
     }
 
+    /**
+     * store proposal
+     */
     public function storeProposals(Request $request)
     {
         $this->tenantRoute = $this->getTenantRoute();
@@ -113,6 +121,9 @@ class TemplatesController extends Controller
         }
     }
 
+    /**
+     * destory proposal
+     */
     public function destroyProposals($id)
     {
         try {
@@ -126,7 +137,9 @@ class TemplatesController extends Controller
                 ->with('error', 'An error occurred while creating the Proposal Template: ' . $e->getMessage());
         }
     }
-
+    /**
+     * edit proposal
+     */
     public function editProposals($id)
     {
         $template = $this->applyTenantFilter(CRMTemplates::where('id', $id))->firstOrFail();
@@ -138,7 +151,9 @@ class TemplatesController extends Controller
             'template' => $template
         ]);
     }
-
+    /**
+     * update proposal
+     */
     public function updateProposals(Request $request)
     {
         $this->tenantRoute = $this->getTenantRoute();
@@ -167,7 +182,9 @@ class TemplatesController extends Controller
         }
     }
 
-
+    /**
+     * view proposal
+     */
     public function viewProposals($id)
     {
         $template = $this->applyTenantFilter(CRMTemplates::where('id', $id))->firstOrFail();
@@ -178,11 +195,13 @@ class TemplatesController extends Controller
             'template' => $template
         ]);
     }
-    
+
 
 
     // estimate
-
+    /**
+     * index of estimate view and fetch
+     */
     public function indexEstimates(Request $request)
     {
         $this->tenantRoute = $this->getTenantRoute();
@@ -190,7 +209,7 @@ class TemplatesController extends Controller
 
         // Server-side DataTables response
         if ($request->ajax()) {
-            return $this->templateService->getDatatablesResponse($request, 'Estimates','estimates','ESTIMATES_TEMPLATES','viewEstimates','editEstimates','destroyEstimates');
+            return $this->templateService->getDatatablesResponse($request, 'Estimates', 'estimates', 'ESTIMATES_TEMPLATES', 'viewEstimates', 'editEstimates', 'destroyEstimates');
         }
 
         return view($this->getViewFilePath('index'), [
@@ -203,6 +222,9 @@ class TemplatesController extends Controller
         ]);
     }
 
+    /**
+     * create estimate
+     */
     public function createEstimates()
     {
         return view($this->getViewFilePath('create'), [
@@ -211,6 +233,10 @@ class TemplatesController extends Controller
             'store' => 'estimates.storeEstimates',
         ]);
     }
+
+    /**
+     * store estimate
+     */
 
     public function storeEstimates(Request $request)
     {
@@ -239,6 +265,9 @@ class TemplatesController extends Controller
         }
     }
 
+    /**
+     * destory estimate
+     */
     public function destroyEstimates($id)
     {
         try {
@@ -253,6 +282,9 @@ class TemplatesController extends Controller
         }
     }
 
+    /**
+     * edit estimate
+     */
     public function editEstimates($id)
     {
         $template = $this->applyTenantFilter(CRMTemplates::where('id', $id))->firstOrFail();
@@ -265,6 +297,9 @@ class TemplatesController extends Controller
         ]);
     }
 
+    /**
+     * update estimate
+     */
     public function updateEstimates(Request $request)
     {
         $this->tenantRoute = $this->getTenantRoute();
@@ -293,6 +328,9 @@ class TemplatesController extends Controller
         }
     }
 
+    /**
+     * view estimate
+     */
     public function viewEstimates($id)
     {
         $template = $this->applyTenantFilter(CRMTemplates::where('id', $id))->firstOrFail();
@@ -304,126 +342,146 @@ class TemplatesController extends Controller
         ]);
     }
 
-     // contracts
+    // contracts
+    /**
+     * view and fetch the contracts index
+     */
+    public function indexContracts(Request $request)
+    {
+        $this->tenantRoute = $this->getTenantRoute();
 
-     public function indexContracts(Request $request)
-     {
-         $this->tenantRoute = $this->getTenantRoute();
- 
- 
-         // Server-side DataTables response
-         if ($request->ajax()) {
-             return $this->templateService->getDatatablesResponse($request, 'Contracts','contracts','CONTRACTS_TEMPLATES','viewContracts','editContracts','destroyContracts');
-         }
- 
-         return view($this->getViewFilePath('index'), [
-             'filters' => $request->all(),
-             'title' => 'Contracts Template Management',
-             'permissions' => PermissionsHelper::getPermissionsArray('CONTRACTS_TEMPLATES'),
-             'module' => PANEL_MODULES[$this->getPanelModule()]['contracts'],
-             'type' => 'Contracts',
- 
-         ]);
-     }
- 
-     public function createContracts()
-     {
-         return view($this->getViewFilePath('create'), [
-             'title' => 'Create Contracts Template',
-             'type' => 'Contracts',
-             'store' => 'contracts.storeContracts',
-         ]);
-     }
- 
-     public function storeContracts(Request $request)
-     {
-         $this->tenantRoute = $this->getTenantRoute();
- 
-         $validated = $request->validate([
-             'title' => 'required|string|max:150',
-             'template_details' => 'required|string'
-         ]);
- 
-         try {
-             $template = CRMTemplates::create([
-                 'title' => trim($validated['title']),
-                 'template_details' => $validated['template_details'],
-                 'type' => 'Contracts',
-                 'company_id' => Auth::user()->company_id,
-                 'created_by' => Auth::id()
-             ]);
- 
-             return redirect()->route($this->tenantRoute . 'contracts.indexContracts')
-                 ->with('success', 'Contracts Template created successfully.');
-         } catch (\Exception $e) {
-             // Handle any errors during role creation
-             return redirect()->back()
-                 ->with('error', 'An error occurred while creating the Contracts Template: ' . $e->getMessage());
-         }
-     }
- 
-     public function destroyContracts($id)
-     {
-         try {
-             //code...
-             $this->applyTenantFilter(CRMTemplates::where('id', $id))->delete();
- 
-             return redirect()->back()->with('success', 'Template deleted successfully');
-         } catch (\Exception $e) {
-             //throw $th;
-             return redirect()->back()
-                 ->with('error', 'An error occurred while creating the Contracts Template: ' . $e->getMessage());
-         }
-     }
- 
-     public function editContracts($id)
-     {
-         $template = $this->applyTenantFilter(CRMTemplates::where('id', $id))->firstOrFail();
- 
-         return view($this->getViewFilePath('edit'), [
-             'title' => 'Edit Contracts Template',
-             'type' => 'Contracts',
-             'store' => 'contracts.updateContracts',
-             'template' => $template
-         ]);
-     }
- 
-     public function updateContracts(Request $request)
-     {
-         $this->tenantRoute = $this->getTenantRoute();
- 
-         $validated = $request->validate([
-             'title' => 'required|string|max:150',
-             'template_details' => 'required|string',
-             'id' => 'integer|exists:templates,id'
-         ]);
- 
-         try {
- 
-             $template = $this->applyTenantFilter(CRMTemplates::where('id', $validated['id']))->firstOrFail();
- 
-             $template->update([
-                 'title' => trim($validated['title']),
-                 'template_details' => $validated['template_details'],
-             ]);
- 
-             return redirect()->route($this->tenantRoute . 'contracts.editContracts', ['id' => $template->id])
-                 ->with('success', 'Contracts Template updated successfully.');
-         } catch (\Exception $e) {
-             // Handle any errors during role creation
-             return redirect()->back()
-                 ->with('error', 'An error occurred while updated the Contracts Template: ' . $e->getMessage());
-         }
-     }
 
-     public function viewContracts($id)
-     {
-         $template = $this->applyTenantFilter(CRMTemplates::where('id', $id))->firstOrFail();
- 
-         return view($this->getViewFilePath('view'), [
-             'title' => 'View Contracts Template',
-             'type' => 'Contracts',
-             'template' => $template
-         ]);
-     }
+        // Server-side DataTables response
+        if ($request->ajax()) {
+            return $this->templateService->getDatatablesResponse($request, 'Contracts', 'contracts', 'CONTRACTS_TEMPLATES', 'viewContracts', 'editContracts', 'destroyContracts');
+        }
+
+        return view($this->getViewFilePath('index'), [
+            'filters' => $request->all(),
+            'title' => 'Contracts Template Management',
+            'permissions' => PermissionsHelper::getPermissionsArray('CONTRACTS_TEMPLATES'),
+            'module' => PANEL_MODULES[$this->getPanelModule()]['contracts'],
+            'type' => 'Contracts',
+
+        ]);
+    }
+
+    /**
+     * create contracts
+     */
+    public function createContracts()
+    {
+        return view($this->getViewFilePath('create'), [
+            'title' => 'Create Contracts Template',
+            'type' => 'Contracts',
+            'store' => 'contracts.storeContracts',
+        ]);
+    }
+
+    /**
+     * store contracts
+     */
+    public function storeContracts(Request $request)
+    {
+        $this->tenantRoute = $this->getTenantRoute();
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:150',
+            'template_details' => 'required|string'
+        ]);
+
+        try {
+            $template = CRMTemplates::create([
+                'title' => trim($validated['title']),
+                'template_details' => $validated['template_details'],
+                'type' => 'Contracts',
+                'company_id' => Auth::user()->company_id,
+                'created_by' => Auth::id()
+            ]);
+
+            return redirect()->route($this->tenantRoute . 'contracts.indexContracts')
+                ->with('success', 'Contracts Template created successfully.');
+        } catch (\Exception $e) {
+            // Handle any errors during role creation
+            return redirect()->back()
+                ->with('error', 'An error occurred while creating the Contracts Template: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * destory contracts
+     */
+    public function destroyContracts($id)
+    {
+        try {
+            //code...
+            $this->applyTenantFilter(CRMTemplates::where('id', $id))->delete();
+
+            return redirect()->back()->with('success', 'Template deleted successfully');
+        } catch (\Exception $e) {
+            //throw $th;
+            return redirect()->back()
+                ->with('error', 'An error occurred while creating the Contracts Template: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * edit contracts
+     */
+    public function editContracts($id)
+    {
+        $template = $this->applyTenantFilter(CRMTemplates::where('id', $id))->firstOrFail();
+
+        return view($this->getViewFilePath('edit'), [
+            'title' => 'Edit Contracts Template',
+            'type' => 'Contracts',
+            'store' => 'contracts.updateContracts',
+            'template' => $template
+        ]);
+    }
+
+    /**
+     * update contracts
+     */
+    public function updateContracts(Request $request)
+    {
+        $this->tenantRoute = $this->getTenantRoute();
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:150',
+            'template_details' => 'required|string',
+            'id' => 'integer|exists:templates,id'
+        ]);
+
+        try {
+
+            $template = $this->applyTenantFilter(CRMTemplates::where('id', $validated['id']))->firstOrFail();
+
+            $template->update([
+                'title' => trim($validated['title']),
+                'template_details' => $validated['template_details'],
+            ]);
+
+            return redirect()->route($this->tenantRoute . 'contracts.editContracts', ['id' => $template->id])
+                ->with('success', 'Contracts Template updated successfully.');
+        } catch (\Exception $e) {
+            // Handle any errors during role creation
+            return redirect()->back()
+                ->with('error', 'An error occurred while updated the Contracts Template: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * view contracts
+     */
+    public function viewContracts($id)
+    {
+        $template = $this->applyTenantFilter(CRMTemplates::where('id', $id))->firstOrFail();
+
+        return view($this->getViewFilePath('view'), [
+            'title' => 'View Contracts Template',
+            'type' => 'Contracts',
+            'template' => $template
+        ]);
+    }
 }

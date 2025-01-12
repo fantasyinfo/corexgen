@@ -118,7 +118,9 @@ class ProductServicesController extends Controller
     }
 
 
-
+     /**
+     * get header status
+     */
     private function getHeaderStatus($model, $permission)
     {
         $user = Auth::user();

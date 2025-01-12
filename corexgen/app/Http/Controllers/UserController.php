@@ -135,7 +135,9 @@ class UserController extends Controller
     }
 
 
-
+    /**
+     * get header status
+     */
     private function getHeaderStatus($model, $permission)
     {
         $user = Auth::user();
@@ -668,6 +670,11 @@ class UserController extends Controller
         }
     }
 
+
+
+    /**
+     * change password
+     */
     public function changePassword(Request $request)
     {
         // Validate input
@@ -709,6 +716,11 @@ class UserController extends Controller
             ], 500);
         }
     }
+
+
+    /**
+     * update password
+     */
     public function updatePassword(Request $request)
     {
         // Validate input
@@ -779,6 +791,9 @@ class UserController extends Controller
 
 
 
+    /**
+     * view user
+     */
     public function view($id)
     {
         $query = User::query()
@@ -850,6 +865,9 @@ class UserController extends Controller
 
 
 
+    /**
+     * view profile
+     */
     public function profile()
     {
 
@@ -882,6 +900,9 @@ class UserController extends Controller
 
 
 
+    /**
+     * login as user
+     */
     public function loginas($userid)
     {
         \DB::enableQueryLog();
@@ -951,6 +972,9 @@ class UserController extends Controller
         }
     }
 
+    /**
+     * login back
+     */
     public function loginback()
     {
         session()->remove('login_as_team_member');

@@ -25,6 +25,10 @@ class CompanyOnboardingController extends Controller
 {
 
     use MediaTrait;
+
+           /**
+     * company onboarding form
+     */
     public function showOnboardingForm()
     {
         $company = auth()->user()->company;
@@ -41,6 +45,9 @@ class CompanyOnboardingController extends Controller
         return view('companyonbording.index', compact('company', 'onboarding', 'countries', 'timezones', 'plans', 'payment_gateways'));
     }
 
+           /**
+     * save company address
+     */
     public function saveAddress(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -86,6 +93,9 @@ class CompanyOnboardingController extends Controller
     }
 
 
+           /**
+     * create company adress if provided
+     */
     private function createAddressIfProvided(array $data): ?Address
     {
         $requiredAddressFields = [
@@ -110,6 +120,9 @@ class CompanyOnboardingController extends Controller
         ]);
     }
 
+           /**
+     * find or create city
+     */
     private function findOrCreateCity($cityName, $countryId)
     {
         $city = City::firstOrCreate(
@@ -119,6 +132,10 @@ class CompanyOnboardingController extends Controller
 
         return $city->id;
     }
+
+           /**
+     * validate all address fields are there
+     */
     private function hasAllAddressFields(array $data, array $requiredFields): bool
     {
         return collect($requiredFields)->every(
@@ -128,6 +145,9 @@ class CompanyOnboardingController extends Controller
     }
 
 
+           /**
+     * save company default currency
+     */
     public function saveCurrency(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -158,6 +178,9 @@ class CompanyOnboardingController extends Controller
         ]);
     }
 
+           /**
+     * save timezone of a company
+     */
     public function saveTimezone(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -187,6 +210,9 @@ class CompanyOnboardingController extends Controller
         ]);
     }
 
+           /**
+     * save company plans
+     */
     public function savePlan(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -255,6 +281,10 @@ class CompanyOnboardingController extends Controller
 
 
     }
+
+           /**
+     * process the payment of a company plan
+     */
     public function processPayment(Request $request, PaymentGatewayFactory $paymentGatewayFactory)
     {
 
@@ -349,6 +379,9 @@ class CompanyOnboardingController extends Controller
         }
     }
 
+           /**
+     * simulate gateway
+     */
     private function simulatePaymentGateway($request)
     {
         // Implement actual payment gateway integration
@@ -356,6 +389,9 @@ class CompanyOnboardingController extends Controller
         return true;
     }
 
+           /**
+     * complete onboarding
+     */
     public function completeOnboarding(Request $request)
     {
         // update compnay onbording status
@@ -365,8 +401,4 @@ class CompanyOnboardingController extends Controller
 
     }
 
-    public function upgrade()
-    {
-
-    }
 }

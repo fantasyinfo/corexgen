@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\Auth;
 use OwenIt\Auditing\Contracts\Auditable;
 use Illuminate\Support\Str;
 
+/**
+ * Clients table model handle all filters, observers, evenets, relatioships related to a client
+ */
 class CRMClients extends Model implements Auditable
 {
     use HasFactory;
@@ -56,6 +59,10 @@ class CRMClients extends Model implements Auditable
         'tags' => 'array',
     ];
 
+
+    /**
+     * address relations to client 
+     */
     public function addresses()
     {
         return $this->belongsToMany(
@@ -70,17 +77,26 @@ class CRMClients extends Model implements Auditable
             ->withTimestamps();
     }
 
+    /**
+     * company relations to client 
+     */
     public function company()
     {
         return $this->belongsTo(Company::class, 'company_id');
     }
 
+    /**
+     * category group tags relations to client 
+     */
     public function categoryGroupTag()
     {
         return $this->belongsTo(CategoryGroupTag::class, 'cgt_id');
     }
 
 
+    /**
+     * comments relations to client 
+     */
     public function comments()
     {
         return $this->morphMany(CommentNote::class, 'commentable')
@@ -88,23 +104,29 @@ class CRMClients extends Model implements Auditable
             ->latest('created_at');
     }
 
+    /**
+     * attachments relations to client 
+     */
     public function attachments()
     {
         return $this->morphMany(Attachments::class, 'attachable')->latest('created_at');
 
     }
 
-    public  function getActiveClientsStats()
+    /**
+     * get Active clients status 
+     */
+    public function getActiveClientsStats()
     {
         $currentMonth = now()->startOfMonth();
         $lastMonth = now()->subMonth()->startOfMonth();
 
-        $thisMonthCount = self::where('status',  CRM_STATUS_TYPES['CLIENTS']['STATUS']['ACTIVE'])
+        $thisMonthCount = self::where('status', CRM_STATUS_TYPES['CLIENTS']['STATUS']['ACTIVE'])
             ->where('company_id', Auth::user()->company_id)
             ->whereBetween('created_at', [$currentMonth, now()])
             ->count();
 
-        $lastMonthCount = self::where('status',  CRM_STATUS_TYPES['CLIENTS']['STATUS']['ACTIVE'])
+        $lastMonthCount = self::where('status', CRM_STATUS_TYPES['CLIENTS']['STATUS']['ACTIVE'])
             ->where('company_id', Auth::user()->company_id)
             ->whereBetween('created_at', [$lastMonth, $currentMonth])
             ->count();
@@ -121,6 +143,9 @@ class CRMClients extends Model implements Auditable
         ];
     }
 
+    /**
+     * boot method of the client 
+     */
     protected static function boot()
     {
         parent::boot();

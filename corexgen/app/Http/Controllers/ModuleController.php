@@ -52,7 +52,7 @@ class ModuleController extends Controller
     /**
      * Method index returning exiting modules
      *
-     * @return void
+
      */
     public function index()
     {
@@ -68,7 +68,7 @@ class ModuleController extends Controller
      *
      * @param Request $request uploding the module
      *
-     * @return void
+
      */
     public function create(Request $request)
     {
@@ -171,7 +171,7 @@ class ModuleController extends Controller
      *
      * @param string $module deleting the module after
      *
-     * @return void
+   
      */
     public function destroy(string $module)
     {

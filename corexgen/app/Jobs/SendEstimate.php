@@ -28,6 +28,10 @@ class SendEstimate implements ShouldQueue
         $this->viewPath = $viewPath;
     }
 
+
+    /**
+     * send estimate on email job
+     */
     public function handle()
     {
         // Generate PDF

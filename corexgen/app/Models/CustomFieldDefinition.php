@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Custom fields definations table model handle all filters, observers, evenets, relatioships
+ */
 class CustomFieldDefinition extends Model
 {
     use HasFactory;
@@ -33,16 +36,22 @@ class CustomFieldDefinition extends Model
         'is_active' => 'boolean',
     ];
 
+    /**
+     * values relations with custom fields definations table
+     */
     public function values()
     {
         return $this->hasMany(CustomFieldValue::class, 'definition_id');
     }
 
+    /**
+     * scope for company filters
+     */
     public function scopeForCompany($query, $companyId = null)
     {
         return $query->where(function ($q) use ($companyId) {
             $q->where('company_id', $companyId)
-              ->orWhereNull('company_id'); // Include tenant-wide fields
+                ->orWhereNull('company_id'); // Include tenant-wide fields
         });
     }
 }

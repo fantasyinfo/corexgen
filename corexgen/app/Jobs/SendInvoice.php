@@ -28,6 +28,9 @@ class SendInvoice implements ShouldQueue
         $this->viewPath = $viewPath;
     }
 
+     /**
+     * send invoice on email job
+     */
     public function handle()
     {
         // Generate PDF

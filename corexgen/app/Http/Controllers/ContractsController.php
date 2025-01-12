@@ -133,7 +133,9 @@ class ContractsController extends Controller
     }
 
 
-
+       /**
+     * get header status
+     */
     private function getHeaderStatus($model, $permission)
     {
         $user = Auth::user();
@@ -666,6 +668,9 @@ class ContractsController extends Controller
         }
     }
 
+         /**
+     * accept the company
+     */
     public function acceptCompany(Request $request)
     {
         try {

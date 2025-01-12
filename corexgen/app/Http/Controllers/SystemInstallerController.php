@@ -25,7 +25,7 @@ class SystemInstallerController extends Controller
      * Method showInstaller
      * showing the view of installer
      *
-     * @return void
+
      */
     public function showInstaller()
     {
@@ -473,7 +473,7 @@ class SystemInstallerController extends Controller
     /**
      * Method checkExtensions
      * checking extenstions
-     * @return void
+
      */
     private function checkExtensions()
     {

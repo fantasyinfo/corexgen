@@ -96,6 +96,9 @@ class TasksController extends Controller
     }
 
 
+    /**
+     * tasks view , fetch
+     */
     public function index(Request $request)
     {
         $this->tenantRoute = $this->getTenantRoute();
@@ -129,6 +132,9 @@ class TasksController extends Controller
 
 
 
+    /**
+     * get header status
+     */
     private function getHeaderStages($model, $type, $relation, $table, $permission)
     {
         $user = Auth::user();
@@ -155,6 +161,10 @@ class TasksController extends Controller
         ];
     }
 
+
+    /**
+     * store the task
+     */
     public function store(TasksRequest $request)
     {
 
@@ -195,6 +205,9 @@ class TasksController extends Controller
                 ->with('error', $e->getMessage());
         }
     }
+    /**
+     * create the task
+     */
     public function create()
     {
         $this->checkCurrentUsage(strtolower(PermissionsHelper::$plansPermissionsKeys['TASKS']));
@@ -220,6 +233,9 @@ class TasksController extends Controller
         ]);
     }
 
+    /**
+     * update the task
+     */
     public function update(TasksEditRequest $request)
     {
         $this->tenantRoute = $this->getTenantRoute();
@@ -269,6 +285,10 @@ class TasksController extends Controller
                 ->with('error', 'An error occurred while updating the lead. ' . $e->getMessage());
         }
     }
+
+    /**
+     * edit the task
+     */
     public function edit($id)
     {
         $query = Tasks::query()->with([
@@ -312,6 +332,9 @@ class TasksController extends Controller
         ]);
     }
 
+    /**
+     * destory the task
+     */
     public function destroy($id)
     {
         try {
@@ -338,6 +361,9 @@ class TasksController extends Controller
         }
     }
 
+    /**
+     * bulk delete the task
+     */
     public function bulkDelete(Request $request)
     {
         $ids = $request->input('ids');
@@ -375,6 +401,10 @@ class TasksController extends Controller
             );
         }
     }
+
+    /**
+     * view the task
+     */
     public function view($id)
     {
         $query = Tasks::query()->with([
@@ -437,7 +467,9 @@ class TasksController extends Controller
         ]);
     }
 
-
+    /**
+     * change status the task
+     */
     public function changeStatus($id, $status)
     {
         try {
@@ -452,6 +484,9 @@ class TasksController extends Controller
 
 
     // kanban board stuff
+    /**
+     * change stage the task
+     */
     public function changeStage($leadid, $stageid)
     {
 
@@ -485,7 +520,9 @@ class TasksController extends Controller
         }
     }
 
-
+    /**
+     * view kanban of the task
+     */
     public function kanban(Request $request)
     {
         $this->tenantRoute = $this->getTenantRoute();
@@ -510,6 +547,9 @@ class TasksController extends Controller
         ]);
     }
 
+    /**
+     * kanban load the task
+     */
     public function kanbanLoad(Request $request)
     {
         $this->tenantRoute = $this->getTenantRoute();
@@ -519,6 +559,9 @@ class TasksController extends Controller
         return response()->json($data);
     }
 
+    /**
+     * kanban edit the task
+     */
     public function kanbanEdit($id)
     {
         $query = CRMLeads::query()->with([
@@ -554,6 +597,10 @@ class TasksController extends Controller
             'cfOldValues' => $cfOldValues->toArray()
         ]);
     }
+
+    /**
+     * kanbanview the task
+     */
     public function kanbanView($id)
     {
         $query = Tasks::query()->with([
@@ -584,7 +631,9 @@ class TasksController extends Controller
         ]);
     }
 
-
+    /**
+     * get Assignee of the task
+     */
     public function getAssignee(int $taskid, $isCollcet = false)
     {
         $task = $this->applyTenantFilter(Tasks::query()

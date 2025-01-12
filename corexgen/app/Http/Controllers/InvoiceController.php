@@ -132,7 +132,9 @@ class InvoiceController extends Controller
     }
 
 
-
+    /**
+     * get header status
+     */
     private function getHeaderStatus($model, $permission)
     {
         $user = Auth::user();
@@ -401,7 +403,7 @@ class InvoiceController extends Controller
                     'client',
                     'task',
                     'project',
-     
+
                     'company.addresses' => function ($query) {
                         $query->with(['country', 'city'])
                             ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');

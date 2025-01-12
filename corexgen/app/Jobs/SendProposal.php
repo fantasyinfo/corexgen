@@ -28,6 +28,9 @@ class SendProposal implements ShouldQueue
         $this->viewPath = $viewPath;
     }
 
+     /**
+     * send proposal on email job
+     */
     public function handle()
     {
         // Generate PDF

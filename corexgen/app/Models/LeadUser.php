@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
 
+
+/**
+ * Lead User table model handle all filters, observers, evenets, relatioships
+ */
 class LeadUser extends Model implements Auditable
 {
     use HasFactory;

@@ -57,6 +57,10 @@ class CustomFieldController extends Controller
         $this->customFieldService = $customFieldService;
     }
 
+    /**
+     * load custom fields view
+     */
+
     public function index(Request $request)
     {
         $this->tenantRoute = $this->getTenantRoute();
@@ -113,6 +117,9 @@ class CustomFieldController extends Controller
         ]);
     }
 
+    /**
+     * store the custom fields
+     */
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -160,7 +167,9 @@ class CustomFieldController extends Controller
     }
 
 
-
+    /**
+     * create custom fields
+     */
     public function create()
     {
         $this->checkCurrentUsage(strtolower(PLANS_FEATURES['CUSTOM_FIELDS']));
@@ -170,7 +179,9 @@ class CustomFieldController extends Controller
         ]);
     }
 
-
+    /**
+     * edit custom fields
+     */
     public function edit($id)
     {
         // Apply tenant filtering to role query
@@ -197,6 +208,9 @@ class CustomFieldController extends Controller
         ]);
     }
 
+    /**
+     * update custom fields
+     */
     public function update(Request $request)
     {
         $this->tenantRoute = $this->getTenantRoute();
@@ -232,6 +246,9 @@ class CustomFieldController extends Controller
             ->with('success', __('Custom Field updated successfully'));
     }
 
+    /**
+     * destory custom fields
+     */
     public function destroy($id)
     {
         try {
@@ -249,6 +266,9 @@ class CustomFieldController extends Controller
         }
     }
 
+    /**
+     * change status of custom fields
+     */
     public function changeStatus($id, $status)
     {
         try {
@@ -264,6 +284,9 @@ class CustomFieldController extends Controller
         }
     }
 
+    /**
+     * bulk delete of custom fields
+     */
     public function bulkDelete(Request $request)
     {
 

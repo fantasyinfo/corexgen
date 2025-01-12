@@ -5,6 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+
+/**
+ * Payment Gateway table model handle all filters, observers, evenets, relatioships
+ */
 class PaymentGateway extends Model
 {
     use HasFactory;

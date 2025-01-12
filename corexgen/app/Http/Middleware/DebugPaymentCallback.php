@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\Log;
 
 class DebugPaymentCallback
 {
+
+    /**
+     * Debug payment callback
+     */
     public function handle(Request $request, Closure $next)
     {
         // Extensive logging for debugging

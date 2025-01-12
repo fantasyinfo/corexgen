@@ -18,6 +18,10 @@ use Illuminate\Database\Eloquent\Builder;
 use OwenIt\Auditing\Contracts\Auditable;
 use Illuminate\Support\Facades\DB;
 
+
+/**
+ * Projects table model handle all filters, observers, evenets, relatioships
+ */
 class Project extends Model implements Auditable
 {
     use HasFactory;
@@ -53,18 +57,27 @@ class Project extends Model implements Auditable
      */
 
     // Belongs to company
+    /**
+     * company relations with projects table
+     */
     public function company()
     {
         return $this->belongsTo(Company::class, 'company_id');
     }
 
 
+    /**
+     * clients relations with projects table
+     */
     public function client()
     {
         return $this->belongsTo(CRMClients::class, 'client_id');
     }
 
     // Many-to-many relationship for multiple assignees
+    /**
+     * assignees relations with projects table
+     */
     public function assignees()
     {
         return $this->belongsToMany(User::class, 'project_user', 'project_id', 'user_id')
@@ -72,7 +85,9 @@ class Project extends Model implements Auditable
             ->withPivot('company_id');
     }
 
-
+    /**
+     * comments relations with projects table
+     */
     public function comments()
     {
         return $this->morphMany(CommentNote::class, 'commentable')
@@ -80,6 +95,9 @@ class Project extends Model implements Auditable
             ->latest('created_at');
     }
 
+    /**
+     * attachments relations with projects table
+     */
     public function attachments()
     {
         return $this->morphMany(Attachments::class, 'attachable')->latest('created_at');
@@ -99,6 +117,9 @@ class Project extends Model implements Auditable
     }
 
 
+    /**
+     * get timesheet
+     */
     public function getTimeSheet()
     {
         return Timesheet::whereIn('task_id', $this->tasks()->pluck('id'))->count();
@@ -169,6 +190,9 @@ class Project extends Model implements Auditable
     }
 
 
+    /**
+     * get fileters data
+     */
     public function getFilteredData(array $filters = [])
     {
         $tasksQuery = $this->tasks();
@@ -191,6 +215,9 @@ class Project extends Model implements Auditable
     }
 
     // Define the relationship for tasks
+    /**
+     * tasks relations with projects table
+     */
     public function tasks()
     {
         return $this->hasMany(Tasks::class, 'project_id');
@@ -198,8 +225,10 @@ class Project extends Model implements Auditable
 
 
 
-
-    public  function getProjectTimelineData($year = null)
+    /**
+     * get project timeline data
+     */
+    public function getProjectTimelineData($year = null)
     {
         $year = $year ?? now()->year;
 

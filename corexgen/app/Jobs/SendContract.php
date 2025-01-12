@@ -28,6 +28,10 @@ class SendContract implements ShouldQueue
         $this->viewPath = $viewPath;
     }
 
+
+    /**
+     * send contract on email job
+     */
     public function handle()
     {
         // Generate PDF

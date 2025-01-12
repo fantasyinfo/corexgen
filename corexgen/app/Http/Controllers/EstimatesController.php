@@ -74,7 +74,7 @@ class EstimatesController extends Controller
     }
 
 
-  
+
     protected $estimateService;
 
     protected $customFieldService;
@@ -132,7 +132,9 @@ class EstimatesController extends Controller
         ]);
     }
 
-
+    /**
+     * get header status
+     */
     private function getHeaderStatus($model, $permission)
     {
         $user = Auth::user();
@@ -630,7 +632,7 @@ class EstimatesController extends Controller
         */
     public function accept(Request $request)
     {
-      
+
         try {
             // Validate the request data
             $validatedData = $request->validate([
@@ -648,7 +650,7 @@ class EstimatesController extends Controller
             if (!$estimate) {
                 throw new \Exception('Estimate not found.');
             }
-         
+
             // Update the estimate status and acceptance details
             $estimate->update([
                 'status' => 'ACCEPTED',
@@ -661,7 +663,7 @@ class EstimatesController extends Controller
                 ],
             ]);
 
-    
+
             return redirect()->back()->with('success', 'Estimate status updated successfully.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to process the request: ' . $e->getMessage());

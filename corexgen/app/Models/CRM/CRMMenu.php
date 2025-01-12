@@ -5,6 +5,9 @@ namespace App\Models\CRM;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Menu table model handle all filters, observers, evenets, relatioships 
+ */
 class CRMMenu extends Model
 {
     
@@ -25,6 +28,10 @@ class CRMMenu extends Model
 
     protected $table = self::table;
 
+
+        /**
+     * boot method of menu table
+     */
 
     protected static function boot(){
         parent::boot();

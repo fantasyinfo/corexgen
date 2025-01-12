@@ -57,6 +57,10 @@ class SettingsController extends Controller
     {
         return $this->viewDir . $filename;
     }
+
+    /**
+     * get general settings
+     */
     public function general()
     {
         $this->tenantRoute = $this->getTenantRoute();
@@ -88,6 +92,9 @@ class SettingsController extends Controller
         ]);
     }
 
+    /**
+     * get default timezone format
+     */
     public function defaultDateTimeFormats(): array
     {
         return [
@@ -106,6 +113,9 @@ class SettingsController extends Controller
 
     }
 
+    /**
+     * update general settings
+     */
     public function generalUpdate(Request $request)
     {
         if ($request->is_tenant) {
@@ -192,6 +202,9 @@ class SettingsController extends Controller
         return redirect()->back()->with('success', 'Settings updated successfully');
     }
 
+    /**
+     * update company logo file path
+     */
     public function updateCompanyLogo(Request $request, $is_tenant)
     {
         // Determine the logo setting name based on tenant status
@@ -251,7 +264,9 @@ class SettingsController extends Controller
         }
     }
 
-
+    /**
+     * get mail settings
+     */
     public function mail()
     {
         $this->tenantRoute = $this->getTenantRoute();
@@ -351,7 +366,9 @@ class SettingsController extends Controller
 
 
 
-
+    /**
+     * test mail connections if valid
+     */
     public function testMailConnection(Request $request)
     {
         try {
@@ -465,7 +482,9 @@ class SettingsController extends Controller
     }
 
 
-
+    /**
+     * get cronjob settings
+     */
     public function cron()
     {
         $this->tenantRoute = $this->getTenantRoute();
@@ -476,6 +495,9 @@ class SettingsController extends Controller
         ]);
     }
 
+    /**
+     * get one word settings
+     */
     public function oneWord()
     {
         $this->tenantRoute = $this->getTenantRoute();
@@ -491,6 +513,9 @@ class SettingsController extends Controller
         ]);
     }
 
+    /**
+     * update one word settings
+     */
     public function oneWordUpdate(Request $request)
     {
         $validatedData = $request->validate([
@@ -529,7 +554,9 @@ class SettingsController extends Controller
         }
     }
 
-
+    /**
+     * find or create city
+     */
     private function findOrCreateCity($cityName, $countryId)
     {
         $city = City::firstOrCreate(
@@ -540,6 +567,9 @@ class SettingsController extends Controller
         return $city->id;
     }
 
+    /**
+     * create address if provided
+     */
     private function createAddressIfProvided(array $data)
     {
         // Find or create the city ID

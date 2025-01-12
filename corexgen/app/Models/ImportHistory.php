@@ -5,6 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+
+/**
+ * Import History table model handle all filters, observers, evenets, relatioships
+ */
 class ImportHistory extends Model
 {
     use HasFactory;
@@ -37,11 +41,18 @@ class ImportHistory extends Model
         'completed_at' => 'datetime'
     ];
 
+    /**
+     * company relations with import history table
+     */
     public function company()
     {
         return $this->belongsTo(Company::class);
     }
 
+
+    /**
+     * user relations with import history table
+     */
     public function user()
     {
         return $this->belongsTo(User::class);

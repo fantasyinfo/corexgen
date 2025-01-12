@@ -78,6 +78,10 @@ class DashboardController extends Controller
         $this->clientModelModel = $clientModelModel;
     }
 
+    /**
+     * company home dashboard
+     */
+
     public function companyHome()
     {
         return view($this->getViewFilePath('companyHome'), [
@@ -96,6 +100,9 @@ class DashboardController extends Controller
         ]);
     }
 
+    /**
+     * super admin home dashboard
+     */
     public function superHome()
     {
 
