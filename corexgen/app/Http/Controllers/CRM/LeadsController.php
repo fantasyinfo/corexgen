@@ -93,6 +93,9 @@ class LeadsController extends Controller
     }
 
 
+    /**
+     * view and fetch leads table
+     */
     public function index(Request $request)
     {
         $this->tenantRoute = $this->getTenantRoute();
@@ -128,7 +131,9 @@ class LeadsController extends Controller
         ]);
     }
 
-
+    /**
+     * get header stages of leads
+     */
     private function getHeaderStages($model, $type, $relation, $table, $permission)
     {
         $user = Auth::user();
@@ -154,6 +159,10 @@ class LeadsController extends Controller
             'groupData' => $groupData
         ];
     }
+
+    /**
+     * store new lead
+     */
     public function store(LeadsRequest $request)
     {
 
@@ -195,6 +204,10 @@ class LeadsController extends Controller
                 ->with('error', $e->getMessage());
         }
     }
+
+    /**
+     * create new lead
+     */
     public function create()
     {
         $this->checkCurrentUsage(strtolower(PermissionsHelper::$plansPermissionsKeys['LEADS']));
@@ -219,6 +232,9 @@ class LeadsController extends Controller
         ]);
     }
 
+    /**
+     * update  lead
+     */
     public function update(LeadsEditRequest $request)
     {
         $this->tenantRoute = $this->getTenantRoute();
@@ -268,6 +284,10 @@ class LeadsController extends Controller
                 ->with('error', 'An error occurred while updating the lead. ' . $e->getMessage());
         }
     }
+
+    /**
+     * edit  lead
+     */
     public function edit($id)
     {
         $query = CRMLeads::query()->with([
@@ -322,7 +342,9 @@ class LeadsController extends Controller
 
 
 
-
+    /**
+     * delete the lead
+     */
     public function destroy($id)
     {
         try {
@@ -348,6 +370,10 @@ class LeadsController extends Controller
             return redirect()->back()->with('error', 'Failed to delete the client: ' . $e->getMessage());
         }
     }
+
+    /**
+     * exoort lead
+     */
     public function export(Request $request)
     {
         // Apply filters and fetch leads
@@ -395,6 +421,9 @@ class LeadsController extends Controller
             ->header('Content-Disposition', "attachment; filename={$csvData['file']}");
     }
 
+    /**
+     * generate csv for lead
+     */
     public function generateCSVForClients($leads)
     {
 
@@ -471,6 +500,9 @@ class LeadsController extends Controller
         ];
     }
 
+    /**
+     * import lead
+     */
     public function importView()
     {
 
@@ -581,6 +613,10 @@ class LeadsController extends Controller
             'module' => PANEL_MODULES[$this->getPanelModule()]['leads'],
         ]);
     }
+
+    /**
+     * import leads
+     */
     public function import(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -648,7 +684,9 @@ class LeadsController extends Controller
 
 
 
-
+    /**
+     * bulk delete the leads
+     */
     public function bulkDelete(Request $request)
     {
         $ids = $request->input('ids');
@@ -686,6 +724,10 @@ class LeadsController extends Controller
             );
         }
     }
+
+    /**
+     * view lead
+     */
     public function view($id)
     {
         $query = CRMLeads::query()->with([
@@ -766,6 +808,9 @@ class LeadsController extends Controller
     {
     }
 
+    /**
+     * change status of lead
+     */
     public function changeStatus($id, $status)
     {
         try {
@@ -780,6 +825,9 @@ class LeadsController extends Controller
 
 
     // kanban board stuff
+    /**
+     * lead kanban board change stage
+     */
     public function changeStage($leadid, $stageid)
     {
 
@@ -813,7 +861,9 @@ class LeadsController extends Controller
         }
     }
 
-
+    /**
+     * view leads kanban board
+     */
     public function kanban(Request $request)
     {
         $this->tenantRoute = $this->getTenantRoute();
@@ -840,6 +890,9 @@ class LeadsController extends Controller
         ]);
     }
 
+    /**
+     * load kanban board for leads
+     */
     public function kanbanLoad(Request $request)
     {
         $this->tenantRoute = $this->getTenantRoute();
@@ -849,6 +902,9 @@ class LeadsController extends Controller
         return response()->json($data);
     }
 
+    /**
+     * edit the lead via kanban board
+     */
     public function kanbanEdit($id)
     {
         $query = CRMLeads::query()->with([
@@ -884,6 +940,10 @@ class LeadsController extends Controller
             'cfOldValues' => $cfOldValues->toArray()
         ]);
     }
+
+    /**
+     * view lead via kanban board 
+     */
     public function kanbanView($id)
     {
         $query = CRMLeads::query()->with([

@@ -9,6 +9,9 @@ namespace App\Helpers;
 class PermissionsHelper
 {
 
+    /**
+     * match the plans keys with permissions
+     */
     public static $plansPermissionsKeys = [
         'DASHBOARD' => 'DASHBOARD',
         'ROLE' => 'ROLE',
@@ -153,6 +156,9 @@ class PermissionsHelper
         ];
     }
 
+    /**
+     * default features
+     */
 
     public static function defaultFeatuers()
     {

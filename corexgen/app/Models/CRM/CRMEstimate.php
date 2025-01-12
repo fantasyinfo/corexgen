@@ -10,7 +10,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
 use SebastianBergmann\Template\Template;
 
-class CRMEstimate extends Model  implements Auditable
+/**
+ * Estimate table model handle all filters, observers, evenets, relatioships
+ */
+class CRMEstimate extends Model implements Auditable
 {
     use HasFactory;
     use SoftDeletes;
@@ -46,23 +49,34 @@ class CRMEstimate extends Model  implements Auditable
     ];
 
 
+    /**
+     * typable relations with estimate table
+     */
     public function typable()
     {
         return $this->morphTo();
     }
 
 
+    /**
+     * company relations with estimate table
+     */
     public function company()
     {
         return $this->belongsTo(Company::class);
     }
 
+    /**
+     * user relations with estimate table
+     */
     public function user()
     {
         return $this->belongsTo(User::class, 'assign_to');
     }
 
-
+    /**
+     * template relations with estimate table
+     */
     public function template()
     {
         return $this->belongsTo(CRMTemplates::class, 'template_id');

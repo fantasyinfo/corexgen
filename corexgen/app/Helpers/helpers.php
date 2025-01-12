@@ -60,29 +60,15 @@ function createMedia(UploadedFile $file)
 
 
 
-// function isFeatureEnabled($module)
-// {
-//     if (!Auth::user() || Auth::user()->company_id == null) {
-//         return true;
-//     }
-
-
-//     $planFeatuers = Company::with(['plans.planFeatures' => fn($q) => $q->where('module_name', strtolower($module))])
-//         ->where('id', Auth::user()->company_id)
-//         ->first()->toArray();
-
-//     if (@$planFeatuers['plans']['plan_features'][0]['value'] == 0) {
-//         return false;
-//     }
-
-//     return true;
-// }
 
 
 // Cache storage using static variables
 $GLOBALS['feature_cache'] = null;
 $GLOBALS['default_user_cache'] = null;
 
+/**
+ * is feature enable ck
+ */
 function isFeatureEnabled($module)
 {
     // Check if user is not logged in or has no company_id
@@ -100,6 +86,9 @@ function isFeatureEnabled($module)
     return !isset($features[$moduleName]) || $features[$moduleName] !== 0;
 }
 
+/**
+ * check if is default user
+ */
 function isDefaultUser()
 {
     if ($GLOBALS['default_user_cache'] === null) {
@@ -107,7 +96,9 @@ function isDefaultUser()
     }
     return $GLOBALS['default_user_cache'];
 }
-
+/**
+ * get all features
+ */
 function getAllFeatures()
 {
     if ($GLOBALS['feature_cache'] === null) {
@@ -134,6 +125,9 @@ function clearFeatureCache()
     $GLOBALS['default_user_cache'] = null;
 }
 
+/**
+ * replace underscore with spaces
+ */
 
 function replaceUnderscoreWithSpace(string $str): string
 {
@@ -146,7 +140,9 @@ function replaceUnderscoreWithSpace(string $str): string
 
 
 
-
+/**
+ * get user name
+ */
 function getUserName($id = null)
 {
     if ($id == null) {
@@ -158,7 +154,9 @@ function getUserName($id = null)
 
 
 
-// crm/roles
+/**
+ * filter roles details
+ */
 function filterRolesDetails($roles)
 {
     $roleData = [];
@@ -178,6 +176,9 @@ function filterRolesDetails($roles)
     return $roleData;
 }
 
+/**
+ * filter role details
+ */
 function filterRoleDetails($role)
 {
 
@@ -193,7 +194,9 @@ function filterRoleDetails($role)
     ];
 }
 
-// users
+/**
+ * filter users details
+ */
 function filterUsersDetails($users)
 {
     $userData = [];
@@ -212,6 +215,9 @@ function filterUsersDetails($users)
     return $userData;
 }
 
+/**
+ * get user role name
+ */
 function getRoleName($role_id = null)
 {
 
@@ -221,7 +227,9 @@ function getRoleName($role_id = null)
         return CRMRole::findOrFail($role_id)->role_name;
     }
 }
-
+/**
+ * filter user details
+ */
 function filerUserDetails($user)
 {
 
@@ -235,7 +243,9 @@ function filerUserDetails($user)
         'status' => $user->status,
     ];
 }
-
+/**
+ * debugging pre print r
+ */
 
 function prePrintR($arr)
 {
@@ -244,7 +254,9 @@ function prePrintR($arr)
     echo '</pre>';
 }
 
-
+/**
+ * get menu items in cache
+ */
 
 function getCRMMenus()
 {
@@ -263,7 +275,9 @@ function getCRMMenus()
     });
 }
 
-
+/**
+ * check if user has valid permission
+ */
 function hasPermission($permissionKey)
 {
     $user = Auth::user();
@@ -371,7 +385,9 @@ function hasMenuPermission($permissionId = null)
 
 
 
-
+/**
+ * get panel access
+ */
 function panelAccess()
 {
     $user = Auth::user();
@@ -382,17 +398,25 @@ function panelAccess()
     return PANEL_TYPES['COMPANY_PANEL'];
 }
 
+/**
+ * get panel url
+ */
 function getPanelUrl($string)
 {
     return strtolower(str_replace('_', '-', $string));
 }
 
+/**
+ * get panel routes with panel access
+ */
 function getPanelRoutes($route)
 {
     return getPanelUrl(panelAccess()) . '.' . $route;
 }
 
-
+/**
+ * get component dir path dynamicaly
+ */
 function getComponentsDirFilePath($filename)
 {
     return 'layout.components.' . $filename;
@@ -472,7 +496,9 @@ function clearSettingsCache(): void
     Cache::forget(SETTINGS_CACHE_KEY . '_' . ($user->company_id ?? 'tenant'));
 }
 
-
+/**
+ * get logo path
+ */
 function getLogoPath()
 {
     return Cache::remember('tenant_company_logo', now()->addHours(CACHE_DEFAULT_HOURS), function () {
@@ -496,6 +522,9 @@ function getLogoPath()
     });
 }
 
+/**
+ * countries lists
+ */
 function countriesList()
 {
     return [
@@ -766,6 +795,9 @@ function countriesList()
     ];
 }
 
+/**
+ * find php path for cron job
+ */
 function find_php_paths()
 {
     $paths = [];
@@ -999,7 +1031,9 @@ function format_php_paths_for_display($paths)
 }
 
 
-
+/**
+ * get active plan with features
+ */
 function getActivePlanWithFeatuers($companyId)
 {
     if ($companyId == null)
@@ -1011,7 +1045,9 @@ function getActivePlanWithFeatuers($companyId)
         ->first();
 }
 
-
+/**
+ * get company name
+ */
 function getCompanyName($companyid = null)
 {
     if (Auth::user()->is_tenant) {
@@ -1025,7 +1061,9 @@ function getCompanyName($companyid = null)
     return Company::where('id', $companyid)->value('name');
 }
 
-
+/**
+ * get team mates users lists
+ */
 function getTeamMates()
 {
     if (Auth::user()->is_tenant) {
@@ -1037,7 +1075,9 @@ function getTeamMates()
 
 }
 
-
+/**
+ * formate date time as per user selected timezone
+ */
 if (!function_exists('formatDateTime')) {
     function formatDateTime($date, $timezone = null, $format = null)
     {
@@ -1054,7 +1094,9 @@ if (!function_exists('formatDateTime')) {
     }
 }
 
-
+/**
+ * truncate the file name with ...
+ */
 function truncateFileName($filename)
 {
     // Get file extension
@@ -1073,7 +1115,9 @@ function truncateFileName($filename)
     return $first . '...' . $last . '.' . $extension;
 }
 
-
+/**
+ * calculate the time diffrence
+ */
 function calculateTimeDifference($start_date, $end_date)
 {
     // Convert the dates to Carbon instances
@@ -1093,7 +1137,9 @@ function calculateTimeDifference($start_date, $end_date)
         'duration' => $totalMinutes
     ];
 }
-
+/**
+ * convert minutes to hours and min
+ */
 function convertMinutesToHoursAndMinutes($totalMinutes)
 {
     // Convert minutes to hours and remaining minutes
@@ -1104,6 +1150,9 @@ function convertMinutesToHoursAndMinutes($totalMinutes)
     return sprintf("%d hours and %d minutes", $hours, $minutes);
 }
 
+/**
+ * calculate cost per minute per hour rate basic
+ */
 function calculateCostFromMinutes($totalMinutes, $ratePerHour)
 {
     // Convert minutes to hours and remaining minutes

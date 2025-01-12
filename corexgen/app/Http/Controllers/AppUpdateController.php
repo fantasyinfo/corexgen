@@ -49,7 +49,7 @@ class AppUpdateController extends Controller
     /**
      * Method index returning exiting modules
      *
-     * @return void
+
      */
     public function index()
     {
@@ -62,7 +62,7 @@ class AppUpdateController extends Controller
      *
      * @param Request $request uploding the module
      *
-     * @return void
+
      */
     public function create(Request $request)
     {

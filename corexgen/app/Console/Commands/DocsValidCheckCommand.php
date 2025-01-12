@@ -8,11 +8,18 @@ use App\Models\Invoice;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Expire all the docs if valid / due date is passed DocsValidCheckCommand
+ */
 class DocsValidCheckCommand extends Command
 {
     protected $signature = 'app:docs-check';
     protected $description = 'Checking Company Proposals, Contracts, Estimates Expiry Dates & Update Status.';
 
+    /**
+     * expire proposals, estimates, contracts, invoice of handle
+     * @return void
+     */
     public function handle()
     {
         //Log::info('DocsValidCheckCommand started.');
@@ -25,6 +32,9 @@ class DocsValidCheckCommand extends Command
         //Log::info('DocsValidCheckCommand completed.');
     }
 
+    /**
+     * expire proposals,
+     */
     private function expireProposals()
     {
         $today = now();
@@ -39,11 +49,14 @@ class DocsValidCheckCommand extends Command
 
         foreach ($expiredProposals as $proposal) {
             $companyId = $proposal->company->id ?? 'Unknown';
-           // Log::info("Expiring proposal ID {$proposal->id} for company ID {$companyId}");
+            // Log::info("Expiring proposal ID {$proposal->id} for company ID {$companyId}");
             $proposal->update(['status' => 'EXPIRED']);
         }
     }
 
+    /**
+     * expire estimates,
+     */
     private function expireEstimates()
     {
         $today = now();
@@ -58,11 +71,14 @@ class DocsValidCheckCommand extends Command
 
         foreach ($expiredEstimates as $estimate) {
             $companyId = $estimate->company->id ?? 'Unknown';
-           // Log::info("Expiring estimate ID {$estimate->id} for company ID {$companyId}");
+            // Log::info("Expiring estimate ID {$estimate->id} for company ID {$companyId}");
             $estimate->update(['status' => 'EXPIRED']);
         }
     }
 
+    /**
+     * expire contracts,
+     */
     private function expireContracts()
     {
         $today = now();
@@ -77,10 +93,13 @@ class DocsValidCheckCommand extends Command
 
         foreach ($expiredContracts as $contract) {
             $companyId = $contract->company->id ?? 'Unknown';
-           // Log::info("Expiring contract ID {$contract->id} for company ID {$companyId}");
+            // Log::info("Expiring contract ID {$contract->id} for company ID {$companyId}");
             $contract->update(['status' => 'EXPIRED']);
         }
     }
+    /**
+     * expire dueinvoice,
+     */
     private function overDueInvoice()
     {
         $today = now();
@@ -95,7 +114,7 @@ class DocsValidCheckCommand extends Command
 
         foreach ($dueDatesOfInvoices as $invoice) {
             $companyId = $invoice->company->id ?? 'Unknown';
-           // Log::info("Expiring invoice ID {$invoice->id} for company ID {$companyId}");
+            // Log::info("Expiring invoice ID {$invoice->id} for company ID {$companyId}");
             $invoice->update(['status' => 'OVERDUE']);
         }
     }

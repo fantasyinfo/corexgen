@@ -24,7 +24,7 @@ class CRMMenuSeeder extends Seeder
             // Insert parent menu
             $parentMenuId = DB::table('crm_menu')->insertGetId([
                 'menu_name' => $category,
-                'menu_url' => '',
+                'menu_url' => $menuData['menu_url'],
                 'parent_menu' => '1',
                 'parent_menu_id' => null,
                 'menu_icon' => $menuData['menu_icon'],
@@ -56,7 +56,7 @@ class CRMMenuSeeder extends Seeder
             // Insert parent menu
             $parentMenuId = DB::table('crm_menu')->insertGetId([
                 'menu_name' => $category,
-                'menu_url' => '',
+                'menu_url' => $menuData['menu_url'],
                 'parent_menu' => '1',
                 'is_default' => $menuData['is_default'] ?? false,
                 'parent_menu_id' => null,

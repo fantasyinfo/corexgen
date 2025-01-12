@@ -33,6 +33,9 @@ class AuditController extends Controller
         return $this->viewDir . $filename;
     }
 
+    /**
+     * view and fetch the latest audit for activities
+     */
     public function index()
     {
         $audits = Audit::with('user')->latest()->limit(50)->get();
@@ -44,9 +47,13 @@ class AuditController extends Controller
             ]
         );
     }
-    
 
-    public function bulkimport(Request $request){
+
+    /**
+     * bulk import fetch status
+     */
+    public function bulkimport(Request $request)
+    {
         //
 
         $this->tenantRoute = $this->getTenantRoute();

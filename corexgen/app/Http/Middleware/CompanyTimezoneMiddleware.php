@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\Session;
 
 class CompanyTimezoneMiddleware
 {
+
+    /**
+     * company timezone middleware
+     */
     public function handle($request, Closure $next)
     {
 

@@ -30,6 +30,10 @@ class CsvImportJob implements ShouldQueue
         $this->userContext = $userContext;
     }
 
+
+    /**
+     * csv file import handle job
+     */
     public function handle()
     {
         if (ImportHistory::where('file_name', basename($this->filePath))->exists()) {

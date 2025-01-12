@@ -9,11 +9,17 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * check the company subscription and expire if subscription ends SubscriptionCheckCommand
+ */
 class SubscriptionCheckCommand extends Command
 {
     protected $signature = 'app:subscription-check';
     protected $description = 'Checking Company Subscription and alerting the notifications';
 
+    /**
+     * handle the cmd run
+     */
     public function handle()
     {
         //// Log::info('SubscriptionCheckCommand started.');
@@ -65,6 +71,9 @@ class SubscriptionCheckCommand extends Command
         $this->info("Subscription alerts processed successfully.");
     }
 
+    /**
+     * alert company
+     */
     private function alertCompany($subscription, $daysLeft)
     {
         $companyEmail = $subscription->company->email;
@@ -96,6 +105,9 @@ class SubscriptionCheckCommand extends Command
         }
     }
 
+    /**
+     * fetch saas owner smtp details for sending email to company
+     */
     public function fetchSmtpDetails()
     {
         // Log::info('Fetching SMTP details from CRMSettings.');
@@ -147,6 +159,9 @@ class SubscriptionCheckCommand extends Command
         return true;
     }
 
+    /**
+     * deactive the company if plans expires
+     */
     private function deactivateCompany($subscription)
     {
         $company = $subscription->company;

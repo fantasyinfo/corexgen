@@ -5,6 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+
+/**
+ * Plans Featuers table model handle all filters, observers, evenets, relatioships
+ */
 class PlansFeatures extends Model
 {
     use HasFactory;
@@ -13,9 +17,14 @@ class PlansFeatures extends Model
 
     protected $table = self::table;
 
-    protected $fillable = ['plan_id', 'module_name','value'];
+    protected $fillable = ['plan_id', 'module_name', 'value'];
 
-    public function plan(){
-       return $this->belongsTo(Plans::class,'plan_id');
+
+    /**
+     * plan  relations with plans features table
+     */
+    public function plan()
+    {
+        return $this->belongsTo(Plans::class, 'plan_id');
     }
 }

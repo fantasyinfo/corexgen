@@ -10,7 +10,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
 use SebastianBergmann\Template\Template;
 
-class CRMProposals extends Model  implements Auditable
+
+/**
+ * Proposal table model handle all filters, observers, evenets, relatioships 
+ */
+class CRMProposals extends Model implements Auditable
 {
     use HasFactory;
     use SoftDeletes;
@@ -46,22 +50,38 @@ class CRMProposals extends Model  implements Auditable
     ];
 
 
+    /**
+     * typable relations with proposal table
+     */
+
     public function typable()
     {
         return $this->morphTo();
     }
 
 
+
+    /**
+     * company relations with proposal table
+     */
+
     public function company()
     {
         return $this->belongsTo(Company::class);
     }
+
+    /**
+     * user relations with proposal table
+     */
 
     public function user()
     {
         return $this->belongsTo(User::class, 'assign_to');
     }
 
+    /**
+     * template relations with proposal table
+     */
 
     public function template()
     {

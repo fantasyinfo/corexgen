@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\Auth;
 use OwenIt\Auditing\Contracts\Auditable;
 use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * Leads table model handle all filters, observers, evenets, relatioships
+ */
 class CRMLeads extends Model implements Auditable
 {
     use HasFactory;
@@ -110,6 +113,9 @@ class CRMLeads extends Model implements Auditable
             ->withPivot('company_id');
     }
 
+    /**
+     * coments relations with leads table
+     */
 
     public function comments()
     {
@@ -117,6 +123,11 @@ class CRMLeads extends Model implements Auditable
             ->with('user:id,name,profile_photo_path') // Eager load only needed user fields
             ->latest('created_at');
     }
+
+
+    /**
+     * attachments relations with leads table
+     */
 
     public function attachments()
     {

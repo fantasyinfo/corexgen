@@ -133,6 +133,10 @@ class ProposalController extends Controller
     }
 
 
+
+  /**
+     * get header status
+     */
     private function getHeaderStatus($model, $permission)
     {
         $user = Auth::user();

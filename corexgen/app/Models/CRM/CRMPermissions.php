@@ -5,6 +5,9 @@ namespace App\Models\CRM;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Permissions table model handle all filters, observers, evenets, relatioships
+ */
 class CRMPermissions extends Model
 {
     use HasFactory;
@@ -12,7 +15,7 @@ class CRMPermissions extends Model
     const table = 'crm_permissions';
 
     protected $fillable = [
-        'name', 
+        'name',
         'parent_menu',
         'parent_menu_id',
         'permission_id',
@@ -22,7 +25,11 @@ class CRMPermissions extends Model
     protected $table = self::table;
 
 
-    protected static function boot(){
+    /**
+     * Model boot method to set default values
+     */
+    protected static function boot()
+    {
         parent::boot();
 
     }

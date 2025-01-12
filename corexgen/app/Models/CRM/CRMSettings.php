@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
 
+/**
+ * Settings table model handle all filters, observers, evenets, relatioships 
+ */
 class CRMSettings extends Model implements Auditable
 {
     use HasFactory;
@@ -33,7 +36,12 @@ class CRMSettings extends Model implements Auditable
     protected $table = self::table;
 
 
-    public function media(){
-        return $this->belongsTo(Media::class,'media_id');
+    /**
+     * media relations with settings table
+     */
+
+    public function media()
+    {
+        return $this->belongsTo(Media::class, 'media_id');
     }
 }

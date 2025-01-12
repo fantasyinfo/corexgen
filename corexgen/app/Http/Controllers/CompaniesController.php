@@ -122,6 +122,9 @@ class CompaniesController extends Controller
     }
 
 
+    /**
+     * get header status
+     */
     private function getHeaderStatus($model, $permission, $isSeftDelete = true)
     {
         $user = Auth::user();
@@ -285,7 +288,7 @@ class CompaniesController extends Controller
      *
      * @param Request $request [exporting the company]
      *
-     * @return void
+
      */
     public function export(Request $request, CompanyRepository $companyRepository)
     {
@@ -374,6 +377,9 @@ class CompaniesController extends Controller
             ->header('Content-Disposition', "attachment; filename={$fileName}");
     }
 
+    /**
+     * import view of company
+     */
     public function importView()
     {
         $expectedHeaders = [
@@ -605,6 +611,9 @@ class CompaniesController extends Controller
     }
 
 
+    /**
+     * login as company
+     */
     public function loginas($companyid)
     {
         \DB::enableQueryLog();
@@ -677,6 +686,9 @@ class CompaniesController extends Controller
         }
     }
 
+    /**
+     * login back to company
+     */
     public function loginback()
     {
         session()->remove('login_as');
@@ -744,6 +756,9 @@ class CompaniesController extends Controller
         }
     }
 
+    /**
+     * change password
+     */
     public function changePassword(Request $request)
     {
         // Validate input
@@ -795,6 +810,9 @@ class CompaniesController extends Controller
         }
     }
 
+    /**
+     * view company
+     */
     public function view($id)
     {
         $query = Company::query()

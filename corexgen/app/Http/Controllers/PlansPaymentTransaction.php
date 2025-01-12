@@ -77,10 +77,14 @@ class PlansPaymentTransaction extends Controller
         ]);
     }
 
+    /**
+     * view subscriptions view and fetch list
+     */
 
-    public function subscriptions(Request $request){
-         // Ajax DataTables request
-         if ($request->ajax()) {
+    public function subscriptions(Request $request)
+    {
+        // Ajax DataTables request
+        if ($request->ajax()) {
             return $this->ppTService->getDatatablesResponseForSub($request);
         }
 

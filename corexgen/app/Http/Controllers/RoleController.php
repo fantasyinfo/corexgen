@@ -124,7 +124,7 @@ class RoleController extends Controller
         }
 
 
-        $headerStatus = $this->getHeaderStatus(\App\Models\CRM\CRMRole::class, PermissionsHelper::$plansPermissionsKeys['ROLE'],false);
+        $headerStatus = $this->getHeaderStatus(\App\Models\CRM\CRMRole::class, PermissionsHelper::$plansPermissionsKeys['ROLE'], false);
 
 
 
@@ -140,12 +140,16 @@ class RoleController extends Controller
         ]);
     }
 
-    private function getHeaderStatus($model, $permission,$isSeftDelete = true)
+    /**
+     * get header status
+     */
+
+    private function getHeaderStatus($model, $permission, $isSeftDelete = true)
     {
         $user = Auth::user();
 
         // fetch totals status by clause
-        $statusQuery = $this->getGroupByStatusQuery($model,$isSeftDelete);
+        $statusQuery = $this->getGroupByStatusQuery($model, $isSeftDelete);
         $groupData = $this->applyTenantFilter($statusQuery['groupQuery'])->get()->toArray();
         $totalData = $this->applyTenantFilter($statusQuery['totalQuery'])->count();
         // fetch usage

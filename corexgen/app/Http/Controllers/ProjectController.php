@@ -102,6 +102,10 @@ class ProjectController extends Controller
     }
 
 
+    /**
+     * view and fetch the projects
+     */
+
     public function index(Request $request)
     {
         $this->tenantRoute = $this->getTenantRoute();
@@ -128,7 +132,9 @@ class ProjectController extends Controller
     }
 
 
-
+    /**
+     * get header status
+     */
     private function getHeaderStatus($model, $permission)
     {
         $user = Auth::user();
@@ -155,6 +161,9 @@ class ProjectController extends Controller
         ];
     }
 
+    /**
+     * store the project details
+     */
     public function store(ProjectRequest $request)
     {
 
@@ -194,6 +203,10 @@ class ProjectController extends Controller
                 ->with('error', $e->getMessage());
         }
     }
+
+    /**
+     * create project
+     */
     public function create()
     {
         $this->checkCurrentUsage(strtolower(PermissionsHelper::$plansPermissionsKeys['PROJECTS']));
@@ -214,6 +227,9 @@ class ProjectController extends Controller
         ]);
     }
 
+    /**
+     * update project
+     */
     public function update(ProjectEditRequest $request)
     {
         $this->tenantRoute = $this->getTenantRoute();
@@ -263,6 +279,10 @@ class ProjectController extends Controller
                 ->with('error', 'An error occurred while updating the project. ' . $e->getMessage());
         }
     }
+
+    /**
+     * edit project
+     */
     public function edit($id)
     {
         $query = Project::query()->with([
@@ -299,6 +319,9 @@ class ProjectController extends Controller
         ]);
     }
 
+    /**
+     * destory project
+     */
     public function destroy($id)
     {
         try {
@@ -325,6 +348,9 @@ class ProjectController extends Controller
         }
     }
 
+    /**
+     * bulk delete project
+     */
     public function bulkDelete(Request $request)
     {
         $ids = $request->input('ids');
@@ -362,6 +388,10 @@ class ProjectController extends Controller
             );
         }
     }
+
+    /**
+     * view project
+     */
     public function view($id)
     {
         $query = Project::query()->with([
@@ -423,7 +453,7 @@ class ProjectController extends Controller
         // timesheets
         $timesheets = collect();
         $taskIds = $tasks->pluck('id');
-        $timesheets = $this->applyTenantFilter(Timesheet::whereIn('task_id', $taskIds)->with('task', 'user','invoice'))->get();
+        $timesheets = $this->applyTenantFilter(Timesheet::whereIn('task_id', $taskIds)->with('task', 'user', 'invoice'))->get();
 
 
         // invoices
@@ -453,7 +483,9 @@ class ProjectController extends Controller
         ]);
     }
 
-
+    /**
+     * change status of project
+     */
     public function changeStatus($id, $status)
     {
         try {
@@ -466,6 +498,9 @@ class ProjectController extends Controller
         }
     }
 
+    /**
+     * add assignee to project
+     */
     public function addAssignee(Request $request)
     {
         $request->validate([
@@ -487,7 +522,9 @@ class ProjectController extends Controller
 
 
     // milestones
-
+    /**
+     * store milestone of a project
+     */
     public function storeMilestones(Request $request)
     {
         $validated = $request->validate([
@@ -500,12 +537,19 @@ class ProjectController extends Controller
         return response()->json($milestone);
     }
 
+    /**
+     * edit milestones of a  project
+     */
     public function editMilestones($id)
     {
         $milestone = $this->applyTenantFilter(Milestone::find($id));
         return response()->json($milestone);
     }
 
+
+    /**
+     * update milestones of a  project
+     */
     public function updateMilestones(Request $request)
     {
         $validated = $request->validate([
@@ -519,6 +563,9 @@ class ProjectController extends Controller
         return response()->json($milestone);
     }
 
+    /**
+     * destory milestones of a  project
+     */
     public function destroyMilestones($id)
     {
         $milestone = $this->applyTenantFilter(Milestone::find($id))->delete();
@@ -528,7 +575,9 @@ class ProjectController extends Controller
 
     // timesheets
 
-
+    /**
+     * store timesheets of a  project
+     */
     public function storeTimesheets(Request $request)
     {
         $validated = $request->validate([
@@ -547,11 +596,20 @@ class ProjectController extends Controller
         return response()->json($timesheet);
     }
 
+
+    /**
+     * edit timesheets of a  project
+     */
     public function editTimesheets($id)
     {
         $timesheet = $this->applyTenantFilter(Timesheet::find($id));
         return response()->json($timesheet);
     }
+
+
+    /**
+     * update timesheets of a  project
+     */
 
     public function updateTimesheets(Request $request)
     {
@@ -572,6 +630,10 @@ class ProjectController extends Controller
         return response()->json($timeSheet);
     }
 
+
+    /**
+     * destory timesheets of a  project
+     */
     public function destroyTimesheets($id)
     {
         $timeSheet = $this->applyTenantFilter(Timesheet::find($id))->delete();

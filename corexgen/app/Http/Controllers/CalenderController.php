@@ -42,20 +42,29 @@ class CalenderController extends Controller
         ]);
     }
 
+    /**
+     * fetch calnder details
+     */
     public function fetch(Request $request)
     {
         $start = $request->input('start');
         $end = $request->input('end');
 
-        $query = Calender::query()
-            ->whereBetween('start_date', [$start, $end])
-            ->orWhereBetween('end_date', [$start, $end])
-            ->orWhere(function ($query) use ($start, $end) {
-                $query->where('start_date', '<=', $start)
-                    ->where('end_date', '>=', $end);
-            });
-
+        $query = Calender::query();
         $query = $this->applyTenantFilter($query);
+
+        $query->where(function ($query) use ($start, $end) {
+            $query->whereBetween('start_date', [$start, $end])
+                ->orWhereBetween('end_date', [$start, $end])
+                ->orWhere(function ($query) use ($start, $end) {
+                    $query->where('start_date', '<=', $start)
+                        ->where('end_date', '>=', $end);
+                });
+        });
+
+
+
+        // dd($query->get());
 
         $events = $query->get()->map(function ($event) {
             return [
@@ -212,6 +221,9 @@ class CalenderController extends Controller
         ]);
     }
 
+    /**
+     * edit calender
+     */
     public function edit($id)
     {
         $query = Calender::query()->where('id', $id);

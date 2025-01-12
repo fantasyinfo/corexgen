@@ -5,6 +5,9 @@ namespace App\Core;
 use Illuminate\Support\Facades\Artisan;
 use ZipArchive;
 
+/**
+ * Update Manager (Update App to new version) AppUpdateManager
+ */
 class AppUpdateManager
 {
 
@@ -189,6 +192,9 @@ class AppUpdateManager
     }
 
 
+    /**
+     * delete directory
+     */
     protected function deleteDirectory(string $dir)
     {
         if (!is_dir($dir)) {

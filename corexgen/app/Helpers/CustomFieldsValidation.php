@@ -5,8 +5,14 @@ use App\Models\CustomFieldDefinition;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * Dynamically valid the custom fields CustomFieldsValidation
+ */
 class CustomFieldsValidation
 {
+    /**
+     * validate all fields types on custom fields
+     */
     public function validate(array $customFields, string $entityType, int $companyId)
     {
         // Fetch all active custom field definitions for this entity type

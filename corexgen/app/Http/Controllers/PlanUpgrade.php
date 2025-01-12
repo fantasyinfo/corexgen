@@ -80,6 +80,10 @@ class PlanUpgrade extends Controller
         ]);
     }
 
+
+    /**
+     * upgrade the company plans
+     */
     public function upgrade(Request $request, CompanyService $companyService, PaymentGatewayFactory $paymentGatewayFactory)
     {
 
@@ -162,6 +166,9 @@ class PlanUpgrade extends Controller
 
     }
 
+    /**
+     * find the company owner details
+     */
     private function findCompanyOwner($company)
     {
         $user = User::where('company_id', $company->id)

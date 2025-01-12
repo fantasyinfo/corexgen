@@ -5,6 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+
+/**
+ * Client Address table model handle all filters, observers, evenets, relatioships
+ */
 class ClientAddress extends Model
 {
     use HasFactory;

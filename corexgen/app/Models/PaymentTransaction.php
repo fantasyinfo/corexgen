@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+
+/**
+ * Payment Transation table model handle all filters, observers, evenets, relatioships
+ */
 class PaymentTransaction extends Model
 {
     use HasFactory;
@@ -30,21 +34,33 @@ class PaymentTransaction extends Model
 
     ];
 
+    /**
+     * company relations with payment transation table
+     */
     public function company()
     {
         return $this->belongsTo(Company::class, 'company_id');
     }
 
+    /**
+     * plans relations with payment transation table
+     */
     public function plans()
     {
         return $this->belongsTo(Plans::class, 'plan_id');
     }
 
+    /**
+     * subscription relations with payment transation table
+     */
     public function subscription()
     {
         return $this->hasOne(Subscription::class, 'payment_id');
     }
 
+    /**
+     * get monthly revenue
+     */
     public function getMonthlyRevenue()
     {
         return self::where('status', CRM_STATUS_TYPES['PAYMENTSTRANSACTIONS']['STATUS']['SUCCESS']) // Ensure only successful transactions are counted
@@ -54,7 +70,9 @@ class PaymentTransaction extends Model
     }
 
 
-
+    /**
+     * get last six month revenue
+     */
     public function getLastSixMonthsRevenue()
     {
         // Get the current date

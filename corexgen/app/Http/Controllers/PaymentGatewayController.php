@@ -130,7 +130,9 @@ class PaymentGatewayController extends Controller
     }
 
 
-
+    /**
+     * view payment gateway and fetch
+     */
 
     public function index(Request $request)
     {
@@ -183,6 +185,9 @@ class PaymentGatewayController extends Controller
         ]);
     }
 
+    /**
+     * edit payment gateway
+     */
     public function edit($id)
     {
         // Apply tenant filtering to gateway query
@@ -195,6 +200,10 @@ class PaymentGatewayController extends Controller
         ]);
     }
 
+    /**
+     * update payment gateway
+     */
+
     public function update(Request $request)
     {
 
@@ -205,7 +214,7 @@ class PaymentGatewayController extends Controller
         ]);
 
         $this->tenantRoute = $this->getTenantRoute();
-        
+
         try {
             // Validate and update role
             $query = PaymentGateway::query()->where('id', $request->id);
@@ -221,7 +230,7 @@ class PaymentGatewayController extends Controller
         }
     }
 
-       /**
+    /**
      * Chaning the status 
      * 
      * @param int $id

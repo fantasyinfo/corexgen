@@ -34,6 +34,9 @@ class CompanyRegisterController extends Controller
 
 
 
+    /**
+     * register the company view
+     */
     public function register()
     {
         $plans = Plans::where('status', CRM_STATUS_TYPES['PLANS']['STATUS']['ACTIVE'])->get();
@@ -41,6 +44,9 @@ class CompanyRegisterController extends Controller
     }
 
 
+    /**
+     * init the payment gateway for company registraiton
+     */
     public function initPaymentForCompnayRegistration(
         CompaniesRequest $request,
         PaymentGatewayFactory $paymentGatewayFactory
@@ -72,7 +78,9 @@ class CompanyRegisterController extends Controller
         }
     }
 
-
+    /**
+     * store new company via frontend
+     */
     public function store(CompaniesRequest $request, CompanyService $companyService)
     {
         try {
@@ -105,7 +113,9 @@ class CompanyRegisterController extends Controller
         }
     }
 
-
+    /**
+     * store the company after payment to db
+     */
     public function storeCompanyAfterPayment(array $paymentData)
     {
         $validatedData = session('pending_company_registration');
@@ -154,6 +164,9 @@ class CompanyRegisterController extends Controller
         }
     }
 
+    /**
+     * save onboarding details after payment into db
+     */
     public function storeCompnayAfterPaymentOnboading(array $paymentData)
     {
         $companyService = $this->companyService;
@@ -222,41 +235,44 @@ class CompanyRegisterController extends Controller
     }
 
 
+    /**
+     * upgrade the plans 0f a company
+     */
     public function upgradePlanForCompany(array $paymentData)
     {
         $companyService = $this->companyService;
         $validatedData = [];
         $validatedData['payment_details'] = $paymentData;
-        
+
         try {
             return DB::transaction(function () use ($companyService, $validatedData) {
                 $company = Company::find($validatedData['payment_details']['company_id']);
-                
+
                 // Find and login company owner
                 $user = $this->findCompanyOwner($company);
-    
+
                 // create transaction 
                 $paymentTransaction = $companyService->createPaymentTransaction(
                     $validatedData['payment_details']['plan_id'],
-                    $company->id, 
+                    $company->id,
                     $validatedData['payment_details']
                 );
-    
+
                 // create permission to company
                 $companyService->givePermissionsToCompany($company, $user);
-    
+
                 // create menu items for company
                 $companyService->createMenuItemsForCompanyPanel($validatedData['payment_details']['plan_id']);
-    
+
                 $company->plan_id = $validatedData['payment_details']['plan_id'];
                 $company->save();
-    
+
                 // Log successful registration
                 Log::info('Company Plan Upgraded Successfully', [
                     'company_id' => $company->id,
                     'new_plan_id' => $validatedData['payment_details']['plan_id']
                 ]);
-    
+
                 // Directly return the redirect to plan upgrade index
                 return redirect()->route(
                     getPanelUrl(PANEL_TYPES['COMPANY_PANEL']) . '.planupgrade.index'
@@ -268,7 +284,7 @@ class CompanyRegisterController extends Controller
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-    
+
             // Redirect back with error
             return redirect()->back()->with('error', 'Plan upgrade failed: ' . $e->getMessage());
         }

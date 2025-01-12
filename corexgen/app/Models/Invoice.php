@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Auth;
 use OwenIt\Auditing\Contracts\Auditable;
 
 
+/**
+ * Invoice table model handle all filters, observers, evenets, relatioships
+ */
 class Invoice extends Model implements Auditable
 {
     use HasFactory;
@@ -47,24 +50,41 @@ class Invoice extends Model implements Auditable
 
 
 
+    /**
+     * company relations with invoice table
+     */
     public function company()
     {
         return $this->belongsTo(Company::class, 'company_id');
     }
+
+    /**
+     * task relations with invoice table
+     */
     public function task()
     {
         return $this->belongsTo(Tasks::class, 'task_id');
     }
 
+    /**
+     * project relations with invoice table
+     */
     public function project()
     {
         return $this->belongsTo(Project::class, 'project_id');
     }
 
+    /**
+     * client relations with invoice table
+     */
     public function client()
     {
         return $this->belongsTo(CRMClients::class, 'client_id');
     }
+
+    /**
+     * timesheet relations with invoice table
+     */
     public function timesheet()
     {
         return $this->belongsTo(Timesheet::class, 'timesheet_id');
@@ -107,11 +127,18 @@ class Invoice extends Model implements Auditable
     }
 
 
+    /**
+     *get recent invoices
+     */
     public function getRecentInvoices($limit = 10)
     {
         return self::with(['client', 'task', 'timesheet', 'project'])->where('company_id', Auth::user()->company_id)->latest()->limit($limit)->get();
     }
 
+
+    /**
+     * boot method of invoice
+     */
     protected static function boot()
     {
         parent::boot();
@@ -121,12 +148,9 @@ class Invoice extends Model implements Auditable
 
             if (Auth::check()) {
                 $invoice->company_id = $invoice->company_id ?? Auth::user()->company_id;
-
             } else {
                 $invoice->company_id = $invoice->company_id ?? null;
-
             }
         });
     }
-
 }

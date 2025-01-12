@@ -4,6 +4,9 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 
+/**
+ * make a service class via this cmd MakeServiceCommand
+ */
 class MakeServiceCommand extends Command
 {
     /**

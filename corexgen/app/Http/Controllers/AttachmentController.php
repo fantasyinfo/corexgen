@@ -22,6 +22,10 @@ class AttachmentController extends Controller
     {
         $this->attachmentService = $attachmentService;
     }
+
+    /**
+     * add leads attachments
+     */
     public function addLeadsAttachment(AttachmentRequest $request)
     {
 
@@ -57,6 +61,9 @@ class AttachmentController extends Controller
         }
     }
 
+    /**
+     * remove leads attachments
+     */
     public function destroyLeadsAttachment($id, AttachmentService $attachmentService)
     {
         try {
@@ -86,6 +93,9 @@ class AttachmentController extends Controller
         }
     }
 
+    /**
+     * add clients attachments
+     */
     public function addClientsAttachment(AttachmentRequest $request)
     {
 
@@ -121,6 +131,9 @@ class AttachmentController extends Controller
         }
     }
 
+    /**
+     * remove clients attachments
+     */
     public function destroyClientsAttachment($id, AttachmentService $attachmentService)
     {
         try {
@@ -152,7 +165,9 @@ class AttachmentController extends Controller
 
 
     // projects
-
+    /**
+     * add projects attachments
+     */
     public function addProjectsAttachment(AttachmentRequest $request)
     {
 
@@ -188,6 +203,9 @@ class AttachmentController extends Controller
         }
     }
 
+    /**
+     * remove projects attachments
+     */
     public function destroyProjectsAttachment($id, AttachmentService $attachmentService)
     {
         try {
@@ -219,6 +237,9 @@ class AttachmentController extends Controller
 
     // tasks
 
+    /**
+     * add tasks attachments
+     */
     public function addTasksAttachment(AttachmentRequest $request)
     {
 
@@ -254,6 +275,9 @@ class AttachmentController extends Controller
         }
     }
 
+    /**
+     * remove tasks atachments
+     */
     public function destroyTasksAttachment($id, AttachmentService $attachmentService)
     {
         try {
