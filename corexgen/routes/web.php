@@ -5,6 +5,7 @@ use App\Http\Controllers\AppUpdateController;
 use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\AuditController;
 use App\Http\Controllers\BackupController;
+use App\Http\Controllers\CalenderController;
 use App\Http\Controllers\CategoryGroupTagControllerSettings;
 use App\Http\Controllers\CommentsController;
 use App\Http\Controllers\CompanyOnboardingController;
@@ -763,14 +764,29 @@ Route::middleware([
 
         Route::get('/tasks-status', [CategoryGroupTagControllerSettings::class, 'indexTasksStatus'])->name('indexTasksStatus')->middleware('check.permission:SETTINGS_CTG.READ_ALL');
 
-
-
-
-
-
-
-
     });
+
+
+    // calender
+
+    Route::prefix(PANEL_MODULES['COMPANY_PANEL']['calender'])->as(PANEL_MODULES['COMPANY_PANEL']['calender'] . '.')->group(function () {
+        // role for fetch, store, update
+        Route::get('/', [CalenderController::class, 'index'])->name('index')->middleware('check.permission:CALENDER.READ_ALL');
+        Route::post('/', [CalenderController::class, 'store'])->name('store')->middleware('check.permission:CALENDER.CREATE');
+        Route::put('/', [CalenderController::class, 'update'])->name('update')->middleware('check.permission:CALENDER.UPDATE');
+
+        // create, edit, change status, delete
+        Route::get('/create', [CalenderController::class, 'create'])->name('create')->middleware('check.permission:CALENDER.CREATE');
+        Route::get('/edit/{id}', [CalenderController::class, 'edit'])->name('edit')->middleware('check.permission:CALENDER.UPDATE');
+
+        Route::delete('/destroy/{id}', [CalenderController::class, 'destroy'])->name('destroy')->middleware('check.permission:CALENDER.DELETE');
+
+        Route::get('/view/{id}', [CalenderController::class, 'view'])->name('view')->middleware('check.permission:CALENDER.VIEW');
+
+        Route::get('/fetch', [CalenderController::class, 'fetch'])->name('fetch')->middleware('check.permission:CALENDER.READ_ALL');
+    });
+
+
 });
 
 
