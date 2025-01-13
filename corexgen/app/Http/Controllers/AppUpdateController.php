@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Artisan;
 
+use Illuminate\Support\Facades\Http;
+
 class AppUpdateController extends Controller
 {
     //
@@ -53,9 +55,39 @@ class AppUpdateController extends Controller
      */
     public function index()
     {
+        $apiUrl = rtrim(env('VERSION_CHECK_API'), '/') . '/version_api.php';
+        $currentVersion = config('app.version');
+        $latestVersion = null;
+        $isUpdateAvailable = false;
 
-        return view($this->getViewFilePath('index'), ['module' => PANEL_MODULES[$this->getPanelModule()]['appupdates'], 'title' => 'App Updates Management']);
+        try {
+            // Fetch the latest version from the API
+            $response = Http::get($apiUrl);
+            if ($response->successful()) {
+                $latestVersion = $response->json('version');
+                // Compare the versions
+                $isUpdateAvailable = version_compare($latestVersion, $currentVersion, '>');
+            }
+        } catch (\Exception $e) {
+            // Log the error and provide a fallback message
+            Log::error('Error fetching the latest version', ['error' => $e->getMessage()]);
+            $latestVersion = 'Unable to fetch version';
+        }
+
+        // Pass the data to the view
+        return view(
+            $this->getViewFilePath('index'),
+            [
+                'module' => PANEL_MODULES[$this->getPanelModule()]['appupdates'],
+                'title' => 'App Updates Management',
+                'latestVersion' => $latestVersion,
+                'currentVersion' => $currentVersion,
+                'isUpdateAvailable' => $isUpdateAvailable,
+            ]
+        );
     }
+
+
 
     /**
      * Method create
