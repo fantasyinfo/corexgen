@@ -64,7 +64,7 @@
 @section('content')
     <div class="container-fluid py-4">
         <div class="row justify-content-center">
-            <div class="col-12 col-md-10 col-lg-8">
+            <div class="col-md-12">
                 <div class="backup-section">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h2 class="mb-0">
@@ -72,7 +72,7 @@
                             Backup Management
                         </h2>
 
-                        {{-- @if (hasPermission('BACKUP.CREATE'))
+                        @if (hasPermission('BACKUP.CREATE'))
                             <form method="POST" action="{{ route(getPanelRoutes($module . '.createBackup')) }}">
                                 @csrf
                                 <button type="submit" id="createBackupBtn" class="btn btn-outline-primary">
@@ -80,7 +80,7 @@
                                     Create New Backup
                                 </button>
                             </form>
-                        @endif --}}
+                        @endif
                     </div>
 
                     @if (hasPermission('DOWNLOAD_BACKUP.READ_ALL') || hasPermission('DOWNLOAD_BACKUP.READ'))
@@ -95,7 +95,7 @@
                                         <div class="text-muted small">
                                             <span class="me-3">
                                                 <i class="fas fa-calendar-alt me-1"></i>
-                                                {{ \Carbon\Carbon::parse($backup['date'])->format('F d, Y - H:i A') }}
+                                                {{ formatDateTime($backup['date']) }}
                                             </span>
                                             <span>
                                                 <i class="fas fa-weight me-1"></i>
