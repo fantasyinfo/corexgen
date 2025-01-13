@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class LeadsService
 {
@@ -47,21 +48,26 @@ class LeadsService
     {
         return DB::transaction(function () use ($validatedData) {
 
-            $validGroupID = $this->checkIsValidCGTID($validatedData['group_id'], Auth::user()->company_id, CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_groups'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads']);
+            if (Auth::check()) {
+                $validGroupID = $this->checkIsValidCGTID($validatedData['group_id'], Auth::user()->company_id, CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_groups'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads']);
 
-            $validSourceID = $this->checkIsValidCGTID($validatedData['source_id'], Auth::user()->company_id, CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_sources'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads']);
+                $validSourceID = $this->checkIsValidCGTID($validatedData['source_id'], Auth::user()->company_id, CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_sources'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads']);
 
-            $validStatusID = $this->checkIsValidCGTID($validatedData['status_id'], Auth::user()->company_id, CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_status'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads']);
+                $validStatusID = $this->checkIsValidCGTID($validatedData['status_id'], Auth::user()->company_id, CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_status'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads']);
 
-            if (!$validGroupID) {
-                throw new \InvalidArgumentException("Failed to create lead beacuse invalid Group ID ");
+                if (!$validGroupID) {
+                    throw new \InvalidArgumentException("Failed to create lead beacuse invalid Group ID ");
+                }
+                if (!$validSourceID) {
+                    throw new \InvalidArgumentException("Failed to create lead beacuse invalid Source ID ");
+                }
+                if (!$validStatusID) {
+                    throw new \InvalidArgumentException("Failed to create lead beacuse invalid Stage ID ");
+                }
             }
-            if (!$validSourceID) {
-                throw new \InvalidArgumentException("Failed to create lead beacuse invalid Source ID ");
-            }
-            if (!$validStatusID) {
-                throw new \InvalidArgumentException("Failed to create lead beacuse invalid Stage ID ");
-            }
+
+
+
 
             $address = $this->createAddressIfProvided($validatedData);
 
@@ -96,6 +102,7 @@ class LeadsService
                 }
 
             }
+
             $lead = CRMLeads::create($validatedData);
 
 

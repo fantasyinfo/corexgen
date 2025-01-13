@@ -117,6 +117,48 @@ class Company extends Model implements Auditable
     }
 
     /**
+     * projects relations with company table
+     */
+    public function projects(): HasMany
+    {
+        return $this->hasMany(Project::class, 'company_id');
+    }
+
+
+    /**
+     * Get the total number of projects related to this company.
+     *
+     * @return int Total projects count.
+     */
+    public function totalProjects(): int
+    {
+        return $this->projects()->count();
+    }
+
+    /**
+     * Get the total number of Clients related to this company.
+     *
+     * @return int Total Clients count.
+     */
+    public function totalClients(): int
+    {
+        return $this->clients()->count();
+    }
+
+
+
+    /**
+     * Get the total number of Users related to this company.
+     *
+     * @return int Total Users count.
+     */
+    public function totalUsers(): int
+    {
+        return $this->users()->count();
+    }
+
+
+    /**
      * get total company
      */
     public function totalCompany()

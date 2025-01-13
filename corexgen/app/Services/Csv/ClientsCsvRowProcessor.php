@@ -57,7 +57,7 @@ class ClientsCsvRowProcessor
             // Build address array
             $address = $this->buildAddressArray($row);
 
-            $validCGTID = $this->checkIsValidCGTID($row['CGT ID'], $companyId, CATEGORY_GROUP_TAGS_TYPES['STATUS']['categories'], CATEGORY_GROUP_TAGS_RELATIONS['STATUS']['clients']);
+            $validCGTID = $this->checkIsValidCGTID($row['CGT ID'], $companyId, CATEGORY_GROUP_TAGS_TYPES['KEY']['categories'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['clients']);
 
             if (!$validCGTID) {
                 throw new ImportException(

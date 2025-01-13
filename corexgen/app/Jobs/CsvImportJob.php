@@ -56,6 +56,7 @@ class CsvImportJob implements ShouldQueue
             'import_id' => $this->importHistory->id,
         ]);
 
+        $successfulCount = 0;
         try {
             if (!file_exists($this->filePath) || !is_readable($this->filePath)) {
                 throw new \Exception("Unable to read the uploaded file: {$this->filePath}");
@@ -81,7 +82,7 @@ class CsvImportJob implements ShouldQueue
             }
 
             $skippedRows = [];
-            $successfulCount = 0;
+
             $processor = app($this->processorClass);
 
             foreach ($data as $index => $row) {
