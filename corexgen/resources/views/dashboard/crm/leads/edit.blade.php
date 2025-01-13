@@ -4,11 +4,37 @@
     @php
         // prePrintR($lead->toArray());
     @endphp
+    @push('style')
+        <style>
+            .error-badge {
+                font-size: 0.75rem;
+                padding: 0.25em 0.6em;
+                border-radius: 50%;
+            }
+
+            .validation-errors-list {
+                padding-left: 1.25rem;
+                margin-bottom: 0;
+            }
+
+            .validation-errors-list li {
+                margin-bottom: 0.5rem;
+            }
+
+            .validation-errors-list li:last-child {
+                margin-bottom: 0;
+            }
+
+            .nav-link.text-danger {
+                position: relative;
+            }
+        </style>
+    @endpush
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
                 <div class="card stretch stretch-full">
-                    <form id="leadForm" action="{{ route(getPanelRoutes('leads.update')) }}" method="POST">
+                    <form id="leadForm" action="{{ route(getPanelRoutes('leads.update')) }}" method="POST" novalidate>
                         @csrf
                         @method('PUT')
                         <input type="hidden" name="id" value="{{ $lead->id }}" />
@@ -255,8 +281,8 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <x-form-components.input-group type="date" placeholder="Select Date" name="last_contacted_date"
-                                                id="last_contacted_date"
+                                            <x-form-components.input-group type="date" placeholder="Select Date"
+                                                name="last_contacted_date" id="last_contacted_date"
                                                 value="{{ old('last_contacted_date', $lead->last_contacted_date) }}" />
                                         </div>
                                     </div>
@@ -268,8 +294,8 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <x-form-components.input-group type="date" placeholder="Select Date" name="last_activity_date"
-                                                id="last_activity_date"
+                                            <x-form-components.input-group type="date" placeholder="Select Date"
+                                                name="last_activity_date" id="last_activity_date"
                                                 value="{{ old('last_activity_date', $lead->last_activity_date) }}" />
                                         </div>
                                     </div>
@@ -281,8 +307,8 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <x-form-components.input-group type="date" placeholder="Select Date" name="follow_up_date"
-                                                id="follow_up_date"
+                                            <x-form-components.input-group type="date" placeholder="Select Date"
+                                                name="follow_up_date" id="follow_up_date"
                                                 value="{{ old('follow_up_date', $lead->follow_up_date) }}" />
                                         </div>
                                     </div>
@@ -331,7 +357,7 @@
                                 <div class="tab-pane fade" id="contact" role="tabpanel">
                                     <div class="row mb-4">
                                         <div class="col-lg-4">
-                                            <x-form-components.input-label for="emails">
+                                            <x-form-components.input-label for="emails" required>
                                                 {{ __('leads.Email') }}
                                             </x-form-components.input-label>
                                         </div>
@@ -360,7 +386,7 @@
 
                                                     <x-form-components.input-group type="tel" name="phone"
                                                         id="phone" placeholder="{{ __('Phone Number') }}"
-                                                        value="{{ old('phone', $lead->phone) }}" required />
+                                                        value="{{ old('phone', $lead->phone) }}" />
                                                 </div>
 
                                             </div>
@@ -593,9 +619,9 @@
                         'wordcount'
                     ],
                     toolbar: 'undo redo | formatselect | bold italic backcolor | \
-                                                                                                                                  alignleft aligncenter alignright alignjustify | \
-                                                                                                                                  bullist numlist outdent indent | removeformat | help | \
-                                                                                                                                  link image media preview codesample table'
+                                                                                                                                      alignleft aligncenter alignright alignjustify | \
+                                                                                                                                      bullist numlist outdent indent | removeformat | help | \
+                                                                                                                                      link image media preview codesample table'
                 });
             }
 
@@ -655,73 +681,7 @@
                 attachValidationListeners(field);
             });
 
-            // Handle form submission
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
 
-                // Get active tab
-                const activeTab = document.querySelector('.nav-link.active').getAttribute('data-bs-target')
-                    .replace('#', '');
-
-                // Update active tab input
-                let activeTabInput = form.querySelector('input[name="active_tab"]');
-                if (!activeTabInput) {
-                    activeTabInput = document.createElement('input');
-                    activeTabInput.type = 'hidden';
-                    activeTabInput.name = 'active_tab';
-                    form.appendChild(activeTabInput);
-                }
-                activeTabInput.value = activeTab;
-
-                // Validate all fields
-                let isValid = true;
-                let firstInvalidField = null;
-
-                form.querySelectorAll('input, select, textarea').forEach(field => {
-                    if (!validateField(field)) {
-                        isValid = false;
-                        if (!firstInvalidField) {
-                            firstInvalidField = field;
-                        }
-                    }
-                });
-
-                if (!isValid && firstInvalidField) {
-                    // Switch to tab containing first invalid field
-                    const fieldTab = firstInvalidField.closest('.tab-pane').id;
-                    const tabButton = document.querySelector(`[data-bs-target="#${fieldTab}"]`);
-                    if (tabButton) {
-                        const tab = new bootstrap.Tab(tabButton);
-                        tab.show();
-                    }
-
-                    // Scroll to and focus the invalid field
-                    firstInvalidField.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'center'
-                    });
-                    firstInvalidField.focus();
-                    return;
-                }
-
-                if (isValid) {
-                    // Sync WYSIWYG editor
-                    if (typeof tinymce !== 'undefined') {
-                        tinymce.triggerSave();
-                    }
-
-                    // Store form data backup
-
-                    const formData = new FormData(form);
-                    const formDataObj = {};
-                    formData.forEach((value, key) => {
-                        formDataObj[key] = value;
-                    });
-                    localStorage.setItem('formBackup', JSON.stringify(formDataObj));
-
-                    this.submit();
-                }
-            });
 
             // Initialize tab from URL parameter
             const urlParams = new URLSearchParams(window.location.search);
@@ -754,6 +714,181 @@
                     localStorage.removeItem('formBackup');
                 }
             }
+
+            // new items
+
+            if (!document.getElementById('validationErrorsContainer')) {
+                const errorContainer = document.createElement('div');
+                errorContainer.id = 'validationErrorsContainer';
+                errorContainer.className = 'mb-4';
+                errorContainer.style.display = 'none';
+                errorContainer.innerHTML = `
+                    <div class="alert alert-danger">
+                        <h6 class="alert-heading mb-2">Please correct the following errors:</h6>
+                        <ul class="validation-errors-list mb-0"></ul>
+                    </div>`;
+
+                // Insert it before the tabs
+                const tabs = document.getElementById('clientsTabs');
+                tabs.parentNode.insertBefore(errorContainer, tabs);
+            }
+
+            form.querySelectorAll('[required]').forEach(field => {
+                field.addEventListener('input', function() {
+                    if (this.value.trim() !== '') {
+                        this.classList.remove('is-invalid');
+                        this.classList.add('is-valid');
+                        const errorDiv = this.nextElementSibling;
+                        if (errorDiv && errorDiv.classList.contains('invalid-feedback')) {
+                            errorDiv.remove();
+                        }
+                    }
+                });
+            });
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                // Clear previous error states
+                document.querySelectorAll('.nav-link').forEach(tab => {
+                    tab.classList.remove('text-danger');
+                    const badge = tab.querySelector('.error-badge');
+                    if (badge) badge.remove();
+                });
+
+                const errorContainer = document.getElementById('validationErrorsContainer');
+                const errorsList = errorContainer.querySelector('.validation-errors-list');
+                errorsList.innerHTML = '';
+                errorContainer.style.display = 'none';
+
+                // Validate all fields
+                let isValid = true;
+                let tabErrors = new Map();
+                let errorMessages = [];
+
+                // Validate each tab
+                document.querySelectorAll('.tab-pane').forEach(tabPane => {
+                    const tabId = tabPane.id;
+                    const tabButton = document.querySelector(`[data-bs-target="#${tabId}"]`);
+                    const tabName = tabButton.textContent.trim();
+                    let tabErrorCount = 0;
+
+                    // Check all required fields in this tab
+                    tabPane.querySelectorAll('[required]').forEach(field => {
+                        const isFieldValid = field.value.trim() !== '';
+                        if (!isFieldValid) {
+                            isValid = false;
+                            tabErrorCount++;
+
+                            // Get field label
+                            let fieldLabel = '';
+                            const labelElement = document.querySelector(
+                                `label[for="${field.id}"]`);
+                            if (labelElement) {
+                                fieldLabel = labelElement.textContent.replace('*', '')
+                                    .trim();
+                            } else {
+                                fieldLabel = field.placeholder || field.name;
+                            }
+
+                            // Add to error messages
+                            errorMessages.push({
+                                tab: tabName,
+                                field: fieldLabel
+                            });
+
+                            // Add invalid class to field
+                            field.classList.add('is-invalid');
+
+                            // Add error message below field if not exists
+                            let errorDiv = field.nextElementSibling;
+                            if (!errorDiv || !errorDiv.classList.contains(
+                                    'invalid-feedback')) {
+                                errorDiv = document.createElement('div');
+                                errorDiv.className = 'invalid-feedback';
+                                errorDiv.textContent = 'This field is required';
+                                field.parentNode.insertBefore(errorDiv, field.nextSibling);
+                            }
+                        } else {
+                            // Remove invalid state if field is valid
+                            field.classList.remove('is-invalid');
+                            field.classList.add('is-valid');
+                            const errorDiv = field.nextElementSibling;
+                            if (errorDiv && errorDiv.classList.contains(
+                                    'invalid-feedback')) {
+                                errorDiv.remove();
+                            }
+                        }
+                    });
+
+                    if (tabErrorCount > 0) {
+                        tabErrors.set(tabId, tabErrorCount);
+                    }
+                });
+
+                if (!isValid) {
+                    // Show error container
+                    errorContainer.style.display = 'block';
+
+                    // Group errors by tab
+                    const groupedErrors = errorMessages.reduce((acc, error) => {
+                        if (!acc[error.tab]) {
+                            acc[error.tab] = [];
+                        }
+                        acc[error.tab].push(error.field);
+                        return acc;
+                    }, {});
+
+                    // Create error messages
+                    Object.entries(groupedErrors).forEach(([tab, fields]) => {
+                        const li = document.createElement('li');
+                        li.innerHTML =
+                            `<strong>${tab}:</strong> Required fields missing: ${fields.join(', ')}`;
+                        errorsList.appendChild(li);
+                    });
+
+                    // Add error indicators to tabs
+                    tabErrors.forEach((errorCount, tabId) => {
+                        const tabButton = document.querySelector(`[data-bs-target="#${tabId}"]`);
+                        if (tabButton) {
+                            tabButton.classList.add('text-danger');
+
+                            const badge = document.createElement('span');
+                            badge.className = 'badge bg-danger ms-2 error-badge';
+                            badge.textContent = errorCount;
+                            tabButton.appendChild(badge);
+                        }
+                    });
+
+                    // Scroll to error container
+                    errorContainer.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+
+
+                    return false;
+                }
+
+                // If form is valid, proceed with submission
+                if (isValid) {
+                    // Sync WYSIWYG editor if exists
+                    if (typeof tinymce !== 'undefined') {
+                        tinymce.triggerSave();
+                    }
+
+                    // Store form data backup
+                    const formData = new FormData(form);
+                    const formDataObj = {};
+                    formData.forEach((value, key) => {
+                        formDataObj[key] = value;
+                    });
+                    localStorage.setItem('formBackup', JSON.stringify(formDataObj));
+
+                    // Submit the form
+                    form.submit();
+                }
+            });
         });
     </script>
 @endpush

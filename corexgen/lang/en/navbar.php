@@ -5,5 +5,6 @@ return  [
     'Home' => 'Home',
     'Dashboard' => 'Dashboard',
     'Role' => 'Role',
+    'Back' => 'Back',
 
 ];

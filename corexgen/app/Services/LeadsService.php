@@ -415,10 +415,10 @@ class LeadsService
                 return "<a  class='dt-link' href='" . route($this->tenantRoute . $module . '.view', $lead->id) . "' target='_blank'>$lead->title</a>";
             })
             ->editColumn('group', function ($lead) {
-                return "<span class='badge badge-pill bg-" . $lead->group->color . "'>{$lead->group->name}</span>";
+                return "<span class='badge badge-pill bg-" . $lead?->group?->color . "'>{$lead?->group?->name}</span>";
             })
             ->editColumn('source', function ($lead) {
-                return "<span class='badge badge-pill bg-" . $lead->source->color . "'>{$lead->source->name}</span>";
+                return "<span class='badge badge-pill bg-" . $lead?->source?->color . "'>{$lead?->source?->name}</span>";
             })
             ->editColumn('stage', function ($lead) use ($stages) {
                 // return "<span class='badge badge-pill bg-" . $lead->stage->color . "'>{$lead->stage->name}</span>";
