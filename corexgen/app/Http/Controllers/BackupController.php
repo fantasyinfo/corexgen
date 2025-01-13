@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 
+use App\Jobs\CreateBackupJob;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -31,7 +32,7 @@ class BackupController extends Controller
         return $this->viewDir . $filename;
     }
 
-        /**
+    /**
      * load all backups
      */
     public function index()
@@ -131,7 +132,7 @@ class BackupController extends Controller
     }
 
 
-        /**
+    /**
      * create backup
      */
     public function createBackup()
@@ -140,18 +141,11 @@ class BackupController extends Controller
         try {
 
 
-            // Use Spatie Backup to create a new backup
-            \Artisan::call('backup:run');
-
-            // Log the backup creation
-            \Log::info('Backup created', [
-                'user' => auth()->id(),
-                'timestamp' => now()
-            ]);
+            CreateBackupJob::dispatch();
 
             return redirect()->back()->with([
-                'success' => true,
-                'message' => 'Backup created successfully'
+                'success' => 'Backup is running in the background, will be done shortly, & listed below.',
+                'message' => 'Backup is running in the background, will be done shortly, & listed below.'
             ]);
         } catch (\Exception $e) {
             // Log the error

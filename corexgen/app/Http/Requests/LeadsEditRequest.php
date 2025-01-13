@@ -35,7 +35,6 @@ class LeadsEditRequest extends FormRequest
             'first_name' => 'nullable|string|max:255',
             'last_name' => 'nullable|string|max:255',
             'email' => [
-                'nullable',
                 'email',
                 Rule::unique('leads', 'email')->ignore($this->id), // Use $this->id to get the input value
             ],

@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Auth;
 
 class CommentService
 {
+    /**
+     * add a comment 
+     */
     public function add($modal, $data)
     {
         return $modal->comments()->create([

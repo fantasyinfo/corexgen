@@ -121,7 +121,9 @@ class UsersCsvRowProcessor
         }
     }
 
-
+    /**
+     * handle all database errors if any
+     */
     private function handleDatabaseError(\Exception $e, array $row): string
     {
         if (strpos($e->getMessage(), 'users.users_email_unique') !== false) {
@@ -139,6 +141,9 @@ class UsersCsvRowProcessor
         return "Unable to create user due to database conflict. Please check for duplicate information.";
     }
 
+    /**
+     * handle all database errors if any
+     */
     private function getUserFriendlyError(string $message): string
     {
         $errorMap = [

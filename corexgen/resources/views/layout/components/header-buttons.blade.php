@@ -1,10 +1,5 @@
-<div class="d-flex  flex-wrap justify-content-between align-items-center">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item">{{ __('navbar.Home') }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ $title ?? '' }}</li>
-        </ol>
-    </nav>
+{{-- <div class="d-flex  flex-wrap justify-content-between align-items-center"> --}}
+
     <div class="mb-3 d-flex flex-wrap justify-content-end">
 
 
@@ -116,4 +111,4 @@
             </div>
         @endif
     </div>
-</div>
+{{-- </div> --}}

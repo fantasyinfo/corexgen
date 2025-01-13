@@ -34,6 +34,10 @@ class ContractService
     }
 
 
+
+    /**
+     * create contract
+     */
     public function createContract($data)
     {
         // Generate a unique URL slug
@@ -60,6 +64,9 @@ class ContractService
 
         return $proposal;
     }
+    /**
+     * update contract
+     */
     public function updateContract($data)
     {
 
@@ -84,14 +91,18 @@ class ContractService
         return $proposal;
     }
 
-
+    /**
+     * get contract
+     */
 
     public function getContracts($typable_type, $typable_id)
     {
         return $this->applyTenantFilter(CRMContract::query()->where('typable_type', $typable_type)->where('typable_id', $typable_id)->latest()->get());
     }
 
-
+    /**
+     * send contract on email
+     */
     public function sendContractOnEmail(CRMContract $contract, $view = "dashboard.crm.contracts.print"): bool
     {
         try {
@@ -133,7 +144,9 @@ class ContractService
     }
 
 
-
+    /**
+     * get dt table of contracts
+     */
     public function getDatatablesResponse($request)
     {
         $query = $this->contractRepository->getContractQuery($request);
@@ -194,6 +207,9 @@ class ContractService
             ->make(true);
     }
 
+    /**
+     * render contract action col
+     */
     protected function renderActionsColumn($contract)
     {
         $module = PANEL_MODULES[$this->getPanelModule()]['contracts'];

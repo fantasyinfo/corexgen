@@ -12,13 +12,7 @@
         </select>
     </div>
 
-    <div class="detail-group">
-        <x-form-components.input-label for="title" required>
-            {{ __('clients.Title') }}
-        </x-form-components.input-label>
-        <x-form-components.input-group type="text" name="title" id="title"
-            placeholder="{{ __('New Development Project Lead') }}" value="{{ old('title', $client->title) }}" required />
-    </div>
+
 
     <div class="detail-group">
         <x-form-components.input-label for="companyName" required>
@@ -27,6 +21,14 @@
 
         <x-form-components.input-group type="text" name="company_name" id="companyName"
             placeholder="{{ __('Abc Pvt Ltd') }}" value="{{ old('company_name', $client->company_name) }}" />
+    </div>
+
+    <div class="detail-group">
+        <x-form-components.input-label for="title" >
+            {{ __('clients.Title') }}
+        </x-form-components.input-label>
+        <x-form-components.input-group type="text" name="title" id="title"
+            placeholder="{{ __('Mr, Miss, Dr, Master...') }}" value="{{ old('title', $client->title) }}"  />
     </div>
 
     <div class="detail-group">

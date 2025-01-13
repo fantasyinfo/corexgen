@@ -11,6 +11,7 @@ use App\Models\Country;
 use App\Models\CRM\CRMClients;
 use App\Services\ContractService;
 use App\Services\Csv\ClientsCsvRowProcessor;
+use App\Services\Csv\LeadsCsvRowProcessor;
 use App\Services\EstimateService;
 use App\Services\ProposalService;
 use App\Traits\AuditFilter;
@@ -24,6 +25,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use App\Jobs\CsvImportJob;
 use App\Models\CRM\CRMLeads;
+use App\Repositories\LeadsRepository;
 use App\Services\CustomFieldService;
 use App\Services\LeadsService;
 use Illuminate\Support\Facades\DB;
@@ -374,48 +376,13 @@ class LeadsController extends Controller
     /**
      * exoort lead
      */
-    public function export(Request $request)
+    public function export(Request $request, LeadsRepository $leadsRepository)
     {
         // Apply filters and fetch leads
-        $leads = CRMClients::query()
-            ->where('company_id', Auth::user()->company_id)
-            ->with([
-                'addresses' => function ($query) {
-                    $query->with(['country', 'city'])
-                        ->select('addresses.id', 'addresses.street_address', 'addresses.postal_code', 'addresses.city_id', 'addresses.country_id');
-                }
-            ])
-            ->when(
-                $request->filled('name'),
-                fn($q) => $q->where(function ($subQuery) use ($request) {
-                    $subQuery->where('first_name', 'LIKE', "%{$request->name}%")
-                        ->orWhere('middle_name', 'LIKE', "%{$request->name}%")
-                        ->orWhere('last_name', 'LIKE', "%{$request->name}%");
-                })
-            )
-            ->when(
-                $request->filled('email'),
-                fn($q) => $q->whereJsonContains('email', $request->email)
-            )
-            ->when(
-                $request->filled('phone'),
-                fn($q) => $q->whereJsonContains('phone', $request->phone)
-            )
-            ->when(
-                $request->filled('status') && $request->status != 0,
-                fn($q) => $q->where('status', $request->status)
-            )
-            ->when(
-                $request->filled('start_date'),
-                fn($q) => $q->whereDate('created_at', '>=', $request->start_date)
-            )
-            ->when(
-                $request->filled('end_date'),
-                fn($q) => $q->whereDate('created_at', '<=', $request->end_date)
-            )
-            ->get();
+        $leads = $this->applyTenantFilter($leadsRepository->getLeadsQuery($request))->get();
 
-        $csvData = $this->generateCSVForClients($leads);
+
+        $csvData = $this->generateCSVForLeads($leads);
         return response($csvData['csvContent'])
             ->header('Content-Type', 'text/csv')
             ->header('Content-Disposition', "attachment; filename={$csvData['file']}");
@@ -424,7 +391,7 @@ class LeadsController extends Controller
     /**
      * generate csv for lead
      */
-    public function generateCSVForClients($leads)
+    public function generateCSVForLeads($leads)
     {
 
         // Prepare CSV data
@@ -435,12 +402,12 @@ class LeadsController extends Controller
             'Company Name',
             'Title',
             'First Name',
-            'Middle Name',
             'Last Name',
-            'Emails',
-            'Phones',
-            'Social Media Links',
-            'CGT ID',
+            'Email',
+            'Phone',
+            'Group',
+            'Source',
+            'Stage',
             'Street Address',
             'City ID',
             'City Name',
@@ -451,37 +418,29 @@ class LeadsController extends Controller
             'Created At',
         ]; // CSV headers
 
-        foreach ($leads as $client) {
+        foreach ($leads as $lead) {
             // Prepare consolidated data
-            $emails = isset($client->email) ? implode('; ', $client->email) : '';
-            $phones = isset($client->phone) ? implode('; ', $client->phone) : '';
-            $socialMedia = isset($client->social_media)
-                ? implode('; ', array_map(fn($key, $value) => "$key: $value", array_keys($client->social_media), $client->social_media))
-                : '';
-
-            // Use the first address as a representative for each client
-            $address = $client->addresses->first();
 
             $csvData[] = [
-                $client->id,
-                $client->type,
-                $client->company_name,
-                $client->title,
-                $client->first_name,
-                $client->middle_name,
-                $client->last_name,
-                $emails,
-                $phones,
-                $socialMedia,
-                $client->cgt_id,
+                $lead->id,
+                $lead->type,
+                $lead->company_name,
+                $lead->title,
+                $lead->first_name,
+                $lead->last_name,
+                $lead->email,
+                $lead->phone ?? '',
+                $lead->group?->name,
+                $lead->source?->name,
+                $lead->stage?->name,
                 $address?->street_address ?? '',
                 $address?->city_id ?? '',
                 $address?->city?->name ?? '',
                 $address?->country_id ?? '',
                 $address?->country?->name ?? '',
                 $address?->postal_code ?? '',
-                $client->status,
-                $client?->created_at?->format('Y-m-d H:i:s') ?? 'N/A',
+                $lead->status,
+                $lead?->created_at?->format('Y-m-d H:i:s') ?? 'N/A',
             ];
         }
 
@@ -492,7 +451,7 @@ class LeadsController extends Controller
         }
 
         // Return the response with the CSV content as a file
-        $fileName = 'clients_export_' . now()->format('Y_m_d_H_i_s') . '.csv';
+        $fileName = 'leads_export_' . now()->format('Y_m_d_H_i_s') . '.csv';
 
         return [
             'file' => $fileName,
@@ -510,7 +469,7 @@ class LeadsController extends Controller
         $expectedHeaders = [
             'Type' => [
                 'key' => 'Type',
-                'message' => 'string, e.g., Individual or Company',
+                'message' => 'required, string, e.g., Individual or Company',
             ],
             'Company Name' => [
                 'key' => 'Company Name',
@@ -518,35 +477,35 @@ class LeadsController extends Controller
             ],
             'Title' => [
                 'key' => 'Title',
-                'message' => 'string, e.g., Mr, Miss, Dr, Master',
+                'message' => 'required, string, e.g., Need information about this x service',
             ],
             'First Name' => [
                 'key' => 'First Name',
-                'message' => 'string, e.g., John, Anna',
-            ],
-            'Middle Name' => [
-                'key' => 'Middle Name',
-                'message' => 'string, optional, e.g., Edward, Marie',
+                'message' => 'required, string, e.g., John, Anna',
             ],
             'Last Name' => [
                 'key' => 'Last Name',
-                'message' => 'string, e.g., Doe, Smith',
+                'message' => 'required, string, e.g., Doe, Smith',
             ],
-            'Emails' => [
-                'key' => 'Emails',
-                'message' => 'array, comma-separated, e.g., john.doe@example.com, jane.doe@example.org',
+            'Email' => [
+                'key' => 'Email',
+                'message' => 'required, email, string,  e.g., john.doe@example.com',
             ],
-            'Phones' => [
-                'key' => 'Phones',
-                'message' => 'array, comma-separated, e.g., +1-555-123-4567, +1-555-765-4321',
+            'Phone' => [
+                'key' => 'Phone',
+                'message' => 'phone , string,  e.g., +1-555-123-4567',
             ],
-            'Social Media Links' => [
-                'key' => 'Social Media Links',
-                'message' => 'array, optional, comma-separated, e.g., x: https://x.com/user, fb: https://www.facebook.com/user',
+            'Group ID' => [
+                'key' => 'Group ID',
+                'message' => 'required,  exists:from Group ID,id, e.g., 1 ,2,3 ',
             ],
-            'CGT ID' => [
-                'key' => 'CGT ID',
-                'message' => 'required,  exists:from CGT ID,id, e.g., 1 ,2,3 ',
+            'Source ID' => [
+                'key' => 'Source ID',
+                'message' => 'required,  exists:from Source ID,id, e.g., 1 ,2,3 ',
+            ],
+            'Status ID' => [
+                'key' => 'Status ID',
+                'message' => 'required,  exists:from Status ID / Stage ID,id, e.g., 1 ,2,3 ',
             ],
             'Street Address' => [
                 'key' => 'Street Address',
@@ -571,14 +530,14 @@ class LeadsController extends Controller
             [
                 'Type' => 'Individual',
                 'Company Name' => '',
-                'Title' => 'Mr',
+                'Title' => 'I need details for macbokk m1 pro',
                 'First Name' => 'John',
-                'Middle Name' => 'Edward',
                 'Last Name' => 'Doe',
-                'Emails' => 'john.doe@example.com; jane.doe@example.org',
-                'Phones' => '+91 8989898989; +1 89898989898',
-                'Social Media Links' => 'x: https://x.com/johndoe, fb: https://www.facebook.com/johndoe, in: https://www.instagram.com/johndoe, ln: https://www.linkedin.com/in/johndoe',
-                'CGT ID' => '2',
+                'Email' => 'john.doe@example.com',
+                'Phone' => '+91 8989898989',
+                'Group ID' => '3',
+                'Source ID' => '5',
+                'Status ID' => '11',
                 'Street Address' => '123 Elm Street',
                 'City Name' => 'Springfield',
                 'Country ID' => '1',
@@ -587,14 +546,14 @@ class LeadsController extends Controller
             [
                 'Type' => 'Company',
                 'Company Name' => 'ABC Multi Brach Hospital For Children',
-                'Title' => 'Dr',
+                'Title' => 'Need infomartion about this service',
                 'First Name' => 'Anna',
-                'Middle Name' => 'Marie',
                 'Last Name' => 'Smith',
-                'Emails' => 'anna.smith@example.org; contact@smithco.com',
-                'Phones' => '+44 8787878787; +44 7676767676',
-                'Social Media Links' => 'x: https://x.com/smithco, fb: https://www.facebook.com/smithco, in: https://www.instagram.com/smithco, ln: https://www.linkedin.com/company/smithco',
-                'CGT ID' => '1',
+                'Email' => 'anna.smith@example.org',
+                'Phone' => '+44 8787878787',
+                'Group ID' => '4',
+                'Source ID' => '6',
+                'Status ID' => '12',
                 'Street Address' => '456 Oak Avenue',
                 'City Name' => 'London',
                 'Country ID' => '44',
@@ -639,14 +598,14 @@ class LeadsController extends Controller
             $rules = [
                 'Type' => ['required', 'string', Rule::in(['Individual', 'Company'])],
                 'Company Name' => ['nullable', 'required_if:Type,Company'],
-                'Title' => ['nullable', 'string'],
+                'Title' => ['required', 'string'],
                 'First Name' => ['required', 'string'],
-                'Middle Name' => ['nullable', 'string'],
                 'Last Name' => ['required', 'string'],
-                'Emails' => ['required', 'string'],
-                'Phones' => ['required', 'string'],
-                'Social Media Links' => ['nullable', 'string'], // Allow empty
-                'CGT ID' => ['required', 'string', 'exists:category_group_tag,id'],
+                'Email' => ['required', 'string'],
+                'Phone' => ['required', 'string'],
+                'Group ID' => ['required', 'string', 'exists:category_group_tag,id'],
+                'Source ID' => ['required', 'string', 'exists:category_group_tag,id'],
+                'Status ID' => ['required', 'string', 'exists:category_group_tag,id'],
                 'Street Address' => ['nullable', 'string', 'max:255'], // Allow empty
                 'City Name' => ['nullable', 'string'], // Allow empty
                 'Country ID' => ['nullable', 'exists:countries,id'], // Allow empty
@@ -654,13 +613,13 @@ class LeadsController extends Controller
             ];
 
             // Expected CSV headers
-            $expectedHeaders = ['Type', 'Company Name', 'Title', 'First Name', 'Middle Name', 'Last Name', 'Emails', 'Phones', 'Social Media Links', 'CGT ID', 'Street Address', 'City Name', 'Country ID', 'Pincode'];
+            $expectedHeaders = ['Type', 'Company Name', 'Title', 'First Name', 'Last Name', 'Email', 'Phone', 'Group ID', 'Source ID', 'Status ID', 'Street Address', 'City Name', 'Country ID', 'Pincode'];
 
             // Dispatch the job
             CsvImportJob::dispatch(
                 $absoluteFilePath,
                 $rules,
-                ClientsCsvRowProcessor::class,
+                LeadsCsvRowProcessor::class,
                 $expectedHeaders,
                 [
                     'company_id' => Auth::user()->company_id,

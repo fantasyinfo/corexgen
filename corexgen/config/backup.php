@@ -211,7 +211,7 @@ return [
         'notifiable' => \Spatie\Backup\Notifications\Notifiable::class,
 
         'mail' => [
-            'to' => env('ADMIN_EMAIL','admin@email.com'),
+            'to' => env('ADMIN_EMAIL', 'admin@email.com'),
 
             'from' => [
                 'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),

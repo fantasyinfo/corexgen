@@ -5,12 +5,12 @@
         <p>{{ $client->type }}</p>
     </div>
     <div class="detail-group">
-        <label>Title</label>
-        <p>{{ $client->title }}</p>
-    </div>
-    <div class="detail-group">
         <label>Company Name</label>
         <p>{{ $client->company_name }}</p>
+    </div>
+    <div class="detail-group">
+        <label>Title</label>
+        <p>{{ $client->title }}</p>
     </div>
     <div class="detail-group">
         <label>First Name</label>

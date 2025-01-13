@@ -14,8 +14,6 @@ use App\Traits\TenantFilter;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
 use Yajra\DataTables\Facades\DataTables;
-use Carbon\Carbon;
-use Exception;
 use Illuminate\Support\Facades\Auth;
 
 class ClientService
@@ -37,6 +35,10 @@ class ClientService
         $this->tenantRoute = $this->getTenantRoute();
     }
 
+
+    /**
+     * create client
+     */
     public function createClient(array $validatedData)
     {
         return DB::transaction(function () use ($validatedData) {
@@ -65,7 +67,9 @@ class ClientService
 
 
 
-
+    /**
+     * update client
+     */
     public function updateClient(array $validatedData)
     {
         // Validate that company ID is provided
@@ -97,6 +101,9 @@ class ClientService
         });
     }
 
+    /**
+     * create client address / update
+     */
     public function createOrUpdateAddresses($validatedData, $client)
     {
         if (empty($validatedData['addresses'])) {
@@ -130,6 +137,9 @@ class ClientService
         return $processedAddresses;
     }
 
+    /**
+     * find or create city
+     */
     private function findOrCreateCity($cityName, $countryId)
     {
         $city = City::firstOrCreate(
@@ -140,6 +150,9 @@ class ClientService
         return $city->id;
     }
 
+    /**
+     * create or update single address client
+     */
     private function createOrUpdateAddress($addressData, $cityId)
     {
         $address = Address::updateOrCreate(
@@ -158,6 +171,9 @@ class ClientService
         return $address->id;
     }
 
+    /**
+     * link or update address of a client
+     */
     private function linkOrUpdateClientAddress($clientId, $addressId, $type)
     {
         ClientAddress::updateOrCreate(
@@ -171,12 +187,18 @@ class ClientService
         );
     }
 
+    /**
+     * get all clients
+     */
 
     public function getAllClients()
     {
         return CRMClients::where('company_id', Auth::user()->company_id)->where('status', CRM_STATUS_TYPES['CLIENTS']['STATUS']['ACTIVE'])->get();
     }
 
+    /**
+     * get datatable of  clients lists
+     */
     public function getDatatablesResponse($request)
     {
         $this->tenantRoute = $this->getTenantRoute();
@@ -224,7 +246,9 @@ class ClientService
             ->make(true);
     }
 
-
+    /**
+     * find client with type email or phone
+     */
     public function findClientWithType($search, $type = 'email'): bool
     {
         if ($type == 'email') {
@@ -235,6 +259,9 @@ class ClientService
         return CRMClients::where('primary_email', $search)->exists();
     }
 
+    /**
+     * render action columns of clients datatable
+     */
 
     protected function renderActionsColumn($client)
     {
@@ -248,6 +275,9 @@ class ClientService
         ])->render();
     }
 
+    /**
+     * render status column of dt tbl
+     */
     protected function renderStatusColumn($client)
     {
 

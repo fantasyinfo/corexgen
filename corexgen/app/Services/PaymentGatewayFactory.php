@@ -15,8 +15,8 @@ class PaymentGatewayFactory
     private array $gateways = [
         'stripe' => \App\Services\StripePaymentGateway::class,
         // Future gateways can be added here
-    
-    
+
+
         'paypal' => \Modules\PaypalGatewayModule\App\Services\PayPalPaymentGateway::class,
     ];
 
@@ -39,10 +39,13 @@ class PaymentGatewayFactory
         return app($gatewayClass);
     }
 
+    /**
+     *add gateway
+     */
     public function addGateway(string $key, string $class): void
     {
         $this->gateways[$key] = $class;
-        \Log::info('Gateway Push',[ $this->gateways[$key] => $class] );
+        \Log::info('Gateway Push', [$this->gateways[$key] => $class]);
     }
 
     /**

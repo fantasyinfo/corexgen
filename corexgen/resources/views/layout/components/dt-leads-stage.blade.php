@@ -2,16 +2,16 @@
     
 @php
 
-$currentStage = $status['available_status']->where('id', $status['current_status'])->select('name','color')->first();
+$currentStage = $status['available_status']->where('id', @$status['current_status'])->select('name','color')->first();
 
 @endphp
 <div class="mx-1 dropdown">
         <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle p-0"
             id="statusDropDown" data-bs-toggle="dropdown" aria-expanded="true">
 
-          <span class="badge bg-{{ $currentStage['color'] }}">
+          <span class="badge bg-{{ @$currentStage['color'] }}">
             
-                {{ ucfirst($currentStage['name']) }}
+                {{ ucfirst(@$currentStage['name']) }}
             </span> 
         </a>
         <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="statusDropDown"
@@ -34,7 +34,7 @@ $currentStage = $status['available_status']->where('id', $status['current_status
         </ul>
     </div>
 @else
-    <span class="badge bg-{{ $status['bt_class'][$status['current_status']] }}">
-        {{ ucfirst($status['current_status']) }}
+    <span class="badge bg-{{ $status['bt_class'][@$status['current_status']] }}">
+        {{ ucfirst(@$status['current_status']) }}
     </span>
 @endif

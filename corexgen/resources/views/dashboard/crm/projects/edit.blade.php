@@ -45,13 +45,36 @@
                 font-weight: 500;
                 box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             }
+
+            .error-badge {
+                font-size: 0.75rem;
+                padding: 0.25em 0.6em;
+                border-radius: 50%;
+            }
+
+            .validation-errors-list {
+                padding-left: 1.25rem;
+                margin-bottom: 0;
+            }
+
+            .validation-errors-list li {
+                margin-bottom: 0.5rem;
+            }
+
+            .validation-errors-list li:last-child {
+                margin-bottom: 0;
+            }
+
+            .nav-link.text-danger {
+                position: relative;
+            }
         </style>
     @endpush
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
                 <div class="card stretch stretch-full">
-                    <form id="projectForm" action="{{ route(getPanelRoutes('projects.update')) }}" method="POST">
+                    <form id="projectForm" action="{{ route(getPanelRoutes('projects.update')) }}" method="POST" novalidate>
                         @csrf
                         @method('PUT')
                         <input type="hidden" name="id" value="{{ $project->id }}" />
@@ -67,7 +90,7 @@
                                 </button>
                             </div>
 
-                            <ul class="nav nav-tabs" id="projectsTabs" role="tablist">
+                            <ul class="nav nav-tabs" id="clientsTabs" role="tablist">
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link active" id="general-tab" data-bs-toggle="tab"
                                         data-bs-target="#general" type="button" role="tab">
@@ -166,13 +189,14 @@
                                                 prepend="{{ getSettingValue('Currency Symbol') }}"
                                                 append="{{ getSettingValue('Currency Code') }}" type="number"
                                                 name="per_hour_cost" id="perHourCost" placeholder="{{ __('99') }}"
-                                                value="{{ old('per_hour_cost',$project->per_hour_cost) }}" />
+                                                value="{{ old('per_hour_cost', $project->per_hour_cost) }}" />
                                         </div>
                                     </div>
 
                                     <div class="row mb-4 align-items-center" id="one_time_cost" style="display:none;">
                                         <div class="col-lg-4">
-                                            <x-form-components.input-label for="perHourCost" class="custom-class" required>
+                                            <x-form-components.input-label for="perHourCost" class="custom-class"
+                                                required>
                                                 {{ __('projects.One Time Cost') }}
                                             </x-form-components.input-label>
                                         </div>
@@ -181,7 +205,7 @@
                                                 prepend="{{ getSettingValue('Currency Symbol') }}"
                                                 append="{{ getSettingValue('Currency Code') }}" type="number"
                                                 name="one_time_cost" id="perHourCost" placeholder="{{ __('99') }}"
-                                                value="{{ old('one_time_cost',$project->one_time_cost) }}" />
+                                                value="{{ old('one_time_cost', $project->one_time_cost) }}" />
                                         </div>
                                     </div>
 
@@ -192,8 +216,9 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <x-form-components.input-group type="date" placeholder="Select Date" name="start_date"
-                                                id="startDate" value="{{ old('start_date',$project->start_date) }}" required
+                                            <x-form-components.input-group type="date" placeholder="Select Date"
+                                                name="start_date" id="startDate"
+                                                value="{{ old('start_date', $project->start_date) }}" required
                                                 class="custom-class" />
                                         </div>
                                     </div>
@@ -205,8 +230,9 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <x-form-components.input-group type="date" placeholder="Select Date" name="due_date" id="dueDate"
-                                                value="{{ old('due_date',$project->due_date) }}" class="custom-class" />
+                                            <x-form-components.input-group type="date" placeholder="Select Date"
+                                                name="due_date" id="dueDate"
+                                                value="{{ old('due_date', $project->due_date) }}" class="custom-class" />
                                         </div>
                                     </div>
 
@@ -217,8 +243,9 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
-                                            <x-form-components.input-group type="date" placeholder="Select Date" name="deadline" id="deadLine"
-                                                value="{{ old('deadline',$project->deadline) }}" class="custom-class" />
+                                            <x-form-components.input-group type="date" placeholder="Select Date"
+                                                name="deadline" id="deadLine"
+                                                value="{{ old('deadline', $project->deadline) }}" class="custom-class" />
                                         </div>
                                     </div>
 
@@ -233,7 +260,7 @@
                                                 <div class="col-md-10">
                                                     <input type="range" name="progress" class="form-range"
                                                         id="progressInput" name="progress" min="0" max="100"
-                                                        value="{{old('progress',$project->progress)}}">
+                                                        value="{{ old('progress', $project->progress) }}">
                                                 </div>
                                                 <div class="col-md-2">
                                                     <span id="progressValue" class="ms-2 progress-value">10%</span>
@@ -254,7 +281,8 @@
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="number" name="estimated_hours"
                                                 id="estimatedHours" placeholder="{{ __('10') }}"
-                                                value="{{ old('estimated_hours',$project->estimated_hours) }}" class="custom-class" />
+                                                value="{{ old('estimated_hours', $project->estimated_hours) }}"
+                                                class="custom-class" />
                                         </div>
                                     </div>
 
@@ -267,7 +295,8 @@
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="number" name="time_spent"
                                                 id="timeSpent" placeholder="{{ __('2') }}"
-                                                value="{{ old('time_spent', $project->time_spent) }}" class="custom-class" />
+                                                value="{{ old('time_spent', $project->time_spent) }}"
+                                                class="custom-class" />
                                         </div>
                                     </div>
 
@@ -280,10 +309,10 @@
                                         <div class="col-lg-8">
 
                                             <x-form-components.dropdown-with-profile :title="'Select Team Members'" :options="$teamMates"
-                                                :name="'assign_to'" :multiple="true" 
-                                                :selected="old('assign_to',$project->assignees->pluck('id')->toArray())"
-                                             
-                                                 />
+                                                :name="'assign_to'" :multiple="true" :selected="old(
+                                                    'assign_to',
+                                                    $project->assignees->pluck('id')->toArray(),
+                                                )" />
 
 
                                         </div>
@@ -298,7 +327,8 @@
                                         </x-form-components.input-label>
 
                                         <x-form-components.textarea-group name="description" id="desc"
-                                            placeholder="Describe the project details" value="{{ old('description',$project->description) }}"
+                                            placeholder="Describe the project details"
+                                            value="{{ old('description', $project->description) }}"
                                             class="custom-class description" />
 
                                     </div>
@@ -308,10 +338,7 @@
                                     @endif
                                 </div>
                                 @if (isset($customFields) && $customFields->isNotEmpty())
-                                    <x-form-components.custom-fields-edit
-                                    :customFields="$customFields"
-                                    :cfOldValues="$cfOldValues"
-                                     />
+                                    <x-form-components.custom-fields-edit :customFields="$customFields" :cfOldValues="$cfOldValues" />
                                 @endif
                             </div>
 
@@ -380,9 +407,9 @@
                         'wordcount'
                     ],
                     toolbar: 'undo redo | formatselect | bold italic backcolor | \
-                                                                                                                                                  alignleft aligncenter alignright alignjustify | \
-                                                                                                                                                  bullist numlist outdent indent | removeformat | help | \
-                                                                                                                                                  link image media preview codesample table'
+                                                                                                                                                      alignleft aligncenter alignright alignjustify | \
+                                                                                                                                                      bullist numlist outdent indent | removeformat | help | \
+                                                                                                                                                      link image media preview codesample table'
                 });
             }
 
@@ -414,6 +441,217 @@
                 document.getElementById('progressValue').textContent = this.value + '%';
             });
 
+
+            // new items
+
+            const form = document.getElementById('projectForm');
+
+            // Real-time validation function
+            function validateField(field) {
+                const isValid = field.checkValidity();
+                field.classList.toggle('is-invalid', !isValid);
+                field.classList.toggle('is-valid', isValid);
+
+                // Remove existing feedback
+                const existingFeedback = field.parentNode.querySelector('.invalid-feedback');
+                if (existingFeedback) {
+                    existingFeedback.remove();
+                }
+
+                if (!isValid) {
+                    const feedback = document.createElement('div');
+                    feedback.className = 'invalid-feedback';
+
+                    if (field.validity.valueMissing) {
+                        feedback.textContent = 'This field is required';
+                    } else if (field.validity.typeMismatch) {
+                        if (field.type === 'email') {
+                            feedback.textContent = 'Please enter a valid email address';
+                        } else if (field.type === 'tel') {
+                            feedback.textContent = 'Please enter a valid phone number';
+                        }
+                    } else if (field.validity.patternMismatch) {
+                        feedback.textContent = field.title || 'Please match the requested format';
+                    }
+
+                    field.parentNode.appendChild(feedback);
+                }
+
+                return isValid;
+            }
+
+            if (!document.getElementById('validationErrorsContainer')) {
+                const errorContainer = document.createElement('div');
+                errorContainer.id = 'validationErrorsContainer';
+                errorContainer.className = 'mb-4';
+                errorContainer.style.display = 'none';
+                errorContainer.innerHTML = `
+        <div class="alert alert-danger">
+            <h6 class="alert-heading mb-2">Please correct the following errors:</h6>
+            <ul class="validation-errors-list mb-0"></ul>
+        </div>`;
+
+                // Insert it before the tabs
+                const tabs = document.getElementById('clientsTabs');
+                tabs.parentNode.insertBefore(errorContainer, tabs);
+            }
+
+            form.querySelectorAll('[required]').forEach(field => {
+                field.addEventListener('input', function() {
+                    if (this.value.trim() !== '') {
+                        this.classList.remove('is-invalid');
+                        this.classList.add('is-valid');
+                        const errorDiv = this.nextElementSibling;
+                        if (errorDiv && errorDiv.classList.contains('invalid-feedback')) {
+                            errorDiv.remove();
+                        }
+                    }
+                });
+            });
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                // Clear previous error states
+                document.querySelectorAll('.nav-link').forEach(tab => {
+                    tab.classList.remove('text-danger');
+                    const badge = tab.querySelector('.error-badge');
+                    if (badge) badge.remove();
+                });
+
+                const errorContainer = document.getElementById('validationErrorsContainer');
+                const errorsList = errorContainer.querySelector('.validation-errors-list');
+                errorsList.innerHTML = '';
+                errorContainer.style.display = 'none';
+
+                // Validate all fields
+                let isValid = true;
+                let tabErrors = new Map();
+                let errorMessages = [];
+
+                // Validate each tab
+                document.querySelectorAll('.tab-pane').forEach(tabPane => {
+                    const tabId = tabPane.id;
+                    const tabButton = document.querySelector(`[data-bs-target="#${tabId}"]`);
+                    const tabName = tabButton.textContent.trim();
+                    let tabErrorCount = 0;
+
+                    // Check all required fields in this tab
+                    tabPane.querySelectorAll('[required]').forEach(field => {
+                        const isFieldValid = field.value.trim() !== '';
+                        if (!isFieldValid) {
+                            isValid = false;
+                            tabErrorCount++;
+
+                            // Get field label
+                            let fieldLabel = '';
+                            const labelElement = document.querySelector(
+                                `label[for="${field.id}"]`);
+                            if (labelElement) {
+                                fieldLabel = labelElement.textContent.replace('*', '')
+                                    .trim();
+                            } else {
+                                fieldLabel = field.placeholder || field.name;
+                            }
+
+                            // Add to error messages
+                            errorMessages.push({
+                                tab: tabName,
+                                field: fieldLabel
+                            });
+
+                            // Add invalid class to field
+                            field.classList.add('is-invalid');
+
+                            // Add error message below field if not exists
+                            let errorDiv = field.nextElementSibling;
+                            if (!errorDiv || !errorDiv.classList.contains(
+                                    'invalid-feedback')) {
+                                errorDiv = document.createElement('div');
+                                errorDiv.className = 'invalid-feedback';
+                                errorDiv.textContent = 'This field is required';
+                                field.parentNode.insertBefore(errorDiv, field.nextSibling);
+                            }
+                        } else {
+                            // Remove invalid state if field is valid
+                            field.classList.remove('is-invalid');
+                            field.classList.add('is-valid');
+                            const errorDiv = field.nextElementSibling;
+                            if (errorDiv && errorDiv.classList.contains(
+                                    'invalid-feedback')) {
+                                errorDiv.remove();
+                            }
+                        }
+                    });
+
+                    if (tabErrorCount > 0) {
+                        tabErrors.set(tabId, tabErrorCount);
+                    }
+                });
+
+                if (!isValid) {
+                    // Show error container
+                    errorContainer.style.display = 'block';
+
+                    // Group errors by tab
+                    const groupedErrors = errorMessages.reduce((acc, error) => {
+                        if (!acc[error.tab]) {
+                            acc[error.tab] = [];
+                        }
+                        acc[error.tab].push(error.field);
+                        return acc;
+                    }, {});
+
+                    // Create error messages
+                    Object.entries(groupedErrors).forEach(([tab, fields]) => {
+                        const li = document.createElement('li');
+                        li.innerHTML =
+                            `<strong>${tab}:</strong> Required fields missing: ${fields.join(', ')}`;
+                        errorsList.appendChild(li);
+                    });
+
+                    // Add error indicators to tabs
+                    tabErrors.forEach((errorCount, tabId) => {
+                        const tabButton = document.querySelector(`[data-bs-target="#${tabId}"]`);
+                        if (tabButton) {
+                            tabButton.classList.add('text-danger');
+
+                            const badge = document.createElement('span');
+                            badge.className = 'badge bg-danger ms-2 error-badge';
+                            badge.textContent = errorCount;
+                            tabButton.appendChild(badge);
+                        }
+                    });
+
+                    // Scroll to error container
+                    errorContainer.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+
+
+                    return false;
+                }
+
+                // If form is valid, proceed with submission
+                if (isValid) {
+                    // Sync WYSIWYG editor if exists
+                    if (typeof tinymce !== 'undefined') {
+                        tinymce.triggerSave();
+                    }
+
+                    // Store form data backup
+                    const formData = new FormData(form);
+                    const formDataObj = {};
+                    formData.forEach((value, key) => {
+                        formDataObj[key] = value;
+                    });
+                    localStorage.setItem('formBackup', JSON.stringify(formDataObj));
+
+                    // Submit the form
+                    form.submit();
+                }
+            });
         });
     </script>
 @endpush

@@ -32,6 +32,9 @@ class InvoiceService
     }
 
 
+    /**
+     *create invoice
+     */
     public function createInvoice($data)
     {
         // First, let's log or dd the incoming data
@@ -60,6 +63,9 @@ class InvoiceService
         }
     }
 
+    /**
+     *check if product added then add them into the invoice
+     */
     public function checkIfProductAddedThenAdd($data, $invoice)
     {
         $product_details = [];
@@ -100,7 +106,9 @@ class InvoiceService
         ]);
     }
 
-
+    /**
+     *update invoice
+     */
     public function updateInvoice($data)
     {
 
@@ -114,7 +122,9 @@ class InvoiceService
         return $invoice;
     }
 
-
+    /**
+     *get invoices
+     */
 
     public function getInvoices($project_id = null)
     {
@@ -125,6 +135,9 @@ class InvoiceService
     }
 
 
+    /**
+     *send invoice on email
+     */
     public function sendInvoiceOnEmail(Invoice $invoice, $view = "dashboard.crm.invoices.print"): bool
     {
         try {
@@ -164,6 +177,9 @@ class InvoiceService
 
 
 
+    /**
+     *get dt tbl lists invoice
+     */
     public function getDatatablesResponse($request)
     {
         $query = $this->invoiceRepository->getInvoiceQuery($request);
@@ -215,6 +231,9 @@ class InvoiceService
             ->make(true);
     }
 
+    /**
+     *render action col for invoice
+     */
     protected function renderActionsColumn($contract)
     {
         $module = PANEL_MODULES[$this->getPanelModule()]['invoices'];

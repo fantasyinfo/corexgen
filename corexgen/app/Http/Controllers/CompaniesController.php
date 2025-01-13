@@ -842,6 +842,7 @@ class CompaniesController extends Controller
         return view($this->getViewFilePath('view'), [
 
             'title' => 'View Company',
+            'permissions' => PermissionsHelper::getPermissionsArray('COMPANIES'),
             'company' => $company,
             'module' => PANEL_MODULES[$this->getPanelModule()]['companies'],
         ]);

@@ -136,6 +136,11 @@ class Project extends Model implements Auditable
         return $this->tasks()->count();
     }
 
+
+
+
+
+
     /**
      * Get the total number of attachments for the project.
      *

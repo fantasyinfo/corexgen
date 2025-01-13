@@ -26,6 +26,20 @@
 
 
                 <div class="toast-container" id="toastContainer"></div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="javascript:history.back()" class="btn-link">
+                                <i class="fas fa-arrow-left"></i>
+                                {{ __('navbar.Back') }}
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">{{ __('navbar.Home') }}</li>
+                        <li class="breadcrumb-item active" aria-current="page">{{ $title ?? '' }}</li>
+                    </ol>
+                </nav>
+
+
                 @if ($errors->any())
                     <div class="alert alert-danger">
                         <ul>
@@ -35,6 +49,8 @@
                         </ul>
                     </div>
                 @endif
+
+
                 @yield('content')
             </div>
 

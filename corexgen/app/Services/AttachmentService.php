@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Storage;
 
 class AttachmentService
 {
+    /**
+     * add new attachment
+     */
     public function add($modal, $data)
     {
         $mediaUrls = $this->createMedia($data);
@@ -24,13 +27,16 @@ class AttachmentService
         });
     }
 
+    /**
+     * create new media and store
+     */
     public function createMedia($data)
     {
 
         $files = $data['files'] ?? [$data['file']]; // Handle both single and multiple files
         $savedMedia = [];
 
-    
+
         foreach ($files as $file) {
             // Generate file properties
             $fileName = time() . '_' . $file->getClientOriginalName();
@@ -52,6 +58,9 @@ class AttachmentService
         return $savedMedia;
     }
 
+    /**
+     * delete the media attachment
+     */
     public function deleteMedia($attachment)
     {
         try {
