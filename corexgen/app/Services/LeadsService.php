@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Auth;
 
 class LeadsService
 {
-    
+
 
     use TenantFilter;
     use MediaTrait;
@@ -39,6 +39,10 @@ class LeadsService
         $this->tenantRoute = $this->getTenantRoute();
     }
 
+
+    /**
+     *create lead
+     */
     public function createLead(array $validatedData)
     {
         return DB::transaction(function () use ($validatedData) {
@@ -104,6 +108,10 @@ class LeadsService
             ];
         });
     }
+
+    /**
+     *update lead
+     */
     public function updateLead(array $validatedData)
     {
         // Validate that company ID is provided
@@ -194,6 +202,9 @@ class LeadsService
     }
 
 
+    /**
+     *assign leads to users 
+     */
     private function assignLeadsToUserIfProvided(array $validatedData, CRMLeads $lead)
     {
         if (!empty($validatedData['assign_to']) && is_array($validatedData['assign_to'])) {
@@ -237,7 +248,9 @@ class LeadsService
 
 
 
-
+    /**
+     * create address if provided 
+     */
     private function createAddressIfProvided(array $data): ?Address
     {
         $requiredAddressFields = [
@@ -262,6 +275,9 @@ class LeadsService
         ]);
     }
 
+    /**
+     * find or create city
+     */
     private function findOrCreateCity($cityName, $countryId)
     {
         $city = City::firstOrCreate(
@@ -271,6 +287,10 @@ class LeadsService
 
         return $city->id;
     }
+
+    /**
+     * update user address
+     */
     private function updateUserAddress(CRMLeads $lead, array $data): ?Address
     {
 
@@ -312,6 +332,9 @@ class LeadsService
         ]);
     }
 
+    /**
+     * validate has address fields
+     */
     private function hasAllAddressFields(array $data, array $requiredFields): bool
     {
         return collect($requiredFields)->every(
@@ -321,19 +344,27 @@ class LeadsService
     }
 
 
-
+    /**
+     * get leads with groups
+     */
     public function getLeadsGroups()
     {
         $leadsGroups = $this->getCategoryGroupTags(CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_groups'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads']);
         $leadsGroups = $this->applyTenantFilter($leadsGroups);
         return $leadsGroups->get();
     }
+    /**
+     * get leads with sources
+     */
     public function getLeadsSources()
     {
         $leadsGroups = $this->getCategoryGroupTags(CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_sources'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads']);
         $leadsGroups = $this->applyTenantFilter($leadsGroups);
         return $leadsGroups->get();
     }
+    /**
+     *get leads with status/stages
+     */
     public function getLeadsStatus()
     {
         $leadsGroups = $this->getCategoryGroupTags(CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_status'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads']);
@@ -342,11 +373,13 @@ class LeadsService
     }
 
 
-
+    /**
+     * get leads by user
+     */
     public function getLeadsByUser(int $user_id)
     {
         // Get leads assigned to the given user
-        $leads = CRMLeads::with(['assignedBy','stage'])->whereHas('assignees', function ($query) use ($user_id) {
+        $leads = CRMLeads::with(['assignedBy', 'stage'])->whereHas('assignees', function ($query) use ($user_id) {
             $query->where('user_id', $user_id);
         })->with('assignees')->get();
 
@@ -356,7 +389,9 @@ class LeadsService
 
 
 
-
+    /**
+     * get dt tbl response of leads lists
+     */
     public function getDatatablesResponse($request)
     {
         $this->tenantRoute = $this->getTenantRoute();
@@ -420,7 +455,9 @@ class LeadsService
     }
 
 
-
+    /**
+     * render action col of leads dt
+     */
     protected function renderActionsColumn($lead)
     {
         return View::make(getComponentsDirFilePath('dt-actions-buttons'), [
@@ -431,6 +468,9 @@ class LeadsService
         ])->render();
     }
 
+    /**
+     * render stage col
+     */
     protected function renderStageColumn($lead, $stages)
     {
         return View::make(getComponentsDirFilePath('dt-leads-stage'), [
@@ -445,6 +485,9 @@ class LeadsService
         ])->render();
     }
 
+    /**
+     * get all kanban stages of leads
+     */
     public function getKanbanBoardStages($request)
     {
         $query = CategoryGroupTag::where('type', CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_status'])
@@ -456,6 +499,9 @@ class LeadsService
 
     }
 
+    /**
+     * get kanban board view by all stages
+     */
     public function getKanbanLoad($request)
     {
         $query = $this->leadsRepository->getKanbanLoad($request);

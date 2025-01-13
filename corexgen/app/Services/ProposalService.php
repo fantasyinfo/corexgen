@@ -34,6 +34,9 @@ class ProposalService
     }
 
 
+    /**
+     *  create proposal
+     */
     public function createProposal($data)
     {
         // Generate a unique URL slug
@@ -60,6 +63,10 @@ class ProposalService
         $this->checkIFProductAddedThenAdd($data, $proposal);
         return $proposal;
     }
+
+    /**
+     *  update proposal
+     */
     public function updateProposal($data)
     {
 
@@ -84,14 +91,17 @@ class ProposalService
         return $proposal;
     }
 
-
+    /**
+     *  check if product added then add them 
+     */
     public function checkIfProductAddedThenAdd($data, $proposal)
     {
         $product_details = [];
         $json_data = ['products' => []];
-    
-        if (!empty($data['product_title']) && 
-            is_array($data['product_title']) && 
+
+        if (
+            !empty($data['product_title']) &&
+            is_array($data['product_title']) &&
             array_filter($data['product_title'], 'trim')
         ) {
             foreach ($data['product_title'] as $k => $title) {
@@ -100,36 +110,42 @@ class ProposalService
                     $product_details[] = [
                         'title' => $trimmedTitle,
                         'description' => trim($data['product_description'][$k] ?? ''),
-                        'qty' => (float)($data['product_qty'][$k] ?? 0),
-                        'rate' => (float)($data['product_rate'][$k] ?? 0.00),
+                        'qty' => (float) ($data['product_qty'][$k] ?? 0),
+                        'rate' => (float) ($data['product_rate'][$k] ?? 0.00),
                         'tax' => $data['product_tax'][$k] ?? null,
                     ];
                 }
             }
-    
+
             // Only add additional fields if there are valid products
             if (!empty($product_details)) {
                 $json_data = [
                     'products' => $product_details,
                     'additional_fields' => [
-                        'discount' => (float)($data['discount'] ?? 0),
-                        'adjustment' => (float)($data['adjustment'] ?? 0),
+                        'discount' => (float) ($data['discount'] ?? 0),
+                        'adjustment' => (float) ($data['adjustment'] ?? 0),
                     ],
                 ];
             }
         }
-    
+
         $proposal->update([
             'product_details' => json_encode($json_data)
         ]);
     }
 
+    /**
+     *  get proposals
+     */
     public function getProposals($typable_type, $typable_id)
     {
         return $this->applyTenantFilter(CRMProposals::query()->where('typable_type', $typable_type)->where('typable_id', $typable_id)->latest()->get());
     }
 
 
+    /**
+     *  send proposal on email
+     */
     public function sendProposalOnEmail(CRMProposals $proposal, $view = "dashboard.crm.proposals.print"): bool
     {
         try {
@@ -171,7 +187,9 @@ class ProposalService
     }
 
 
-
+    /**
+     *  get dt response
+     */
     public function getDatatablesResponse($request)
     {
         $query = $this->proposalRepository->getProposalQuery($request);
@@ -232,6 +250,9 @@ class ProposalService
             ->make(true);
     }
 
+    /**
+     *  render action col
+     */
     protected function renderActionsColumn($proposal)
     {
         $module = PANEL_MODULES[$this->getPanelModule()]['proposals'];

@@ -16,7 +16,19 @@ class TemplateService
 
     private $tenantRoute;
 
-    public function getDatatablesResponse($request, $type, $module, $permission, $viewRoute,$editRoute, $deleteRoute)
+
+    /**
+     * get the lits of template service lists getDatatablesResponse
+     * @param mixed $request
+     * @param mixed $type
+     * @param mixed $module
+     * @param mixed $permission
+     * @param mixed $viewRoute
+     * @param mixed $editRoute
+     * @param mixed $deleteRoute
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getDatatablesResponse($request, $type, $module, $permission, $viewRoute, $editRoute, $deleteRoute)
     {
         $query = $this->applyTenantFilter(CRMTemplates::query()->with('createdBy')->where('type', $type));
 
@@ -28,8 +40,8 @@ class TemplateService
             ->editColumn('created_by', function ($template) {
                 return $template->createdBy->name;
             })
-            ->editColumn('title', function ($template) use ($module,$viewRoute) {
-                $viewRoute = route($this->tenantRoute . $module . '.'. $viewRoute, $template->id);
+            ->editColumn('title', function ($template) use ($module, $viewRoute) {
+                $viewRoute = route($this->tenantRoute . $module . '.' . $viewRoute, $template->id);
                 return "<a class='dt-link' href='{$viewRoute}' target='_blank'>{$template->title}</a>";
             })
             ->editColumn('created_at', fn($template) => $template?->created_at ? formatDatetime($template?->created_at) : '')
@@ -37,6 +49,15 @@ class TemplateService
             ->make(true);
     }
 
+    /**
+     * get the action cols getActionsColumn
+     * @param mixed $template
+     * @param mixed $module
+     * @param mixed $permission
+     * @param mixed $editRoute
+     * @param mixed $deleteRoute
+     * @return string
+     */
     private function getActionsColumn($template, $module, $permission, $editRoute, $deleteRoute)
     {
         $editRoute = route($this->tenantRoute . $module . '.' . $editRoute, $template->id);

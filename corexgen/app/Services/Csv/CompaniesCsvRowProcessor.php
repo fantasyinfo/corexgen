@@ -122,13 +122,16 @@ class CompaniesCsvRowProcessor
         }
     }
 
+    /**
+     * handle all database errors if any
+     */
     private function handleDatabaseError(\Exception $e, array $row): string
     {
         if (strpos($e->getMessage(), 'companies.companies_email_unique') !== false) {
             return "Email address '{$row['Email']}' is already registered to another company";
         }
 
-  
+
 
         if (strpos($e->getMessage(), 'companies.companies_name_unique') !== false) {
             return "Company name '{$row['Company Name']}' is already taken";
@@ -137,6 +140,9 @@ class CompaniesCsvRowProcessor
         return "Unable to create company due to database conflict. Please check for duplicate information.";
     }
 
+    /**
+     * handle all database errors if any
+     */
     private function getUserFriendlyError(string $message): string
     {
         $errorMap = [

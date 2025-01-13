@@ -29,6 +29,10 @@ class UserService
         $this->tenantRoute = $this->getTenantRoute();
     }
 
+
+    /**
+     *  create user
+     */
     public function createUser(array $validatedData)
     {
         return DB::transaction(function () use ($validatedData) {
@@ -44,6 +48,10 @@ class UserService
         });
     }
 
+
+    /**
+     *  update user
+     */
     public function updateUser(array $validatedData)
     {
         return DB::transaction(function () use ($validatedData) {
@@ -64,6 +72,9 @@ class UserService
 
 
 
+    /**
+     *  register user
+     */
     public function registerUser(array $validatedData, $address_id = null, )
     {
         $validatedData = array_merge($validatedData, [
@@ -77,6 +88,9 @@ class UserService
     }
 
 
+    /**
+     *  create address if provided
+     */
     private function createAddressIfProvided(array $data): ?Address
     {
         $requiredAddressFields = [
@@ -90,7 +104,7 @@ class UserService
             return null;
         }
 
-        $cityId =  $this->findOrCreateCity($data['address_city_name'], $data['address_country_id']);
+        $cityId = $this->findOrCreateCity($data['address_city_name'], $data['address_country_id']);
 
         return Address::create([
             'street_address' => $data['address_street_address'],
@@ -101,6 +115,9 @@ class UserService
         ]);
     }
 
+    /**
+     *  find or create city
+     */
     private function findOrCreateCity($cityName, $countryId)
     {
         $city = City::firstOrCreate(
@@ -110,6 +127,9 @@ class UserService
 
         return $city->id;
     }
+    /**
+     *  update user address
+     */
     private function updateUserAddress(User $user, array $data): ?Address
     {
 
@@ -127,7 +147,7 @@ class UserService
             return null;
         }
 
-        $cityId =  $this->findOrCreateCity($data['address_city_name'], $data['address_country_id']);
+        $cityId = $this->findOrCreateCity($data['address_city_name'], $data['address_country_id']);
         // If company already has an address, update it
         if ($user->address_id) {
 
@@ -135,7 +155,7 @@ class UserService
             $address->update([
                 'street_address' => $data['address_street_address'],
                 'postal_code' => $data['address_pincode'],
-                'city_id' =>  $cityId,
+                'city_id' => $cityId,
                 'country_id' => $data['address_country_id'],
             ]);
             return $address;
@@ -151,14 +171,20 @@ class UserService
         ]);
     }
 
+    /**
+     *  has all address fields
+     */
     private function hasAllAddressFields(array $data, array $requiredFields): bool
     {
         return collect($requiredFields)->every(
             fn($field) =>
-            !empty ($data[$field])
+            !empty($data[$field])
         );
     }
 
+    /**
+     *  get dt table response of users lists
+     */
 
     public function getDatatablesResponse($request)
     {
@@ -183,6 +209,9 @@ class UserService
             ->make(true);
     }
 
+    /**
+     *  render action col
+     */
     protected function renderActionsColumn($user)
     {
         return View::make(getComponentsDirFilePath('dt-actions-buttons'), [
@@ -193,6 +222,9 @@ class UserService
         ])->render();
     }
 
+    /**
+     *  render status col
+     */
     protected function renderStatusColumn($user)
     {
         return View::make(getComponentsDirFilePath('dt-status'), [

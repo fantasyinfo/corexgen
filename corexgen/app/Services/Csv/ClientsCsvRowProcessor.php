@@ -234,6 +234,9 @@ class ClientsCsvRowProcessor
         ];
     }
 
+    /**
+     * handle all database errors if any
+     */
     private function handleDatabaseError(\Exception $e): string
     {
         // Check for duplicate email error
@@ -254,6 +257,9 @@ class ClientsCsvRowProcessor
         return "Unable to create client due to database conflict. Please check for duplicate information.";
     }
 
+    /**
+     * get user frinedly errors
+     */
     private function getUserFriendlyError(string $message): string
     {
         // Map of technical error messages to user-friendly ones

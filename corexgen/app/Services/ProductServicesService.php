@@ -29,6 +29,9 @@ class ProductServicesService
     }
 
 
+    /**
+     * create product
+     */
     public function createProduct($data)
     {
 
@@ -54,6 +57,9 @@ class ProductServicesService
     }
 
 
+    /**
+     * update product
+     */
     public function updateProduct($data)
     {
 
@@ -85,6 +91,9 @@ class ProductServicesService
     }
 
 
+    /**
+     * get products categories
+     */
     public function getProductCategories()
     {
         // categories
@@ -93,6 +102,9 @@ class ProductServicesService
         return $categoryQuery->get();
     }
 
+    /**
+     * create products taxes
+     */
     public function getProductTaxes()
     {
         $taxQuery = $this->getCategoryGroupTags(CATEGORY_GROUP_TAGS_TYPES['KEY']['products_taxs'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['products_services']);
@@ -100,11 +112,18 @@ class ProductServicesService
         return $taxQuery->get();
     }
 
+    /**
+     * get all products
+     */
     public function getAllProducts()
     {
         return $this->applyTenantFilter(ProductsServices::query())->get();
     }
 
+
+    /**
+     * dt tbl of products
+     */
     public function getDatatablesResponse($request)
     {
         $this->tenantRoute = $this->getTenantRoute();
@@ -140,6 +159,9 @@ class ProductServicesService
             ->make(true);
     }
 
+    /**
+     * render action col
+     */
     protected function renderActionsColumn($product)
     {
         return View::make(getComponentsDirFilePath('dt-actions-buttons'), [
@@ -150,6 +172,9 @@ class ProductServicesService
         ])->render();
     }
 
+    /**
+     * render status col
+     */
     protected function renderStatusColumn($product)
     {
         return View::make(getComponentsDirFilePath('dt-status'), [

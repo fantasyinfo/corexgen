@@ -35,6 +35,9 @@ class ProjectService
         $this->tenantRoute = $this->getTenantRoute();
     }
 
+    /**
+     * create project
+     */
     public function createProject(array $validatedData)
     {
         return DB::transaction(function () use ($validatedData) {
@@ -47,6 +50,10 @@ class ProjectService
             return $project;
         });
     }
+
+    /**
+     * update project
+     */
     public function updateProject(array $validatedData)
     {
         // Validate that company ID is provided
@@ -70,7 +77,9 @@ class ProjectService
         });
     }
 
-
+    /**
+     * assing projects to users project
+     */
     public function assignprojectsToUserIfProvided(array $validatedData, Project $project)
     {
         if (!empty($validatedData['assign_to']) && is_array($validatedData['assign_to'])) {
@@ -112,12 +121,17 @@ class ProjectService
         }
     }
 
-
+    /**
+     * get all projects
+     */
     public function getAllProjects()
     {
         return $this->applyTenantFilter(Project::where('status', CRM_STATUS_TYPES['PROJECTS']['STATUS']['ACTIVE']))->get();
     }
 
+    /**
+     * get project by user
+     */
     public function getProjectsByUser(int $user_id)
     {
         // Get leads assigned to the given user
@@ -129,6 +143,9 @@ class ProjectService
         return $this->applyTenantFilter($leads);
     }
 
+    /**
+     * get dt response of projects
+     */
     public function getDatatablesResponse($request)
     {
         $this->tenantRoute = $this->getTenantRoute();
@@ -186,7 +203,9 @@ class ProjectService
     }
 
 
-
+    /**
+     *  render action col
+     */
     protected function renderActionsColumn($project)
     {
         return View::make(getComponentsDirFilePath('dt-actions-buttons'), [
@@ -197,7 +216,9 @@ class ProjectService
         ])->render();
     }
 
-
+    /**
+     *  render status col
+     */
     protected function renderStatusColumn($project)
     {
         return View::make(getComponentsDirFilePath('dt-status'), [

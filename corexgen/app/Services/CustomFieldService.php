@@ -5,13 +5,10 @@ namespace App\Services;
 use App\Helpers\PermissionsHelper;
 use App\Models\CustomFieldDefinition;
 use App\Models\CustomFieldValue;
-
 use App\Repositories\CustomFieldsRepository;
 use App\Traits\TenantFilter;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
-use Carbon\Carbon;
 use Yajra\DataTables\Facades\DataTables;
 
 class CustomFieldService
@@ -30,6 +27,10 @@ class CustomFieldService
         $this->tenantRoute = $this->getTenantRoute();
     }
 
+
+    /**
+     * create definition 
+     */
     public function createDefinition(array $data)
     {
         return DB::transaction(function () use ($data) {
@@ -37,6 +38,9 @@ class CustomFieldService
         });
     }
 
+    /**
+     * update definition 
+     */
     public function updateDefinition(CustomFieldDefinition $definition, array $data)
     {
         return DB::transaction(function () use ($definition, $data) {
@@ -45,6 +49,9 @@ class CustomFieldService
         });
     }
 
+    /**
+     * get gields for entitiy definition 
+     */
     public function getFieldsForEntity(string $entityType, int $companyId)
     {
         return CustomFieldDefinition::where('entity_type', $entityType)
@@ -53,6 +60,9 @@ class CustomFieldService
             ->get();
     }
 
+    /**
+     * save values of custom fields 
+     */
     public function saveValues($entity, array $values)
     {
         $entityType = $entity->getCustomFieldEntityType();
@@ -106,6 +116,9 @@ class CustomFieldService
         }
     }
 
+    /**
+     * get values of entitity  
+     */
     public function getValuesForEntity($entity)
     {
         return CustomFieldValue::with('definition')
@@ -120,6 +133,9 @@ class CustomFieldService
             ->get();
     }
 
+    /**
+     * delete entity value 
+     */
     public function deleteEntityValues($entity)
     {
         return DB::transaction(function () use ($entity) {
@@ -130,6 +146,10 @@ class CustomFieldService
                 ->delete();
         });
     }
+
+    /**
+     * bulk delete entity value 
+     */
 
     public function bulkDeleteEntityValues(string $entityType, array $entityIds)
     {
@@ -142,6 +162,10 @@ class CustomFieldService
         });
     }
 
+
+    /**
+     * get dt tbl of custom fields
+     */
     public function getDatatablesResponse($request)
     {
         $this->tenantRoute = $this->getTenantRoute();
@@ -175,6 +199,9 @@ class CustomFieldService
             ->make(true);
     }
 
+    /**
+     * render action col of dt table of custom fields
+     */
     protected function renderActionsColumn($customfield)
     {
 
@@ -187,6 +214,9 @@ class CustomFieldService
         ])->render();
     }
 
+    /**
+     * render status col of dt table of custom fields
+     */
     protected function renderStatusColumn($customfield)
     {
 

@@ -19,7 +19,6 @@ use App\Models\CRM\CRMRolePermissions;
 use App\Models\CRM\CRMSettings;
 use App\Repositories\CompanyRepository;
 use App\Traits\TenantFilter;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
@@ -43,6 +42,9 @@ class CompanyService
 
 
 
+    /**
+     * create company
+     */
 
     public function createCompany(array $validatedData)
     {
@@ -77,7 +79,9 @@ class CompanyService
 
 
 
-
+    /**
+     * generate settings for a  company
+     */
     public function generateAllSettings($companyid)
     {
         $this->generateGeneralSettingsForCompany($companyid);
@@ -85,6 +89,10 @@ class CompanyService
         $this->generatezOneWordSettingsForCompany($companyid);
         $this->generateCategoryGroupsTags($companyid);
     }
+
+    /**
+     * generate general settings for a company
+     */
     public function generateGeneralSettingsForCompany($companyid)
     {
         foreach (CRM_COMPANY_GENERAL_SETTINGS as $setting) {
@@ -132,6 +140,9 @@ class CompanyService
             ]);
         }
     }
+    /**
+     * generate mail settings for a company
+     */
     public function generateMailSettingsForCompany($companyid)
     {
         foreach (CRM_COMPANY_MAIL_SETTINGS as $setting) {
@@ -159,6 +170,9 @@ class CompanyService
         }
     }
 
+    /**
+     * generate one word settings for a company
+     */
     public function generatezOneWordSettingsForCompany($companyid)
     {
         foreach (CRM_COMPANY_ONE_WORD_SETTINGS as $setting) {
@@ -186,6 +200,9 @@ class CompanyService
         }
     }
 
+    /**
+     * generate category, groups, tags settings for a company
+     */
     public function generateCategoryGroupsTags($companyid)
     {
         // Clients Category
@@ -374,7 +391,9 @@ class CompanyService
 
 
 
-
+    /**
+     * create address for a company
+     */
     private function createAddressIfProvided(array $data): ?Address
     {
         $requiredAddressFields = [
@@ -401,6 +420,9 @@ class CompanyService
         ]);
     }
 
+    /**
+     * find or create a city
+     */
     private function findOrCreateCity($cityName, $countryId)
     {
         $city = City::firstOrCreate(
@@ -410,6 +432,9 @@ class CompanyService
 
         return $city->id;
     }
+    /**
+     * create company users acc
+     */
     private function createCompanyUser(Company $company, array $data, $userFullName)
     {
         unset($data['name']);
@@ -423,6 +448,9 @@ class CompanyService
         ]);
     }
 
+    /**
+     * validate if have all address fields to create address acc
+     */
     private function hasAllAddressFields(array $data, array $requiredFields): bool
     {
         return collect($requiredFields)->every(
@@ -431,6 +459,9 @@ class CompanyService
         );
     }
 
+    /**
+     * create payment transaction entry into db
+     */
     public function createPaymentTransaction($planid, $companyid, $paymentDetails)
     {
         // Validate input parameters
@@ -501,7 +532,9 @@ class CompanyService
     }
 
 
-
+    /**
+     * provide permissions to company 
+     */
     public function givePermissionsToCompany($company, $companyAdminUser)
     {
         return;
@@ -612,6 +645,10 @@ class CompanyService
     }
 
 
+
+    /**
+     * add default features to company
+     */
     public function addDefaultFeatuersToCompany($company)
     {
         $permissionToPush = [];
@@ -660,6 +697,9 @@ class CompanyService
 
 
 
+    /**
+     * create menu itesm for company
+     */
     public function createMenuItemsForCompanyPanel($planId)
     {
         return;
@@ -678,6 +718,10 @@ class CompanyService
         }
     }
 
+
+    /**
+     * ck if menu is allowed for a company with a plan
+     */
     private function isMenuAllowedByPlanFeatures($plansFeatures, $menuData)
     {
         if (!isset($menuData['permission_plan'])) {
@@ -691,6 +735,9 @@ class CompanyService
         });
     }
 
+    /**
+     * inter menu with childrens
+     */
     private function insertMenuWithChildren($category, $menuData)
     {
         DB::beginTransaction();
@@ -756,6 +803,9 @@ class CompanyService
 
 
     // company update 
+    /**
+     * update company
+     */
     public function updateCompany(array $validatedData)
     {
         // dd($validatedData);
@@ -816,6 +866,9 @@ class CompanyService
         });
     }
 
+    /**
+     * update company address
+     */
     private function updateCompanyAddress(Company $company, array $data): ?Address
     {
         // Check if address fields are provided
@@ -854,6 +907,9 @@ class CompanyService
         ]);
     }
 
+    /**
+     * update company plans and permissions
+     */
     private function updateCompanyPlanAndPermissions(Company $company, $newPlanId)
     {
 
@@ -880,7 +936,9 @@ class CompanyService
 
 
     /// index 
-
+    /**
+     * get datatable response of a company
+     */
     public function getDatatablesResponse($request)
     {
 
@@ -917,7 +975,9 @@ class CompanyService
             ->make(true);
     }
 
-
+    /**
+     * render action column for datatable
+     */
     protected function renderActionsColumn($company)
     {
 
@@ -930,6 +990,9 @@ class CompanyService
         ])->render();
     }
 
+    /**
+     * render status column for datatable
+     */
     protected function renderStatusColumn($company)
     {
 

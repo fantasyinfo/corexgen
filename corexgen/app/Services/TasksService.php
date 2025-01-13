@@ -34,6 +34,9 @@ class TasksService
     }
 
 
+    /**
+     *  create task
+     */
     public function createTask(array $validatedData)
     {
         return DB::transaction(function () use ($validatedData) {
@@ -55,7 +58,9 @@ class TasksService
         });
     }
 
-
+    /**
+     *  update task
+     */
     public function updateTask(array $validatedData)
     {
         if (empty($validatedData['id'])) {
@@ -83,6 +88,9 @@ class TasksService
         });
     }
 
+    /**
+     *  add attachments ti task
+     */
     public function addAttachmentsIFProvideded(array $validatedData, Tasks $task)
     {
 
@@ -93,7 +101,9 @@ class TasksService
         }
     }
 
-
+    /**
+     *  add assign users to tasks
+     */
     public function assignTasksToUserIfProvided(array $validatedData, Tasks $task)
     {
         if (!empty($validatedData['assign_to']) && is_array($validatedData['assign_to'])) {
@@ -135,26 +145,35 @@ class TasksService
         }
     }
 
+    /**
+     *  get tasks by user
+     */
     public function getTasksByUser(int $user_id)
     {
         // Get leads assigned to the given user
-        $leads = Tasks::with(['assignedBy','stage'])->whereHas('assignees', function ($query) use ($user_id) {
+        $leads = Tasks::with(['assignedBy', 'stage'])->whereHas('assignees', function ($query) use ($user_id) {
             $query->where('user_id', $user_id);
         })->with('assignees')->get();
 
         // Apply tenant filter (ensure this function modifies or filters the results as intended)
         return $this->applyTenantFilter($leads);
     }
+
+    /**
+     *  get all tasks
+     */
     public function getAllTasks(int $project_id = null)
     {
         if ($project_id == null) {
-            return Tasks::with('assignees','stage:id,name,color')->where('company_id', Auth::user()->company_id)->get();
+            return Tasks::with('assignees', 'stage:id,name,color')->where('company_id', Auth::user()->company_id)->get();
         }
-        return Tasks::with('assignees','stage:id,name,color',)->where('company_id', Auth::user()->company_id)->where('project_id', $project_id)->get();
+        return Tasks::with('assignees', 'stage:id,name,color', )->where('company_id', Auth::user()->company_id)->where('project_id', $project_id)->get();
     }
 
- 
 
+    /**
+     *  get dt tbl response of tasks
+     */
     public function getDatatablesResponse($request)
     {
         $this->tenantRoute = $this->getTenantRoute();
@@ -201,7 +220,9 @@ class TasksService
     }
 
 
-
+    /**
+     *  render action col of tasks
+     */
     protected function renderActionsColumn($task)
     {
         return View::make(getComponentsDirFilePath('dt-actions-buttons'), [
@@ -212,6 +233,9 @@ class TasksService
         ])->render();
     }
 
+    /**
+     *  render stage col
+     */
     protected function renderStageColumn($task, $stages)
     {
         return View::make(getComponentsDirFilePath('dt-leads-stage'), [
@@ -226,6 +250,9 @@ class TasksService
         ])->render();
     }
 
+    /**
+     *  get kanban board of stages
+     */
     public function getKanbanBoardStages($request)
     {
         $query = CategoryGroupTag::where('type', CATEGORY_GROUP_TAGS_TYPES['KEY']['tasks_status'])
@@ -237,6 +264,9 @@ class TasksService
 
     }
 
+    /**
+     *  load kanban board leads lists
+     */
     public function getKanbanLoad($request)
     {
         $query = $this->tasksRepository->getKanbanLoad($request);
@@ -244,6 +274,9 @@ class TasksService
         return $query->get()->groupBy('stage_name');
     }
 
+    /**
+     *  get tasks stages/status
+     */
     public function getTasksStatus()
     {
         $leadsGroups = $this->getCategoryGroupTags(CATEGORY_GROUP_TAGS_TYPES['KEY']['tasks_status'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['tasks']);

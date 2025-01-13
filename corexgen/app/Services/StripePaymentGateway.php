@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Contracts\Payments\PaymentGatewayInterface;
 use App\Http\Controllers\CompanyRegisterController;
 use App\Models\PaymentGateway;
-use App\Services\CompanyService;
 use Illuminate\Http\Request;
 use Stripe\Stripe;
 use Stripe\Checkout\Session;
@@ -13,6 +12,10 @@ use Stripe\Checkout\Session;
 class StripePaymentGateway implements PaymentGatewayInterface
 {
 
+
+    /**
+     *  get stripe secret key
+     */
     public function getStripeSecretKey()
     {
         $stripe = PaymentGateway::where('name', 'Stripe')->first();
@@ -22,9 +25,13 @@ class StripePaymentGateway implements PaymentGatewayInterface
         return null;
     }
 
+
+    /**
+     *  initilize the gateway
+     */
     public function initialize(array $paymentDetails)
     {
-        \Log::info('Stripe API Key from StripePaymentGateway Service: ',[$this->getStripeSecretKey()]);
+        \Log::info('Stripe API Key from StripePaymentGateway Service: ', [$this->getStripeSecretKey()]);
         Stripe::setApiKey($this->getStripeSecretKey()); // 
 
         $session = Session::create([
@@ -50,6 +57,9 @@ class StripePaymentGateway implements PaymentGatewayInterface
         return $session->url;
     }
 
+    /**
+     *  process payment
+     */
     public function processPayment($paymentData)
     {
 
@@ -100,11 +110,17 @@ class StripePaymentGateway implements PaymentGatewayInterface
 
     }
 
+    /**
+     *  handle webhooks
+     */
     public function handleWebhook(Request $request)
     {
         // Implement Stripe webhook handling
     }
 
+    /**
+     *  handle refund
+     */
     public function refund(string $transactionId, float $amount)
     {
         // Implement refund logic
