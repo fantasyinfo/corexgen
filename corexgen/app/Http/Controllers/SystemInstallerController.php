@@ -14,7 +14,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Config;
-
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Installer for software SystemInstallerController
@@ -234,7 +235,7 @@ class SystemInstallerController extends Controller
         DB::purge('mysql');
         DB::reconnect('mysql');
 
-        \Log::info('DB is Reconnected.');
+        Log::info('DB is Reconnected.');
     }
 
 
@@ -277,11 +278,11 @@ class SystemInstallerController extends Controller
      */
     public function installApplication(Request $request)
     {
-        \Log::info('Reached to the installation function');
+        Log::info('Reached to the installation function');
         try {
-            \Log::info('Installation Begin');
+            Log::info('Installation Begin');
 
-            \Log::info('Ensure DB Connect');
+            Log::info('Ensure DB Connect');
             $this->ensureDatabaseExists(
                 $request->db_host,
                 $request->db_port,
@@ -291,13 +292,13 @@ class SystemInstallerController extends Controller
             );
 
 
-            \Log::info('Reconnect the DB');
+            Log::info('Reconnect the DB');
             $this->reConnectDB($request);
 
             // Test connection immediately
             DB::connection('mysql')->getPdo();
 
-            \Log::info('DB Transaction Begin');
+            Log::info('DB Transaction Begin');
             DB::beginTransaction();
 
 
@@ -323,7 +324,7 @@ class SystemInstallerController extends Controller
             ]);
 
             if ($validator->fails()) {
-                \Log::info('Validation Failed');
+                Log::info('Validation Failed');
                 return response()->json([
                     'status' => 'error',
                     'errors' => $validator->errors()
@@ -331,22 +332,22 @@ class SystemInstallerController extends Controller
             }
 
             // remove old config file if exists
-            \Log::info('Unlinking the old cache file if exists.');
+            Log::info('Unlinking the old cache file if exists.');
             if (file_exists(base_path('/bootstrap/cache/config.php'))) {
                 unlink(base_path('/bootstrap/cache/config.php'));
             }
 
 
 
-            \Log::info('Migration Started.');
+            Log::info('Migration Started.');
             // Run migrations
             Artisan::call('migrate:fresh');
 
-            \Log::info('Seeders Started.');
+            Log::info('Seeders Started.');
 
             $this->runSeeders();
 
-            \Log::info('Super Admin Creating...');
+            Log::info('Super Admin Creating...');
             // Create super admin
             $user = $this->createSuperAdmin($request);
 
@@ -356,11 +357,11 @@ class SystemInstallerController extends Controller
             File::put(storage_path('installed.lock'), 'Installation completed on ' . now());
 
 
-            \Log::info('Updating the .env file...');
+            Log::info('Updating the .env file...');
             // Update environment file
             $this->updateEnvironmentFile($request);
 
-            \Log::info('Artisan Calls...');
+            Log::info('Artisan Calls...');
 
             // Generate application key
             Artisan::call('key:generate');
@@ -370,7 +371,7 @@ class SystemInstallerController extends Controller
             Artisan::call('config:cache');
             Artisan::call('optimize');
 
-            \Log::info('DB Commit...');
+            Log::info('DB Commit...');
 
             DB::commit();
 
@@ -379,7 +380,7 @@ class SystemInstallerController extends Controller
 
 
 
-            \Log::info('Installation Succfully...');
+            Log::info('Installation Succfully...');
             return response()->json([
                 'status' => 'success',
                 'message' => 'Installation Successful',
@@ -387,7 +388,7 @@ class SystemInstallerController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Installation failed', [
+            Log::error('Installation failed', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
@@ -404,12 +405,31 @@ class SystemInstallerController extends Controller
      *
      * @param $code $code verification of purchase code ::todo api call
      *
-     * @return void
+     * @return bool
      */
     private function verifyPurchaseCode($code)
     {
         // Implement your purchase code verification logic here
         // This is a placeholder - replace with actual verification
+        $apiUrl = rtrim(env('VERSION_CHECK_API'), '/') . '/validate_license.php';
+
+        try {
+            // Fetch the latest version from the API
+            $response = Http::get($apiUrl);
+            if ($response->successful()) {
+                $status = $response->json('status');
+
+                if($status == 'success'){
+                    return true;
+                }else {
+                    return false;
+                }
+            }
+        } catch (\Exception $e) {
+            // Log the error and provide a fallback message
+            Log::error('Error fetching the latest version', ['error' => $e->getMessage()]);
+        }
+
         return true;
     }
 
