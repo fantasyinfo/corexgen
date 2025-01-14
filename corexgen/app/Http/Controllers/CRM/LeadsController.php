@@ -9,6 +9,7 @@ use App\Http\Requests\LeadsEditRequest;
 use App\Http\Requests\LeadsRequest;
 use App\Models\Country;
 use App\Models\CRM\CRMClients;
+use App\Models\WebToLeadForm;
 use App\Services\ContractService;
 use App\Services\Csv\ClientsCsvRowProcessor;
 use App\Services\Csv\LeadsCsvRowProcessor;
@@ -943,6 +944,50 @@ class LeadsController extends Controller
             'cfOldValues' => $cfOldValues
         ]);
     }
+
+
+    /**
+     * lead form view
+     */
+    public function leadForm(Request $request)
+    {
+        if (!$request->get('_id')) {
+            return redirect()->route(getPanelRoutes('home'));
+        }
+
+        $countries = Country::all();
+
+        $formData = WebToLeadForm::where('uuid', $request->get('_id'))
+            ->firstOrFail();
+
+        return view($this->getViewFilePath('leadForm'), [
+            'title' => 'Create Lead',
+            'countries' => $countries,
+            'module' => PANEL_MODULES[$this->getPanelModule()]['leads'],
+            'formData' => $formData
+        ]);
+    }
+    /**
+     * lead form store
+     */
+    public function leadFormStore(Request $request)
+    {
+        dd($request);
+        $countries = Country::all();
+
+
+
+        return view($this->getViewFilePath('leadForm'), [
+            'title' => 'Create Lead',
+            'countries' => $countries,
+            'module' => PANEL_MODULES[$this->getPanelModule()]['leads'],
+            'formData' => $formData
+        ]);
+    }
+
+
+
+
 
 
 
