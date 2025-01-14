@@ -623,10 +623,13 @@ class SettingsController extends Controller
      */
     public function leadFormSettingFetch(Request $request)
     {
+        $data = $this->applyTenantFilter(
+            WebToLeadForm::query()
+                ->withCount('leads as leads_count')
+                ->with(['stage', 'source', 'group'])
+        )->latest()->get();
 
-        $data = $this->applyTenantFilter(WebToLeadForm::query()->with(['stage', 'source', 'group']))->latest()->get();
         return response()->json($data);
-
     }
 
     /**
@@ -711,7 +714,7 @@ class SettingsController extends Controller
                 ->where('id', $id)
                 ->firstOrFail();
 
-            return redirect()->route('leadForm', ['_id' => $form->uuid]);
+            return redirect()->route('leadForm', ['id' => $form->uuid]);
         } catch (\Exception $e) {
             // (Optional) Log the exception
             Log::error('Error generating lead form:', [

@@ -17,14 +17,7 @@
             font-weight: bold;
         }
 
-        /* .btn-primary {
-            background: linear-gradient(45deg, #007bff, #0056b3);
-            border: none;
-        }
 
-        .btn-primary:hover {
-            background: linear-gradient(45deg, #0056b3, #003580);
-        } */
 
         .invalid-feedback {
             display: none;
@@ -33,6 +26,8 @@
         .is-invalid~.invalid-feedback {
             display: block;
         }
+
+     
     </style>
 @endpush
 
@@ -46,8 +41,8 @@
                     @csrf
 
                     {{-- Hidden Fields --}}
-                    <input type="hidden" name="id" value="{{ $formData->id ?? '' }}">
-                    <input type="hidden" name="uuid" value="{{ $formData->uuid ?? '' }}">
+                    <input type="hidden" name="web_to_leads_form_id" value="{{ $formData->id ?? '' }}">
+                    <input type="hidden" name="web_to_leads_form_uuid" value="{{ $formData->uuid ?? '' }}">
                     <input type="hidden" name="title" value="{{ $formData->title ?? '' }}">
                     <input type="hidden" name="group_id" value="{{ $formData->group_id ?? '' }}">
                     <input type="hidden" name="source_id" value="{{ $formData->source_id ?? '' }}">
@@ -55,6 +50,20 @@
                     <input type="hidden" name="company_id" value="{{ $formData->company_id ?? '' }}">
 
                     {{-- Fields --}}
+                    <div class="mb-3">
+                        <label for="type" class="form-label">Type</label>
+                        <select class="form-select" name="type" id="type" required>
+                            <option value="Individual">Individual</option>
+                            <option value="Company">Company</option>
+                        </select>
+                        <div class="invalid-feedback">Please enter a valid company name.</div>
+                    </div>
+                    <div class="mb-3" >
+                        <label for="company_name" class="form-label">Company Name </label>
+                        <input type="text" class="form-control" id="company_name" name="company_name"
+                            placeholder="Enter Company Name (Optional)" >
+                        <div class="invalid-feedback">Please enter a valid company name.</div>
+                    </div>
                     <div class="mb-3">
                         <label for="first_name" class="form-label">First Name <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="first_name" name="first_name"
@@ -196,5 +205,7 @@
                 }
             });
         });
+
+     
     </script>
 @endpush

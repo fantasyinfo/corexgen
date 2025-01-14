@@ -30,7 +30,8 @@ use App\Repositories\LeadsRepository;
 use App\Services\CustomFieldService;
 use App\Services\LeadsService;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
 
 class LeadsController extends Controller
 {
@@ -949,15 +950,15 @@ class LeadsController extends Controller
     /**
      * lead form view
      */
-    public function leadForm(Request $request)
+    public function leadForm($id)
     {
-        if (!$request->get('_id')) {
+        if (!$id) {
             return redirect()->route(getPanelRoutes('home'));
         }
 
         $countries = Country::all();
 
-        $formData = WebToLeadForm::where('uuid', $request->get('_id'))
+        $formData = WebToLeadForm::where('uuid', $id)
             ->firstOrFail();
 
         return view($this->getViewFilePath('leadForm'), [
@@ -972,21 +973,123 @@ class LeadsController extends Controller
      */
     public function leadFormStore(Request $request)
     {
-        dd($request);
-        $countries = Country::all();
 
+        try {
+            // Start database transaction
+            DB::beginTransaction();
 
+            // Validate incoming request
+            $validated = $request->validate([
+                'web_to_leads_form_id' => 'required|string|exists:web_to_leads_form,id',
+                'web_to_leads_form_uuid' => 'required|string|exists:web_to_leads_form,uuid',
+                'company_id' => 'required|string|exists:companies,id',
+                'company_name' => 'nullable|string|max:255', // client company name
+                'title' => 'required|string|max:255',
+                'first_name' => 'required|string|max:255',
+                'last_name' => 'required|string|max:255',
+                'email' => 'required|email',
+                'phone' => 'nullable|min:7|max:15',
+                'preferred_contact_method' => 'nullable|in:Email,Phone,In-Person',
+                'group_id' => 'required|exists:category_group_tag,id',
+                'source_id' => 'required|exists:category_group_tag,id',
+                'status_id' => 'required|exists:category_group_tag,id',
+                'address_street_address' => 'nullable|string|max:255',
+                'address_country_id' => 'nullable|exists:countries,id',
+                'address_city_name' => 'nullable|string|max:255',
+                'address_pincode' => 'nullable|string|max:20',
+            ]);
 
-        return view($this->getViewFilePath('leadForm'), [
-            'title' => 'Create Lead',
-            'countries' => $countries,
-            'module' => PANEL_MODULES[$this->getPanelModule()]['leads'],
-            'formData' => $formData
-        ]);
+            // Log the incoming lead attempt
+            Log::info('New lead form submission', [
+                'company_id' => $validated['company_id'],
+                'email' => $validated['email'],
+                'source' => $validated['source_id']
+            ]);
+
+            // Validate category group tags
+            $this->validateCategoryGroupTags($validated);
+
+            // Create the lead
+            $lead = $this->leadsService->createLead($validated);
+
+            // Commit transaction
+            DB::commit();
+
+            // Log successful lead creation
+            Log::info('Lead successfully created', [
+                'lead_id' => $lead['lead']->id,
+                'company_id' => $lead['lead']->company_id
+            ]);
+
+            return redirect()->back()->with(
+                'success',
+                'Thank you for your interest! Our team will contact you shortly.'
+            );
+
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            Log::warning('Lead validation failed', [
+                'errors' => $e->errors(),
+                'input' => $request->except(['password'])
+            ]);
+
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->withInput()
+                ->with('error', 'Please check the form for errors and try again.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Lead creation failed', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'company_id' => $request->input('company_id')
+            ]);
+
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Unable to process your request at this time. Please try again later.');
+        }
     }
 
 
+    /**
+     * Validate category group tags for the lead
+     *
+     * @param array $validated
+     */
+    private function validateCategoryGroupTags(array $validated)
+    {
+        $validations = [
+            'group_id' => [
+                'type' => CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_groups'],
+                'message' => 'Invalid lead group selected. Please check and try again.'
+            ],
+            'source_id' => [
+                'type' => CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_sources'],
+                'message' => 'Invalid lead source selected. Please check and try again.'
+            ],
+            'status_id' => [
+                'type' => CATEGORY_GROUP_TAGS_TYPES['KEY']['leads_status'],
+                'message' => 'Invalid lead status selected. Please check and try again.'
+            ]
+        ];
 
+        foreach ($validations as $field => $config) {
+            $isValid = $this->checkIsValidCGTID(
+                $validated[$field],
+                $validated['company_id'],
+                $config['type'],
+                CATEGORY_GROUP_TAGS_RELATIONS['KEY']['leads']
+            );
+
+            if (!$isValid) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', $config['message']);
+            }
+        }
+    }
 
 
 

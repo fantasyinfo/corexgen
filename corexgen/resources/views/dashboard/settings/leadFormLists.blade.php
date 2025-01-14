@@ -1,5 +1,5 @@
-@extends('dashboard.settings.settings-layout')
-@section('settings_content')
+@extends('layout.app')
+@section('content')
     <div class="container-fluid">
         <h3 class="mb-4">{{ $title }}</h3>
 
@@ -15,8 +15,8 @@
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th>#</th>
                                 <th>Title</th>
+                                <th>Leads Capture</th>
                                 <th>Group</th>
                                 <th>Source</th>
                                 <th>Status</th>
@@ -147,6 +147,30 @@
         </div>
     </div>
 
+    <!-- Leads Modal -->
+    <div class="modal fade" id="leadsModal" tabindex="-1" aria-labelledby="leadsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="leadsModalLabel">Captured Leads</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="leadsContainer">
+                        <!-- Leads list/table will be injected here -->
+                    </div>
+                    <!-- You can also add a link to a dedicated page if desired -->
+                    <div class="mt-3">
+                        <a href="/some-view-leads-page" class="btn btn-primary" id="viewLeadsPageLink">
+                            Go to Full Leads Page
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     @push('scripts')
         <script>
             document.addEventListener('DOMContentLoaded', function() {
@@ -161,8 +185,9 @@
                             const tableBody = document.getElementById('webToLeadFormBody');
                             tableBody.innerHTML = data.map((form, index) => `
                             <tr>
-                                <td>${index + 1}</td>
+                               
                                 <td>${form.title}</td>
+                                <td>${form.leads_count ?? 0}</td>
                  
                                 <td>
                                     <span class="badge bg-${form.group.color}">
@@ -210,6 +235,8 @@
                                     >
                                         <i class="fas fa-paper-plane me-2"></i>
                                     </button>
+
+                                   
                                 </td>
                             </tr>
                         `).join('');
@@ -337,7 +364,13 @@
                             window.location.href = generateRoute
                         });
                     });
+
+
                 }
+
+
+
+
 
                 // Initial load
                 loadForms();

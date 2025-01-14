@@ -49,5 +49,6 @@ return [
     "Product Taxes" => "Product Taxes",
     "Tasks Status" => "Tasks Status",
     "Bulk Import" => "Bulk Import",
-    "Templates" => "Templates"
+    "Templates" => "Templates",
+    "Web to Lead" => "Web to Lead",
 ];

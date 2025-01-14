@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\CRM\CRMLeads;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -54,6 +55,21 @@ class WebToLeadForm extends Model
     public function stage()
     {
         return $this->belongsTo(CategoryGroupTag::class, 'status_id');
+    }
+
+    // Belongs to leads
+    public function leads()
+    {
+        return $this->hasMany(CRMLeads::class, 'web_to_leads_form_id');
+    }
+
+    /**
+     * get leads count capture by this form
+     */
+
+    public function getTotalLeadsCaptureCount()
+    {
+        return $this->leads->count();
     }
 
     /**

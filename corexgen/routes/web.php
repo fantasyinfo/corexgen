@@ -178,7 +178,7 @@ Route::get('/invoices/view/{id}', [InvoiceController::class, 'viewOpen'])->name(
 Route::get('/invoices/print/{id}', [InvoiceController::class, 'print'])->name('invoices.print');
 
 // lead form view
-Route::get('/lead-form-view', [LeadsController::class, 'leadForm'])->name('leadForm');
+Route::get('/lead-form-view/{id}', [LeadsController::class, 'leadForm'])->name('leadForm');
 Route::post('/lead-form-view', [LeadsController::class, 'leadFormStore'])->name('leadFormStore');
 
 
