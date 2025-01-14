@@ -231,6 +231,7 @@ Route::middleware([
 
     // home routes
     Route::get('/', [DashboardController::class, 'companyHome'])->name('home');
+    Route::get('/search', [DashboardController::class, 'companySearch'])->name('search');
 
     // role routes
     Route::prefix(PANEL_MODULES['COMPANY_PANEL']['role'])->as(PANEL_MODULES['COMPANY_PANEL']['role'] . '.')->group(function () {
@@ -801,6 +802,7 @@ Route::middleware([
 
     // home routes
     Route::get('/', [DashboardController::class, 'superHome'])->name('home');
+    Route::get('/search', [DashboardController::class, 'superSearch'])->name('search');
     // role routes
     Route::prefix('role')->as('role.')->group(function () {
         // role for fetch, store, update

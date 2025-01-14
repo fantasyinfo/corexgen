@@ -1480,3 +1480,81 @@ PermissionsHelper::initializePermissions();
         'ticket' => 'ticket',
     ],
 ]);
+
+/**
+ * quick create menus
+ */
+!defined('QUICK_CREATE_MENU') && define('QUICK_CREATE_MENU', [
+    'SUPER_PANEL' => [
+        'MENUS' => [
+            [
+                'name' => 'User',
+                'route' => 'users.create',
+            ],
+            [
+                'name' => 'Company',
+                'route' => 'companies.create',
+            ],
+            [
+                'name' => 'Plans',
+                'route' => 'plans.create',
+            ],
+            [
+                'name' => 'Role',
+                'route' => 'role.create',
+            ],
+        ]
+    ],
+    'COMPANY_PANEL' => [
+        'MENUS' => [
+            [
+                'name' => 'Client',
+                'route' => 'clients.create',
+            ],
+            [
+                'name' => 'Lead',
+                'route' => 'leads.create',
+            ],
+            [
+                'name' => 'Proposal',
+                'route' => 'proposals.create',
+            ],
+            [
+                'name' => 'Estimate',
+                'route' => 'estimates.create',
+            ],
+            [
+                'name' => 'Contract',
+                'route' => 'contracts.create',
+            ],
+            [
+                'name' => 'Product',
+                'route' => 'products_services.create',
+            ],
+            [
+                'name' => 'Invoice',
+                'route' => 'invoices.create',
+            ],
+            [
+                'name' => 'Project',
+                'route' => 'projects.create',
+            ],
+            [
+                'name' => 'Task',
+                'route' => 'tasks.create',
+            ],
+            [
+                'name' => 'Custom Field',
+                'route' => 'customfields.create',
+            ],
+            [
+                'name' => 'User',
+                'route' => 'users.create',
+            ],
+            [
+                'name' => 'Role',
+                'route' => 'role.create',
+            ],
+        ]
+    ],
+]);
