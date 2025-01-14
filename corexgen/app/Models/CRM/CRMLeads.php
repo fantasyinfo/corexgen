@@ -7,6 +7,7 @@ use App\Models\CategoryGroupTag;
 use App\Models\CommentNote;
 use App\Models\Company;
 use App\Models\User;
+use App\Models\WebToLeadForm;
 use App\Traits\HasCustomFields;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -55,6 +56,8 @@ class CRMLeads extends Model implements Auditable
         'status_id',
         'address_id',
         'company_id',
+        'web_to_leads_form_id',
+        'web_to_leads_form_uuid',
     ];
 
     protected $casts = [
@@ -103,6 +106,11 @@ class CRMLeads extends Model implements Auditable
     public function assignedBy()
     {
         return $this->belongsTo(User::class, 'assign_by');
+    }
+    // Belongs to web_to_leads_form
+    public function webToLeadForm()
+    {
+        return $this->belongsTo(WebToLeadForm::class, 'web_to_leads_form_id');
     }
 
     // Many-to-many relationship for multiple assignees

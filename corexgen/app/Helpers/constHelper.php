@@ -159,6 +159,13 @@ PermissionsHelper::initializePermissions();
         'for' => 'company',
         'is_feature' => false
     ],
+    PermissionsHelper::$plansPermissionsKeys['SETTINGS_LEADFORM'] => [
+        'name' => 'SETTINGS_LEADFORM',
+        'id' => PermissionsHelper::getParentPermissionId('37'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['SETTINGS_LEADFORM'],
+        'for' => 'company',
+        'is_feature' => false
+    ],
 
     // CRM Core Features - Starting from 100
     PermissionsHelper::$plansPermissionsKeys['CLIENTS'] => [
@@ -383,6 +390,7 @@ PermissionsHelper::initializePermissions();
             'General' => ['menu_url' => 'settings.general', 'menu_icon' => 'fa-sliders-h', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_GENERAL'], 'READ')],
             'Mail' => ['menu_url' => 'settings.mail', 'menu_icon' => 'fa-envelope', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_MAIL'], 'READ')],
             'Cron' => ['menu_url' => 'settings.cron', 'menu_icon' => 'fa-clock', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_CRON'], 'READ')],
+
         ]
     ],
     'Logs & Events' => [
@@ -420,6 +428,7 @@ PermissionsHelper::initializePermissions();
             'General' => ['menu_url' => 'settings.general', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS'], 'READ')],
             'Mail' => ['menu_url' => 'settings.mail', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_MAIL'], 'READ')],
             'One Word' => ['menu_url' => 'settings.oneWord', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_ONEWORD'], 'READ')],
+            'Web to Lead' => ['menu_url' => 'settings.leadFormSetting', 'menu_icon' => 'fa-clock', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_LEADFORM'], 'READ')],
             'Clients Category' => ['menu_url' => 'cgt.indexClientCategory', 'menu_icon' => 'fa-cog', 'permission_id' => 2000],
             'Leads Groups' => ['menu_url' => 'cgt.indexLeadsGroups', 'menu_icon' => 'fa-cog', 'permission_id' => 2001],
             'Leads Status' => ['menu_url' => 'cgt.indexLeadsStatus', 'menu_icon' => 'fa-cog', 'permission_id' => 2002],
@@ -854,6 +863,7 @@ PermissionsHelper::initializePermissions();
         'for' => 'company',
         'module' => 'settings',
     ],
+
     'Clients Category' => [
         'name' => 'Clients Category',
         'link' => 'indexClientCategory',
@@ -902,6 +912,13 @@ PermissionsHelper::initializePermissions();
         'icon' => 'fa-tags',
         'for' => 'company',
         'module' => 'cgt',
+    ],
+    'Web to Lead' => [
+        'name' => 'Web to Lead',
+        'link' => 'leadFormSetting',
+        'icon' => 'fa-phone-volume',
+        'for' => 'company',
+        'module' => 'settings',
     ],
 ]);
 

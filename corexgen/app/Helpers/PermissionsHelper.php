@@ -50,6 +50,7 @@ class PermissionsHelper
         'INVOICES' => 'INVOICES',
         'SETTINGS_CTG' => 'SETTINGS_CTG',
         'CALENDER' => 'CALENDER',
+        'SETTINGS_LEADFORM' => 'SETTINGS_LEADFORM'
 
 
     ];
@@ -147,12 +148,15 @@ class PermissionsHelper
             self::$plansPermissionsKeys['TIMESHEETS'] => [4351 => 'READ', 4352 => 'READ_ALL', 4353 => 'CREATE', 4354 => 'UPDATE', 4355 => 'DELETE'],
 
 
+
             self::$plansPermissionsKeys['INVOICES'] => [4401 => 'CREATE', 4402 => 'READ', 4403 => 'READ_ALL', 4404 => 'UPDATE', 4405 => 'DELETE', 4406 => 'FILTER', 4407 => 'CHANGE_STATUS', 4408 => 'BULK_DELETE', 4409 => 'VIEW'],
 
 
             self::$plansPermissionsKeys['SETTINGS_CTG'] => [4501 => 'CREATE', 4502 => 'READ', 4503 => 'READ_ALL', 4504 => 'UPDATE', 4505 => 'DELETE'],
 
             self::$plansPermissionsKeys['CALENDER'] => [4551 => 'CREATE', 4552 => 'READ', 4553 => 'READ_ALL', 4554 => 'UPDATE', 4555 => 'DELETE'],
+
+            self::$plansPermissionsKeys['SETTINGS_LEADFORM'] => [4601 => 'READ', 4602 => 'READ_ALL', 4603 => 'CREATE', 4604 => 'UPDATE', 4605 => 'DELETE'],
         ];
     }
 
@@ -177,6 +181,7 @@ class PermissionsHelper
             'CONTRACTS_TEMPLATES' => 'CONTRACTS_TEMPLATES',
             'TIMESHEETS' => 'TIMESHEETS',
             'SETTINGS_CTG' => 'SETTINGS_CTG',
+            'SETTINGS_LEADFORM' => 'SETTINGS_LEADFORM'
         ];
     }
 

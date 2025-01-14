@@ -12,11 +12,14 @@ use App\Models\Country;
 use App\Models\CRM\CRMSettings;
 use App\Models\Media;
 use App\Models\Tenant;
+use App\Models\WebToLeadForm;
+use App\Services\LeadsService;
 use App\Traits\IsSMTPValid;
 use App\Traits\MediaTrait;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 
 class SettingsController extends Controller
@@ -599,5 +602,131 @@ class SettingsController extends Controller
         Company::find(Auth::user()->company_id)->update(['address_id' => $address->id]);
     }
 
+
+    /**
+     * leadFormSetting view 
+     */
+    public function leadFormSetting(LeadsService $leadsService)
+    {
+
+        return view($this->getViewFilePath('leadFormLists'), [
+            'title' => 'Lead Web Forms Lists',
+            'module' => PANEL_MODULES[$this->getPanelModule()]['settings'],
+            'leadsStatus' => $leadsService->getLeadsStatus(),
+            'leadsGroups' => $leadsService->getLeadsGroups(),
+            'leadsSources' => $leadsService->getLeadsSources(),
+            'teamMates' => getTeamMates()
+        ]);
+    }
+    /**
+     * leadFormSetting fetch list
+     */
+    public function leadFormSettingFetch(Request $request)
+    {
+        $data = $this->applyTenantFilter(
+            WebToLeadForm::query()
+                ->withCount('leads as leads_count')
+                ->with(['stage', 'source', 'group'])
+        )->latest()->get();
+
+        return response()->json($data);
+    }
+
+    /**
+     * create and store leadFormSettingStore
+
+     */
+    public function leadFormSettingStore(Request $request)
+    {
+        try {
+            // Validate incoming request data
+            $validatedData = $request->validate([
+                'title' => 'required|string|max:255',
+                'group_id' => 'required|exists:category_group_tag,id',
+                'source_id' => 'required|exists:category_group_tag,id',
+                'status_id' => 'required|exists:category_group_tag,id',
+            ]);
+
+            // Create the new WebToLeadForm entry
+            $form = WebToLeadForm::create($validatedData);
+
+
+            // Return success response
+            return response()->json(['success' => true, 'form' => $form], 201);
+        } catch (\Exception $e) {
+            // Log the error (if logging is desired)
+            Log::error('Error in leadFormSettingStore:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            // Return error response
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create the lead form setting.',
+                'error' => $e->getMessage(), // For production, you may want to hide the actual error message.
+            ], 500);
+        }
+    }
+
+    /**
+        * update and save leadFormSettingUpdate
+
+        */
+    public function leadFormSettingUpdate(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'group_id' => 'required|exists:category_group_tag,id',
+            'source_id' => 'required|exists:category_group_tag,id',
+            'status_id' => 'required|exists:category_group_tag,id',
+            'id' => 'required|exists:web_to_leads_form,id'
+        ]);
+
+        $form = WebToLeadForm::where('company_id', Auth::user()->company_id)->findOrFail($validated['id']);
+        $form->update($validated);
+
+        return response()->json(['success' => true, 'form' => $form]);
+    }
+
+    /**
+     * Remove the lead form delete
+     */
+    public function leadFormSettingDestory($id)
+    {
+        $form = WebToLeadForm::where('company_id', Auth::user()->company_id)->findOrFail($id);
+        $form->delete();
+
+        return response()->json(['success' => true, 'message' => 'Deleted successfully']);
+    }
+
+    /**
+     * Generate the form based on the source, groups, status, and title
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function leadFormSettingGenerate($id)
+    {
+        try {
+            // Fetch the form or fail with 404 if not found
+            $form = WebToLeadForm::where('company_id', Auth::user()->company_id)
+                ->where('id', $id)
+                ->firstOrFail();
+
+            return redirect()->route('leadForm', ['id' => $form->uuid]);
+        } catch (\Exception $e) {
+            // (Optional) Log the exception
+            Log::error('Error generating lead form:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            // Redirect back or to some error page with a friendly error message
+            return redirect()->back()->with([
+                'error' => 'An error occurred while trying to generate the lead form.',
+            ]);
+        }
+    }
 
 }

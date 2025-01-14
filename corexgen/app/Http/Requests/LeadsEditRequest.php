@@ -25,7 +25,7 @@ class LeadsEditRequest extends FormRequest
      */
     public function rules(): array
     {
-    
+
         return [
             'id' => 'required|exists:leads,id',
             'type' => 'required|in:Individual,Company',
@@ -36,13 +36,12 @@ class LeadsEditRequest extends FormRequest
             'last_name' => 'nullable|string|max:255',
             'email' => [
                 'email',
-                Rule::unique('leads', 'email')->ignore($this->id), // Use $this->id to get the input value
             ],
             'phone' => [
                 'nullable',
                 'min:7',
                 'max:15',
-                Rule::unique('leads', 'phone')->ignore($this->id), // Use $this->id to get the input value
+
             ],
             'details' => 'nullable|string',
             'last_contacted_date' => 'nullable|date',
@@ -91,7 +90,7 @@ class LeadsEditRequest extends FormRequest
             'follow_up_date.date' => 'The follow-up date must be a valid date.',
             'last_contacted_date.date' => 'The last contacted date must be a valid date.',
             'last_activity_date.date' => 'The last activity date must be a valid date.',
-            
+
         ];
     }
 }

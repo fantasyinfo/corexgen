@@ -42,6 +42,19 @@
         </div>
     </div>
 </div>
+<div class="card  border-2 mb-4">
+
+    <div class="card-body d-flex gap-2">
+        <div class="stat-icon">
+            <i class="fas fa-check"></i>
+        </div>
+        <div>
+            <h6 class="stat-label">Is Capture Via WebForm</h6>
+            <h3 class="stat-value">{{ $lead?->web_to_leads_form_id ? 'Yes' : 'No' }}
+            </h3>
+        </div>
+    </div>
+</div>
 
 
 <div class="card  border-2 mb-4">
@@ -75,7 +88,7 @@
                 @endphp
                 <div class="detail-group">
                     <label>{{ ucfirst($cf['field_label']) }}</label>
-                    <p>{{ trim($fieldValue) != '' || null ? $fieldValue :  'NA'}}</p>
+                    <p>{{ trim($fieldValue) != '' || null ? $fieldValue : 'NA' }}</p>
                 </div>
             @endforeach
         </div>

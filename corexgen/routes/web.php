@@ -177,6 +177,9 @@ Route::post('/contract/acceptCompany', [ContractsController::class, 'acceptCompa
 Route::get('/invoices/view/{id}', [InvoiceController::class, 'viewOpen'])->name('invoices.viewOpen');
 Route::get('/invoices/print/{id}', [InvoiceController::class, 'print'])->name('invoices.print');
 
+// lead form view
+Route::get('/lead-form-view/{id}', [LeadsController::class, 'leadForm'])->name('leadForm');
+Route::post('/lead-form-view', [LeadsController::class, 'leadFormStore'])->name('leadFormStore');
 
 
 // register
@@ -340,6 +343,23 @@ Route::middleware([
 
         Route::get('/oneWord', [SettingsController::class, 'oneWord'])->name('oneWord')->middleware('check.permission:SETTINGS_ONEWORD.READ_ALL');
         Route::put('/oneWord', [SettingsController::class, 'oneWordUpdate'])->name('oneWordUpdate')->middleware('check.permission:SETTINGS_ONEWORD.UPDATE');
+
+        // web to lead form settings
+
+        Route::get('/leadFormSetting', [SettingsController::class, 'leadFormSetting'])->name('leadFormSetting')->middleware('check.permission:SETTINGS_LEADFORM.READ_ALL');
+
+        Route::get('/leadFormSettingFetch', [SettingsController::class, 'leadFormSettingFetch'])->name('leadFormSettingFetch')->middleware('check.permission:SETTINGS_LEADFORM.READ_ALL');
+
+        Route::get('/leadFormSetting/view/{id}', [SettingsController::class, 'leadFormSettingView'])->name('leadFormSettingView')->middleware('check.permission:SETTINGS_LEADFORM.READ');
+
+        Route::get('/leadFormSetting/generate/{id}', [SettingsController::class, 'leadFormSettingGenerate'])->name('leadFormSettingGenerate')->middleware('check.permission:SETTINGS_LEADFORM.READ');
+
+        Route::post('/leadFormSettingStore', [SettingsController::class, 'leadFormSettingStore'])->name('leadFormSettingStore')->middleware('check.permission:SETTINGS_LEADFORM.CREATE');
+
+        Route::put('/leadFormSettingUpdate', [SettingsController::class, 'leadFormSettingUpdate'])->name('leadFormSettingUpdate')->middleware('check.permission:SETTINGS_LEADFORM.UPDATE');
+
+        Route::delete('/leadFormSettingDestory/{id}', [SettingsController::class, 'leadFormSettingDestory'])->name('leadFormSettingDestory')->middleware('check.permission:SETTINGS_LEADFORM.DELETE');
+
     });
     // upgrade routes
     Route::prefix(PANEL_MODULES['COMPANY_PANEL']['planupgrade'])->as(PANEL_MODULES['COMPANY_PANEL']['planupgrade'] . '.')->group(function () {
