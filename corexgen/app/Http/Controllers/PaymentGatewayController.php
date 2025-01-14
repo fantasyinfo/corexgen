@@ -8,6 +8,7 @@ use App\Models\PaymentGateway;
 use App\Services\PaymentGatewayFactory;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
 use Yajra\DataTables\Facades\DataTables;
@@ -85,7 +86,6 @@ class PaymentGatewayController extends Controller
 
             // Redirect to payment gateway
             return redirect()->away($paymentUrl);
-
         } catch (\Exception $e) {
             Log::error('Payment Initiation Failed: ' . $e->getMessage());
 
@@ -107,7 +107,6 @@ class PaymentGatewayController extends Controller
 
             // Process payment and create user account
             return $paymentGateway->processPayment($request->all());
-
         } catch (\Exception $e) {
             Log::error('Payment Success Handling Failed: PaymentGatewayController::handleSuccess ' . $e->getMessage());
 
@@ -130,53 +129,75 @@ class PaymentGatewayController extends Controller
     }
 
 
-    /**
-     * view payment gateway and fetch
-     */
 
+
+    /**
+     * View payment gateway and fetch
+     */
     public function index(Request $request)
     {
-        //
-
-        $query = PaymentGateway::query();
         $this->tenantRoute = $this->getTenantRoute();
-        // Server-side DataTables response
+
+        // Start a base query on the PaymentGateway model
+        $query = PaymentGateway::query();
+
+        // If user is *not* tenant (i.e., a company user),
+        // eager-load only the settings that belong to that user's company.
+        if (!Auth::user()->is_tenant) {
+            $companyId = Auth::user()->company_id;
+
+            // Eager-load paymentGatewaySettings but filter by this company_id
+            $query->with([
+                'paymentGatewaySettings' => function ($settingsQuery) use ($companyId) {
+                    $settingsQuery->where('company_id', $companyId);
+                }
+            ]);
+        }
+
+        // Handle Ajax/DataTables
         if ($request->ajax()) {
             return DataTables::of($query)
                 ->addColumn('actions', function ($paymentGateway) {
                     return View::make(getComponentsDirFilePath('dt-actions-buttons'), [
-
                         'tenantRoute' => $this->tenantRoute,
                         'permissions' => PermissionsHelper::getPermissionsArray('PAYMENTGATEWAYS'),
                         'module' => PANEL_MODULES[$this->getPanelModule()]['paymentGateway'],
                         'id' => $paymentGateway->id
-
                     ])->render();
                 })
-                ->editColumn('created_at', fn($paymentGateway) => $paymentGateway->created_at->format('d M Y'))
-                ->editColumn('logo', fn($paymentGateway) => "<img src='" . asset("/img/gateway/$paymentGateway->logo") . "' class='gateway_logo_img' />")
-
+                ->editColumn('created_at', function ($paymentGateway) {
+                    return $paymentGateway->created_at->format('d M Y');
+                })
+                ->editColumn('logo', function ($paymentGateway) {
+                    return "<img src='" . asset("/img/gateway/$paymentGateway->logo") . "' class='gateway_logo_img' />";
+                })
                 ->editColumn('status', function ($paymentGateway) {
-                    return View::make(getComponentsDirFilePath('dt-status'), [
+                    // If tenant, read the status directly from the gateway table
+                    // If company user, read from the *first* (and presumably only) PaymentGatewaySettings row
+                    $status = Auth::user()->is_tenant
+                        ? $paymentGateway->status
+                        : ($paymentGateway->paymentGatewaySettings->first()?->status ?? 'Active');
 
+                    return View::make(getComponentsDirFilePath('dt-status'), [
                         'tenantRoute' => $this->tenantRoute,
                         'permissions' => PermissionsHelper::getPermissionsArray('PAYMENTGATEWAYS'),
                         'module' => PANEL_MODULES[$this->getPanelModule()]['paymentGateway'],
                         'id' => $paymentGateway->id,
                         'status' => [
-                            'current_status' => $paymentGateway->status,
+                            'current_status' => $status,
                             'available_status' => ['Active', 'Inactive'],
-                            'bt_class' => ['Active' => 'success', 'Inactive' => 'danger'],
-
-                        ]
+                            'bt_class' => [
+                                'Active' => 'success',
+                                'Inactive' => 'danger'
+                            ],
+                        ],
                     ])->render();
                 })
                 ->rawColumns(['actions', 'status', 'logo'])
                 ->make(true);
         }
 
-
-        // Render index view with filterss
+        // Non-ajax request: render the index view
         return view($this->getViewFilePath('index'), [
             'filters' => $request->all(),
             'title' => 'Gateway Management',
@@ -185,28 +206,40 @@ class PaymentGatewayController extends Controller
         ]);
     }
 
+
     /**
      * edit payment gateway
      */
+
     public function edit($id)
     {
-        // Apply tenant filtering to gateway query
         $query = PaymentGateway::query()->where('id', $id);
+
+        // If user is NOT tenant, we only want the PaymentGatewaySettings for that user's company
+        if (!Auth::user()->is_tenant) {
+            $companyId = Auth::user()->company_id;
+            $query->with([
+                'paymentGatewaySettings' => function ($settingsQuery) use ($companyId) {
+                    $settingsQuery->where('company_id', $companyId);
+                }
+            ]);
+        }
+
         $gateway = $query->firstOrFail();
 
         return view($this->getViewFilePath('edit'), [
             'title' => 'Edit Payment Gateway',
-            'gateway' => $gateway
+            'gateway' => $gateway,
+            'isTenant' => Auth::user()->is_tenant
         ]);
     }
 
-    /**
-     * update payment gateway
-     */
 
+    /**
+     * Update payment gateway
+     */
     public function update(Request $request)
     {
-
         $validatedData = $request->validate([
             'config_key' => 'required|string',
             'config_value' => 'required|string',
@@ -216,19 +249,39 @@ class PaymentGatewayController extends Controller
         $this->tenantRoute = $this->getTenantRoute();
 
         try {
-            // Validate and update role
-            $query = PaymentGateway::query()->where('id', $request->id);
-            $query->update($validatedData);
+            // Fetch the PaymentGateway
+            $gateway = PaymentGateway::query()
+                ->with(['paymentGatewaySettings'])
+                ->where('id', $request->id)
+                ->firstOrFail();
+
+            if (Auth::user()->is_tenant) {
+                // Tenant => update directly in the main PaymentGateway table
+                $gateway->update($validatedData);
+            } elseif (Auth::user()->company_id) {
+                // Company user => update or create in PaymentGatewaySettings for this company & gateway
+                $gateway->paymentGatewaySettings()
+                    ->updateOrCreate([
+                        'company_id' => Auth::user()->company_id,
+                        'payment_gateway_id' => $gateway->id,
+                    ], $validatedData);
+            } else {
+                // Optional fallback if user is neither tenant nor has a company_id
+                return redirect()->back()
+                    ->with('error', 'Unable to determine tenant or company for this user. Cannot update gateway.');
+            }
 
             // Redirect with success message
-            return redirect()->route($this->tenantRoute . 'paymentGateway.index')
+            return redirect()
+                ->route($this->tenantRoute . 'paymentGateway.index')
                 ->with('success', 'Payment Gateway updated successfully.');
         } catch (\Exception $e) {
-            // Handle any errors during role update
+            // Handle any errors
             return redirect()->back()
                 ->with('error', 'An error occurred while updating the gateway: ' . $e->getMessage());
         }
     }
+
 
     /**
      * Chaning the status 
@@ -240,8 +293,15 @@ class PaymentGatewayController extends Controller
     {
         try {
             // Apply tenant filtering and find role
-            $query = PaymentGateway::query()->where('id', $id);
-            $query->update(['status' => $status]);
+            $gateway = PaymentGateway::query()->with(['paymentGatewaySettings'])->where('id', $id)->firstOrFail();
+            if (Auth::user()->is_tenant) {
+                $gateway->update(['status' => $status]);
+            } else if (Auth::user()->company_id != null) {
+                $gateway->paymentGatewaySettings()->updateOrCreate([
+                    'company_id' => Auth::user()->company_id,
+                    'payment_gateway_id' => $id
+                ], ['status' => $status]);
+            }
             // Redirect with success message
             return redirect()->back()->with('success', 'Gateway status changed successfully.');
         } catch (\Exception $e) {

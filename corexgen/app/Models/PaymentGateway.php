@@ -28,4 +28,14 @@ class PaymentGateway extends Model
         'status',
 
     ];
+
+
+    /**
+     * payment Gateway Settings relations with payment_gateway table
+     */
+    public function paymentGatewaySettings()
+    {
+        return $this->hasMany(PaymentGatewaySettings::class, 'payment_gateway_id');
+    }
+
 }
