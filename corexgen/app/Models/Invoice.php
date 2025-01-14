@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use OwenIt\Auditing\Contracts\Auditable;
-
+use Illuminate\Support\Str;
 
 /**
  * Invoice table model handle all filters, observers, evenets, relatioships
@@ -145,7 +145,7 @@ class Invoice extends Model implements Auditable
 
         static::creating(function ($invoice) {
             $invoice->status = $invoice->status ?? CRM_STATUS_TYPES['INVOICES']['STATUS']['PENDING'];
-
+            $invoice->uuid = (string) Str::uuid();
             if (Auth::check()) {
                 $invoice->company_id = $invoice->company_id ?? Auth::user()->company_id;
             } else {

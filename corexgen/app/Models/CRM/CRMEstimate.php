@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
-use SebastianBergmann\Template\Template;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Estimate table model handle all filters, observers, evenets, relatioships
@@ -80,6 +81,26 @@ class CRMEstimate extends Model implements Auditable
     public function template()
     {
         return $this->belongsTo(CRMTemplates::class, 'template_id');
+    }
+
+     /**
+     * Model boot method to set default values
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($estimate) {
+
+            $estimate->uuid = (string) Str::uuid();
+            if (Auth::check()) {
+                $estimate->company_id = $estimate->company_id ?? Auth::user()->company_id;
+
+            } else {
+                $estimate->company_id = $estimate->company_id ?? null;
+
+            }
+        });
     }
 
 

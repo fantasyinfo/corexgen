@@ -3,7 +3,7 @@
 
 A new invoice has been sent to you. Please find the attachment below as a PDF.
 
-@component('mail::button', ['url' => url('/invoices/view/' . $invoice->id)])
+@component('mail::button', ['url' => url('/invoices/view/' . $invoice->uuid)])
 View Invoice
 @endcomponent
 

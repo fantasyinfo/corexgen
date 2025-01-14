@@ -3,7 +3,7 @@
 
 A new contract has been sent to you. Please find the attachment below as a PDF.
 
-@component('mail::button', ['url' => url('/contract/view/' . $contract->id)])
+@component('mail::button', ['url' => url('/contract/view/' . $contract->uuid)])
 View Contract
 @endcomponent
 

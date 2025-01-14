@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
-use SebastianBergmann\Template\Template;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 
 /**
@@ -89,5 +90,24 @@ class CRMProposals extends Model implements Auditable
     }
    
 
+       /**
+     * Model boot method to set default values
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($proposal) {
+
+            $proposal->uuid = (string) Str::uuid();
+            if (Auth::check()) {
+                $proposal->company_id = $proposal->company_id ?? Auth::user()->company_id;
+
+            } else {
+                $proposal->company_id = $proposal->company_id ?? null;
+
+            }
+        });
+    }
 
 }

@@ -353,7 +353,7 @@
                 <!-- Action Buttons -->
 
                 <div class="d-flex justify-content-end mt-5 pt-4 border-top">
-                    <a href="{{ route('invoices.viewOpen', ['id' => $invoice->id]) }}"
+                    <a href="{{ route('invoices.viewOpen', ['id' => $invoice->uuid]) }}"
                         class="dt-link btn btn-outline-dark me-2">
                         View as client
                     </a>

@@ -494,7 +494,7 @@ class ProposalController extends Controller
                             ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
                     }
                 ])
-                ->where('id', '=', $id)
+                ->where('uuid', '=', $id)
         );
 
 

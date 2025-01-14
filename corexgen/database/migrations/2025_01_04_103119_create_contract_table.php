@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('contract', function (Blueprint $table) {
             $table->id();
+            $table->string('uuid');
             $table->string('_prefix')->default('CONT');
             $table->string('_id');
             $table->string('title');
