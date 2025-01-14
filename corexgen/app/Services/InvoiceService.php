@@ -4,8 +4,6 @@ namespace App\Services;
 
 
 use App\Jobs\SendInvoice;
-use App\Models\CRM\CRMContract;
-use App\Models\CRM\CRMLeads;
 use App\Traits\IsSMTPValid;
 use App\Traits\TenantFilter;
 use Yajra\DataTables\Facades\DataTables;

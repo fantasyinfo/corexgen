@@ -3,7 +3,7 @@
 
 A new proposal has been sent to you. Please find the attachment below as a PDF.
 
-@component('mail::button', ['url' => url('/proposal/view/' . $proposal->id)])
+@component('mail::button', ['url' => url('/proposal/view/' . $proposal->uuid)])
 View Proposal
 @endcomponent
 

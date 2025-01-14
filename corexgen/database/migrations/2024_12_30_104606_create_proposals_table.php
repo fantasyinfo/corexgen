@@ -13,6 +13,7 @@ return new class extends Migration {
         Schema::create('proposals', function (Blueprint $table) {
             $table->id();
             $table->string('_prefix')->default('PRO');
+            $table->string('uuid');
             $table->string('_id');
             $table->string('title');
             $table->string('url')->unique();

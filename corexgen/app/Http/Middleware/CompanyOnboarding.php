@@ -16,9 +16,20 @@ class CompanyOnboarding
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::user()->company->status === CRM_STATUS_TYPES['COMPANIES']['STATUS']['ONBOARDING']){
-            return redirect()->route('onboarding.index');
+        if (Auth::check()) {
+            if (!isset(Auth::user()->company->status)) {
+                Auth::guard('web')->logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return redirect()->route('login');
+            }
+
+            if (Auth::user()->company->status === CRM_STATUS_TYPES['COMPANIES']['STATUS']['ONBOARDING']) {
+                return redirect()->route('onboarding.index');
+            }
         }
+
         return $next($request);
     }
 }

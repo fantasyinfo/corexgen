@@ -184,7 +184,7 @@ class InvoiceController extends Controller
             $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['INVOICES']]), '+', '1');
 
 
-            if ($request->validated()['timesheet_id'] && $request->validated()['timesheet_id'] > 0) {
+            if (isset($request->validated()['timesheet_id']) && $request->validated()['timesheet_id'] && $request->validated()['timesheet_id'] > 0) {
                 Timesheet::find($request->validated()['timesheet_id'])->update(['invoice_generated' => 1]);
                 return response()->json($invoice);
             }
@@ -445,7 +445,7 @@ class InvoiceController extends Controller
                     }
 
                 ])
-                ->where('id', '=', $id)
+                ->where('uuid', '=', $id)
         );
 
 

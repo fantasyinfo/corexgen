@@ -807,6 +807,29 @@ Route::middleware([
         Route::get('/fetch', [CalenderController::class, 'fetch'])->name('fetch')->middleware('check.permission:CALENDER.READ_ALL');
     });
 
+    // payment gateways
+      // payment gateways routes
+
+      Route::prefix('paymentGateway')->as('paymentGateway.')->group(function () {
+        // role for fetch, store, update
+        Route::get('/', [PaymentGatewayController::class, 'index'])->name('index')->middleware('check.permission:PAYMENTGATEWAYS.READ_ALL');
+
+        Route::put('/', [PaymentGatewayController::class, 'update'])->name('update')->middleware('check.permission:PAYMENTGATEWAYS.UPDATE');
+
+        //  edit, change status, 
+
+        Route::get('/edit/{id}', [PaymentGatewayController::class, 'edit'])->name('edit')->middleware('check.permission:PAYMENTGATEWAYS.UPDATE');
+        Route::get(
+            '/changeStatus/{id}/{status}',
+            [PaymentGatewayController::class, 'changeStatus']
+        )->name('changeStatus')->middleware('check.permission:PAYMENTGATEWAYS.CHANGE_STATUS');
+    });
+
+        // planPaymentTransaction routes
+        Route::prefix('planPaymentTransaction')->as('planPaymentTransaction.')->group(function () {
+            // role for fetch, store, update
+            Route::get('/', [PlansPaymentTransaction::class, 'index'])->name('index')->middleware('check.permission:PAYMENTSTRANSACTIONS.READ_ALL');
+        });
 
 });
 

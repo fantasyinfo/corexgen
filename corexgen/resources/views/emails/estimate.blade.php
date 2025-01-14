@@ -3,7 +3,7 @@
 
 A new estimate has been sent to you. Please find the attachment below as a PDF.
 
-@component('mail::button', ['url' => url('/estimate/view/' . $estimate->id)])
+@component('mail::button', ['url' => url('/estimate/view/' . $estimate->uuid)])
 View Estimate
 @endcomponent
 

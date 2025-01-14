@@ -52,14 +52,14 @@ PermissionsHelper::initializePermissions();
         'name' => 'PAYMENTSTRANSACTIONS',
         'id' => PermissionsHelper::getParentPermissionId('4'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['PAYMENTSTRANSACTIONS'],
-        'for' => 'tenant',
+        'for' => 'both',
         'is_feature' => false
     ],
     PermissionsHelper::$plansPermissionsKeys['PAYMENTGATEWAYS'] => [
         'name' => 'PAYMENTGATEWAYS',
         'id' => PermissionsHelper::getParentPermissionId('5'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['PAYMENTGATEWAYS'],
-        'for' => 'tenant',
+        'for' => 'both',
         'is_feature' => false
     ],
     PermissionsHelper::$plansPermissionsKeys['SUBSCRIPTIONS'] => [
@@ -438,6 +438,15 @@ PermissionsHelper::initializePermissions();
             'Tasks Status' => ['menu_url' => 'cgt.indexTasksStatus', 'menu_icon' => 'fa-cog', 'permission_id' => 2006],
         ]
     ],
+    'Gateway & Transactions' => [
+        'menu_icon' => 'fas fa-file-invoice-dollar',
+        'permission_id' => PermissionsHelper::getParentPermissionId('4'),
+        'menu_url' => 'paymentGateway',
+        'children' => [
+            'Gateways' => ['menu_url' => 'paymentGateway.index', 'menu_icon' => 'fa-credit-card', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PAYMENTGATEWAYS'], 'READ_ALL')],
+            'Transactions' => ['menu_url' => 'planPaymentTransaction.index', 'menu_icon' => 'fa-money-bill-wave', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PAYMENTSTRANSACTIONS'], 'READ_ALL')],
+        ]
+    ],
     'Roles & Permissions' => [
         'menu_icon' => 'fa-users',
         'feature_type' => PermissionsHelper::$plansPermissionsKeys['ROLE'], // this need to match the PLANS_FEATURES key
@@ -759,6 +768,8 @@ PermissionsHelper::initializePermissions();
         'invoices' => 'invoices',
         'cgt' => 'cgt',
         'calender' => 'calender',
+        'planPaymentTransaction' => 'planPaymentTransaction',
+        'paymentGateway' => 'paymentGateway',
 
     ]
 ]);

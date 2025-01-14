@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use OwenIt\Auditing\Contracts\Auditable;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Str;
 
 /**
  * Projects table model handle all filters, observers, evenets, relatioships
@@ -286,7 +286,7 @@ class Project extends Model implements Auditable
 
         static::creating(function ($project) {
             $project->status = $project->status ?? CRM_STATUS_TYPES['PROJECTS']['STATUS']['ACTIVE'];
-
+            $project->uuid = (string) Str::uuid();
             if (Auth::check()) {
                 $project->company_id = $project->company_id ?? Auth::user()->company_id;
 

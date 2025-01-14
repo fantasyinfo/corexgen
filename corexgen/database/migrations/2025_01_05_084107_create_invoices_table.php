@@ -12,6 +12,7 @@ return new class extends Migration {
     {
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
+            $table->string('uuid');
             $table->string('_prefix')->default('INV');
             $table->string('_id');
             $table->date('issue_date');

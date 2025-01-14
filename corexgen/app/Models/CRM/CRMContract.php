@@ -7,8 +7,9 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 use OwenIt\Auditing\Contracts\Auditable;
-use SebastianBergmann\Template\Template;
+use Illuminate\Support\Str;
 
 /**
  * Contract table model handle all filters, observers, evenets, relatioships
@@ -84,5 +85,25 @@ class CRMContract extends Model implements Auditable
         return $this->belongsTo(CRMTemplates::class, 'template_id');
     }
 
+
+    /**
+     * Model boot method to set default values
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($contract) {
+
+            $contract->uuid = (string) Str::uuid();
+            if (Auth::check()) {
+                $contract->company_id = $contract->company_id ?? Auth::user()->company_id;
+
+            } else {
+                $contract->company_id = $contract->company_id ?? null;
+
+            }
+        });
+    }
 
 }

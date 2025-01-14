@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
+            $table->string('uuid');
             $table->string('title');
             $table->text('description')->nullable();
             $table->enum('billing_type', ['Hourly', 'One-Time']);
