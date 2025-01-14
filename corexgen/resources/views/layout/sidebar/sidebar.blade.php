@@ -4,30 +4,35 @@
     $currentRoute = Route::currentRouteName();
 
     // Function to get the base route without prefixes for comparison
-    function getBaseRoute($route)
-    {
-        $prefix = getPanelRoutes(''); // Get the dynamic panel prefix (e.g., 'company-panel.')
-        $cleanedRoute = str_replace($prefix, '', $route); // Remove the prefix from the route
-        return trim($cleanedRoute, '.'); // Ensure no trailing dots
+
+    if (!function_exists('_getBaseRouteCoreX')) {
+        function _getBaseRouteCoreX($route)
+        {
+            $prefix = getPanelRoutes(''); // Get the dynamic panel prefix (e.g., 'company-panel.')
+            $cleanedRoute = str_replace($prefix, '', $route); // Remove the prefix from the route
+            return trim($cleanedRoute, '.'); // Ensure no trailing dots
+        }
     }
 
     // Function to check if the current route matches or is part of the parent menu's URL
-function isParentMenuActive($currentRoute, $parentMenuUrl)
-{
-    // Return false if menu_url is empty
-    if (empty($parentMenuUrl)) {
-        // Log::warning('Menu URL is empty', ['currentRoute' => $currentRoute, 'parentMenuUrl' => $parentMenuUrl]);
-        return false;
-    }
+if (!function_exists('isParentMenuActive')) {
+    function isParentMenuActive($currentRoute, $parentMenuUrl)
+    {
+        // Return false if menu_url is empty
+        if (empty($parentMenuUrl)) {
+            // Log::warning('Menu URL is empty', ['currentRoute' => $currentRoute, 'parentMenuUrl' => $parentMenuUrl]);
+            return false;
+        }
 
-    $baseCurrentRoute = getBaseRoute($currentRoute); // Get the base route for the current route
-    // Log::info('Checking if parent menu is active', [
-    //     'currentRoute' => $currentRoute,
-    //     'baseCurrentRoute' => $baseCurrentRoute,
-    //     'parentMenuUrl' => $parentMenuUrl,
-    //     'isActive' => str_contains($baseCurrentRoute, $parentMenuUrl),
-    // ]);
-    return str_contains($baseCurrentRoute, $parentMenuUrl); // Check if the base route contains the parent menu's URL
+        $baseCurrentRoute = _getBaseRouteCoreX($currentRoute); // Get the base route for the current route
+        // Log::info('Checking if parent menu is active', [
+        //     'currentRoute' => $currentRoute,
+        //     'baseCurrentRoute' => $baseCurrentRoute,
+        //     'parentMenuUrl' => $parentMenuUrl,
+        //     'isActive' => str_contains($baseCurrentRoute, $parentMenuUrl),
+        // ]);
+        return str_contains($baseCurrentRoute, $parentMenuUrl); // Check if the base route contains the parent menu's URL
+        }
     }
 @endphp
 
@@ -38,7 +43,8 @@ function isParentMenuActive($currentRoute, $parentMenuUrl)
         color: var(--primary-color);
         border-radius: 10px;
     }
-/* 
+
+    /*
     .debug-active {
         border: 1px solid green;
     }
@@ -90,7 +96,8 @@ $isParentMenuActive = isParentMenuActive($currentRoute, $parentMenu->menu_url);
 //     'isParentMenuActive' => $isParentMenuActive,
 //     'hasChildPermission' => $hasChildPermission,
 //     'hasParentPermission' => $hasParentPermission,
-//                     ]);
+                    //                     ]);
+
                 @endphp
 
                 @if ($hasChildPermission || $hasParentPermission)

@@ -87,6 +87,7 @@ class CRMProposals extends Model implements Auditable
     {
         return $this->belongsTo(CRMTemplates::class, 'template_id');
     }
+   
 
 
 }
