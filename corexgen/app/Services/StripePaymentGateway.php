@@ -6,9 +6,11 @@ use App\Contracts\Payments\PaymentGatewayInterface;
 use App\Http\Controllers\CompanyRegisterController;
 use App\Http\Controllers\PaymentGatewayController;
 use App\Models\PaymentGateway;
+use App\Models\PaymentGatewayStoreSession;
 use Illuminate\Http\Request;
 use Stripe\Stripe;
 use Stripe\Checkout\Session;
+use Illuminate\Support\Facades\Log;
 
 class StripePaymentGateway implements PaymentGatewayInterface
 {
@@ -47,12 +49,14 @@ class StripePaymentGateway implements PaymentGatewayInterface
                 $paymentDetails['config_value'],
                 $paymentDetails['mode']
             );
+            \Log::info('from company');
         } else {
             $accessToken = $this->getStripeSecretKey();
+            \Log::info('from tenant ');
         }
 
-        \Log::info('Stripe API Key from StripePaymentGateway Service: ', [$this->getStripeSecretKey()]);
-        Stripe::setApiKey($this->getStripeSecretKey()); // 
+        \Log::info('Stripe API Key from StripePaymentGateway Service: ', [$accessToken]);
+        Stripe::setApiKey($accessToken); // 
 
         $session = Session::create([
             'payment_method_types' => ['card'],
@@ -74,6 +78,21 @@ class StripePaymentGateway implements PaymentGatewayInterface
             'metadata' => $paymentDetails['metadata'],
         ]);
 
+
+        // Store config in database as backup
+        if (isset($paymentDetails['config_key'])) {
+            PaymentGatewayStoreSession::updateOrCreate(
+                ['session_id' => $session->id, 'company_id' => $paymentDetails['metadata']['company_id']],
+                [
+                    'config_key' => $paymentDetails['config_key'],
+                    'config_value' => encrypt($paymentDetails['config_value']),
+                    'mode' => $paymentDetails['mode'],
+
+                ]
+            );
+        }
+
+
         return $session->url;
     }
 
@@ -83,9 +102,6 @@ class StripePaymentGateway implements PaymentGatewayInterface
     public function processPayment($paymentData)
     {
 
-        // \Log::info('payment Data outside.', $paymentData);
-        Stripe::setApiKey($this->getStripeSecretKey()); // todo:// get these from tenenat payment settings 
-
         $sessionId = $paymentData['session_id'];
 
         if (!$sessionId) {
@@ -93,8 +109,36 @@ class StripePaymentGateway implements PaymentGatewayInterface
             return redirect()->route('payment.failed')->with('error', 'Invalid payment session');
         }
 
+        Log::info('Stripe Session Id', [$sessionId]);
+
+
+
+        $stripeConfig = PaymentGatewayStoreSession::where('session_id', $sessionId)->first();
+
+        // If not in metadata, try to get from database backup
+
+        $configKey = $configValue = $mode = null;
+        if ($stripeConfig) {
+            $configKey = $stripeConfig->config_key;
+            $configValue = decrypt($stripeConfig->config_value);
+            $mode = $stripeConfig->mode;
+            Log::info('Retrieved Stripe config from database backup');
+        }
+
+
+        // Set API key based on available config
+        if ($configKey && $configValue && $mode) {
+            $accessToken = $this->getStripeSecretKey($configKey, $configValue, $mode);
+            Log::info('Using retrieved configuration for payment processing');
+        } else {
+            $accessToken = $this->getStripeSecretKey();
+            Log::info('Using default configuration for payment processing');
+        }
+
+        Stripe::setApiKey($accessToken);
 
         $session = Session::retrieve($sessionId);
+
 
         // dd($session);
 
@@ -125,9 +169,11 @@ class StripePaymentGateway implements PaymentGatewayInterface
             'is_company_registration' => filter_var($session?->metadata?->is_company_registration, FILTER_VALIDATE_BOOLEAN),
         ];
 
+        if ($stripeConfig) {
+            // Clean up stored config if it exists
+            PaymentGatewayStoreSession::where('session_id', $sessionId)->delete();
+        }
         return app(PaymentGatewayController::class)->handlePaymentGatewaysSuccessResponse($paymentDetails);
-
-
 
     }
 

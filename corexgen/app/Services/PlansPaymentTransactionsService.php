@@ -59,7 +59,6 @@ class PlansPaymentTransactionsService
                 } else {
                     return '';
                 }
-
             })
             ->editColumn('subscription.start_date', function ($ppT) {
                 return formatDateTime($ppT->subscription->start_date);
@@ -110,4 +109,36 @@ class PlansPaymentTransactionsService
     }
 
 
+    /**
+     * get dt response of plans payment transations for Company
+     */
+    public function getDatatablesResponseCompany($request)
+    {
+
+        $this->tenantRoute = $this->getTenantRoute();
+
+        $query = $this->plansPaymentTransactionRepository->getTransactionQueryCompany($request);
+
+        // dd($query->get()->toArray());
+
+
+        $module = PANEL_MODULES[$this->getPanelModule()]['planPaymentTransaction'];
+
+
+        return DataTables::of($query)
+            // ->addColumn('actions', function ($ppT) {
+            //     return $this->renderActionsColumn($ppT);
+            // })
+            ->editColumn('created_at', function ($ppT) {
+                return formatDateTime($ppT->created_at);
+            })
+            ->editColumn('transaction_date', function ($ppT) {
+                return formatDateTime($ppT->transaction_date);
+            })
+            ->editColumn('transaction_reference', function ($ppT) {
+                return '<button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#transactionModal" data-refrence="' . htmlspecialchars($ppT->transaction_reference, ENT_QUOTES) . '">View Details</button>';
+            })
+            ->rawColumns(['created_at', 'transaction_reference', 'transaction_date']) // Add 'status' to raw columns
+            ->make(true);
+    }
 }

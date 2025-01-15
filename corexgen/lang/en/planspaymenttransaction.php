@@ -27,6 +27,7 @@ return [
     'Type' => 'Type',
     'Transaction Date' => 'Transaction Date',
     'Plan Start Date' => 'Plan Start Date',
+    'Transaction Refrence' => 'Transaction Refrence'
 
 
 ];

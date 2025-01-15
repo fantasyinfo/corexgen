@@ -829,7 +829,7 @@ Route::middleware([
         // planPaymentTransaction routes
         Route::prefix('planPaymentTransaction')->as('planPaymentTransaction.')->group(function () {
             // role for fetch, store, update
-            Route::get('/', [PlansPaymentTransaction::class, 'index'])->name('index')->middleware('check.permission:PAYMENTSTRANSACTIONS.READ_ALL');
+            Route::get('/', [PlansPaymentTransaction::class, 'indexCompany'])->name('index')->middleware('check.permission:PAYMENTSTRANSACTIONS.READ_ALL');
         });
 
 });

@@ -46,7 +46,7 @@ class PaymentGatewayNotFoundException extends Exception
     /**
      * Custom string representation of the exception
      *
-     * @return string
+
      */
     public function __toString()
     {

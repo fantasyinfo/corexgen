@@ -5,14 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+
 /**
- * Payment Gateway Settings table model handle all filters, observers, evenets, relatioships
+ * Payment Gateway Store Sesstions table model handle all filters, observers, evenets, relatioships
  */
-class PaymentGatewaySettings extends Model
+class PaymentGatewayStoreSession extends Model
 {
     use HasFactory;
 
-    const table = 'payment_gateway_settings';
+    const table = 'payment_gateway_store_session';
 
     protected $table = self::table;
 
@@ -20,8 +21,7 @@ class PaymentGatewaySettings extends Model
         'company_id',
         'config_key',
         'config_value',
-        'payment_gateway_id',
-        'status',
+        'session_id',
         'mode'
     ];
 
@@ -31,13 +31,5 @@ class PaymentGatewaySettings extends Model
     public function company()
     {
         return $this->belongsTo(Company::class, 'company_id');
-    }
-
-    /**
-     * payment Gateway relations with payment_gateway_settings table
-     */
-    public function paymentGateway()
-    {
-        return $this->belongsTo(PaymentGateway::class, 'payment_gateway_id');
     }
 }

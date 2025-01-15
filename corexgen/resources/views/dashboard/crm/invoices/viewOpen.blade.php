@@ -307,7 +307,8 @@
                                                     @if ($totalTax > 0)
                                                         <tr>
                                                             <td colspan="5" class="text-end">Tax:</td>
-                                                            <td class="text-end"> {{ $additionalFields['currency_symbol'] }}
+                                                            <td class="text-end">
+                                                                {{ $additionalFields['currency_symbol'] }}
                                                                 {{ number_format($totalTax, 2) }}
                                                                 {{ $additionalFields['currency_code'] }}</td>
                                                         </tr>
@@ -360,10 +361,11 @@
 
                 <div class="d-flex justify-content-end mt-5 pt-4 border-top">
 
-                    <button class="btn btn-primary me-2" onclick="payNow('{{ $invoice?->uuid }}')">
-                        <i class="fas fa-paper-plane me-2"></i>Pay Now
-                    </button>
-
+                    @if ($invoice->status !== 'SUCCESS')
+                        <button class="btn btn-primary me-2" onclick="payNow('{{ $invoice?->uuid }}')">
+                            <i class="fas fa-paper-plane me-2"></i>Pay Now
+                        </button>
+                    @endif
                     <button class="btn btn-outline-secondary me-2" onclick="printInvoice()">
                         <i class="fas fa-down me-2"></i>Download PDF
                     </button>
