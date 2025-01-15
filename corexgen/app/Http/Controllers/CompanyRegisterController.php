@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Exceptions\Payment;
 use App\Models\Company;
 use App\Models\CompanyOnboarding;
+use App\Models\CRM\CRMSettings;
 use App\Repositories\CompanyRepository;
 use App\Services\PaymentGatewayFactory;
 use Illuminate\Support\Facades\DB;
@@ -40,9 +41,20 @@ class CompanyRegisterController extends Controller
     public function register()
     {
         $plans = Plans::where('status', CRM_STATUS_TYPES['PLANS']['STATUS']['ACTIVE'])->get();
-        return view('landing.register', ['plans' => $plans]);
+        return view('landing.register', ['plans' => $plans, 'logo' => $this->getLogo()]);
     }
 
+    /**
+     * 
+     * get logo
+     */
+    private function getLogo()
+    {
+        $query = CRMSettings::with('media');
+        $logo = $query->where('is_tenant', 1)->where('name', 'tenant_company_logo')->first();
+
+        return $logo?->media?->file_path ?? '/img/logo.png';
+    }
 
     /**
      * init the payment gateway for company registraiton
