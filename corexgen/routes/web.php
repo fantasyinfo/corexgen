@@ -20,6 +20,7 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\CustomFieldController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\EstimatesController;
+use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\ProductServicesController;
 use App\Http\Controllers\ProposalController;
 use App\Http\Controllers\RoleController;
@@ -85,7 +86,7 @@ Route::prefix('installer')->group(function () {
 
 // home route of applying it to a group of routes
 Route::middleware(['check.installation'])->group(function () {
-    // All routes that require the installation to be completed
+    // Home route with authentication check
     Route::get('/', function () {
         if (Auth::check()) {
             if (Auth::user()->is_tenant) {
@@ -93,16 +94,22 @@ Route::middleware(['check.installation'])->group(function () {
             } else if (Auth::user()->company_id != null) {
                 return redirect()->route(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']) . '.home');
             }
-        } else {
-            return view('landing.index');
         }
+
+        // If not authenticated, return the landing page
+        return app(LandingPageController::class)->home();
     })->name('home');
 
+    // Landing page route (separate from home for direct access)
+    Route::get('/landing', [LandingPageController::class, 'home'])->name('landing.index');
 
-    Route::get('/company/register', [CompanyRegisterController::class, 'register'])->name('compnay.landing-register');
-    Route::post('/company/register', [CompanyRegisterController::class, 'store'])->name('company.register');
+    // Company registration routes
+    Route::get('/company/register', [CompanyRegisterController::class, 'register'])
+        ->name('compnay.landing-register');
+    Route::post('/company/register', [CompanyRegisterController::class, 'store'])
+        ->name('company.register');
 
-
+    // Login route
     Route::get('/login', function () {
         return view('auth.login');
     })->name('login');
@@ -809,9 +816,9 @@ Route::middleware([
     });
 
     // payment gateways
-      // payment gateways routes
+    // payment gateways routes
 
-      Route::prefix('paymentGateway')->as('paymentGateway.')->group(function () {
+    Route::prefix('paymentGateway')->as('paymentGateway.')->group(function () {
         // role for fetch, store, update
         Route::get('/', [PaymentGatewayController::class, 'index'])->name('index')->middleware('check.permission:PAYMENTGATEWAYS.READ_ALL');
 
@@ -826,11 +833,11 @@ Route::middleware([
         )->name('changeStatus')->middleware('check.permission:PAYMENTGATEWAYS.CHANGE_STATUS');
     });
 
-        // planPaymentTransaction routes
-        Route::prefix('planPaymentTransaction')->as('planPaymentTransaction.')->group(function () {
-            // role for fetch, store, update
-            Route::get('/', [PlansPaymentTransaction::class, 'indexCompany'])->name('index')->middleware('check.permission:PAYMENTSTRANSACTIONS.READ_ALL');
-        });
+    // planPaymentTransaction routes
+    Route::prefix('planPaymentTransaction')->as('planPaymentTransaction.')->group(function () {
+        // role for fetch, store, update
+        Route::get('/', [PlansPaymentTransaction::class, 'indexCompany'])->name('index')->middleware('check.permission:PAYMENTSTRANSACTIONS.READ_ALL');
+    });
 
 });
 
@@ -1014,6 +1021,9 @@ Route::middleware([
 
 
         Route::get('/cron', [SettingsController::class, 'cron'])->name('cron')->middleware('check.permission:SETTINGS_CRON.READ_ALL');
+
+        Route::get('/frontend', [SettingsController::class, 'frontend'])->name('frontend')->middleware('check.permission:LANDING_PAGE_SETTINGS.READ_ALL');
+        Route::put('/frontend', [SettingsController::class, 'frontendUpdate'])->name('frontendUpdate')->middleware('check.permission:LANDING_PAGE_SETTINGS.UPDATE');
     });
 
 

@@ -50,7 +50,8 @@ class PermissionsHelper
         'INVOICES' => 'INVOICES',
         'SETTINGS_CTG' => 'SETTINGS_CTG',
         'CALENDER' => 'CALENDER',
-        'SETTINGS_LEADFORM' => 'SETTINGS_LEADFORM'
+        'SETTINGS_LEADFORM' => 'SETTINGS_LEADFORM',
+        'LANDING_PAGE_SETTINGS' => 'LANDING_PAGE_SETTINGS',
 
 
     ];
@@ -157,6 +158,8 @@ class PermissionsHelper
             self::$plansPermissionsKeys['CALENDER'] => [4551 => 'CREATE', 4552 => 'READ', 4553 => 'READ_ALL', 4554 => 'UPDATE', 4555 => 'DELETE'],
 
             self::$plansPermissionsKeys['SETTINGS_LEADFORM'] => [4601 => 'READ', 4602 => 'READ_ALL', 4603 => 'CREATE', 4604 => 'UPDATE', 4605 => 'DELETE'],
+
+            self::$plansPermissionsKeys['LANDING_PAGE_SETTINGS'] => [5001 => 'READ', 5002 => 'READ_ALL', 5003 => 'UPDATE',],
         ];
     }
 

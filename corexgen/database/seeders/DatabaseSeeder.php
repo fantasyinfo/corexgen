@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             CRMSettingsSeeder::class,
             PlansSeeder::class,
             PaymentGatewaySeeder::class,
+            FrontendSeeder::class,
         ]);
 
         // Re-enable auditing globally

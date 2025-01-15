@@ -6,7 +6,7 @@
     </div>
     <div class="detail-group">
         <label>Hourly Rate</label>
-        <p>{{ number_format($task->hourly_rate,2) }}</p>
+        <p>{{ number_format($task->hourly_rate, 2) }}</p>
     </div>
     <div class="detail-group">
         <label>Start Date</label>
@@ -20,8 +20,12 @@
         <label>Related to</label>
         <p>{{ ucwords($task->related_to) }}</p>
     </div>
-    <div class="detail-group">
-        <label>Project</label>
-        <p><a href="{{ route(getPanelRoutes('projects.view'),['id' => $task?->project?->id]) }}">{{ $task?->project?->title }}</a></p>
-    </div>
+    @if ($task?->project)
+        <div class="detail-group">
+            <label>Project</label>
+            <p><a
+                    href="{{ route(getPanelRoutes('projects.view'), ['id' => $task?->project?->id]) }}">{{ $task?->project?->title }}</a>
+            </p>
+        </div>
+    @endif
 </div>

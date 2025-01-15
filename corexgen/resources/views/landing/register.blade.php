@@ -11,10 +11,8 @@
     <section id='register_section' class="auth-section py-5 d-flex align-items-center my-5">
         <div class="container">
             <div class="row ">
-                <div class="col-md-6">
-                    <img src="/img/register.jpg" alt="register" style="width:100%;height:auto">
-                </div>
-                <div class="col-md-6">
+
+                <div class="col-md-6 mx-auto">
                     <div class="card shadow">
                         <div class="card-body p-5">
                             @if ($errors->any())

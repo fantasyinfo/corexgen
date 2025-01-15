@@ -10,7 +10,7 @@
     @include('landing.components.solutions')
     @include('landing.components.pricing')
     @include('landing.components.testimonial')
-    @include('landing.components.cta')
+    {{-- @include('landing.components.cta') --}}
     @include('landing.components.footer')
 </body>
 
