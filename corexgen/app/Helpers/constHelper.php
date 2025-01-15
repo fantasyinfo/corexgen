@@ -166,6 +166,13 @@ PermissionsHelper::initializePermissions();
         'for' => 'company',
         'is_feature' => false
     ],
+    PermissionsHelper::$plansPermissionsKeys['LANDING_PAGE_SETTINGS'] => [
+        'name' => 'LANDING_PAGE_SETTINGS',
+        'id' => PermissionsHelper::getParentPermissionId('36'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['LANDING_PAGE_SETTINGS'],
+        'for' => 'tenant',
+        'is_feature' => false
+    ],
 
     // CRM Core Features - Starting from 100
     PermissionsHelper::$plansPermissionsKeys['CLIENTS'] => [
@@ -390,6 +397,7 @@ PermissionsHelper::initializePermissions();
             'General' => ['menu_url' => 'settings.general', 'menu_icon' => 'fa-sliders-h', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_GENERAL'], 'READ')],
             'Mail' => ['menu_url' => 'settings.mail', 'menu_icon' => 'fa-envelope', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_MAIL'], 'READ')],
             'Cron' => ['menu_url' => 'settings.cron', 'menu_icon' => 'fa-clock', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_CRON'], 'READ')],
+            'Front End' => ['menu_url' => 'settings.frontend', 'menu_icon' => 'fa-clock', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['LANDING_PAGE_SETTINGS'], 'READ')],
 
         ]
     ],
@@ -1584,5 +1592,87 @@ PermissionsHelper::initializePermissions();
                 'route' => 'role.create',
             ],
         ]
+    ],
+]);
+
+/**
+ * frontend default settings
+ */
+!defined('FRONT_END_DEFAULT_SETTINGS') && define('FRONT_END_DEFAULT_SETTINGS', [
+    'HERO' => [
+        'Heading' => 'Streamline Your Business with CoreXGen CRM',
+        'SubHeading' => "Intelligent Customer Relationship Management that transforms how you connect, engage, and grow your business.",
+    ],
+    "FEATURES" => [
+        'Heading' => 'Powerful Features for Modern Businesses',
+        'SubHeading' => "CoreXGen offers comprehensive tools to manage your customer relationships",
+        "Options" => [
+            [
+                "Heading" => "Tasks Pipeline",
+                "SubHeading" => "Visualize and optimize your tasks process with intuitive pipeline management."
+            ],
+            [
+                "Heading" => "Customer Insights",
+                "SubHeading" => "Deep analytics and 360-degree customer view to understand your clients better."
+            ],
+            [
+                "Heading" => "Capture Leads",
+                "SubHeading" => "Web to lead capture online in one click, don't miss out your single opportunity."
+            ],
+        ]
+    ],
+    "SOLUTIONS" => [
+        'Heading' => 'Custom Solutions for Every Business',
+        'SubHeading' => "CoreXGen adapts to your unique business needs with flexible, scalable solutions.",
+        "Options" => [
+            "Leads Management",
+            "Clients Management",
+            "Proposal Management",
+            "Estimates Management",
+            "Contracts Management",
+            "Products & Services Management",
+            "Invoices Management",
+            "Projects Management",
+            "Tasks Management",
+            "Custom Fields",
+            "Event Calendar",
+            "Users & Employees Managment",
+            "Roles & Permissions Managment",
+            "Much More...",
+        ]
+    ],
+    'PLANS' => [
+        'Heading' => 'Simple, Transparent Pricing',
+        'SubHeading' => "Choose a plan that grows with your business.",
+    ],
+    "TESTIMONIALS" => [
+        'Heading' => 'What Our Customers Say',
+        "Options" => [
+            [
+                "Message" => "CoreXGen transformed our sales process. The insights are incredible!",
+                "Customer Name" => "Sarah Johnson",
+                "Position" => "CEO",
+                "Company" => "TechStartup Inc.",
+                "LOGO" => "/img/100.svg"
+            ],
+            [
+                "Message" => "Seamless integrations and powerful automation. A game-changer for our business!",
+                "Customer Name" => "Mike Rodriguez",
+                "Position" => "Sales Director",
+                "Company" => "GlobalSales Co.",
+                "LOGO" => "/img/100.svg"
+            ],
+            [
+                "Message" => "The customer insights feature has dramatically improved our customer relationships",
+                "Customer Name" => "Emily Chen",
+                "Position" => "Marketing Director",
+                "Company" => "InnovateNow",
+                "LOGO" => "/img/100.svg"
+            ],
+        ]
+    ],
+    'FOOTER' => [
+        'Heading' => 'Intelligent CRM that helps businesses grow and succeed.',
+        'SubHeading' => "All Rights Reserved.",
     ],
 ]);

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\CRM\CRMSettings;
+use App\Models\LandingPage;
+use App\Models\Plans;
 use Illuminate\Http\Request;
 
 class LandingPageController extends Controller
@@ -50,9 +52,16 @@ class LandingPageController extends Controller
 
 
 
+        $landingPage = LandingPage::all();
+        $plans = Plans::with(['planFeatures'])->where('status', CRM_STATUS_TYPES['PLANS']['STATUS']['ACTIVE'])->get();
+
+        $settings = CRMSettings::query()->where('is_tenant', '1')->get();
 
         return view('landing.index', [
-            'logo' => $this->getLogo()
+            'logo' => $this->getLogo(),
+            'landingPage' => $landingPage,
+            'plans' => $plans,
+            'settings' => $settings
         ]);
     }
 

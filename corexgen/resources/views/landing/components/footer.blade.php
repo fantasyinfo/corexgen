@@ -1,14 +1,23 @@
     <!-- Footer -->
+    @php
+        $footerSection = $landingPage->where('key', 'footer')->first()->toArray();
+
+        $footerSection = $footerSection['value'] ?? [];
+
+        // prePrintR($customOptions);
+
+    @endphp
     <footer class="py-5">
         <div class="container">
             <div class="row">
                 <div class="col-md-6 mx-auto text-center">
-                    <img src="{{$logo}}" alt="CoreXGen Logo" height="40" class="mb-3">
-                    <p>Intelligent CRM that helps businesses grow and succeed.</p>
+                    <img src="{{ $logo }}" alt="CoreXGen Logo" height="40" class="mb-3">
+                    <p>{{ $footerSection['Heading'] ?? 'Intelligent CRM that helps businesses grow and succeed.' }}</p>
                 </div>
             </div>
             <div class="footer-bottom text-center mt-4">
-                <p>&copy; {{date('Y')}} {{config('app.name')}}. All Rights Reserved.</p>
+                <p>&copy; {{ date('Y') }} {{ config('app.name') }}.
+                    {{ $footerSection['SubHeading'] ?? 'All Rights Reserved.' }}</p>
             </div>
         </div>
     </footer>

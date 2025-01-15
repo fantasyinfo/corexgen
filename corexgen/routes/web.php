@@ -1021,6 +1021,9 @@ Route::middleware([
 
 
         Route::get('/cron', [SettingsController::class, 'cron'])->name('cron')->middleware('check.permission:SETTINGS_CRON.READ_ALL');
+
+        Route::get('/frontend', [SettingsController::class, 'frontend'])->name('frontend')->middleware('check.permission:LANDING_PAGE_SETTINGS.READ_ALL');
+        Route::put('/frontend', [SettingsController::class, 'frontendUpdate'])->name('frontendUpdate')->middleware('check.permission:LANDING_PAGE_SETTINGS.UPDATE');
     });
 
 
