@@ -202,7 +202,7 @@
 </style>
 
 
-<div class="row g-3 my-2">
+<div class="row g-3 my-2" id="header-stats">
     <!-- Total Stats Card -->
     <div class="col-12 col-md-6 col-lg-3">
         <div class="stats-card p-3">
