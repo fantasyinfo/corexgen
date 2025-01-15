@@ -3,11 +3,14 @@
 namespace Modules\PaypalGatewayModule\App\Services;
 
 use App\Contracts\Payments\PaymentGatewayInterface;
+use App\Http\Controllers\PaymentGatewayController;
+use App\Models\PaymentGatewayStoreSession;
 use Illuminate\Http\Request;
 use App\Http\Controllers\CompanyRegisterController;
 use App\Models\PaymentGateway;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Support\Str;
 
 class PayPalPaymentGateway implements PaymentGatewayInterface
 {
@@ -54,6 +57,7 @@ class PayPalPaymentGateway implements PaymentGatewayInterface
             $this->initializeCredentials();
         }
 
+
         try {
             $response = $this->client->post("{$this->baseUrl}/v1/oauth2/token", [
                 'auth' => [$this->clientId, $this->clientSecret],
@@ -61,8 +65,11 @@ class PayPalPaymentGateway implements PaymentGatewayInterface
                     'grant_type' => 'client_credentials'
                 ]
             ]);
+            \Log::info('Entire Response', [$response]);
 
             $data = json_decode($response->getBody(), true);
+            \Log::info('Access Token Init', [$data]);
+
             return $data['access_token'];
         } catch (RequestException $e) {
             \Log::error('PayPal Access Token Error', [
@@ -76,11 +83,22 @@ class PayPalPaymentGateway implements PaymentGatewayInterface
     public function initialize(array $paymentDetails)
     {
         try {
+            $uuid = Str::uuid();
             if (isset($paymentDetails['config_key']) && isset($paymentDetails['config_value']) && isset($paymentDetails['mode'])) {
                 $accessToken = $this->getAccessToken(
                     $paymentDetails['config_key'],
                     $paymentDetails['config_value'],
                     $paymentDetails['mode']
+                );
+
+                PaymentGatewayStoreSession::updateOrCreate(
+                    ['session_id' => $uuid, 'company_id' => $paymentDetails['metadata']['company_id']],
+                    [
+                        'config_key' => $paymentDetails['config_key'],
+                        'config_value' => encrypt($paymentDetails['config_value']),
+                        'mode' => $paymentDetails['mode'],
+
+                    ]
                 );
             } else {
                 $accessToken = $this->getAccessToken();
@@ -100,11 +118,15 @@ class PayPalPaymentGateway implements PaymentGatewayInterface
                             'company_id' => $paymentDetails['metadata']['company_id'] ?? null,
                             'plan_id' => $paymentDetails['metadata']['plan_id'] ?? null,
                             'is_plan_upgrade' => $paymentDetails['metadata']['is_plan_upgrade'] ?? null,
+                            'invoice_uuid' => $paymentDetails['metadata']['invoice_uuid'] ?? null,
+                            'is_invoice_paying' => $paymentDetails['metadata']['is_invoice_paying'] ?? null,
+                            'is_company_registration' => $paymentDetails['metadata']['is_company_registration'] ?? null,
+
                         ])
                     ]
                 ],
                 'application_context' => [
-                    'return_url' => route('payment.success', ['gateway' => 'paypal']),
+                    'return_url' => route('payment.success', ['gateway' => 'paypal']) . '?_token=' . $uuid,
                     'cancel_url' => route('payment.cancel', ['gateway' => 'paypal']),
                     'user_action' => 'PAY_NOW'
                 ]
@@ -136,11 +158,12 @@ class PayPalPaymentGateway implements PaymentGatewayInterface
 
     public function processPayment($paymentData)
     {
-        \Log::info('PayPal Payment Data Received outside', $paymentData);
+        // \Log::info('PayPal Payment Data Received outside', $paymentData);
         try {
             // Log all incoming payment data for debugging
-            \Log::info('PayPal Payment Data Received', $paymentData);
+            // \Log::info('PayPal Payment Data Received', $paymentData);
 
+            // \Log::info('Access Token Process', [$paymentData['token']]);
             // Extract order ID from the incoming data
             $orderId = $paymentData['token'] ?? null;
 
@@ -149,7 +172,32 @@ class PayPalPaymentGateway implements PaymentGatewayInterface
                 return redirect()->route('payment.failed')->with('error', 'Invalid payment session');
             }
 
-            $accessToken = $this->getAccessToken();
+
+            $configGateway = false;
+            if (isset($paymentData['_token'])) {
+                $configGateway = PaymentGatewayStoreSession::where('session_id', $paymentData['_token'])->first();
+            }
+
+            // If not in metadata, try to get from database backup
+
+            $configKey = $configValue = $mode = null;
+            if ($configGateway) {
+                $configKey = $configGateway->config_key;
+                $configValue = decrypt($configGateway->config_value);
+                $mode = $configGateway->mode;
+                \Log::info('Retrieved Stripe config from database backup');
+            }
+
+
+            // Set API key based on available config
+            if ($configKey && $configValue && $mode) {
+                $accessToken = $this->getAccessToken($configKey, $configValue, $mode);
+                \Log::info('Using retrieved configuration for payment processing');
+            } else {
+                $accessToken = $this->getAccessToken();
+                \Log::info('Using default configuration for payment processing');
+            }
+
 
             // Capture the order using the token/order ID
             $response = $this->client->post("{$this->baseUrl}/v2/checkout/orders/{$orderId}/capture", [
@@ -175,25 +223,30 @@ class PayPalPaymentGateway implements PaymentGatewayInterface
             $paymentCapture = $captureData['purchase_units'][0]['payments']['captures'][0];
 
             $paymentDetails = [
-                'payment_gateway' => 'paypal',
+                'payment_gateway' => 'Paypal',
                 'payment_type' => 'ONLINE',
                 'transaction_reference' => json_encode($paymentCapture),
                 'transaction_id' => $paymentCapture['id'],
-                'amount' => $paymentCapture['amount']['value'],
-                'currency' => $paymentCapture['amount']['currency_code'],
-                'net_amount' => $paymentCapture['seller_receivable_breakdown']['net_amount']['value'] ?? $paymentCapture['amount']['value'],
-                'paypal_fee' => $paymentCapture['seller_receivable_breakdown']['paypal_fee']['value'] ?? 0,
-                'company_id' => $customMetadata['company_id'] ?? null,
-                'plan_id' => $customMetadata['plan_id'] ?? null,
+                'amount' => $paymentCapture['amount']['value'] ?? '',
+                'currency' => $paymentCapture['amount']['currency_code'] ?? '',
+                'company_id' => $customMetadata['company_id'] ?? '',
+                'plan_id' => $customMetadata['plan_id'] ?? '',
+                'invoice_uuid' => $customMetadata['invoice_uuid'] ?? '',
+                'response' => $captureData,
+                'is_plan_upgrade' => filter_var($customMetadata['is_plan_upgrade'] ?? false, FILTER_VALIDATE_BOOLEAN),
+                'is_invoice_paying' => filter_var($customMetadata['is_invoice_paying'] ?? false, FILTER_VALIDATE_BOOLEAN),
+                'is_company_registration' => filter_var($customMetadata['is_company_registration'] ?? false, FILTER_VALIDATE_BOOLEAN),
             ];
 
-            \Log::info('Payment processed successfully', $paymentDetails);
 
-            if (isset($customMetadata['is_plan_upgrade']) && $customMetadata['is_plan_upgrade']) {
-                return app(CompanyRegisterController::class)->upgradePlanForCompany($paymentDetails);
+            if ($configGateway) {
+                // Clean up stored config if it exists
+                PaymentGatewayStoreSession::where('session_id', $paymentData['_token'])->delete();
             }
 
-            return app(CompanyRegisterController::class)->storeCompnayAfterPaymentOnboading($paymentDetails);
+            return app(PaymentGatewayController::class)->handlePaymentGatewaysSuccessResponse($paymentDetails);
+
+
         } catch (\Exception $e) {
             // Log the full exception for detailed debugging
             \Log::error('PayPal Payment Processing Error', [

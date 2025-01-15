@@ -618,7 +618,10 @@ class InvoiceController extends Controller
                 'metadata' => [
                     'company_id' => $companyId,
                     'is_invoice_paying' => true,
-                    'invoice_uuid' => $validated['uuid']
+                    'invoice_uuid' => $validated['uuid'],
+                    'config_key' => $paymentGateways?->paymentGatewaySettings[0]?->config_key,
+                    'config_value' => $paymentGateways?->paymentGatewaySettings[0]?->config_value,
+                    'mode' => $paymentGateways?->paymentGatewaySettings[0]?->mode,
                 ]
             ];
         }
@@ -699,7 +702,7 @@ class InvoiceController extends Controller
             // Commit transaction
             DB::commit();
 
-        
+
             return redirect()->route('invoices.viewOpen', ['id' => $invoice->uuid])
                 ->with('success', 'Payment processed successfully');
 
@@ -712,7 +715,7 @@ class InvoiceController extends Controller
             return redirect()->back()
                 ->with('error', 'Invalid payment details: ' . $e->getMessage());
 
-        }  catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Payment processing failed', [
                 'error' => $e->getMessage(),
