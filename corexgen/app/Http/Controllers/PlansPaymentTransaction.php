@@ -96,5 +96,26 @@ class PlansPaymentTransaction extends Controller
         ]);
     }
 
+      /**
+     * Display list of users with filtering and DataTables support
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Http\JsonResponse
+     */
+    public function indexCompany(Request $request)
+    {
+        // Ajax DataTables request
+        if ($request->ajax()) {
+            return $this->ppTService->getDatatablesResponseCompany($request);
+        }
+
+        return view($this->getViewFilePath('indexCompany'), [
+            'filters' => $request->all(),
+            'title' => 'Payment Transactions Management',
+            'permissions' => PermissionsHelper::getPermissionsArray('PAYMENTSTRANSACTIONS'),
+            'module' => PANEL_MODULES[$this->getPanelModule()]['planPaymentTransaction'],
+        ]);
+    }
+
 
 }

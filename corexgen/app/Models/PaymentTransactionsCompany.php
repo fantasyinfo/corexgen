@@ -24,7 +24,8 @@ class PaymentTransactionsCompany extends Model
         'payment_type',
         'transaction_reference',
         'status',
-        'transaction_date'
+        'transaction_date',
+        
     ];
 
     /**
