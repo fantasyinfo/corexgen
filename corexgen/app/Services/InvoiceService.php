@@ -94,6 +94,8 @@ class InvoiceService
                     'additional_fields' => [
                         'discount' => (float) ($data['discount'] ?? 0),
                         'adjustment' => (float) ($data['adjustment'] ?? 0),
+                        'currency_code' => getSettingValue('Currency Code'),
+                        'currency_symbol' => getSettingValue('Currency Symbol')
                     ],
                 ];
             }

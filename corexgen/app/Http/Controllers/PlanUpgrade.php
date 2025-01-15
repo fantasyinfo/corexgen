@@ -151,7 +151,6 @@ class PlanUpgrade extends Controller
                 'currency' => getSettingValue('Panel Currency Code'),
                 'metadata' => [
                     'plan_id' => $validatedData['plan_id'],
-                    'company_registration' => true,
                     'company_id' => $company->id,
                     'is_plan_upgrade' => true
                 ]

@@ -81,6 +81,10 @@ class PaymentGatewayController extends Controller
             $paymentUrl = $paymentGateway->initialize([
                 'amount' => $validatedData['amount'],
                 'description' => "Plan Subscription",
+                'metadata' => [
+                    'plan_id' => $validatedData['plan_id'],
+                    'is_company_registration' => true,
+                ]
                 // Add more payment details
             ]);
 
@@ -127,6 +131,7 @@ class PaymentGatewayController extends Controller
     {
         return redirect()->route('home')->with('warning', 'Payment was cancelled from gateway: ' . $gateway);
     }
+
 
 
 
@@ -193,7 +198,16 @@ class PaymentGatewayController extends Controller
                         ],
                     ])->render();
                 })
-                ->rawColumns(['actions', 'status', 'logo'])
+                ->editColumn('mode', function ($paymentGateway) {
+                    // If tenant, read the status directly from the gateway table
+                    // If company user, read from the *first* (and presumably only) PaymentGatewaySettings row
+                    return Auth::user()->is_tenant
+                        ? $paymentGateway->mode
+                        : ($paymentGateway->paymentGatewaySettings->first()?->mode ?? 'TEST');
+
+
+                })
+                ->rawColumns(['actions', 'mode', 'status', 'logo'])
                 ->make(true);
         }
 
@@ -308,5 +322,49 @@ class PaymentGatewayController extends Controller
             // Handle any status change errors
             return redirect()->back()->with('error', 'Failed to change the Gateway status: ' . $e->getMessage());
         }
+    }
+
+
+
+    /**
+     * handle Payments response from gateway payment success
+     */
+
+    public function handlePaymentGatewaysSuccessResponse(array $successPaymentData)
+    {
+        Log::info('Success Payment Data', $successPaymentData);
+
+        $paymentDetails = [
+            'payment_gateway' => $successPaymentData['payment_gateway'] ?? '',
+            'payment_type' => $successPaymentData['payment_type'] ?? '',
+            'transaction_reference' => $successPaymentData['transaction_reference'] ?? '',
+            'transaction_id' => $successPaymentData['transaction_id'] ?? '',
+            'amount' => $successPaymentData['amount'] ?? '',
+            'currency' => $successPaymentData['currency'] ?? '',
+            'company_id' => $successPaymentData['company_id'] ?? '',
+            'plan_id' => $successPaymentData['plan_id'] ?? '',
+            'response' => $successPaymentData['response'] ?? [],
+            'invoice_uuid' => $successPaymentData['invoice_uuid'] ?? ''
+        ];
+
+        // Fix: Convert string "true"/"false" to actual boolean and use strict comparison
+        if (isset($successPaymentData['is_plan_upgrade']) && filter_var($successPaymentData['is_plan_upgrade'], FILTER_VALIDATE_BOOLEAN) === true) {
+            Log::info('Calling Plan Upgrade', ['is_true' => $successPaymentData['is_plan_upgrade']]);
+            return app(CompanyRegisterController::class)->upgradePlanForCompany($paymentDetails);
+
+
+        } else if (isset($successPaymentData['is_company_registration']) && filter_var($successPaymentData['is_company_registration'], FILTER_VALIDATE_BOOLEAN) === true) {
+            Log::info('Calling Company Register', ['is_true' => $successPaymentData['is_company_registration']]);
+            return app(CompanyRegisterController::class)->storeCompnayAfterPaymentOnboading($paymentDetails);
+
+
+        } else if (isset($successPaymentData['is_invoice_paying']) && filter_var($successPaymentData['is_invoice_paying'], FILTER_VALIDATE_BOOLEAN) === true) {
+            Log::info('Calling Pay Invoice', ['is_true' => $successPaymentData['is_invoice_paying']]);
+            return app(InvoiceController::class)->storeInvoicePaymentAfterPaid($paymentDetails);
+
+
+        }
+
+        dd($successPaymentData);
     }
 }

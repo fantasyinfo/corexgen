@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Contracts\Payments\PaymentGatewayInterface;
 use App\Http\Controllers\CompanyRegisterController;
+use App\Http\Controllers\PaymentGatewayController;
 use App\Models\PaymentGateway;
 use Illuminate\Http\Request;
 use Stripe\Stripe;
@@ -16,14 +17,23 @@ class StripePaymentGateway implements PaymentGatewayInterface
     /**
      *  get stripe secret key
      */
-    public function getStripeSecretKey()
+    public function getStripeSecretKey($key = null, $value = null, $mode = null)
     {
+
         $stripe = PaymentGateway::where('name', 'Stripe')->first();
         if ($stripe) {
-            return $stripe->config_value;
+
+            if ($key != null && $value != null && $mode != null) {
+                return $value;
+            } else {
+                return $stripe->config_value;
+            }
+
+
         }
         return null;
     }
+
 
 
     /**
@@ -31,6 +41,16 @@ class StripePaymentGateway implements PaymentGatewayInterface
      */
     public function initialize(array $paymentDetails)
     {
+        if (isset($paymentDetails['config_key']) && isset($paymentDetails['config_value']) && isset($paymentDetails['mode'])) {
+            $accessToken = $this->getStripeSecretKey(
+                $paymentDetails['config_key'],
+                $paymentDetails['config_value'],
+                $paymentDetails['mode']
+            );
+        } else {
+            $accessToken = $this->getStripeSecretKey();
+        }
+
         \Log::info('Stripe API Key from StripePaymentGateway Service: ', [$this->getStripeSecretKey()]);
         Stripe::setApiKey($this->getStripeSecretKey()); // 
 
@@ -63,7 +83,7 @@ class StripePaymentGateway implements PaymentGatewayInterface
     public function processPayment($paymentData)
     {
 
-
+        // \Log::info('payment Data outside.', $paymentData);
         Stripe::setApiKey($this->getStripeSecretKey()); // todo:// get these from tenenat payment settings 
 
         $sessionId = $paymentData['session_id'];
@@ -80,7 +100,7 @@ class StripePaymentGateway implements PaymentGatewayInterface
 
         // Log the full session details
 
-        \Log::info('Payment info.', $session->toArray());
+        // \Log::info('Payment info.', $session->toArray());
 
         // Verify payment status
         if ($session->payment_status !== 'paid') {
@@ -98,14 +118,15 @@ class StripePaymentGateway implements PaymentGatewayInterface
             'currency' => $session->currency,
             'company_id' => $session?->metadata?->company_id,
             'plan_id' => $session?->metadata?->plan_id,
+            'invoice_uuid' => $session?->metadata?->invoice_uuid,
+            'response' => $session->toArray(),
+            'is_plan_upgrade' => filter_var($session?->metadata?->is_plan_upgrade, FILTER_VALIDATE_BOOLEAN),
+            'is_invoice_paying' => filter_var($session?->metadata?->is_invoice_paying, FILTER_VALIDATE_BOOLEAN),
+            'is_company_registration' => filter_var($session?->metadata?->is_company_registration, FILTER_VALIDATE_BOOLEAN),
         ];
 
+        return app(PaymentGatewayController::class)->handlePaymentGatewaysSuccessResponse($paymentDetails);
 
-        if (isset($session?->metadata?->is_plan_upgrade) && $session?->metadata?->is_plan_upgrade) {
-            // upgrade the plan
-            return app(CompanyRegisterController::class)->upgradePlanForCompany($paymentDetails);
-        }
-        return app(CompanyRegisterController::class)->storeCompnayAfterPaymentOnboading($paymentDetails);
 
 
     }

@@ -208,10 +208,10 @@
                                                         <th>Description</th>
                                                         <th class="text-center">Qty / Per Hr</th>
                                                         <th class="text-end" width="200px;">Rate
-                                                            ({{ getSettingValue('Currency Symbol') }})</th>
+                                                            ({{ $additionalFields['currency_symbol'] }})</th>
                                                         <th class="text-end">Tax</th>
                                                         <th class="text-end" width="200px;">Amount
-                                                            ({{ getSettingValue('Currency Symbol') }})</th>
+                                                            ({{ $additionalFields['currency_symbol'] }})</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -238,9 +238,9 @@
                                                                 </span>
                                                             </td>
                                                             <td class="text-end">
-                                                                {{ getSettingValue('Currency Symbol') }}
+                                                                {{ $additionalFields['currency_symbol'] }}
                                                                 {{ number_format($rate, 2) }}
-                                                                {{ getSettingValue('Currency Code') }}
+                                                                {{ $additionalFields['currency_code'] }}
                                                             </td>
                                                             <td class="text-end">
                                                                 <span class="text-muted">
@@ -248,9 +248,9 @@
                                                                 </span>
                                                             </td>
                                                             <td class="text-end">
-                                                                {{ getSettingValue('Currency Symbol') }}
+                                                                {{ $additionalFields['currency_symbol'] }}
                                                                 {{ number_format($amount, 2) }}
-                                                                {{ getSettingValue('Currency Code') }}
+                                                                {{ $additionalFields['currency_code'] }}
                                                             </td>
                                                         </tr>
                                                     @endforeach
@@ -288,9 +288,9 @@
 
                                                     <tr>
                                                         <td colspan="5" class="text-end">Sub Total:</td>
-                                                        <td class="text-end"> {{ getSettingValue('Currency Symbol') }}
+                                                        <td class="text-end"> {{ $additionalFields['currency_symbol'] }}
                                                             {{ number_format($subTotal, 2) }}
-                                                            {{ getSettingValue('Currency Code') }}</td>
+                                                            {{ $additionalFields['currency_code'] }}</td>
                                                     </tr>
                                                     @if ($discount > 0)
                                                         <tr>
@@ -298,18 +298,18 @@
                                                                 Discount ({{ number_format($discount, 1) }}%):
                                                             </td>
                                                             <td class="text-end text-danger">
-                                                                {{ getSettingValue('Currency Symbol') }}
+                                                                {{ $additionalFields['currency_symbol'] }}
                                                                 -{{ number_format($discountAmount, 2) }}
-                                                                {{ getSettingValue('Currency Code') }}
+                                                                {{ $additionalFields['currency_code'] }}
                                                             </td>
                                                         </tr>
                                                     @endif
                                                     @if ($totalTax > 0)
                                                         <tr>
                                                             <td colspan="5" class="text-end">Tax:</td>
-                                                            <td class="text-end"> {{ getSettingValue('Currency Symbol') }}
+                                                            <td class="text-end"> {{ $additionalFields['currency_symbol'] }}
                                                                 {{ number_format($totalTax, 2) }}
-                                                                {{ getSettingValue('Currency Code') }}</td>
+                                                                {{ $additionalFields['currency_code'] }}</td>
                                                         </tr>
                                                     @endif
                                                     @if ($adjustment != 0)
@@ -320,17 +320,23 @@
                                                             </td>
                                                             <td
                                                                 class="text-end {{ $adjustment < 0 ? 'text-danger' : 'text-success' }}">
-                                                                {{ getSettingValue('Currency Symbol') }}
+                                                                {{ $additionalFields['currency_symbol'] }}
                                                                 {{ $adjustment > 0 ? '+' : '' }}{{ number_format($adjustment, 2) }}
-                                                                {{ getSettingValue('Currency Code') }}
+                                                                {{ $additionalFields['currency_code'] }}
                                                             </td>
                                                         </tr>
                                                     @endif
                                                     <tr class="fw-bold">
                                                         <td colspan="5" class="text-end">Total:</td>
-                                                        <td class="text-end"> {{ getSettingValue('Currency Symbol') }}
+                                                        <td class="text-end">
+                                                            <input type="hidden" id="totalAmount"
+                                                                value="{{ $total }}" />
+                                                            <input type="hidden" id="currencyCode"
+                                                                value="{{ $additionalFields['currency_code'] }}" />
+                                                            {{ $additionalFields['currency_symbol'] }}
                                                             {{ number_format($total, 2) }}
-                                                            {{ getSettingValue('Currency Code') }} </td>
+                                                            {{ $additionalFields['currency_code'] }}
+                                                        </td>
                                                     </tr>
                                                 </tfoot>
                                             </table>
@@ -354,21 +360,64 @@
 
                 <div class="d-flex justify-content-end mt-5 pt-4 border-top">
 
+                    <button class="btn btn-primary me-2" onclick="payNow('{{ $invoice?->uuid }}')">
+                        <i class="fas fa-paper-plane me-2"></i>Pay Now
+                    </button>
+
                     <button class="btn btn-outline-secondary me-2" onclick="printInvoice()">
                         <i class="fas fa-down me-2"></i>Download PDF
                     </button>
-                  
+
 
                 </div>
 
 
+            </div>
+
+
+            @php
+                // prePrintR($payment_gateways->toArray());
+            @endphp
+            <!-- Modal -->
+            <div class="modal fade" id="paymentGateways" tabindex="-1" role="dialog"
+                aria-labelledby="paymentGatewaysLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <form id="gatewaySelectForm" method="POST" action="{{ route('invoices.pay') }}">
+                        @csrf
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="paymentGatewaysLabel">Select Payment Gateway</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mt-3">
+                                    <input type="hidden" id="totalAmountToPay" value="" name="total_amount" />
+                                    <input type="hidden" id="currencyCodeToSelect" value=""
+                                        name="curreny_code" />
+                                    <input type="hidden" id="uuidToGetSettings" value="" name="uuid" />
+                                    <label for="paymentGatewayId" class="form-label">Select Payment Method</label>
+                                    <select class="form-select" id="paymentGatewayId" required name="paymentGateway">
+                                        @foreach ($payment_gateways as $pg)
+                                            <option value="{{ strtolower($pg->name) }}">{{ $pg->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary" id="payInvoiceNow">Pay Now</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 @endsection
 
 @push('scripts')
-
     <script>
         function printInvoice() {
             // Open print view in a new window
@@ -391,5 +440,48 @@
             };
         }
 
+
+
+
+        function payNow(uuid) {
+
+            _totalAmount = $('#totalAmount').val();
+            _currentCode = $('#currencyCode').val();
+
+            $("#totalAmountToPay").val(_totalAmount);
+            $("#currencyCodeToSelect").val(_currentCode);
+            $("#uuidToGetSettings").val(uuid);
+
+            $('#paymentGateways').modal('show');
+
+
+        }
+
+        // Confirm plan change
+        $('#payInvoiceNow').off('click').on('click', function() {
+            // If plan has a price, validate gateway selection
+            if (planPrice > 0) {
+                const selectedGateway = $('#paymentGatewayId').val();
+
+                if (!selectedGateway) {
+                    alert('Please select a payment gateway');
+                    return;
+                }
+
+                $form = $("#gatewaySelectForm");
+                // Clear any existing hidden gateway inputs
+                $form.find('input[name="gateway"]').remove();
+
+                // Add hidden input for gateway
+                $form.append(
+                    `<input type="hidden" name="gateway" value="${selectedGateway}">`
+                );
+            }
+
+            // Close modal and submit form
+            const modalInstance = new bootstrap.Modal('#paymentGateways');
+            modalInstance.hide();
+            $form.off('submit').submit();
+        });
     </script>
 @endpush
