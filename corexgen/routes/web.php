@@ -176,6 +176,7 @@ Route::post('/contract/acceptCompany', [ContractsController::class, 'acceptCompa
 // invoices
 Route::get('/invoices/view/{id}', [InvoiceController::class, 'viewOpen'])->name('invoices.viewOpen');
 Route::get('/invoices/print/{id}', [InvoiceController::class, 'print'])->name('invoices.print');
+Route::post('/invoices/pay', [InvoiceController::class, 'pay'])->name('invoices.pay');
 
 // lead form view
 Route::get('/lead-form-view/{id}', [LeadsController::class, 'leadForm'])->name('leadForm');

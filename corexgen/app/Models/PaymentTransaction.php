@@ -28,7 +28,7 @@ class PaymentTransaction extends Model
         'currency',
         'payment_gateway',
         'payment_type',
-        'transaction_refrence',
+        'transaction_reference',
         'status',
         'transaction_date'
 

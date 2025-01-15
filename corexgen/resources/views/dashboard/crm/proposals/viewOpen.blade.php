@@ -177,9 +177,9 @@
                                                 <th>Title</th>
                                                 <th>Description</th>
                                                 <th class="text-center">Qty / Per Hr</th>
-                                                <th class="text-end" width="200px;">Rate ({{ getSettingValue('Currency Symbol') }})</th>
+                                                <th class="text-end" width="200px;">Rate ({{ $additionalFields['currency_symbol'] }})</th>
                                                 <th class="text-end">Tax</th>
-                                                <th class="text-end" width="200px;">Amount ({{ getSettingValue('Currency Symbol') }})</th>
+                                                <th class="text-end" width="200px;">Amount ({{ $additionalFields['currency_symbol'] }})</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -205,7 +205,7 @@
                                                         </span>
                                                     </td>
                                                     <td class="text-end">
-                                                        {{ getSettingValue('Currency Symbol') }} {{ number_format($rate, 2) }} {{ getSettingValue('Currency Code') }}
+                                                        {{ $additionalFields['currency_symbol'] }} {{ number_format($rate, 2) }} {{ $additionalFields['currency_code'] }}
                                                     </td>
                                                     <td class="text-end">
                                                         <span class="text-muted">
@@ -213,7 +213,7 @@
                                                         </span>
                                                     </td>
                                                     <td class="text-end">
-                                                        {{ getSettingValue('Currency Symbol') }} {{ number_format($amount, 2) }} {{ getSettingValue('Currency Code') }}
+                                                        {{ $additionalFields['currency_symbol'] }} {{ number_format($amount, 2) }} {{ $additionalFields['currency_code'] }}
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -248,7 +248,7 @@
 
                                             <tr>
                                                 <td colspan="5" class="text-end">Sub Total:</td>
-                                                <td class="text-end"> {{ getSettingValue('Currency Symbol') }} {{ number_format($subTotal, 2) }} {{ getSettingValue('Currency Code') }}</td>
+                                                <td class="text-end"> {{ $additionalFields['currency_symbol'] }} {{ number_format($subTotal, 2) }} {{ $additionalFields['currency_code'] }}</td>
                                             </tr>
                                             @if ($discount > 0)
                                                 <tr>
@@ -256,14 +256,14 @@
                                                         Discount ({{ number_format($discount, 1) }}%):
                                                     </td>
                                                     <td class="text-end text-danger">
-                                                        {{ getSettingValue('Currency Symbol') }}  -{{ number_format($discountAmount, 2) }} {{ getSettingValue('Currency Code') }}
+                                                        {{ $additionalFields['currency_symbol'] }}  -{{ number_format($discountAmount, 2) }} {{ $additionalFields['currency_code'] }}
                                                     </td>
                                                 </tr>
                                             @endif
                                             @if ($totalTax > 0)
                                                 <tr>
                                                     <td colspan="5" class="text-end">Tax:</td>
-                                                    <td class="text-end"> {{ getSettingValue('Currency Symbol') }} {{ number_format($totalTax, 2) }} {{ getSettingValue('Currency Code') }}</td>
+                                                    <td class="text-end"> {{ $additionalFields['currency_symbol'] }} {{ number_format($totalTax, 2) }} {{ $additionalFields['currency_code'] }}</td>
                                                 </tr>
                                             @endif
                                             @if ($adjustment != 0)
@@ -274,13 +274,13 @@
                                                     </td>
                                                     <td
                                                         class="text-end {{ $adjustment < 0 ? 'text-danger' : 'text-success' }}">
-                                                        {{ getSettingValue('Currency Symbol') }}  {{ $adjustment > 0 ? '+' : '' }}{{ number_format($adjustment, 2) }} {{ getSettingValue('Currency Code') }}
+                                                        {{ $additionalFields['currency_symbol'] }}  {{ $adjustment > 0 ? '+' : '' }}{{ number_format($adjustment, 2) }} {{ $additionalFields['currency_code'] }}
                                                     </td>
                                                 </tr>
                                             @endif
                                             <tr class="fw-bold">
                                                 <td colspan="5" class="text-end">Total:</td>
-                                                <td class="text-end"> {{ getSettingValue('Currency Symbol') }} {{ number_format($total, 2) }} {{ getSettingValue('Currency Code') }} </td>
+                                                <td class="text-end"> {{ $additionalFields['currency_symbol'] }} {{ number_format($total, 2) }} {{ $additionalFields['currency_code'] }} </td>
                                             </tr>
                                         </tfoot>
                                     </table>

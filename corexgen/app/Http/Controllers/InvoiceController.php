@@ -8,8 +8,11 @@ use App\Http\Requests\InvoiceEditRequest;
 use App\Http\Requests\InvoiceRequest;
 use App\Models\CRM\CRMClients;
 use App\Models\Invoice;
+use App\Models\PaymentGateway;
+use App\Models\PaymentTransactionsCompany;
 use App\Models\Timesheet;
 use App\Services\InvoiceService;
+use App\Services\PaymentGatewayFactory;
 use App\Services\ProductServicesService;
 use App\Services\TasksService;
 use App\Traits\IsSMTPValid;
@@ -19,6 +22,7 @@ use App\Traits\SubscriptionUsageFilter;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
@@ -453,11 +457,25 @@ class InvoiceController extends Controller
         $query = $this->applyTenantFilter($invoiceQuery);
         $invoice = $query->firstOrFail();
 
+        // get all payment gateways of a company action only
+        $companyId = $invoice->company_id;
+
+        $paymentGateways = PaymentGateway::whereHas('paymentGatewaySettings', function ($query) use ($companyId) {
+            $query->where('company_id', $companyId)->where('status', 'Active');
+        })->with([
+                    'paymentGatewaySettings' => function ($settingsQuery) use ($companyId) {
+                        $settingsQuery->where('company_id', $companyId)->where('status', 'Active');
+                    }
+                ])->get();
+
+
+
 
         return view($this->getViewFilePath('viewOpen'), [
             'title' => 'View Invoice',
             'invoice' => $invoice,
             'module' => PANEL_MODULES[$this->getPanelModule()]['invoices'],
+            'payment_gateways' => $paymentGateways
 
         ]);
     }
@@ -554,4 +572,155 @@ class InvoiceController extends Controller
     }
 
 
+    /**
+     * pay invoice via client 
+     */
+    public function pay(Request $request, PaymentGatewayFactory $paymentGatewayFactory)
+    {
+
+        $validated = $request->validate([
+            "total_amount" => "required",
+            "curreny_code" => "required",
+            "uuid" => "required|exists:invoices,uuid",
+            "paymentGateway" => "required|exists:payment_gateways,name",
+        ]);
+
+        $invoiceQuery = Invoice::query()->where('uuid', '=', $validated['uuid'])->firstOrFail();
+
+
+        $companyId = $invoiceQuery->company_id;
+
+        $totalAmount = 0;
+        if ($validated['total_amount'] > $invoiceQuery['total_amount']) {
+            $totalAmount = $validated['total_amount'];
+        } else {
+            $totalAmount = $invoiceQuery['total_amount'];
+        }
+
+        $paymentGateways = PaymentGateway::whereHas('paymentGatewaySettings', function ($query) use ($companyId) {
+            $query->where('company_id', $companyId)->where('status', 'Active');
+        })->with([
+                    'paymentGatewaySettings' => function ($settingsQuery) use ($companyId) {
+                        $settingsQuery->where('company_id', $companyId)->where('status', 'Active');
+                    }
+                ])->where('name', $validated['paymentGateway'])->first();
+
+
+
+        if ($totalAmount > 0) {
+            $paymentDetails = [
+                'config_key' => $paymentGateways?->paymentGatewaySettings[0]?->config_key,
+                'config_value' => $paymentGateways?->paymentGatewaySettings[0]?->config_value,
+                'mode' => $paymentGateways?->paymentGatewaySettings[0]?->mode,
+                'amount' => $totalAmount,
+                'description' => "Invoice Id # - $invoiceQuery->_prefix - $invoiceQuery->_id Paying Online",
+                'currency' => $validated['curreny_code'],
+                'metadata' => [
+                    'company_id' => $companyId,
+                    'is_invoice_paying' => true,
+                    'invoice_uuid' => $validated['uuid']
+                ]
+            ];
+        }
+
+
+        // Create payment gateway instance
+        $paymentGateway = $paymentGatewayFactory->create($validated['paymentGateway']);
+
+        // Prepare payment details
+
+        Log::info('Payment Details for Invoice', ['invoice' => $paymentDetails]);
+        // Initialize payment
+        $paymentUrl = $paymentGateway->initialize($paymentDetails);
+        return redirect()->away($paymentUrl);
+
+    }
+
+    /**
+     * Store payment details after payment done and mark paid
+     * 
+     * @param array $paymentDetails
+     * @return mixed
+     * @throws \Exception
+     */
+    public function storeInvoicePaymentAfterPaid(array $paymentDetails)
+    {
+        try {
+            // Start database transaction
+            DB::beginTransaction();
+
+            // Validate required fields
+            $requiredFields = ['company_id', 'amount', 'currency', 'payment_gateway', 'payment_type', 'invoice_uuid'];
+            foreach ($requiredFields as $field) {
+                if (!isset($paymentDetails[$field])) {
+                    throw new \InvalidArgumentException("Missing required field: {$field}");
+                }
+            }
+
+            // Find invoice first to ensure it exists before creating transaction
+            $invoice = Invoice::query()
+                ->where('uuid', '=', $paymentDetails['invoice_uuid'])
+                ->lockForUpdate()  // Lock the row to prevent concurrent updates
+                ->firstOrFail();
+
+            // Check if invoice is already paid to prevent double payment
+            if ($invoice->status === 'SUCCESS') {
+                throw new \Exception('Invoice is already paid');
+            }
+
+            // Prepare payment transaction data
+            $paymentTransactionData = [
+                'company_id' => $paymentDetails['company_id'],
+                'amount' => $paymentDetails['amount'],
+                'currency' => $paymentDetails['currency'],
+                'payment_gateway' => $paymentDetails['payment_gateway'],
+                'payment_type' => $paymentDetails['payment_type'],
+                'transaction_reference' => $paymentDetails['transaction_reference'] ?? null,
+                'transaction_date' => now(),
+                'status' => 'SUCCESS'
+            ];
+
+            // Create payment transaction
+            $transaction = PaymentTransactionsCompany::create($paymentTransactionData);
+
+            // Update invoice with payment details
+            $invoice->update([
+                'status' => 'SUCCESS',
+                'payment_details' => $transaction->toArray(),
+            ]);
+
+            // Log successful payment
+            Log::info('Invoice payment processed successfully', [
+                'invoice_uuid' => $invoice->uuid,
+                'transaction_id' => $transaction->id,
+                'amount' => $paymentDetails['amount']
+            ]);
+
+            // Commit transaction
+            DB::commit();
+
+        
+            return redirect()->route('invoices.viewOpen', ['id' => $invoice->uuid])
+                ->with('success', 'Payment processed successfully');
+
+        } catch (\InvalidArgumentException $e) {
+            DB::rollBack();
+            Log::error('Invalid payment details', [
+                'error' => $e->getMessage(),
+                'payment_details' => $paymentDetails
+            ]);
+            return redirect()->back()
+                ->with('error', 'Invalid payment details: ' . $e->getMessage());
+
+        }  catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Payment processing failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'payment_details' => $paymentDetails
+            ]);
+            return redirect()->back()
+                ->with('error', 'Payment processing failed. Please try again or contact support.');
+        }
+    }
 }

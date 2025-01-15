@@ -334,7 +334,7 @@ class CompanyOnboardingController extends Controller
                 'currency' => getSettingValue('Panel Currency Code'),
                 'metadata' => [
                     'plan_id' => $validatedData['plan_id'],
-                    'company_registration' => true,
+                    'is_company_registration' => true,
                     'company_id' => $company->id
                 ]
             ];

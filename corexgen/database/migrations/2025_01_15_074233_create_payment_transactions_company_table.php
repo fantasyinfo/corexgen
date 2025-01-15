@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('payment_transactions', function (Blueprint $table) {
+        Schema::create('payment_transactions_company', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('plan_id');
             $table->unsignedBigInteger('company_id');
             $table->decimal('amount');
             $table->string('currency')->default('USD');
@@ -21,10 +20,7 @@ return new class extends Migration
             $table->enum('payment_type', ['ONLINE', 'OFFLINE'])->default('ONLINE');
             $table->json('transaction_reference')->nullable();
             $table->enum('status', CRM_STATUS_TYPES['PAYMENTSTRANSACTIONS']['TABLE_STATUS'])->default(CRM_STATUS_TYPES['PAYMENTSTRANSACTIONS']['STATUS']['PENDING']);
-
             $table->dateTime('transaction_date')->default(now());
-
-            $table->foreign('plan_id')->references('id')->on('plans')->onDelete('cascade');
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
             $table->softDeletes();
             $table->timestamps();
@@ -36,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('payment_transactions');
+        Schema::dropIfExists('payment_transactions_company');
     }
 };

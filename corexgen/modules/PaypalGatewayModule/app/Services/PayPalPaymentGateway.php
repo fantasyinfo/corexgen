@@ -20,10 +20,9 @@ class PayPalPaymentGateway implements PaymentGatewayInterface
     public function __construct()
     {
         $this->client = new Client();
-        $this->initializeCredentials();
     }
 
-    protected function initializeCredentials()
+    protected function initializeCredentials($key = null, $value = null, $mode = null)
     {
         $paypal = PaymentGateway::where('name', 'Paypal')->first();
 
@@ -31,16 +30,30 @@ class PayPalPaymentGateway implements PaymentGatewayInterface
             throw new \Exception('PayPal configuration not found');
         }
 
-        $this->clientId = $paypal->config_key;
-        $this->clientSecret = $paypal->config_value;
-        $this->mode = $paypal->mode === 'LIVE' ? 'live' : 'sandbox';
+        if ($key != null && $value != null && $mode != null) {
+            $this->clientId = $key;
+            $this->clientSecret = $value;
+            $this->mode = $paypal->mode === $mode;
+        } else {
+            $this->clientId = $paypal->config_key;
+            $this->clientSecret = $paypal->config_value;
+            $this->mode = $paypal->mode === 'LIVE' ? 'live' : 'sandbox';
+        }
+
+
         $this->baseUrl = $this->mode === 'live'
             ? 'https://api-m.paypal.com'
             : 'https://api-m.sandbox.paypal.com';
     }
 
-    protected function getAccessToken()
+    protected function getAccessToken($key = null, $value = null, $mode = null)
     {
+        if ($key != null && $value != null && $mode != null) {
+            $this->initializeCredentials($key, $value, $mode);
+        } else {
+            $this->initializeCredentials();
+        }
+
         try {
             $response = $this->client->post("{$this->baseUrl}/v1/oauth2/token", [
                 'auth' => [$this->clientId, $this->clientSecret],
@@ -63,7 +76,16 @@ class PayPalPaymentGateway implements PaymentGatewayInterface
     public function initialize(array $paymentDetails)
     {
         try {
-            $accessToken = $this->getAccessToken();
+            if (isset($paymentDetails['config_key']) && isset($paymentDetails['config_value']) && isset($paymentDetails['mode'])) {
+                $accessToken = $this->getAccessToken(
+                    $paymentDetails['config_key'],
+                    $paymentDetails['config_value'],
+                    $paymentDetails['mode']
+                );
+            } else {
+                $accessToken = $this->getAccessToken();
+            }
+
 
             $payload = [
                 'intent' => 'CAPTURE',
@@ -114,6 +136,7 @@ class PayPalPaymentGateway implements PaymentGatewayInterface
 
     public function processPayment($paymentData)
     {
+        \Log::info('PayPal Payment Data Received outside', $paymentData);
         try {
             // Log all incoming payment data for debugging
             \Log::info('PayPal Payment Data Received', $paymentData);
