@@ -129,6 +129,7 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
+                                            <x-form-components.create-new :link="'clients.create'" :text="'Create new'" />
                                             <select name="client_id" id="client_id" class="form-select searchSelectBox">
                                                 @foreach ($clients as $item)
                                                     @php

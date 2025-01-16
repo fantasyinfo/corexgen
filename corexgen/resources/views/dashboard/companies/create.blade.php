@@ -128,6 +128,7 @@
                                         <div class="col-lg-8">
                                             <div class="input-group">
 
+                                                <x-form-components.create-new :link="'plans.create'" :text="'Create new'" />
                                                 <select
                                                     class="form-control searchSelectBox  @error('plan_id') is-invalid @enderror"
                                                     name="plan_id" id="plan_id">
@@ -152,8 +153,8 @@
                                         </div>
                                     </div>
 
-                                 
-                                   
+
+
                                     <hr>
                                     <x-form-components.tab-guidebox :nextTab="'Address'" />
                                 </div>
@@ -172,7 +173,7 @@
                                         <div class="col-lg-8">
                                             <x-form-components.textarea-group name="address.street_address"
                                                 id="compnayAddressStreet" placeholder="Enter Registered Street Address"
-                                                class="custom-class" value="{{ old('address.street_address')}}" />
+                                                class="custom-class" value="{{ old('address.street_address') }}" />
 
                                         </div>
                                     </div>
@@ -223,8 +224,8 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <x-form-components.input-group type="text" name="address.city_name"
-                                            id="compnayAddressCity" placeholder="{{ __('Enter City') }}"
-                                            value="{{ old('address.city_name') }}" class="custom-class" />
+                                                id="compnayAddressCity" placeholder="{{ __('Enter City') }}"
+                                                value="{{ old('address.city_name') }}" class="custom-class" />
                                         </div>
                                     </div>
                                     <div class="row mb-4 align-items-center">
@@ -273,6 +274,5 @@
 
 
         });
-
     </script>
 @endpush

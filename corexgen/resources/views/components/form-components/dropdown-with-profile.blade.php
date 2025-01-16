@@ -6,7 +6,7 @@
     'selected' => null,
     'required' => false,
 ])
-
+  <x-form-components.create-new :link="'users.create'" :text="'Create new'" />
 <div class="dropdown custom-select">
     <button class="btn btn-secondary dropdown-toggle w-100 customDropdownProfile" type="button" data-bs-toggle="dropdown" aria-expanded="false">
         {{ $title }}

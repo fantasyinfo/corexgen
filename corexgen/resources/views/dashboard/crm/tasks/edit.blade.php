@@ -205,6 +205,7 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
+                                            <x-form-components.create-new :link="'cgt.indexLeadsStatus'" :text="'Create new'" />
                                             <select class="form-select" name="status_id" id="status_id" required>
                                                 @foreach ($tasksStatus as $ts)
                                                     <option value="{{ $ts->id }}"
@@ -247,6 +248,7 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
+                                            <x-form-components.create-new :link="'projects.create'" :text="'Create new'" />
                                             <select class="form-select searchSelectBox" name="project_id"
                                                 id="project_id">
                                                 @foreach ($projects as $pro)

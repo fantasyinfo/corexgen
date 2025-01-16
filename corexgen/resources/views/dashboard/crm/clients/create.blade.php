@@ -191,6 +191,7 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
+                                            <x-form-components.create-new :link="'cgt.indexClientCategory'" :text="'Create new'" />
                                             <select class="form-select" name="cgt_id" id="cgt_id">
                                                 @foreach ($categories as $category)
                                                     <option value="{{ $category->id }}">{{ $category->name }}</option>

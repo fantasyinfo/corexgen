@@ -29,7 +29,7 @@
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">
-                                  
+                                    <x-form-components.create-new :link="'role.create'" :text="'Create new'" />
                                     <select class="searchSelectBox form-control  @error('role_id') is-invalid @enderror" name="role_id" id="role_id">
                                         @if($roles && $roles->isNotEmpty())
                                             @foreach($roles as $role)

@@ -27,7 +27,7 @@
                             </div>
                             <div class="col-lg-8">
                                 <div class="input-group">
-                                  
+                                    <x-form-components.create-new :link="'role.create'" :text="'Create new'" />
                                     <select 
                                     disabled
                                     class="form-control searchSelectBox  @error('role_id') is-invalid @enderror" 

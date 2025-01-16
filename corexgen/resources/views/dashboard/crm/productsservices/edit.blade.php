@@ -121,7 +121,7 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <div class="input-group">
-
+                                                <x-form-components.create-new :link="'cgt.indexProductCategories'" :text="'Create new'" />
                                                 <select
                                                     class="form-control searchSelectBox  @error('cgt_id') is-invalid @enderror"
                                                     name="cgt_id" id="cgt_id">
@@ -205,7 +205,7 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <div class="input-group">
-
+                                                <x-form-components.create-new :link="'cgt.indexProductTaxes'" :text="'Create new'" />
                                                 <select
                                                     class="form-control searchSelectBox  @error('tax_id') is-invalid @enderror"
                                                     name="tax_id" id="tax_id">
