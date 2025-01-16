@@ -26,6 +26,7 @@
         </div>
         <button type="submit" class="auth-button w-100">{{ __('Log in') }}</button>
     </form>
+
     @if (Route::has('password.request'))
         <div class="mt-3 text-center">
             <p class="small">
@@ -35,4 +36,7 @@
             </p>
         </div>
     @endif
+    <div class="text-center mt-4">
+        <p>Done't have an account? <a href="/company/register" class="text-primary">Register here</a></p>
+    </div>
 @endsection
