@@ -2,7 +2,18 @@
 
 @section('content')
     @php
-        //prePrintR($customFields->toArray());
+
+        $type = null;
+        $id = null;
+        $refrer = null;
+        if (isset($_GET['type']) && isset($_GET['id']) && isset($_GET['refrer'])) {
+            $type = trim($_GET['type']);
+            $id = trim($_GET['id']);
+            $refrer = trim($_GET['refrer']);
+        }
+
+        // prePrintR($tax->toArray());
+
     @endphp
     @push('style')
         <style>
@@ -37,6 +48,9 @@
                     <form id="taskForm" action="{{ route(getPanelRoutes('tasks.store')) }}" method="POST"
                         enctype="multipart/form-data" novalidate>
                         @csrf
+                        <input type="hidden" name="_ref_type" value="{{ $type }}">
+                        <input type="hidden" name="_ref_id" value="{{ $id }}">
+                        <input type="hidden" name="_ref_refrer" value="{{ $refrer }}">
                         <div class="card-body">
                             <div class="mb-4 d-flex align-items-center justify-content-between">
                                 <p class="fw-bold mb-0 me-4">
@@ -249,6 +263,7 @@
                                                 id="project_id">
                                                 @foreach ($projects as $pro)
                                                     <option value="{{ $pro->id }}"
+                                                        {{ $id == $pro->id ? 'selected' : '' }}
                                                         {{ old('project_id') == $pro->id ? 'selected' : '' }}>
                                                         {{ $pro->title }}</option>
                                                 @endforeach
@@ -385,9 +400,9 @@
                         'wordcount'
                     ],
                     toolbar: 'undo redo | formatselect | bold italic backcolor | \
-                                                                                                                                          alignleft aligncenter alignright alignjustify | \
-                                                                                                                                          bullist numlist outdent indent | removeformat | help | \
-                                                                                                                                          link image media preview codesample table'
+                                                                                                                                              alignleft aligncenter alignright alignjustify | \
+                                                                                                                                              bullist numlist outdent indent | removeformat | help | \
+                                                                                                                                              link image media preview codesample table'
                 });
             }
 

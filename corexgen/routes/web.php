@@ -36,7 +36,7 @@ use App\Http\Controllers\SystemInstallerController;
 use App\Http\Controllers\TasksController;
 use App\Http\Controllers\TemplatesController;
 use App\Http\Controllers\UserController;
-use App\Models\City;
+use Illuminate\Support\Facades\Artisan;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\App;
@@ -82,6 +82,19 @@ Route::prefix('installer')->group(function () {
     });
 });
 
+
+
+// clear the cache...
+Route::get('/clear', function() {
+
+    Artisan::call('cache:clear');
+    Artisan::call('config:clear');
+    Artisan::call('config:cache');
+    Artisan::call('view:clear');
+ 
+    return "Cleared!";
+ 
+ });
 
 
 // home route of applying it to a group of routes
@@ -570,6 +583,9 @@ Route::middleware([
         Route::post('/bulkDelete', [LeadsController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:LEADS.BULK_DELETE');
 
         Route::get('/view/{id}', [LeadsController::class, 'view'])->name('view')->middleware('check.permission:LEADS.VIEW');
+
+        Route::get('/convert/{id}', [LeadsController::class, 'convert'])->name('convert')->middleware('check.permission:LEADS.UPDATE');
+
         Route::get('/profile', [LeadsController::class, 'profile'])->name('profile');
 
 

@@ -1092,6 +1092,43 @@ class LeadsController extends Controller
     }
 
 
+    /**
+     * Convert to client/customer
+     */
+
+    public function convert($id)
+    {
+        // Grab the lead; 404 if not found
+        $lead = $this->applyTenantFilter(
+            CRMLeads::query()->where('id', $id)
+        )->firstOrFail();
+
+        // (Optional) If a lead is already converted, handle that case
+        if ($lead->is_converted) {
+            return redirect()->back()->with('info', 'Lead is already converted.');
+        }
+
+        try {
+            $converted = $this->leadsService->convertToClient($lead->toArray());
+
+            if ($converted) {
+                $lead->update(['is_converted' => true]);
+                return redirect()->back()->with('success', 'Converted to client.');
+            } else {
+                return redirect()->back()->withErrors('Failed to convert lead to client.');
+            }
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            \Log::error('Lead conversion failed', [
+                'lead_id' => $lead->id,
+                'error_message' => $e->getMessage(),
+            ]);
+
+            // Return a friendly error message
+            return redirect()->back()
+                ->withErrors('An error occurred while converting the lead: ' . $e->getMessage());
+        }
+    }
 
 
 

@@ -25,7 +25,7 @@ class EstimateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            '_prefix' => 'required|string' ,
+            '_prefix' => 'required|string',
             '_id' => 'required|string|max:10',
             'type' => 'required|in:client,lead',
             'client_id' => 'required_if:type,client|exists:clients,id',
@@ -44,6 +44,11 @@ class EstimateRequest extends FormRequest
             'product_tax.*' => 'nullable|string',
             'discount' => 'nullable|numeric',
             'adjustment' => 'nullable|numeric',
+
+            // 
+            '_ref_type' => 'nullable',
+            '_ref_id' => 'nullable',
+            '_ref_refrer' => 'nullable',
         ];
     }
 

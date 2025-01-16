@@ -4,8 +4,14 @@ php artisan db:seed --class=CRMMenuSeeder
 php artisan db:seed --class=CRMSettingsSeeder
 php artisan db:seed --class=PlansSeeder
 php artisan db:seed --class=PaymentGatewaySeeder
+php artisan db:seed --class=FrontendSeeder
 
 
+
+# remove cache/config.php file
+# include .env and .htaccess file (if zip if created via mackbook)
+# remove the installer.lock file from storage dir 
+# change the .env SESSION_DRIVER=database to SESSION_DRIVER=file
 
 
 # change the .env file SESSION_DRIVER=file

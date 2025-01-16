@@ -35,7 +35,12 @@ class ContractRequest extends FormRequest
             'details' => 'nullable|string',
             'creating_date' => 'required|date',
             'valid_date' => 'nullable|date|after_or_equal:today',
-            'template_id' => 'nullable|exists:templates,id'
+            'template_id' => 'nullable|exists:templates,id',
+
+            // 
+            '_ref_type' => 'nullable',
+            '_ref_id' => 'nullable',
+            '_ref_refrer' => 'nullable',
         ];
     }
 

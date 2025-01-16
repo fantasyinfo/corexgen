@@ -63,7 +63,7 @@ class SystemInstallerController extends Controller
     public function checkSystemRequirements()
     {
         $requirements = [
-            'php_version' => version_compare(PHP_VERSION, '8.1', '>='),
+            'php_version' => version_compare(PHP_VERSION, '8.2', '>='),
             'extensions' => $this->checkExtensions(),
             'storage_permissions' => is_writable(storage_path()),
             'env_writable' => is_writable(base_path('.env')),
@@ -278,11 +278,12 @@ class SystemInstallerController extends Controller
      */
     public function installApplication(Request $request)
     {
-        Log::info('Reached to the installation function');
+        Log::info('Reached the installation function');
         try {
             Log::info('Installation Begin');
 
-            Log::info('Ensure DB Connect');
+            // Step 1: Ensure DB Connection
+            Log::info('Ensuring database connection parameters.');
             $this->ensureDatabaseExists(
                 $request->db_host,
                 $request->db_port,
@@ -291,18 +292,23 @@ class SystemInstallerController extends Controller
                 $request->db_name
             );
 
-
-            Log::info('Reconnect the DB');
+            Log::info('Reconnecting to the database.');
             $this->reConnectDB($request);
 
-            // Test connection immediately
-            DB::connection('mysql')->getPdo();
+            // Test database connection
+            try {
+                DB::connection('mysql')->getPdo();
+                Log::info('Database connection successful.');
+            } catch (\Exception $e) {
+                Log::error('Database connection failed', ['message' => $e->getMessage()]);
+                throw $e;
+            }
 
+            // Step 2: Begin Transaction
             Log::info('DB Transaction Begin');
             DB::beginTransaction();
 
-
-
+            // Step 3: Validate Input
             $validator = Validator::make($request->all(), [
                 'site_name' => 'required|string|max:255',
                 'name' => 'required|string|max:255',
@@ -324,63 +330,71 @@ class SystemInstallerController extends Controller
             ]);
 
             if ($validator->fails()) {
-                Log::info('Validation Failed');
+                Log::info('Validation Failed', ['errors' => $validator->errors()]);
                 return response()->json([
                     'status' => 'error',
                     'errors' => $validator->errors()
                 ], 422);
             }
 
-            // remove old config file if exists
-            Log::info('Unlinking the old cache file if exists.');
+            // Step 4: Clear Config Cache
+            Log::info('Clearing old cache file if it exists.');
             if (file_exists(base_path('/bootstrap/cache/config.php'))) {
                 unlink(base_path('/bootstrap/cache/config.php'));
             }
 
-
-
+            // Step 5: Run Migrations
             Log::info('Migration Started.');
-            // Run migrations
-            Artisan::call('migrate:fresh');
+            try {
+                Artisan::call('migrate:fresh', ['--force' => true]);
+                Log::info('Migration Output:', ['output' => Artisan::output()]);
+            } catch (\Exception $e) {
+                Log::error('Migration failed', ['message' => $e->getMessage()]);
+                throw $e;
+            }
 
+            // Step 6: Debug Database Tables
+            Log::info('Checking database tables after migration.');
+            $tables = DB::select('SHOW TABLES');
+            Log::info('Current database tables:', ['tables' => $tables]);
+
+            // Step 7: Run Seeders
             Log::info('Seeders Started.');
+            try {
+                Artisan::call('db:seed', ['--force' => true]); // Ensure it uses the default seeder
+                Log::info('Seeders Output:', ['output' => Artisan::output()]);
+            } catch (\Exception $e) {
+                Log::error('Seeding failed', [
+                    'message' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                throw $e;
+            }
 
-            $this->runSeeders();
-
+            // Step 8: Create Super Admin
             Log::info('Super Admin Creating...');
-            // Create super admin
             $user = $this->createSuperAdmin($request);
 
-
-
-            // Create installation lock file
+            // Step 9: Create Installation Lock File
+            Log::info('Creating installation lock file.');
             File::put(storage_path('installed.lock'), 'Installation completed on ' . now());
 
-
+            // Step 10: Update Environment File
             Log::info('Updating the .env file...');
-            // Update environment file
             $this->updateEnvironmentFile($request);
 
-            Log::info('Artisan Calls...');
-
-            // Generate application key
+            // Step 11: Run Artisan Commands
+            Log::info('Running additional Artisan commands.');
             Artisan::call('key:generate');
-
-            // Clear and cache configuration
             Artisan::call('config:clear');
             Artisan::call('config:cache');
             Artisan::call('optimize');
 
-            Log::info('DB Commit...');
-
+            // Step 12: Commit Transaction
+            Log::info('Committing the database transaction.');
             DB::commit();
 
-            session()->put('installation_success', true);
-
-
-
-
-            Log::info('Installation Succfully...');
+            Log::info('Installation Successfully Completed');
             return response()->json([
                 'status' => 'success',
                 'message' => 'Installation Successful',
@@ -400,6 +414,7 @@ class SystemInstallerController extends Controller
         }
     }
 
+
     /**
      * Method verifyPurchaseCode
      *
@@ -415,13 +430,14 @@ class SystemInstallerController extends Controller
 
         try {
             // Fetch the latest version from the API
-            $response = Http::get($apiUrl);
+            $response = Http::post($apiUrl, ['purchase_code' => $code]);
+            Log::info('Licence Check API Response ', ['response' => $response]);
             if ($response->successful()) {
                 $status = $response->json('status');
 
-                if($status == 'success'){
+                if ($status == 'success') {
                     return true;
-                }else {
+                } else {
                     return false;
                 }
             }
@@ -432,7 +448,6 @@ class SystemInstallerController extends Controller
 
         return true;
     }
-
     /**
      * Method updateEnvironmentFile
      *
@@ -457,7 +472,7 @@ class SystemInstallerController extends Controller
             'DB_PORT' => $request->db_port ?? '3306',
             'DB_DATABASE' => $request->db_name ?? '',
             'DB_USERNAME' => $request->db_username ?? '',
-            'DB_PASSWORD' => $request->db_password ?? '',
+            'DB_PASSWORD' => '"' . addslashes($request->db_password ?? '') . '"', // Add double quotes
             'MAIL_MAILER' => 'smtp',
             'MAIL_HOST' => $request->smtp_host ?? '',
             'MAIL_PORT' => $request->smtp_port ?? '',
@@ -526,7 +541,7 @@ class SystemInstallerController extends Controller
         $settings = array_merge($request->all(), [
             'smtp_details' => session()->get('smtp_details'),
         ]);
-        
+
         $tenant = Tenant::create([
             'name' => $request->name,
             'domain' => $request->admin_email,
