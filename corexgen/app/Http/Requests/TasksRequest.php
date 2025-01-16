@@ -38,6 +38,10 @@ class TasksRequest extends FormRequest
             "billable" => "nullable|boolean",
             "visible_to_client" => "nullable|boolean",
             'status_id' => 'nullable|exists:category_group_tag,id',
+            // 
+            '_ref_type' => 'nullable',
+            '_ref_id' => 'nullable',
+            '_ref_refrer' => 'nullable',
         ];
     }
 }

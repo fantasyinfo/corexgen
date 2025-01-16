@@ -44,7 +44,7 @@ return new class extends Migration
 
         Schema::create('task_user', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('task_id')->constrained('leads')->cascadeOnDelete();
+            $table->foreignId('task_id')->constrained('tasks')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
             $table->softDeletes();
