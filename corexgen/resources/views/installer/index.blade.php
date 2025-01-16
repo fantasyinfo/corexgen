@@ -556,8 +556,8 @@
         </p>
         
         <div class="flex gap-4 justify-center mb-6">
-            <a href="/super-admin-login" class="px-8 py-3 bg-blue-600 text-white rounded-full shadow-md hover:bg-blue-500 transition transform hover:scale-105">
-                <i class="fas fa-user-shield mr-2"></i> Super Admin Panel
+            <a href="/login" class="px-8 py-3 bg-blue-600 text-white rounded-full shadow-md hover:bg-blue-500 transition transform hover:scale-105">
+                <i class="fas fa-user-shield mr-2"></i> Admin Panel
             </a>
         </div>
         <p class="text-gray-500 text-sm mb-4">
@@ -929,7 +929,7 @@
 
                 if (data.status === 'success') {
                     const successMessageContent = `
-                Thank you for purchasing our software. We are thrilled to have you on board!<br>
+                Thank you for purchasing our CoreXGen software. We are thrilled to have you on board!<br>
                 A welcome email has been sent to your registered email address.<br>
                 Please check your inbox (and spam folder) for the email.
             `;
@@ -950,7 +950,7 @@
 
                         if (statusData.status === 'success') {
                             const successMessageContent = `
-                        Thank you for purchasing our software. We are thrilled to have you on board!<br>
+                        Thank you for purchasing our CoreXGen software. We are thrilled to have you on board!<br>
                         A welcome email has been sent to your registered email address. <br>
                         Please check your inbox (and spam folder) for the email.
                     `;
