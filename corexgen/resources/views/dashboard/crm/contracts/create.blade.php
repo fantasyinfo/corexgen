@@ -22,7 +22,9 @@
                 <div class="card stretch stretch-full">
                     <form id="contractFieldsForm" action="{{ route(getPanelRoutes('contracts.store')) }}" method="POST">
                         @csrf
-
+                        <input type="hidden" name="_ref_type" value="{{ $type }}">
+                        <input type="hidden" name="_ref_id" value="{{ $id }}">
+                        <input type="hidden" name="_ref_refrer" value="{{ $refrer }}">
                         <div class="card-body general-info">
                             <div class="mb-5 d-flex align-items-center justify-content-between">
                                 <p class="fw-bold mb-0 me-4">

@@ -15,7 +15,7 @@
         // prePrintR($tax->toArray());
 
     @endphp
-    
+
     <div class="container-fluid">
         <div class="row">
             <div class="justify-content-md-center col-lg-12">
@@ -23,6 +23,9 @@
                     <form id="proposalsFieldsForm" action="{{ route(getPanelRoutes('proposals.store')) }}" method="POST">
                         @csrf
 
+                        <input type="hidden" name="_ref_type" value="{{ $type }}">
+                        <input type="hidden" name="_ref_id" value="{{ $id }}">
+                        <input type="hidden" name="_ref_refrer" value="{{ $refrer }}">
                         <div class="card-body general-info">
                             <div class="mb-5 d-flex align-items-center justify-content-between">
                                 <p class="fw-bold mb-0 me-4">
@@ -123,10 +126,11 @@
                                     <x-form-components.input-group type="text" class="custom-class" id="_prefix"
                                         name="_prefix" placeholder="{{ getSettingValue('Proposal Prefix') }}"
                                         value="{{ old('_prefix', getSettingValue('Proposal Prefix')) }}" disabled />
-                                        <input type="hidden" name="_prefix" value="{{getSettingValue('Proposal Prefix')}}" />
-                                        
+                                    <input type="hidden" name="_prefix"
+                                        value="{{ getSettingValue('Proposal Prefix') }}" />
+
                                 </div>
-                               
+
 
                             </div>
                             <div class="row mb-4 align-items-center">
@@ -208,8 +212,9 @@
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
-                                    <x-form-components.input-group type="date" placeholder="Select Date" class="custom-class" id="creating_date"
-                                        name="creating_date" value="{{ old('creating_date') }}" required />
+                                    <x-form-components.input-group type="date" placeholder="Select Date"
+                                        class="custom-class" id="creating_date" name="creating_date"
+                                        value="{{ old('creating_date') }}" required />
 
                                 </div>
                             </div>
@@ -221,16 +226,17 @@
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
-                                    <x-form-components.input-group type="date" placeholder="Select Date" class="custom-class" id="valid_date"
-                                        name="valid_date" value="{{ old('valid_date') }}" />
+                                    <x-form-components.input-group type="date" placeholder="Select Date"
+                                        class="custom-class" id="valid_date" name="valid_date"
+                                        value="{{ old('valid_date') }}" />
                                 </div>
                             </div>
 
 
                             <hr>
 
-                        
-                           
+
+
 
                             <div class="row mb-4 align-items-center">
 
@@ -358,9 +364,6 @@
                     this.dataset.modified = true;
                 });
             });
-
-
-         
         </script>
     @endpush
 @endsection

@@ -181,7 +181,12 @@ class EstimatesController extends Controller
             // update current usage
             $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['ESTIMATES']]), '+', '1');
 
-
+            // redirect back to refrer ...
+            // Handle redirect to referrer
+            $redirect = $this->_redirectBackToRefrer($request->validated());
+            if ($redirect) {
+                return $redirect;
+            }
 
             return redirect()->route($this->tenantRoute . 'estimates.index')
                 ->with('success', 'Estimates created successfully.');
@@ -191,6 +196,23 @@ class EstimatesController extends Controller
         }
     }
 
+
+    /**
+     * redirect back to view if its coming from refrer
+     */
+
+    private function _redirectBackToRefrer(array $data)
+    {
+        if (isset($data['_ref_type'], $data['_ref_id'], $data['_ref_refrer'])) {
+            return redirect()->route(
+                getPanelRoutes($data['_ref_refrer']),
+                ['id' => $data['_ref_id']]
+            )->with('success', $data['_ref_type'] . " Estimate created successfully.");
+        }
+
+        // Return null if no redirection logic matches
+        return null;
+    }
 
 
 
