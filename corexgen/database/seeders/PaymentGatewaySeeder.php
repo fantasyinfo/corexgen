@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\PaymentGateway;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class PaymentGatewaySeeder extends Seeder
 {
@@ -16,8 +17,9 @@ class PaymentGatewaySeeder extends Seeder
         //
 
 
-
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         PaymentGateway::truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         foreach (PAYMENT_GATEWAYS as $gateway) {
             PaymentGateway::create([
