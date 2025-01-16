@@ -10,6 +10,7 @@ use App\Models\Company;
 use App\Models\CompanyOnboarding;
 use App\Models\Country;
 use App\Models\CRM\CRMSettings;
+use App\Models\LandingPage;
 use App\Models\Media;
 use App\Models\Tenant;
 use App\Models\WebToLeadForm;
@@ -21,6 +22,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class SettingsController extends Controller
 {
@@ -727,6 +730,179 @@ class SettingsController extends Controller
                 'error' => 'An error occurred while trying to generate the lead form.',
             ]);
         }
+    }
+
+
+    /**
+     * Show Front End Landing Page Settings View
+     *
+     */
+    public function frontend()
+    {
+        return view($this->getViewFilePath('frontEnd'), [
+            'title' => 'Front End Settings',
+            'module' => PANEL_MODULES[$this->getPanelModule()]['settings'],
+            'settings' => LandingPage::all(),
+        ]);
+    }
+
+    /**
+     * Update Frontend Settings
+     * 
+     * @param Request $request
+     */
+    public function frontendUpdate(Request $request)
+    {
+        try {
+            // Validate the request data
+            $validated = $this->validateFrontendSettings($request);
+
+            // Start database transaction
+            DB::beginTransaction();
+
+            try {
+                // Update Hero Section
+                $this->updateSection('hero', $validated['hero']);
+
+                // Update Features Section
+                $this->updateFeaturesSection($validated['features']);
+
+                // Update Solutions Section
+                $this->updateSection('solutions', $validated['solutions']);
+
+                // Update Pricing Section (maps to 'plans' in db)
+                $this->updateSection('plans', $validated['pricing']);
+
+                // Update Testimonials Section
+                $this->updateTestimonialsSection($validated['testimonials']);
+
+                // Update Footer Section
+                $this->updateSection('footer', $validated['footer']);
+
+                // Commit transaction
+                DB::commit();
+
+                return redirect()->back()->with('success', 'Frontend settings updated successfully');
+
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Frontend settings update failed: ' . $e->getMessage());
+                throw $e;
+            }
+        } catch (ValidationException $e) {
+            return redirect()->back()->with('error', 'Validation failed')->withInput();
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage())->withInput();
+        }
+    }
+
+    /**
+     * Validate frontend settings
+     * 
+     * @param Request $request
+     * @return array
+     */
+    private function validateFrontendSettings(Request $request): array
+    {
+        return $request->validate([
+            'hero' => 'required|array',
+            'hero.Heading' => 'required|string|max:255',
+            'hero.SubHeading' => 'required|string',
+
+            'features' => 'required|array',
+            'features.Heading' => 'required|string|max:255',
+            'features.SubHeading' => 'required|string',
+            'features.Options.Heading.*' => 'required|string|max:255',
+            'features.Options.SubHeading.*' => 'required|string',
+
+            'solutions' => 'required|array',
+            'solutions.Heading' => 'required|string|max:255',
+            'solutions.SubHeading' => 'required|string',
+            'solutions.Options.*' => 'required|string|max:255',
+
+            'pricing' => 'required|array',
+            'pricing.Heading' => 'required|string|max:255',
+            'pricing.SubHeading' => 'required|string',
+
+            'testimonials' => 'required|array',
+            'testimonials.Heading' => 'required|string|max:255',
+            'testimonials.SubHeading' => 'required|string',
+            'testimonials.Options.Message.*' => 'required|string',
+            'testimonials.Options.Customer Name.*' => 'required|string|max:255',
+            'testimonials.Options.Position.*' => 'required|string|max:255',
+            'testimonials.Options.Company.*' => 'required|string|max:255',
+            'testimonials.Options.LOGO.*' => 'required|string',
+
+            'footer' => 'required|array',
+            'footer.Heading' => 'required|string|max:255',
+            'footer.SubHeading' => 'required|string',
+        ]);
+    }
+
+    /**
+     * Update a single section
+     * 
+     * @param string $key
+     * @param array $value
+     * @return void
+     */
+    private function updateSection(string $key, array $value): void
+    {
+        LandingPage::where('key', $key)
+            ->where('type', 'section')
+            ->firstOrFail()
+            ->update(['value' => $value]);
+    }
+
+    /**
+     * Update features section with restructured data
+     * 
+     * @param array $features
+     * @return void
+     */
+    private function updateFeaturesSection(array $features): void
+    {
+        // Restructure the features options to match the original format
+        $restructuredOptions = [];
+
+        foreach ($features['Options']['Heading'] as $index => $heading) {
+            $restructuredOptions[] = [
+                'Heading' => $heading,
+                'SubHeading' => $features['Options']['SubHeading'][$index]
+            ];
+        }
+
+        $features['Options'] = $restructuredOptions;
+
+        $this->updateSection('features', $features);
+    }
+
+    /**
+     * Update testimonials section with restructured data
+     * 
+     * @param array $testimonials
+     * @return void
+     */
+    private function updateTestimonialsSection(array $testimonials): void
+    {
+        // Restructure the testimonials options to match the original format
+        $restructuredOptions = [];
+
+        foreach ($testimonials['Options']['Message'] as $index => $message) {
+            $restructuredOptions[] = [
+                'Message' => $message,
+                'Customer Name' => $testimonials['Options']['Customer Name'][$index],
+                'Position' => $testimonials['Options']['Position'][$index],
+                'Company' => $testimonials['Options']['Company'][$index],
+                'LOGO' => $testimonials['Options']['LOGO'][$index]
+            ];
+        }
+
+        $testimonials['Options'] = $restructuredOptions;
+
+        $this->updateSection('testimonials', $testimonials);
     }
 
 }

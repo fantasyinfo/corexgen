@@ -14,6 +14,7 @@ return [
     'General' => 'General',
     'General Settings' => 'General Settings',
     'Save' => 'Save',
+    'Front End' => 'Front End'
 
 
 ];

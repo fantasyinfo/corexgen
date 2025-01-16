@@ -42,7 +42,7 @@
             padding: 2rem;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 400px;
+            max-width: 600px;
         }
 
         .auth-header {
@@ -86,7 +86,7 @@
         @endif
 
         <div class="auth-header">
-            <img src="/img/logo.png" alt="Logo">
+            {{ config('app.name') }}
         </div>
 
         @yield('content')

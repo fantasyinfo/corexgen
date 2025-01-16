@@ -51,4 +51,5 @@ return [
     "Bulk Import" => "Bulk Import",
     "Templates" => "Templates",
     "Web to Lead" => "Web to Lead",
+    'Front End' => 'Front End'
 ];
