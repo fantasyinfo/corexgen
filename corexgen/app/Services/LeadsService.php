@@ -254,6 +254,43 @@ class LeadsService
     }
 
 
+    /**
+     * convert to customer client
+     */
+
+    public function convertToClient(array $validatedData): bool
+    {
+        $isClientAlreadyExists = false;
+
+        if (isset($validatedData['email'])) {
+            $isClientAlreadyExists = $this->clientService->findClientWithType($validatedData['email'], 'email');
+        } elseif (isset($validatedData['phone'])) {
+            $isClientAlreadyExists = $this->clientService->findClientWithType($validatedData['phone'], 'phone');
+        }
+
+        if (!$isClientAlreadyExists) {
+            $clientData = [
+                'type' => $validatedData['type'],
+                'company_name' => $validatedData['company_name'],
+                'first_name' => $validatedData['first_name'],
+                'last_name' => $validatedData['last_name'],
+                'primary_email' => $validatedData['email'],
+                'primary_phone' => $validatedData['phone'] ?? '9876543210',
+                'company_id' => Auth::user()->company_id,
+                'created_by' => Auth::id(),
+                'updated_by' => Auth::id(),
+            ];
+
+            // Attempt client creation
+            $client = $this->clientService->createClient($clientData);
+
+            // Return true if a client was created, false otherwise
+            return $client ? true : false;
+        }
+
+        // If client already exists, return false
+        return false;
+    }
 
     /**
      * create address if provided 

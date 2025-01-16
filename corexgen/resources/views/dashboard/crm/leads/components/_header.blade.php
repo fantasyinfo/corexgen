@@ -28,6 +28,10 @@
                         <span class="badge bg-success">
                             <i class="fas fa-check-circle me-1"></i> Converted
                         </span>
+                    @else
+                        <a class="btn btn-outline-primary"
+                            href="{{ route(getPanelRoutes('leads.convert'), ['id' => $lead->id]) }}">Convert to
+                            client</a>
                     @endif
                     <span class="lead-score" data-bs-toggle="tooltip" title="Lead Score">
                         {{ $lead->score ?? 0 }} <i class="fas fa-star text-warning"></i>
@@ -36,5 +40,5 @@
             </div>
         </div>
     </div>
- 
+
 </div>

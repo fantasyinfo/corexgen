@@ -570,6 +570,9 @@ Route::middleware([
         Route::post('/bulkDelete', [LeadsController::class, 'bulkDelete'])->name('bulkDelete')->middleware('check.permission:LEADS.BULK_DELETE');
 
         Route::get('/view/{id}', [LeadsController::class, 'view'])->name('view')->middleware('check.permission:LEADS.VIEW');
+
+        Route::get('/convert/{id}', [LeadsController::class, 'convert'])->name('convert')->middleware('check.permission:LEADS.UPDATE');
+
         Route::get('/profile', [LeadsController::class, 'profile'])->name('profile');
 
 
