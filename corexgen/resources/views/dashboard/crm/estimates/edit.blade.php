@@ -55,6 +55,7 @@
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
+                                    <x-form-components.create-new :link="'clients.create'" :text="'Create new'" />
                                     <select name="client_id" id="client_id" class="form-select searchSelectBox">
                                         @foreach ($clients as $item)
                                             @php
@@ -83,6 +84,7 @@
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
+                                    <x-form-components.create-new :link="'leads.create'" :text="'Create new'" />
                                     <select name="lead_id" id="lead_id" class="form-select searchSelectBox">
                                         @foreach ($leads as $item)
                                             @php
@@ -180,6 +182,7 @@
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
+                                    <x-form-components.create-new :link="'estimates.createEstimates'" :text="'Create new'" />
                                     <select name="template_id" id="template_id" class="form-select">
                                         <option value="">Select Estimate Template (optional)</option>
                                         @foreach ($templates as $item)

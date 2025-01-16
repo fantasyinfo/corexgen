@@ -224,6 +224,7 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
+                                            <x-form-components.create-new :link="'cgt.indexLeadsGroups'" :text="'Create new'" />
                                             <select class="form-select" name="group_id" id="group_id">
                                                 @foreach ($leadsGroups as $lg)
                                                     <option value="{{ $lg->id }}"
@@ -241,6 +242,7 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
+                                            <x-form-components.create-new :link="'cgt.indexLeadsSources'" :text="'Create new'" />
                                             <select class="form-select" name="source_id" id="source_id">
                                                 @foreach ($leadsSources as $ls)
                                                     <option value="{{ $ls->id }}"
@@ -259,6 +261,7 @@
                                             </x-form-components.input-label>
                                         </div>
                                         <div class="col-lg-8">
+                                            <x-form-components.create-new :link="'cgt.indexLeadsStatus'" :text="'Create new'" />
                                             <select class="form-select" name="status_id" id="status_id" required>
                                                 @foreach ($leadsStatus as $lst)
                                                     <option value="{{ $lst->id }}"
@@ -324,6 +327,7 @@
                                         </div>
 
                                         <div class="col-lg-8">
+                                          
                                             <x-form-components.dropdown-with-profile :title="'Select Team Members'" :options="$teamMates"
                                                 :name="'assign_to'" :multiple="true" :selected="old('assign_to', $lead->assignees->pluck('id')->toArray())" />
                                         </div>

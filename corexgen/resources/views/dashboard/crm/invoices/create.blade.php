@@ -47,6 +47,7 @@
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
+                                    <x-form-components.create-new :link="'settings.oneWord'" :text="'Change Prefix'" />
                                     <x-form-components.input-group-prepend-append
                                         prepend="{{ getSettingValue('Invoice Prefix') }}-" append="..." type="text"
                                         class="custom-class" id="_id" name="_id" placeholder="{{ __('0001') }}"
@@ -66,6 +67,7 @@
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
+                                    <x-form-components.create-new :link="'clients.create'" :text="'Create new'" />
                                     <select name="client_id" id="client_id" class="form-select searchSelectBox">
                                         @foreach ($clients as $item)
                                             @php
@@ -92,6 +94,7 @@
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
+                                    <x-form-components.create-new :link="'tasks.create'" :text="'Create new'" />
                                     <select name="task_id" id="task_id" class="form-select searchSelectBox">
                                         @foreach ($tasks as $item)
                                             <option value="{{ $item->id }}"

@@ -52,6 +52,7 @@
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
+                                    <x-form-components.create-new :link="'clients.create'" :text="'Create new'" />
                                     <select name="client_id" id="client_id" class="form-select searchSelectBox">
                                         @foreach ($clients as $item)
                                             @php
@@ -79,6 +80,7 @@
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
+                                    <x-form-components.create-new :link="'tasks.create'" :text="'Create new'" />
                                     <select name="task_id" id="task_id" class="form-select searchSelectBox">
                                         @foreach ($tasks as $item)
                                             <option value="{{ $item->id }}"

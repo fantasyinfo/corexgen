@@ -4,6 +4,7 @@
 <h6>Select Products & Services</h6>
 <div class="row mb-4 align-items-center">
     <div class="col-lg-12">
+        <x-form-components.create-new :link="'products_services.create'" :text="'Create new'" />
         <select id="selectProduct" class="form-select searchSelectBox">
             <option value="">Select product/service</option>
             @if (isset($products) && $products->isNotEmpty())

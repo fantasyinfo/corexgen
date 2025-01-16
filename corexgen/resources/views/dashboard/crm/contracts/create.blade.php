@@ -62,6 +62,7 @@
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
+                                    <x-form-components.create-new :link="'clients.create'" :text="'Create new'" />
                                     <select name="client_id" id="client_id" class="form-select searchSelectBox">
                                         @foreach ($clients as $item)
                                             @php
@@ -89,6 +90,7 @@
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
+                                    <x-form-components.create-new :link="'leads.create'" :text="'Create new'" />
                                     <select name="lead_id" id="lead_id" class="form-select searchSelectBox">
                                         @foreach ($leads as $item)
                                             @php
@@ -117,6 +119,7 @@
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
+                                    <x-form-components.create-new :link="'settings.oneWord'" :text="'Change Prefix'" />
                                     <x-form-components.input-group type="text" class="custom-class" id="_prefix"
                                         name="_prefix" placeholder="{{ getSettingValue('Contract Prefix') }}"
                                         value="{{ old('_prefix', getSettingValue('Contract Prefix')) }}" disabled />
@@ -184,6 +187,7 @@
                                     </x-form-components.input-label>
                                 </div>
                                 <div class="col-lg-8">
+                                    <x-form-components.create-new :link="'contracts.createContracts'" :text="'Create new'" />
                                     <select name="template_id" id="template_id" class="form-select">
                                         <option value="">Select Contract Template (optional)</option>
                                         @foreach ($templates as $item)

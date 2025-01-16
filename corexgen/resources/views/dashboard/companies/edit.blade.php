@@ -110,7 +110,7 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <div class="input-group">
-
+                                                <x-form-components.create-new :link="'plans.create'" :text="'Create new'" />
                                                 <select
                                                     class="form-control searchSelectBox  @error('plan_id') is-invalid @enderror"
                                                     name="plan_id" id="plan_id">
