@@ -15,6 +15,7 @@ use App\Models\Media;
 use App\Models\Tenant;
 use App\Models\WebToLeadForm;
 use App\Services\LeadsService;
+use App\Services\MailConfigService;
 use App\Traits\IsSMTPValid;
 use App\Traits\MediaTrait;
 use App\Traits\TenantFilter;
@@ -333,6 +334,8 @@ class SettingsController extends Controller
                 }
             }
 
+             // Update mail configuration
+            MailConfigService::updateMailConfig();
 
         } else {
             $validatedData = $request->validate([
