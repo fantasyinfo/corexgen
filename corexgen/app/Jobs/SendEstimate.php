@@ -54,7 +54,7 @@ class SendEstimate implements ShouldQueue
         // Configure mail settings for this specific email
         config([
             'mail.mailers.smtp.host' => $this->mailSettings['Mail Host'],
-            'mail.mailers.smtp.port' => $this->mailSettings['Mail Port'],
+            'mail.mailers.smtp.port' => (int) $this->mailSettings['Mail Port'],
             'mail.mailers.smtp.username' => $this->mailSettings['Mail Username'],
             'mail.mailers.smtp.password' => $this->mailSettings['Mail Password'],
             'mail.from.address' => $this->mailSettings['Mail From Address'],

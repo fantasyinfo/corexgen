@@ -175,6 +175,8 @@ return [
         Yajra\DataTables\DataTablesServiceProvider::class,
         OwenIt\Auditing\AuditingServiceProvider::class,
         Modules\PaypalGatewayModule\PaypalGatewayModuleServiceProvider::class,
+        App\Providers\DatabaseServiceProvider::class,
+
 
     ])->toArray(),
 

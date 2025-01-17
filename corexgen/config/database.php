@@ -64,7 +64,7 @@ return [
 
             // Dump configuration
             'dump' => [
-                'dump_binary_path' => env('MYSQL_DUMP_PATH', ''), // Automatically detect the path
+                'dump_binary_path' => '', // Automatically detect the path
                 'use_single_transaction' => true,
                 'timeout' => 60 * 5, // Timeout in seconds
             ],
