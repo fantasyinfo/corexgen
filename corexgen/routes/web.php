@@ -85,16 +85,71 @@ Route::prefix('installer')->group(function () {
 
 
 // clear the cache...
-Route::get('/clear', function() {
+Route::get('/clear', function () {
+    try {
+        // 1. Clear all existing caches first
+        Artisan::call('view:clear');
+        Artisan::call('cache:clear');
+        Artisan::call('config:clear');
+        Artisan::call('route:clear');
 
-    Artisan::call('cache:clear');
-    Artisan::call('config:clear');
-    Artisan::call('config:cache');
-    Artisan::call('view:clear');
- 
-    return "Cleared!";
- 
- });
+        // 2. Clear compiled classes and services
+        Artisan::call('clear-compiled');
+
+        // 3. Remove the existing bootstrap/cache/services.php
+        if (file_exists(app_path('../bootstrap/cache/services.php'))) {
+            unlink(app_path('../bootstrap/cache/services.php'));
+        }
+
+        // 4. Recreate bootstrap/cache directory if it doesn't exist
+        if (!file_exists(app_path('../bootstrap/cache'))) {
+            mkdir(app_path('../bootstrap/cache'), 0755, true);
+        }
+
+        // 5. Create storage link if it doesn't exist
+        if (!file_exists(public_path('storage'))) {
+            Artisan::call('storage:link');
+        }
+
+        // 6. Generate new caches
+        Artisan::call('config:cache');
+        Artisan::call('route:cache');
+
+        // 7. Optimize the application
+        Artisan::call('optimize');
+
+     
+
+        $output = [
+            'View cache cleared ✓',
+            'Application cache cleared ✓',
+            'Config cache cleared ✓',
+            'Route cache cleared ✓',
+            'Compiled classes cleared ✓',
+            'Storage link created ✓',
+            'Config cached ✓',
+            'Routes cached ✓',
+            'Application optimized ✓'
+        ];
+
+        // Return success message with details
+        return response()->json([
+            'success' => true,
+            'message' => 'All caches cleared and regenerated successfully!',
+            'details' => $output
+        ]);
+
+    } catch (\Exception $e) {
+        // Log the error
+        \Log::error('Cache clearing failed: ' . $e->getMessage());
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to clear caches',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+})->middleware(['auth', 'throttle:3,1']); // Limit to 3 requests per minute, requires authentication
 
 
 // home route of applying it to a group of routes

@@ -269,6 +269,7 @@ class SystemInstallerController extends Controller
     }
 
 
+ 
     /**
      * Method installApplication
      *
@@ -383,14 +384,36 @@ class SystemInstallerController extends Controller
             Log::info('Updating the .env file...');
             $this->updateEnvironmentFile($request);
 
-            // Step 11: Run Artisan Commands
+            // Step 11: Create Storage Directory and Set Permissions
+            Log::info('Setting up storage directory and permissions...');
+            if (!file_exists(public_path('storage'))) {
+                try {
+                    Log::info('Creating storage symbolic link...');
+                    Artisan::call('storage:link');
+                    Log::info('Storage link created successfully');
+
+                    // Set proper permissions for storage directory
+                    if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+                        Log::info('Setting storage directory permissions...');
+                        chmod(storage_path(), 0755);
+                        chmod(public_path('storage'), 0755);
+                    }
+                } catch (\Exception $e) {
+                    Log::warning('Failed to create storage link or set permissions', [
+                        'message' => $e->getMessage()
+                    ]);
+                    // Continue installation even if storage:link fails
+                }
+            }
+
+            // Step 12: Run Artisan Commands
             Log::info('Running additional Artisan commands.');
             Artisan::call('key:generate');
             Artisan::call('config:clear');
             Artisan::call('config:cache');
             Artisan::call('optimize');
 
-            // Step 12: Commit Transaction
+            // Step 13: Commit Transaction
             Log::info('Committing the database transaction.');
             DB::commit();
 

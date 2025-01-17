@@ -91,7 +91,7 @@ class CompaniesCsvRowProcessor
                 );
             }
 
-            info('Company created successfully', ['email' => $row['Email'], 'company_id' => $company->id]);
+            info('Company created successfully', ['email' => $row['Email'], 'company_id' => $company['company']->id]);
 
             return true;
         } catch (\Illuminate\Database\QueryException $e) {
