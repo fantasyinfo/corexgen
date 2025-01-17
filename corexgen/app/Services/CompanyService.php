@@ -410,6 +410,12 @@ class CompanyService
 
 
         $cityId = $this->findOrCreateCity($data['address_city_name'], $data['address_country_id']);
+        info('City ID resolved in createAddressIfProvided', ['city_id' => $cityId]);
+
+        if (!$cityId) {
+            info('No valid city ID could be determined', ['data' => $data]);
+            return null;
+        }
 
         return Address::create([
             'street_address' => $data['address_street_address'],
@@ -430,8 +436,15 @@ class CompanyService
             ['name' => $cityName, 'country_id' => $countryId]
         );
 
-        return $city->id;
+        if (is_array($city)) {
+            info('findOrCreateCity returned an array', ['city' => $city]);
+        } else {
+            info('findOrCreateCity returned an object', ['city_id' => $city->id]);
+        }
+
+        return $city->id ?? null;
     }
+
     /**
      * create company users acc
      */
