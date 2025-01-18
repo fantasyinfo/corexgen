@@ -18,7 +18,7 @@ class ProposalRepository
      */
     public function getProposalQuery($request)
     {
-        $query = CRMProposals::query();
+        $query = CRMProposals::query()->latest();
 
         $query = $this->applyTenantFilter($query);
 

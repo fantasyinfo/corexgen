@@ -240,7 +240,7 @@ class ProposalService
                 return "$proposal->_prefix $proposal->_id ";
             })
             ->editColumn('value', function ($proposal) {
-                return $proposal?->value ? "$ " . number_format($proposal->value) : "0";
+                return $proposal?->value ? getSettingValue('Currency Symbol') . ' ' . number_format($proposal->value) : "0";
             })
             ->editColumn('created_at', fn($proposal) => $proposal?->created_at ? formatDateTime($proposal->created_at) : '')
             ->editColumn('creating_date', fn($proposal) => $proposal?->creating_date ? formatDateTime($proposal->creating_date) : '')

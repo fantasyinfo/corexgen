@@ -16,7 +16,7 @@ class ProjectRepository
 
         $wantCurrentUserItems = filter_var($request->input('current_user'), FILTER_VALIDATE_BOOLEAN);
 
-        $query = Project::query()->select('projects.*')
+        $query = Project::query()->select('projects.*')->latest()
             ->with([
                 'client',
                 'assignees' => fn($q) => $q

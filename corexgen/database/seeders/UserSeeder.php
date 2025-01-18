@@ -14,7 +14,7 @@ class UserSeeder extends Seeder
 
     protected $companyId;
 
-    public function __construct( int $companyId = null) {
+    public function __construct( int $companyId = 5) {
         $this->companyId = $companyId;
     }
     public function run(): void
@@ -24,13 +24,15 @@ class UserSeeder extends Seeder
 
         $rolesIds = DB::table(table: 'crm_roles')->where('company_id', $this->companyId)->pluck('id')->toArray();
 
+        // info('Roles',[$rolesIds]);
+
         for ($i = 0; $i <= 100; $i++) {
             $usersArray[] = [
                 'name' => fake()->name(),
                 'email' => fake()->safeEmail(), // Use static emails for debugging
                 'password' => 1234, // Hash passwords
                 'role_id' => $rolesIds[array_rand($rolesIds)],
-                'is_tenant' => true,
+                'is_tenant' => false,
                 'company_id' => $this->companyId,
                 'status' => CRM_STATUS_TYPES['USERS']['STATUS']['ACTIVE'],
                 'updated_at' => now(),

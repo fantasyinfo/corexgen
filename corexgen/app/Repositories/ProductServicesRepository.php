@@ -15,7 +15,7 @@ class ProductServicesRepository
      */
     public function getProductsQuery($request)
     {
-        $query = ProductsServices::query()->with(['category', 'tax']);
+        $query = ProductsServices::query()->with(['category', 'tax'])->latest();
 
         $query = $this->applyTenantFilter($query);
 

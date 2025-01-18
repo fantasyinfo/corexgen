@@ -12,7 +12,7 @@ class CustomFieldsRepository
      */
     public function getCustomFieldsQuery($request)
     {
-        $query = CustomFieldDefinition::query();
+        $query = CustomFieldDefinition::query()->latest();
 
         // Apply dynamic filters if any
         // return $this->applyFilters($query, $request);

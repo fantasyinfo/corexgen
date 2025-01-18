@@ -18,7 +18,7 @@ class TasksRepository
 
         $wantCurrentUserItems = filter_var($request->input('current_user'), FILTER_VALIDATE_BOOLEAN);
 
-        $query = Tasks::query()
+        $query = Tasks::query()->latest()
             ->select([
                 'tasks.id',
                 'tasks.priority',
@@ -125,7 +125,7 @@ class TasksRepository
             $wantCurrentUserItems = filter_var($request['query']['current_user'], FILTER_VALIDATE_BOOLEAN);
         }
 
-        $query = Tasks::query()
+        $query = Tasks::query()->latest()
             ->select([
                 'tasks.id',
                 'tasks.priority',

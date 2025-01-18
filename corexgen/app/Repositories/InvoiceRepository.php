@@ -18,7 +18,7 @@ class InvoiceRepository
      */
     public function getInvoiceQuery($request)
     {
-        $query = Invoice::query()->with(['task', 'client', 'project']);
+        $query = Invoice::query()->with(['task', 'client', 'project'])->latest();
 
         $query = $this->applyTenantFilter($query);
 

@@ -144,8 +144,13 @@ class UserController extends Controller
 
         // fetch totals status by clause
         $statusQuery = $this->getGroupByStatusQuery($model);
-        $groupData = $this->applyTenantFilter($statusQuery['groupQuery'])->get()->toArray();
-        $totalData = $this->applyTenantFilter($statusQuery['totalQuery'])->count();
+        if ($user->is_tenant) {
+            $groupData = $this->applyTenantFilter($statusQuery['groupQuery']->where('role_id', '!=', null))->get()->toArray();
+            $totalData = $this->applyTenantFilter($statusQuery['totalQuery']->where('role_id', '!=', null))->count();
+        } else {
+            $groupData = $this->applyTenantFilter($statusQuery['groupQuery']->where('is_tenant', '0')->where('role_id', '!=', null))->get()->toArray();
+            $totalData = $this->applyTenantFilter($statusQuery['totalQuery']->where('is_tenant', '0')->where('role_id', '!=', null))->count();
+        }
         // fetch usage
 
         if (!$user->is_tenant && !is_null($user->company_id)) {
