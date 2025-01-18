@@ -103,21 +103,27 @@ class ProductServicesService
     }
 
     /**
-     * create products taxes
+     * get products taxes
      */
-    public function getProductTaxes()
+    public function getProductTaxes($key = null, $value = null)
     {
         $taxQuery = $this->getCategoryGroupTags(CATEGORY_GROUP_TAGS_TYPES['KEY']['products_taxs'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['products_services']);
         $taxQuery = $this->applyTenantFilter($taxQuery);
+
+        if ($key && $value) {
+            $taxQuery->where($key, $value);
+        }
         return $taxQuery->get();
     }
+
+
 
     /**
      * get all products
      */
     public function getAllProducts($status = 'ACTIVE')
     {
-        return $this->applyTenantFilter(ProductsServices::query()->where('status',$status))->get();
+        return $this->applyTenantFilter(ProductsServices::query()->where('status', $status))->get();
     }
 
 

@@ -41,6 +41,7 @@ class InvoiceEditRequest extends FormRequest
             'product_tax.0' => 'nullable|string',
 
             // Validation for all products
+            'product_id.*' => 'nullable|string',
             'product_title.*' => 'required|string',
             'product_description.*' => 'nullable|string',
             'product_qty.*' => 'required|numeric|min:1',
