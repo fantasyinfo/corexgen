@@ -25,10 +25,12 @@ class EstimateService
     protected $estimateRepository;
 
     private $tenantRoute;
+    private $productServicesService;
 
-    public function __construct(EsitmateRepository $estimateRepository)
+    public function __construct(EsitmateRepository $estimateRepository,ProductServicesService $productServicesService)
     {
         $this->estimateRepository = $estimateRepository;
+        $this->productServicesService = $productServicesService;
         $this->tenantRoute = $this->getTenantRoute();
     }
 
@@ -106,12 +108,16 @@ class EstimateService
             foreach ($data['product_title'] as $k => $title) {
                 $trimmedTitle = trim($title);
                 if ($trimmedTitle !== '') {
+                    $taxData = $this->productServicesService->getProductTaxes('name', $data['product_tax'][$k]);
+                    info('product id', [$data['product_id'][$k]]);
                     $product_details[] = [
                         'title' => $trimmedTitle,
                         'description' => trim($data['product_description'][$k] ?? ''),
                         'qty' => (float) ($data['product_qty'][$k] ?? 0),
                         'rate' => (float) ($data['product_rate'][$k] ?? 0.00),
-                        'tax' => $data['product_tax'][$k] ?? null,
+                        'tax' => @$taxData[0]?->name ?? null,
+                        'tax_id' => @$taxData[0]?->id ?? null,
+                        'product_id' => (int) ($data['product_id'][$k] ?? 0)
                     ];
                 }
             }

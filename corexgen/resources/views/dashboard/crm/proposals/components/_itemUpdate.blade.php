@@ -107,13 +107,15 @@
             // Populate existing data in edit mode
             if (Array.isArray(productDetails) && productDetails.length > 0) {
                 productDetails.forEach(product => {
+                    // console.log(product)
                     addRow({
-                        id: '', // Custom products might not have IDs
+                        id: product?.product_id || '', // Custom products might not have IDs
                         title: product.title || '',
                         description: product.description || '',
                         qty: product.qty || 1,
                         rate: product.rate || 0,
-                        tax: product.tax || null
+                        tax: product.tax || null,
+                        tax_id: product.tax_id || null
                     });
                 });
             }
@@ -131,8 +133,10 @@
                 const product = products.find(p => p.id == productId);
 
                 if (product) {
+                    // Fix: Correct selector syntax for finding existing row
                     const existingRow = table.find(`tr[data-product-id="${productId}"]`);
-                    if (existingRow.length) {
+
+                    if (existingRow.length > 0) {
                         // Increment quantity if product already exists
                         const qtyInput = existingRow.find('.qty-input');
                         qtyInput.val(parseInt(qtyInput.val()) + 1).trigger('change');
@@ -157,9 +161,11 @@
 
             // Function: Add Row
             function addRow(product = null) {
+                console.log(product)
                 rowCounter++;
                 const newRow = `
             <tr data-row="${rowCounter}" data-product-id="${product ? product.id || '' : ''}">
+                <input type="hidden" name="product_id[]" value="${product ? product.id || '' : ''}" />
                 <td>
                     <input type="text" class="form-control" name="product_title[]" 
                         value="${product ? product.title || '' : ''}" required>
@@ -180,7 +186,7 @@
                 </td>
                 <td>
                     <select name="product_tax[]" class="form-select tax-select">
-                        ${generateTaxOptions(product ? product.tax : null)}
+                        ${generateTaxOptions(product ? product.tax_id : null)}
                     </select>
                 </td>
                 <td class="amount-column text-end">0.00</td>
@@ -201,6 +207,7 @@
 
             // Function: Generate Tax Options
             function generateTaxOptions(selectedTax = null) {
+             
                 return taxOptions
                     .map(tax =>
                         `<option value="${tax.name}" data-rate="${tax.name}" ${selectedTax == tax.id ? 'selected' : ''}>${tax.name}</option>`

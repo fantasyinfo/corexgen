@@ -108,12 +108,13 @@
             if (Array.isArray(productDetails) && productDetails.length > 0) {
                 productDetails.forEach(product => {
                     addRow({
-                        id: '', // Custom products might not have IDs
+                        id: product?.product_id || '', // Custom products might not have IDs
                         title: product.title || '',
                         description: product.description || '',
                         qty: product.qty || 1,
                         rate: product.rate || 0,
-                        tax: product.tax || null
+                        tax: product.tax || null,
+                        tax_id: product.tax_id || null
                     });
                 });
             }
@@ -160,6 +161,7 @@
                 rowCounter++;
                 const newRow = `
             <tr data-row="${rowCounter}" data-product-id="${product ? product.id || '' : ''}">
+                <input type="hidden" name="product_id[]" value="${product ? product.id || '' : ''}" />
                 <td>
                     <input type="text" class="form-control" name="product_title[]" 
                         value="${product ? product.title || '' : ''}" required>
@@ -180,7 +182,7 @@
                 </td>
                 <td>
                     <select name="product_tax[]" class="form-select tax-select">
-                        ${generateTaxOptions(product ? product.tax : null)}
+                        ${generateTaxOptions(product ? product.tax_id : null)}
                     </select>
                 </td>
                 <td class="amount-column text-end">0.00</td>

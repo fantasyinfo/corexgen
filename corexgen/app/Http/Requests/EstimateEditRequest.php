@@ -36,7 +36,7 @@ class EstimateEditRequest extends FormRequest
             'valid_date' => 'nullable|date|after_or_equal:today',
             'template_id' => 'nullable|exists:templates,id',
 
-
+            'product_id.*' => 'nullable|string',
             'product_title.*' => 'required|string',
             'product_description.*' => 'nullable|string',
             'product_qty.*' => 'required|numeric|min:1',
