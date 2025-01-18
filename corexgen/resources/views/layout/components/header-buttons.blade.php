@@ -9,10 +9,12 @@
             <i class="fas fa-plus me-2"></i> {{ __('Create') }}
         </a>
     @endif
-    <button id="toggle-stats-btn" class="btn btn-outline-secondary btn-xl me-2 active" data-toggle="tooltip"
-        title="Hide/Show Stats" onclick="toggleStats()">
-        <i class="fas fa-chart-bar"></i>
-    </button>
+    @if (isset($headerStatus))
+        <button id="toggle-stats-btn" class="btn btn-outline-secondary btn-xl me-2 active" data-toggle="tooltip"
+            title="Hide/Show Stats" onclick="toggleStats()">
+            <i class="fas fa-chart-bar"></i>
+        </button>
+    @endif
     @if (
         (isset($permissions['EXPORT']) && hasPermission(strtoupper($module) . '.' . $permissions['EXPORT']['KEY'])) ||
             (isset($permissions['IMPORT']) && hasPermission(strtoupper($module) . '.' . $permissions['IMPORT']['KEY'])) ||

@@ -19,7 +19,7 @@ class ContractRepository
      */
     public function getContractQuery($request)
     {
-        $query = CRMContract::query();
+        $query = CRMContract::query()->latest();
 
         $query = $this->applyTenantFilter($query);
 

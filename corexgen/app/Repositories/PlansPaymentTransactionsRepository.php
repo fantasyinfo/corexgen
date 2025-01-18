@@ -18,7 +18,7 @@ class PlansPaymentTransactionsRepository
     public function getTransactionQuery($request)
     {
         // dd($request->all());
-        $query = PaymentTransaction::with(['plans', 'subscription', 'company']);
+        $query = PaymentTransaction::with(['plans', 'subscription', 'company'])->latest();
 
         return $query;
 
@@ -31,7 +31,7 @@ class PlansPaymentTransactionsRepository
     public function getTransactionQueryCompany($request)
     {
         // dd($request->all());
-        $query = $this->applyTenantFilter(PaymentTransactionsCompany::query());
+        $query = $this->applyTenantFilter(PaymentTransactionsCompany::query()->latest());
 
         return $query;
 
@@ -44,7 +44,7 @@ class PlansPaymentTransactionsRepository
      */
     public function getSubscriptionsQuery($request)
     {
-        $query = Subscription::with(['plans', 'company', 'payment_transaction']);
+        $query = Subscription::with(['plans', 'company', 'payment_transaction'])->latest();
 
         return $query;
 

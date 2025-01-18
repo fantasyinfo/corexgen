@@ -14,18 +14,23 @@ return new class extends Migration {
             $table->id();
             $table->enum('type', ['Product', 'Service'])->default('Product');
             $table->string('title');
-            $table->string('slug')->unique();
+            $table->string('slug');
             $table->text('description')->nullable();
             $table->decimal('rate');
             $table->integer('unit')->default(1);
             $table->enum('status', CRM_STATUS_TYPES['PRODUCTS_SERVICES']['TABLE_STATUS'])->default(CRM_STATUS_TYPES['PRODUCTS_SERVICES']['STATUS']['ACTIVE']);
             $table->softDeletes();
             $table->timestamps();
+
+
+
             $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('updated_by')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('company_id')->nullable()->constrained('companies')->onDelete('set null');
             $table->foreignId('cgt_id')->nullable()->constrained('category_group_tag')->onDelete('set null');
             $table->foreignId('tax_id')->nullable()->constrained('category_group_tag')->onDelete('set null');
+
+            $table->unique(['slug', 'company_id']);
         });
     }
 

@@ -19,7 +19,7 @@ class EsitmateRepository
      */
     public function getEstimateQuery($request)
     {
-        $query = CRMEstimate::query();
+        $query = CRMEstimate::query()->latest();
 
         $query = $this->applyTenantFilter($query);
 

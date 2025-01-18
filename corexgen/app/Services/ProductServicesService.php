@@ -115,9 +115,9 @@ class ProductServicesService
     /**
      * get all products
      */
-    public function getAllProducts()
+    public function getAllProducts($status = 'ACTIVE')
     {
-        return $this->applyTenantFilter(ProductsServices::query())->get();
+        return $this->applyTenantFilter(ProductsServices::query()->where('status',$status))->get();
     }
 
 

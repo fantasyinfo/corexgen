@@ -326,9 +326,7 @@
                                     <x-form-components.tab-guidebox :nextTab="'Address'" />
 
                                     <hr>
-                                    <p class="alert alert-secondary"><i class="fas fa-info-circle me-2 "></i>
-                                        Please add / update <span class="text-success">Address Details</span> on address
-                                        tabs.</p>
+                                  
                                 </div>
 
                                 <!-- Address Tab -->

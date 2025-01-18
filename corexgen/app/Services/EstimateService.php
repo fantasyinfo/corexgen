@@ -238,7 +238,7 @@ class EstimateService
                 return "$estimate->_prefix $estimate->_id ";
             })
             ->editColumn('value', function ($estimate) {
-                return $estimate?->value ? "$ " . number_format($estimate->value) : "0";
+                return $estimate?->value ? getSettingValue('Currency Symbol') . ' ' . number_format($estimate->value) : "0";
             })
             ->editColumn('created_at', fn($estimate) => $estimate?->created_at ? formatDateTime($estimate->created_at) : '')
             ->editColumn('creating_date', fn($estimate) => $estimate?->creating_date ? formatDateTime($estimate->creating_date) : '')

@@ -20,7 +20,7 @@ class LeadsRepository
 
         $wantCurrentUserItems = filter_var($request->input('current_user'), FILTER_VALIDATE_BOOLEAN);
 
-        $query = CRMLeads::query()
+        $query = CRMLeads::query()->latest()
             ->select([
                 'leads.id',  // Specify table name to avoid ambiguity
                 'leads.type',
@@ -168,7 +168,7 @@ class LeadsRepository
             $wantCurrentUserItems = filter_var($request['query']['current_user'], FILTER_VALIDATE_BOOLEAN);
         }
 
-        $query = CRMLeads::query()
+        $query = CRMLeads::query()->latest()
             ->select([
                 'leads.id',
                 'leads.type',

@@ -195,7 +195,7 @@ class ContractService
                 return "$contract->_prefix $contract->_id ";
             })
             ->editColumn('value', function ($contract) {
-                return $contract?->value ? "$ " . number_format($contract->value) : "0";
+                return $contract?->value ? getSettingValue('Currency Symbol') . ' ' . number_format($contract->value) : "0";
             })
             ->editColumn('created_at', fn($contract) => $contract?->created_at ? formatDateTime($contract->created_at) : '')
             ->editColumn('creating_date', fn($contract) => $contract?->creating_date ? formatDateTime($contract->creating_date) : '')

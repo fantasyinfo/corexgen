@@ -11,7 +11,7 @@ class ClientRepository
      */
     public function getClientsQuery($request)
     {
-        $query = CRMClients::query()
+        $query = CRMClients::query()->latest()
             ->leftJoin('category_group_tag', 'clients.cgt_id', '=', 'category_group_tag.id')
             ->select('clients.*', 'category_group_tag.name as category_name', 'category_group_tag.color as category_color')
             ->with([

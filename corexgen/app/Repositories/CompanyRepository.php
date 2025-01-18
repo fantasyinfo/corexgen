@@ -16,7 +16,7 @@ class CompanyRepository
      */
     public function getCompanyQuery($request)
     {
-        $query = Company::query()
+        $query = Company::query()->latest()
             ->with(['plans', 'latestSubscription'])
             ->whereHas('plans') // Ensures the company has at least one plan
             ->whereHas('latestSubscription'); // Ensures the company has a latest subscription

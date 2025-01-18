@@ -16,12 +16,13 @@ class UserRepository
     public function getUsersQuery($request)
     {
         $query = User::query()->with('role')
-            ->where('id', '!=', Auth::user()->id)
-            ->where('role_id', '!=', null);
+            ->where('role_id', '!=', null)->latest();
 
         // Tenant filtering
         if (panelAccess() == PANEL_TYPES['SUPER_PANEL']) {
             $query->where('is_tenant', '=', '1');
+        }else{
+            $query->where('is_tenant', '=', '0');
         }
 
         $query = $this->applyTenantFilter($query);

@@ -219,7 +219,7 @@ class InvoiceService
                 return "<a class='dt-link' href='" . route($this->tenantRoute . $module . '.view', $invoice?->id) . "' target='_blank'>$invoice->_prefix  $invoice->_id</a>";
             })
             ->editColumn('total_amount', function ($invoice) {
-                return $invoice?->total_amount ? number_format($invoice->total_amount) : "0";
+                return $invoice?->total_amount ? getSettingValue('Currency Symbol') . ' ' . number_format($invoice->total_amount) : "0";
             })
             ->editColumn('created_at', fn($invoice) => $invoice?->created_at ? formatDateTime($invoice->created_at) : '')
             ->editColumn('issue_date', fn($invoice) => $invoice?->issue_date ? formatDateTime($invoice->issue_date) : '')
