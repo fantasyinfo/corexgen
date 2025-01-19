@@ -38,7 +38,7 @@ body {
   height: 70px; */
     background-color: var(--card-bg);
     /* border-bottom: 1px solid var(--primary-color); */
-    padding: 10px 30px;
+    padding: 10px 0;
     z-index: 1020;
     transition: left 0.3s;
 }

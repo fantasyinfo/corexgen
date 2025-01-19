@@ -1,4 +1,158 @@
-@extends('layout.app')
+@extends('layout.kanban')
+@section('content')
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Task View</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="card mb-4 border-0 pb-0 lead-header-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center gap-3">
+                            <div>
+                                <h1 class="mb-1">
+                                    {{ $task->title }}
+                                </h1>
+                            </div>
+
+                            <div class="d-flex align-items-center gap-3">
+                            
+                                <span class="badge bg-{{ $task->stage->color }}">
+                                    {{ $task->stage->name }}
+                                </span>
+                                @if ($task->billable)
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check-circle me-1"></i> Billable
+                                    </span>
+                                @endif
+                                <a href="{{ route(getPanelRoutes('tasks.view'), ['id' => $task->id]) }}"
+                                    class="dt-link  justify-content-end">View in Details</a>
+                            </div>
+
+
+                        </div>
+
+                    </div>
+                </div>
+                <div class="card border-0 ">
+                    <div class="card-header bg-transparent border-bottom-0 pb-0">
+                        <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-bs-toggle="tab" href="#details" role="tab">
+                                    <i class="fas fa-info-circle me-2"></i>Details
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#timesheets">
+                                    <i class="fas fa-clock me-2"></i>Timesheets
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#activities">
+                                    <i class="fas fa-history me-2"></i>Activities
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#notesTab">
+                                    <i class="fas fa-sticky-note me-2"></i>Notes
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#files">
+                                    <i class="fas fa-paperclip me-2"></i>Files
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-body mt-0 pt-0">
+                        <div class="tab-content">
+                            <!-- Details View Tab -->
+                            <div class="tab-pane fade show active" id="details">
+                                @if (isset($permissions['UPDATE']) && hasPermission(strtoupper($module) . '.' . $permissions['UPDATE']['KEY']))
+                                    <div class="d-flex my-3 justify-content-lg-end gap-2 ">
+                                        <button id='editToggle' title="Edit" data-toggle="tooltip"
+                                            class="btn btn-outline-secondary">
+                                            <i class="fas fa-pencil-alt me-2"></i>
+                                        </button>
+                                        <button form="leadEditForm" title="Update" data-toggle="tooltip" type="submit"
+                                            id="updateBtn" class="btn btn-primary">
+                                            <i class="fas fa-plus me-2"></i> <span>Update </span>
+                                        </button>
+                                    </div>
+                                @endif
+                                <!-- View Details -->
+                                <div class="row g-4" id="viewDetails">
+                                    <div class="col-lg-7 main-content-view">
+                                        <div class="row">
+                                            @include('dashboard.crm.tasks.components.viewpartials._basic')
+                                            @include('dashboard.crm.tasks.components.viewpartials._additional')
+                                        </div>
+
+                                        @include('dashboard.crm.tasks.components.viewpartials._details')
+                                    </div>
+                                    <div class="col-lg-1 divider-container">
+                                        <div class="divider"></div>
+                                    </div>
+                                    <div class="col-lg-4 sidebar-view">
+                                        @include('dashboard.crm.tasks.components.viewpartials._sidebar')
+                                    </div>
+                                </div>
+                                <!-- Edit Details -->
+                                <div class="row g-4" id="editDetails">
+                                    <form id="leadEditForm" method="POST"
+                                        action="{{ route(getPanelRoutes('tasks.update')) }}">
+                                        @csrf
+                                        @method('PUT')
+                                        <input type="hidden" name="id" value="{{ $task->id }}" />
+                                        <input type="hidden" name="from_view" value="true" />
+                                        <div class="row">
+                                            <div class="col-lg-7 main-content-view">
+                                                <div class="row">
+                                                    @include('dashboard.crm.tasks.components.editpartials._basic')
+                                                    @include('dashboard.crm.tasks.components.editpartials._additional')
+                                                </div>
+
+                                                @include('dashboard.crm.tasks.components.editpartials._details')
+                                            </div>
+                                            <div class="col-lg-1 divider-container">
+                                                <div class="divider"></div>
+                                            </div>
+                                            <div class="col-lg-4 sidebar-view">
+                                                @include('dashboard.crm.tasks.components.editpartials._sidebar')
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+
+                            </div>
+
+
+
+                            <div class="tab-pane fade" id="timesheets">
+                                @include('dashboard.crm.tasks.components._timesheets')
+                            </div>
+                            <div class="tab-pane fade" id="activities">
+                                @include('dashboard.crm.tasks.components._activity')
+                            </div>
+
+                            <!-- Notes Tab -->
+                            <div class="tab-pane fade" id="notesTab">
+                                @include('dashboard.crm.tasks.components._notes')
+                            </div>
+
+                            <!-- Files Tab -->
+                            <div class="tab-pane fade" id="files">
+                                @include('dashboard.crm.tasks.components._attachments')
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
 @push('style')
     <style>
         #editDetails,
@@ -329,7 +483,7 @@
             padding: 0.5rem 1rem;
             font-weight: 500;
             border-radius: 0.5rem;
-            transition: all 0.3s ease;
+            /* transition: all 0.3s ease; */
         }
 
         .btn-primary {
@@ -400,179 +554,4 @@
             /* Add space near the divider */
         }
     </style>
-@endpush
-
-@push('scripts')
-    <script src="{{ asset('js/tinymce/tinymce.min.js') }}"></script>
-    <script>
-        let currentTheme = document.documentElement.getAttribute('data-bs-theme');
-    </script>
-@endpush
-@section('content')
-    @php
-        //  prePrintR($lead->attachments->toArray());
-    @endphp
-    <div class="container-fluid ">
-        <!-- Lead Header -->
-        <div class="card mb-4 border-0 pb-0 lead-header-card">
-            <div class="card-body">
-                @include('dashboard.crm.leads.components._header')
-            </div>
-        </div>
-
-
-        <div class="row">
-            <!-- Main Content Column -->
-
-            <!-- Lead Details Tabs -->
-            <div class="card border-0 ">
-                <div class="card-header bg-transparent border-bottom-0 pb-0">
-                    <ul class="nav nav-tabs card-header-tabs" role="tablist">
-                        <li class="nav-item">
-                            <a class="nav-link active" data-bs-toggle="tab" href="#details" role="tab">
-                                <i class="fas fa-info-circle me-2"></i>Details
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#proposals">
-                                <i class="fas fa-flag me-2"></i>Proposals
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#estimates">
-                                <i class="fas fa-file-signature me-2"></i>Estimates
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#contracts">
-                                <i class="fas fa-file-contract me-2"></i>Contracts
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#activities">
-                                <i class="fas fa-history me-2"></i>Activities
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#notes">
-                                <i class="fas fa-sticky-note me-2"></i>Notes
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#files">
-                                <i class="fas fa-paperclip me-2"></i>Files
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="card-body mt-0 pt-0">
-                    <div class="tab-content">
-                        <!-- Details View Tab -->
-                        <div class="tab-pane fade show active" id="details">
-                            @if (isset($permissions['UPDATE']) && hasPermission(strtoupper($module) . '.' . $permissions['UPDATE']['KEY']))
-                                <div class="d-flex my-3 justify-content-lg-end gap-2 ">
-                                    <button id='editToggle' title="Edit" data-toggle="tooltip"
-                                        class="btn btn-outline-secondary">
-                                        <i class="fas fa-pencil-alt me-2"></i>
-                                    </button>
-                                    <button form="leadEditForm" title="Update" data-toggle="tooltip" type="submit"
-                                        id="updateBtn" class="btn btn-primary">
-                                        <i class="fas fa-plus me-2"></i> <span>Update </span>
-                                    </button>
-                                </div>
-                            @endif
-                            <!-- View Details -->
-                            <div class="row g-4" id="viewDetails">
-                                <div class="col-lg-7 main-content-view">
-                                    <div class="row">
-                                        @include('dashboard.crm.leads.components.viewpartials._basic')
-                                        @include('dashboard.crm.leads.components.viewpartials._additional')
-                                    </div>
-                                    @include('dashboard.crm.leads.components.viewpartials._address')
-                                    @include('dashboard.crm.leads.components.viewpartials._details')
-                                </div>
-                                <div class="col-lg-1 divider-container">
-                                    <div class="divider"></div>
-                                </div>
-                                <div class="col-lg-4 sidebar-view">
-                                    @include('dashboard.crm.leads.components.viewpartials._sidebar')
-                                </div>
-                            </div>
-                            <!-- Edit Details -->
-                            <div class="row g-4" id="editDetails">
-                                <form id="leadEditForm" method="POST" action="{{ route(getPanelRoutes('leads.update')) }}">
-                                    @csrf
-                                    @method('PUT')
-                                    <input type="hidden" name="id" value="{{ $lead->id }}" />
-                                    <input type="hidden" name="from_view" value="true" />
-                                    <div class="row">
-                                        <div class="col-lg-7 main-content-view">
-                                            <div class="row">
-                                                @include('dashboard.crm.leads.components.editpartials._basic')
-                                                @include('dashboard.crm.leads.components.editpartials._additional')
-                                            </div>
-                                            @include('dashboard.crm.leads.components.editpartials._address')
-                                            @include('dashboard.crm.leads.components.editpartials._details')
-                                        </div>
-                                        <div class="col-lg-1 divider-container">
-                                            <div class="divider"></div>
-                                        </div>
-                                        <div class="col-lg-4 sidebar-view">
-                                            @include('dashboard.crm.leads.components.editpartials._sidebar')
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-
-                        </div>
-
-
-                        <div class="tab-pane fade" id="proposals">
-                            @include('dashboard.crm.leads.components._proposals')
-                        </div>
-
-                        <div class="tab-pane fade" id="estimates">
-                            @include('dashboard.crm.leads.components._estimates')
-                        </div>
-                        <div class="tab-pane fade" id="contracts">
-                            @include('dashboard.crm.leads.components._contracts')
-                        </div>
-
-                        <div class="tab-pane fade" id="activities">
-                            @include('dashboard.crm.leads.components._activity')
-                        </div>
-
-                        <!-- Notes Tab -->
-                        <div class="tab-pane fade" id="notes">
-                            @include('dashboard.crm.leads.components._notes')
-                        </div>
-
-                        <!-- Files Tab -->
-                        <div class="tab-pane fade" id="files">
-                            @include('dashboard.crm.leads.components._attachments')
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-
-
-    </div>
-@endsection
-
-
-
-
-@push('scripts')
-    <script>
-        $("#editToggle").click(function(e) {
-            e.preventDefault();
-            $("#viewDetails").toggle();
-            $("#editDetails").toggle();
-            $("#updateBtn").toggle();
-        })
-    </script>
 @endpush

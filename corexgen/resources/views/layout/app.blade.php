@@ -13,7 +13,7 @@
 
             @include('layout.header.sub-header')
 
-
+            <div id="task-detail-container"></div>
             <!-- Content Area -->
             <div class="content-area">
                 <!-- breadcrum section -->

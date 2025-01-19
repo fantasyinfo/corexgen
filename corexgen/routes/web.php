@@ -643,7 +643,8 @@ Route::middleware([
 
         Route::get('/profile', [LeadsController::class, 'profile'])->name('profile');
 
-
+        // add assignee
+        Route::post('/add-assignee', [LeadsController::class, 'addAssignee'])->name('addAssignee')->middleware('check.permission:LEADS.UPDATE');
 
         // kanban board routes.
 
@@ -781,7 +782,8 @@ Route::middleware([
         Route::get('/view/{id}', [TasksController::class, 'view'])->name('view')->middleware('check.permission:TASKS.VIEW');
         Route::get('/profile', [TasksController::class, 'profile'])->name('profile');
 
-
+        // add assignee
+        Route::post('/add-assignee', [TasksController::class, 'addAssignee'])->name('addAssignee')->middleware('check.permission:TASKS.UPDATE');
 
         // kanban board routes.
 

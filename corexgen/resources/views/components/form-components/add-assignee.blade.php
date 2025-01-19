@@ -126,6 +126,46 @@
         document.querySelector('#assigneeModal .modal-content').addEventListener('click', function(event) {
             event.stopPropagation();
         });
+
+        // Handle AJAX form submission
+        $('#assigneeForm').on('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const form = this;
+            const formData = new FormData(form);
+
+            // Disable submit button to prevent multiple submissions
+            const submitButton = form.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.innerText = 'Saving...';
+
+            $.ajax({
+                url: $(form).attr('action'),
+                method: 'POST',
+                data: formData,
+                processData: false, // Required for FormData
+                contentType: false, // Required for FormData
+                success: function(response) {
+                    // Handle success
+                    alert('Team members assigned successfully!, Reload the page to view new assingees');
+                    closeAssigneeModal();
+
+                    // Optionally update the UI dynamically
+                    // For example, refresh a list of team members
+                    // $('#assigneeList').html(response.updatedHTML); // Example
+                },
+                error: function(xhr, status, error) {
+                    // Handle errors
+                    console.error('Error:', xhr.responseText);
+                    alert('An error occurred while assigning team members.');
+                },
+                complete: function() {
+                    // Re-enable the submit button
+                    submitButton.disabled = false;
+                    submitButton.innerText = 'Save';
+                }
+            });
+        });
     </script>
 @endpush
 @push('style')
