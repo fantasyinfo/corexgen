@@ -71,7 +71,7 @@
                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">Add New</button>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-striped">
+                    <table class="table table-striped ">
                         <thead>
                             <tr>
                                 <th>#</th>

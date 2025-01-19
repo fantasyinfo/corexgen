@@ -12,7 +12,7 @@
                         New</button>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-striped">
+                    <table class="table table-striped daTableQuick">
                         <thead>
                             <tr>
                                 <th>Title</th>
