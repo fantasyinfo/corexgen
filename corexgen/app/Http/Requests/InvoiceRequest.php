@@ -24,12 +24,31 @@ class InvoiceRequest extends FormRequest
      */
     public function rules(): array
     {
+
+        \Log::info('Validation Request Data:', [$this->all()]);
+
+        \Log::info('Current Date and Time:', [
+            'server_time' => now(),
+            'today' => today(),
+            'app_timezone' => config('app.timezone'),
+        ]);
+        
         return [
             '_id' => 'required|string|max:10',
             'client_id' => 'required|exists:clients,id',
             'notes' => 'nullable|string',
-            'issue_date' => 'required|date',
-            'due_date' => 'nullable|date|after_or_equal:today',
+            'issue_date' => 'required|date|date_format:Y-m-d',
+            'due_date' => [
+                'nullable',
+                'date',
+                'date_format:Y-m-d',
+                function ($attribute, $value, $fail) {
+                    $issueDate = $this->input('issue_date');
+                    if (strtotime($value) < strtotime($issueDate)) {
+                        $fail('The due date must be a date after or equal to the issue date.');
+                    }
+                },
+            ],
             'task_id' => 'nullable|exists:tasks,id',
             'total_amount' => 'required|numeric|min:1',
             'project_id' => 'nullable|exists:projects,id',

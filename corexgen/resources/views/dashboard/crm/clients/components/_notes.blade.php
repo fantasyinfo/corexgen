@@ -2,81 +2,6 @@
     // prePrintR($comments);
 @endphp
 
-<div class="notes-section">
-    <div class="mb-3">
-        <form id="commentForm" method="POST" action="{{ route(getPanelRoutes('clients.comment.create')) }}">
-            @csrf
-            <input type="hidden" name="id" value="{{ $client->id }}" />
-            <textarea name='comment' class="form-control wysiwyg-editor-comment" rows="3" placeholder="Add a note..."></textarea>
-            <div class="d-flex justify-content-center my-2">
-                <button form="commentForm" class="btn btn-primary mt-2" type="submit">Add Note</button>
-            </div>
-        </form>
-    </div>
-    <div class="note-list">
-        @php
-            $deletePermission = false;
-            if (
-                isset($permissions['DELETE']) &&
-                hasPermission(strtoupper($module) . '.' . $permissions['DELETE']['KEY'])
-            ) {
-                $deletePermission = true;
-            }
-        @endphp
-        @if ($client?->comments?->count() > 0)
-            @foreach ($client?->comments as $comment)
-                <div class="comment-item mb-4">
-                    <div class="d-flex">
-                        <!-- User Avatar -->
-                        <div class="comment-avatar">
-                            @if ($comment->user->profile_photo_path)
-                                <x-form-components.profile-avatar :src="$comment->user->profile_photo_path" />
-                            @else
-                                <div class="default-avatar">
-                                    <i class="fas fa-user"></i>
-                                </div>
-                            @endif
-                        </div>
-
-                        <!-- Comment Content -->
-                        <div class="comment-content flex-grow-1 ms-3">
-                            <div
-                                class="comment-header text-muted d-flex gap-3 justify-content-between align-items-center">
-                                <h6 class="comment-author mb-0">
-                                    {{ $comment->user->name }}
-                                    <small class="text-muted ms-2">
-                                        <i class="far fa-clock"></i>
-                                        {{ \Carbon\Carbon::parse($comment->created_at)->diffForHumans() }}
-                                    </small>
-                                </h6>
-                                @if ($deletePermission)
-                                    <form id="deleteComment{{ $comment->id }}" method="POST"
-                                        action="{{ route(getPanelRoutes('clients.comment.destroy'), ['id' => $comment->id]) }}">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button title="Delete Comment" data-toggle="tooltip"
-                                            class="btn btn-danger btn-sm confirm-delete-note" type="submit"
-                                            form="deleteComment{{ $comment->id }}">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
-                                @endif
-                            </div>
-                            <div class="comment-body mt-2">
-                                <p class="mb-0">{!! $comment->comment !!}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-        @else
-            <div class="no-comments text-center py-4">
-                <i class="far fa-comment-dots fa-2x text-muted"></i>
-                <p class="mt-2 text-muted">No comments yet</p>
-            </div>
-        @endif
-    </div>
-</div>
 
 @push('style')
     <style>
@@ -156,20 +81,177 @@
     </style>
 @endpush
 
+<div class="notes-section">
+    <div class="mb-3">
+        <form id="commentForm" method="POST" action="{{ route(getPanelRoutes('clients.comment.create')) }}">
+            @csrf
+            <input type="hidden" name="id" value="{{ $client->id }}" />
+            <textarea name="comment" class="form-control wysiwyg-editor-comment" rows="3" placeholder="Add a note..."></textarea>
+            <div class="d-flex justify-content-center my-2">
+                <button class="btn btn-primary mt-2" type="submit">Add Note</button>
+            </div>
+        </form>
+    </div>
+    <div class="note-list">
+        @php
+            $deletePermission = false;
+            if (
+                isset($permissions['DELETE']) &&
+                hasPermission(strtoupper($module) . '.' . $permissions['DELETE']['KEY'])
+            ) {
+                $deletePermission = true;
+            }
+        @endphp
+        @if ($client?->comments?->count() > 0)
+            @foreach ($client->comments as $comment)
+                <div class="comment-item mb-4" data-id="{{ $comment->id }}">
+                    <div class="d-flex">
+                        <!-- User Avatar -->
+                        <div class="comment-avatar">
+                            @if ($comment->user->profile_photo_path)
+                                <x-form-components.profile-avatar :src="$comment->user->profile_photo_path" />
+                            @else
+                                <div class="default-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            @endif
+                        </div>
+
+                        <!-- Comment Content -->
+                        <div class="comment-content flex-grow-1 ms-3">
+                            <div class="comment-header text-muted d-flex justify-content-between align-items-center">
+                                <h6 class="comment-author mb-0">
+                                    {{ $comment->user->name }}
+                                    <small class="text-muted ms-2">
+                                        <i class="far fa-clock"></i> {{ $comment->created_at->diffForHumans() }}
+                                    </small>
+                                </h6>
+                                @if ($deletePermission)
+                                    <div class="action-buttons">
+
+                                        <button class="btn btn-danger btn-sm delete-comment"
+                                            data-id="{{ $comment->id }}"
+                                            data-url="{{ route(getPanelRoutes('clients.comment.destroy'), ['id' => $comment->id]) }}">Delete</button>
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="comment-body mt-2">
+                                <p class="mb-0">{!! $comment->comment !!}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        @else
+            <div class="no-comments text-center py-4">
+                <i class="far fa-comment-dots fa-2x text-muted"></i>
+                <p class="mt-2 text-muted">No comments yet</p>
+            </div>
+        @endif
+    </div>
+</div>
+
+
+
 
 @push('scripts')
     <script>
-        document.querySelectorAll('.confirm-delete-note').forEach((button) => {
-            button.addEventListener('click', (e) => {
-                e.preventDefault(); // Prevent form submission
-                const form = e.target.closest('form'); // Get the form element
-                const confirmation = confirm(
-                    'Are you sure you want to delete this note?');
-                if (confirmation) {
-                    form.submit(); // Submit the form if confirmed
+        $('#commentForm').submit(function(e) {
+            e.preventDefault();
+
+            if (typeof tinymce !== 'undefined' && tinymce.get('comment')) {
+                const content = tinymce.get('comment').getContent();
+                if (!content.trim()) {
+                    alert('Please enter a comment');
+                    return;
                 }
+                $('textarea[name="comment"]').val(content);
+            }
+
+
+            const formData = new FormData(this);
+
+            $.ajax({
+                url: $(this).attr('action'),
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+
+                    let deleteURL =
+                        "{{ route(getPanelRoutes('clients.comment.destroy'), ['id' => ':id']) }}";
+                    deleteURL = deleteURL.replace(':id', response.comment.id);
+
+                    let isDeletePermission =
+                        "{{ hasPermission(strtoupper($module) . '.' . $permissions['DELETE']['KEY']) }}";
+
+                    // console.log(isDeletePermission)
+                    // Add the new comment to the UI
+                    const deleteButton = isDeletePermission ?
+                        `<div class="action-buttons">
+                                    <button class="btn btn-danger btn-sm delete-comment" data-id="${response.comment.id}" data-url="${deleteURL}">Delete</button>
+                            </div>` :
+                        '';
+
+                    $('.note-list').prepend(`
+    <div class="comment-item mb-4" data-id="${response.comment.id}">
+        <div class="d-flex">
+            <div class="comment-avatar">
+                ${response.user.profile_photo_path ? 
+                    `<img src="${response.user.profile_photo_path}" alt="Avatar" class="rounded-circle">` : 
+                    `<div class="default-avatar"><i class="fas fa-user"></i></div>`}
+            </div>
+            <div class="comment-content flex-grow-1 ms-3">
+                <div class="comment-header text-muted d-flex justify-content-between align-items-center">
+                    <h6 class="comment-author mb-0">
+                        ${response.user.name}
+                        <small class="text-muted ms-2"><i class="far fa-clock"></i> Just now</small>
+                    </h6>
+                    ${deleteButton}
+                </div>
+                <div class="comment-body mt-2">
+                    <p class="mb-0">${response.comment.comment}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+`);
+
+
+                    // Clear the form
+                    $('#commentForm')[0].reset();
+                    alert('Comment added successfully', 'success');
+                },
+                error: function(xhr) {
+                    alert('An error occurred while adding the comment.');
+                },
             });
         });
+
+        $(document).on('click', '.delete-comment', function() {
+            const button = $(this);
+            const url = button.data('url');
+
+            if (confirm('Are you sure you want to delete this comment?')) {
+                $.ajax({
+                    url: url,
+                    method: 'POST',
+                    data: {
+                        _method: 'DELETE',
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                    },
+                    success: function() {
+                        button.closest('.comment-item').remove();
+                        alert('Comment deleted successfully', 'success');
+                    },
+                    error: function() {
+                        alert('An error occurred while deleting the comment.');
+                    },
+                });
+            }
+        });
+
         // Initialize WYSIWYG editor
         if (typeof tinymce !== 'undefined') {
             tinymce.init({
@@ -180,6 +262,11 @@
                 skin: currentTheme === 'dark' ? 'oxide-dark' : 'oxide',
                 content_css: currentTheme === 'dark' ? 'dark' : 'default',
                 menubar: false,
+                setup: function(editor) {
+                    editor.on('change', function() {
+                        editor.save(); // This automatically updates the textarea
+                    });
+                },
                 plugins: [
                     'accordion',
                     'advlist',

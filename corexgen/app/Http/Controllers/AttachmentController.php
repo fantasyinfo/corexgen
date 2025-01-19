@@ -11,6 +11,7 @@ use App\Models\Tasks;
 use App\Services\AttachmentService;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AttachmentController extends Controller
 {
@@ -36,7 +37,7 @@ class AttachmentController extends Controller
             $query = $this->applyTenantFilter($query);
             $lead = $query->firstOrFail();
 
-            $this->attachmentService->add($lead, $requestData);
+            $attachments = $this->attachmentService->add($lead, $requestData);
 
 
             // Log the detach operation as an audit
@@ -50,11 +51,25 @@ class AttachmentController extends Controller
                 'user_agent' => request()->header('User-Agent'),
             ]);
 
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => 'attachment added.',
+                    'attachments' => $attachments,
+                    'user' => Auth::user()
+                ]);
+            }
+
+
             return redirect()
                 ->back()
                 ->with('success', 'New cattachment added.');
         } catch (\Exception $e) {
             //throw $th;
+
+            if ($request->ajax()) {
+                return response()->json(['error' => 'An error occurred while adding the attachment' . $e->getMessage()]);
+            }
+
             return redirect()
                 ->back()
                 ->with('error', 'An error occurred while adding the attachment ' . $e->getMessage());
@@ -106,7 +121,7 @@ class AttachmentController extends Controller
             $query = $this->applyTenantFilter($query);
             $lead = $query->firstOrFail();
 
-            $this->attachmentService->add($lead, $requestData);
+            $attachments = $this->attachmentService->add($lead, $requestData);
 
 
             // Log the detach operation as an audit
@@ -120,11 +135,28 @@ class AttachmentController extends Controller
                 'user_agent' => request()->header('User-Agent'),
             ]);
 
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => 'attachment added.',
+                    'attachments' => $attachments,
+                    'user' => Auth::user()
+                ]);
+            }
+
+
+
             return redirect()
                 ->back()
                 ->with('success', 'New cattachment added.');
         } catch (\Exception $e) {
             //throw $th;
+
+            if ($request->ajax()) {
+                return response()->json(['error' => 'An error occurred while adding the attachment' . $e->getMessage()]);
+            }
+
+
             return redirect()
                 ->back()
                 ->with('error', 'An error occurred while adding the attachment ' . $e->getMessage());
@@ -178,7 +210,7 @@ class AttachmentController extends Controller
             $query = $this->applyTenantFilter($query);
             $lead = $query->firstOrFail();
 
-            $this->attachmentService->add($lead, $requestData);
+            $attachments = $this->attachmentService->add($lead, $requestData);
 
 
             // Log the detach operation as an audit
@@ -192,11 +224,26 @@ class AttachmentController extends Controller
                 'user_agent' => request()->header('User-Agent'),
             ]);
 
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => 'attachment added.',
+                    'attachments' => $attachments,
+                    'user' => Auth::user()
+                ]);
+            }
+
+
             return redirect()
                 ->back()
                 ->with('success', 'New cattachment added.');
         } catch (\Exception $e) {
             //throw $th;
+
+            if ($request->ajax()) {
+                return response()->json(['error' => 'An error occurred while adding the attachment' . $e->getMessage()]);
+            }
+
+
             return redirect()
                 ->back()
                 ->with('error', 'An error occurred while adding the attachment ' . $e->getMessage());
@@ -250,7 +297,7 @@ class AttachmentController extends Controller
             $query = $this->applyTenantFilter($query);
             $lead = $query->firstOrFail();
 
-            $this->attachmentService->add($lead, $requestData);
+            $attachments = $this->attachmentService->add($lead, $requestData);
 
 
             // Log the detach operation as an audit
@@ -264,11 +311,26 @@ class AttachmentController extends Controller
                 'user_agent' => request()->header('User-Agent'),
             ]);
 
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => 'attachment added.',
+                    'attachments' => $attachments,
+                    'user' => Auth::user()
+                ]);
+            }
+
+
             return redirect()
                 ->back()
                 ->with('success', 'New cattachment added.');
         } catch (\Exception $e) {
             //throw $th;
+
+            if ($request->ajax()) {
+                return response()->json(['error' => 'An error occurred while adding the attachment' . $e->getMessage()]);
+            }
+
+
             return redirect()
                 ->back()
                 ->with('error', 'An error occurred while adding the attachment ' . $e->getMessage());

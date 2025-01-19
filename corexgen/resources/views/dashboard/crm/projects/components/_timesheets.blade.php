@@ -102,8 +102,8 @@
 
 <div class="timeline-wrapper">
     @if ($timesheets && $timesheets->isNotEmpty())
-        <div class="table-responsive table-bg">
-            <table class="table p-3  table-bordered ui celled">
+        <div class="table-responsive ">
+            <table class="table p-3  table-bordered ui daTableQuick">
                 <thead>
                     <tr>
                         <th>Start Date</th>
@@ -252,6 +252,7 @@
                     success: function(response) {
                         console.log(response)
                         showToast(`Invoice Generated successfully`, 'success');
+                        showToast(`Invoice Generated successfully`, 'success');
                         refreshTable();
 
                     },
@@ -259,8 +260,18 @@
                         if (xhr.status === 422) {
                             const errors = xhr.responseJSON.errors;
                             showErrors(errors);
+
+                            // Display errors in an alert box
+                            let errorMessages = '';
+                            for (const [field, messages] of Object.entries(errors)) {
+                                errorMessages += `${field}: ${messages.join(', ')}\n`;
+                            }
+
+                            console.log(errors); // Keep the console log for debugging purposes
+                            alert(errorMessages); // Show all errors in a single alert
                         } else {
                             showToast('An error occurred', 'error');
+                            alert('An error occurred');
                         }
                     }
                 });

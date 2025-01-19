@@ -38,7 +38,7 @@ class CommentsController extends Controller
             $query = $this->applyTenantFilter($query);
             $lead = $query->firstOrFail();
 
-            $this->commentService->add($lead, $requestData);
+            $comment = $this->commentService->add($lead, $requestData);
 
 
             // Log the detach operation as an audit
@@ -52,10 +52,24 @@ class CommentsController extends Controller
                 'user_agent' => request()->header('User-Agent'),
             ]);
 
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => 'Comment note added.',
+                    'comment' => $comment,
+                    'user' => Auth::user()
+                ]);
+            }
+
+
             return redirect()
                 ->back()
                 ->with('success', 'New comment  / note added.');
         } catch (\Exception $e) {
+
+            if ($request->ajax()) {
+                return response()->json(['error' => 'An error occurred while adding the comment / notes.' . $e->getMessage()]);
+            }
             //throw $th;
             return redirect()
                 ->back()
@@ -96,7 +110,7 @@ class CommentsController extends Controller
             $query = $this->applyTenantFilter($query);
             $client = $query->firstOrFail();
 
-            $this->commentService->add($client, $requestData);
+            $comment = $this->commentService->add($client, $requestData);
 
 
             // Log the detach operation as an audit
@@ -110,10 +124,22 @@ class CommentsController extends Controller
                 'user_agent' => request()->header('User-Agent'),
             ]);
 
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => 'Comment note added.',
+                    'comment' => $comment,
+                    'user' => Auth::user()
+                ]);
+            }
+
             return redirect()
                 ->back()
                 ->with('success', 'New comment  / note added.');
         } catch (\Exception $e) {
+
+            if ($request->ajax()) {
+                return response()->json(['error' => 'An error occurred while adding the comment / notes.' . $e->getMessage()]);
+            }
             //throw $th;
             return redirect()
                 ->back()
@@ -155,7 +181,7 @@ class CommentsController extends Controller
             $query = $this->applyTenantFilter($query);
             $project = $query->firstOrFail();
 
-            $this->commentService->add($project, $requestData);
+            $comment = $this->commentService->add($project, $requestData);
 
 
             // Log the detach operation as an audit
@@ -169,11 +195,23 @@ class CommentsController extends Controller
                 'user_agent' => request()->header('User-Agent'),
             ]);
 
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => 'Comment note added.',
+                    'comment' => $comment,
+                    'user' => Auth::user()
+                ]);
+            }
             return redirect()
                 ->back()
                 ->with('success', 'New comment  / note added.');
         } catch (\Exception $e) {
             //throw $th;
+
+            if ($request->ajax()) {
+                return response()->json(['error' => 'An error occurred while adding the comment / notes.' . $e->getMessage()]);
+            }
+
             return redirect()
                 ->back()
                 ->with('error', 'An error occurred while adding the comment / notes. ' . $e->getMessage());
@@ -214,7 +252,7 @@ class CommentsController extends Controller
             $query = $this->applyTenantFilter($query);
             $project = $query->firstOrFail();
 
-            $this->commentService->add($project, $requestData);
+            $comment = $this->commentService->add($project, $requestData);
 
 
             // Log the detach operation as an audit
@@ -228,10 +266,22 @@ class CommentsController extends Controller
                 'user_agent' => request()->header('User-Agent'),
             ]);
 
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => 'Comment note added.',
+                    'comment' => $comment,
+                    'user' => Auth::user()
+                ]);
+            }
+
             return redirect()
                 ->back()
                 ->with('success', 'New comment  / note added.');
         } catch (\Exception $e) {
+
+            if ($request->ajax()) {
+                return response()->json(['error' => 'An error occurred while adding the comment / notes.' . $e->getMessage()]);
+            }
             //throw $th;
             return redirect()
                 ->back()

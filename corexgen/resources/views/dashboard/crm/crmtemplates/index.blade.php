@@ -4,12 +4,7 @@
     <div class="container-fluid">
         <div class="">
             <div class="d-flex  flex-wrap justify-content-between align-items-center">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item">{{ __('navbar.Home') }}</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">{{ $title ?? '' }}</li>
-                    </ol>
-                </nav>
+             
                 <div class="mb-3 d-flex flex-wrap justify-content-end">
                     @if (isset($permissions['CREATE']) && hasPermission(strtoupper($module) . '.' . $permissions['CREATE']['KEY']))
                         <a href="{{ route(getPanelRoutes($module . '.create' . $type)) }}" class="btn btn-primary btn-xl me-2"
