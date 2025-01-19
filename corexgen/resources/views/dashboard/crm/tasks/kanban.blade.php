@@ -178,6 +178,22 @@
                 imageExtensions.includes(attachment.file_extension.toLowerCase())
             );
 
+
+            let isDeletePermission = "{{ hasPermission(strtoupper($module) . '.' . $permissions['DELETE']['KEY']) }}";
+            let isViewPermissions = "{{ hasPermission(strtoupper($module) . '.' . $permissions['READ']['KEY']) }}";
+
+            let DeleteButtonHTML = '';
+            let ViewButtonHTML = '';
+
+            // Check permissions and construct buttons
+            if (isDeletePermission) {
+                DeleteButtonHTML = `<i class="fas fa-trash-alt" onclick="deleteTask(${lead.id})"></i>`;
+            }
+            if (isViewPermissions) {
+                ViewButtonHTML = `<i class="fas fa-eye" onclick="viewTask(${lead.id})"></i>`;
+            }
+
+
             const imageElement = firstImage ?
                 `<img src="${firstImage.file_path.replace(/\\/g, '/')}" 
              alt="${firstImage.file_name}" 
@@ -193,8 +209,8 @@
             <div class="task-header">
                 ${lead.title}
                 <div class="task-actions">
-                    <i class="fas fa-eye" onclick="viewTask(${lead.id})"></i>
-                    <i class="fas fa-trash-alt" onclick="deleteTask(${lead.id})"></i>
+                    ${DeleteButtonHTML}
+                ${ViewButtonHTML}
                 </div>
             </div>
    

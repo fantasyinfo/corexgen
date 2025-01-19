@@ -174,8 +174,8 @@ return [
         App\Providers\JetstreamServiceProvider::class,
         Yajra\DataTables\DataTablesServiceProvider::class,
         OwenIt\Auditing\AuditingServiceProvider::class,
-        Modules\PaypalGatewayModule\PaypalGatewayModuleServiceProvider::class,
         App\Providers\DatabaseServiceProvider::class,
+        Modules\PaypalGatewayModule\PaypalGatewayModuleServiceProvider::class,
 
 
     ])->toArray(),
@@ -199,7 +199,7 @@ return [
 
 
     // App Version
-    'version' => env('APP_VERSION', '1.0.0'), 
-    'app_status' => env('APP_STATUS', 'live'), 
+    'version' => env('APP_VERSION', '1.0.0'),
+    'app_status' => env('APP_STATUS', 'live'),
 
 ];

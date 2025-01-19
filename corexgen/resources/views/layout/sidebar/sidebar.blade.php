@@ -65,6 +65,22 @@ if (!function_exists('isParentMenuActive')) {
         <ul class="nav flex-column">
             @foreach ($menus->where('parent_menu', '1') as $parentMenu)
 
+                {{-- {{ \Log::info('step 0', ['module' => getModule(), 'type' => $parentMenu->module_type, 'name' => $parentMenu->menu_name]) }} --}}
+                @if (getModule() == 'saas' && $parentMenu->module_type == 'company')
+                    {{-- {{ \Log::info('step 1') }} --}}
+                    @continue;
+                @endif
+                @if (getModule() == 'company' && $parentMenu->menu_name == 'Membership')
+                    {{-- {{ \Log::info('step 2') }} --}}
+                    @continue;
+                @endif
+                @if (getModule() == 'saas' &&
+                        $parentMenu->menu_name == 'System Settings' &&
+                        panelAccess() == PANEL_TYPES['COMPANY_PANEL']
+                )
+                    {{-- {{ \Log::info('step 3') }} --}}
+                    @continue;
+                @endif
                 {{-- Skip the menu if it's not enabled and not a default --}}
                 @if (!$parentMenu->is_default && !isFeatureEnabled($parentMenu->feature_type))
                     <li class="nav-item">

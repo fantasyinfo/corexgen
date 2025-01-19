@@ -51,6 +51,10 @@ class LandingPageController extends Controller
          */
 
 
+         if (getModule(1) == 'company') {
+            // info(getModule(1));
+            return redirect()->route('login');
+        }
 
         $landingPage = LandingPage::all();
         $plans = Plans::with(['planFeatures'])->where('status', CRM_STATUS_TYPES['PLANS']['STATUS']['ACTIVE'])->get();

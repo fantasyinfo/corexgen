@@ -463,7 +463,7 @@ class ModuleManager
 
                     try {
                         // Run the seeder
-                        $exitCode = Artisan::call('db:seed', ['--class' => $className]);
+                        $exitCode = Artisan::call('db:seed', ['--class' => $className,'--force' => true,]);
                         Log::info("Artisan seeder output: " . Artisan::output());
                         Log::info("Artisan seeder exit code: $exitCode");
 

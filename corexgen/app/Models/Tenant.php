@@ -17,7 +17,7 @@ class Tenant extends Model
 
     protected $table = self::table;
 
-    protected $fillable = ['name', 'domain', 'settings', 'status', 'currency_code', 'currency_symbol', 'timezone'];
+    protected $fillable = ['name', 'domain', 'settings', 'status', 'currency_code', 'currency_symbol', 'timezone','mode'];
 
 
     /**

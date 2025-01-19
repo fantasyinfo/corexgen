@@ -1171,3 +1171,23 @@ function calculateCostFromMinutes($totalMinutes, $ratePerHour)
 
 
 
+/**
+ * Check module type
+ */
+function getModule(int $tenant_id = 1)
+{
+
+    $cacheKey = "tenant_mode_1";
+
+    // Use cache to retrieve or store the tenant's mode
+    return Cache::remember($cacheKey, now()->addMinutes(30), function () use ($tenant_id) {
+        // Retrieve the tenant
+        $tenant = Tenant::find($tenant_id);
+        // Return the tenant's mode or null if the tenant doesn't exist
+        return $tenant ? $tenant->mode : null;
+    });
+}
+
+
+
+

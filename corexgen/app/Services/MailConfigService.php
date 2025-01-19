@@ -10,37 +10,61 @@ class MailConfigService
     /**
      * Update the mail configuration directly in the .env file.
      */
-    public static function updateMailConfig()
-    {
+    public static function updateMailConfig(
+        $mailingNames = [
+            'tenant_mail_provider',
+            'tenant_mail_host',
+            'tenant_mail_port',
+            'tenant_mail_username',
+            'tenant_mail_password',
+            'tenant_mail_encryption',
+            'tenant_mail_from_address',
+            'tenant_mail_from_name',
+        ]
+    ) {
         try {
             // Fetch mail settings from the database
-            $mailSettings = CRMSettings::where('is_tenant', '1')
-                ->whereIn('name', [
-                    'tenant_mail_provider',
-                    'tenant_mail_host',
-                    'tenant_mail_port',
-                    'tenant_mail_username',
-                    'tenant_mail_password',
-                    'tenant_mail_encryption',
-                    'tenant_mail_from_address',
-                    'tenant_mail_from_name',
-                ])
-                ->get()
-                ->pluck('value', 'name');
+            if (getModule() == 'company') {
+                $mailSettings = CRMSettings::where('is_tenant', '0')
+                    ->whereIn('name', $mailingNames)
+                    ->get()
+                    ->pluck('value', 'name');
+            } else if (getModule() == 'saas') {
+
+                $mailSettings = CRMSettings::where('is_tenant', '1')
+                    ->whereIn('name', $mailingNames)
+                    ->get()
+                    ->pluck('value', 'name');
+            }
 
             if ($mailSettings->isNotEmpty()) {
                 // Prepare the content to update in .env
-                $envUpdates = [
-                    'MAIL_MAILER' => $mailSettings['tenant_mail_provider'] ?? 'smtp',
-                    'MAIL_HOST' => $mailSettings['tenant_mail_host'] ?? '',
-                    'MAIL_PORT' => $mailSettings['tenant_mail_port'] ?? '',
-                    'MAIL_USERNAME' => $mailSettings['tenant_mail_username'] ?? '',
-                    'MAIL_PASSWORD' => $mailSettings['tenant_mail_password'] ?? '',
-                    'MAIL_ENCRYPTION' => $mailSettings['tenant_mail_encryption'] ?? '',
-                    'MAIL_FROM_ADDRESS' => $mailSettings['tenant_mail_from_address'] ?? '',
-                    'MAIL_FROM_NAME' => $mailSettings['tenant_mail_from_name'] ?? '',
-                ];
+                if (getModule() == 'company') {
+                    $envUpdates = [
+                        'MAIL_MAILER' => $mailSettings['client_mail_provider'] ?? 'smtp',
+                        'MAIL_HOST' => $mailSettings['client_mail_host'] ?? '',
+                        'MAIL_PORT' => $mailSettings['client_mail_port'] ?? '',
+                        'MAIL_USERNAME' => $mailSettings['client_mail_username'] ?? '',
+                        'MAIL_PASSWORD' => $mailSettings['client_mail_password'] ?? '',
+                        'MAIL_ENCRYPTION' => $mailSettings['client_mail_encryption'] ?? '',
+                        'MAIL_FROM_ADDRESS' => $mailSettings['client_mail_from_address'] ?? '',
+                        'MAIL_FROM_NAME' => $mailSettings['client_mail_from_name'] ?? '',
+                    ];
+                } else if (getModule() == 'saas') {
 
+                    $envUpdates = [
+                        'MAIL_MAILER' => $mailSettings['tenant_mail_provider'] ?? 'smtp',
+                        'MAIL_HOST' => $mailSettings['tenant_mail_host'] ?? '',
+                        'MAIL_PORT' => $mailSettings['tenant_mail_port'] ?? '',
+                        'MAIL_USERNAME' => $mailSettings['tenant_mail_username'] ?? '',
+                        'MAIL_PASSWORD' => $mailSettings['tenant_mail_password'] ?? '',
+                        'MAIL_ENCRYPTION' => $mailSettings['tenant_mail_encryption'] ?? '',
+                        'MAIL_FROM_ADDRESS' => $mailSettings['tenant_mail_from_address'] ?? '',
+                        'MAIL_FROM_NAME' => $mailSettings['tenant_mail_from_name'] ?? '',
+                    ];
+                }
+
+                info('Mialing Settings Used', $envUpdates);
                 // Update the .env file
                 self::updateEnvFile($envUpdates);
 

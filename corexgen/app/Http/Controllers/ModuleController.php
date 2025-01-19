@@ -56,6 +56,10 @@ class ModuleController extends Controller
      */
     public function index()
     {
+        if (getModule() == 'saas' && panelAccess() == PANEL_TYPES['COMPANY_PANEL']) {
+            abort(403);
+        }
+
         $this->tenantRoute = $this->getTenantRoute();
 
         $panel_type = panelAccess();

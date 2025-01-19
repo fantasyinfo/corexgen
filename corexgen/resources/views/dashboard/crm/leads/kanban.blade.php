@@ -176,6 +176,19 @@
                 "{{ route(getPanelRoutes($module . '.view'), ['id' => ':id']) }}";
             let url = baseUrl.replace(':id', lead.id);
 
+            let isDeletePermission = "{{ hasPermission(strtoupper($module) . '.' . $permissions['DELETE']['KEY']) }}";
+            let isViewPermissions = "{{ hasPermission(strtoupper($module) . '.' . $permissions['READ']['KEY']) }}";
+
+            let DeleteButtonHTML = '';
+            let ViewButtonHTML = '';
+
+            // Check permissions and construct buttons
+            if (isDeletePermission) {
+                DeleteButtonHTML = `<i class="fas fa-trash-alt" onclick="deleteTask(${lead.id})"></i>`;
+            }
+            if (isViewPermissions) {
+                ViewButtonHTML = `<i class="fas fa-eye" onclick="viewTask(${lead.id})"></i>`;
+            }
 
             // const nameElement = lead.type === 'Company' ?
             //     `<h6 class="task-title"> <span class="status-circle bg-success me-2"></span> ${lead.company_name}</h6>` :
@@ -206,8 +219,9 @@
    
                 <div class="task-actions">
                  
-                    <i class="fas fa-eye " onclick="viewTask(${lead.id})"></i>
-                    <i class="fas fa-trash-alt " onclick="deleteTask(${lead.id})"></i>
+                    ${DeleteButtonHTML}
+                ${ViewButtonHTML}
+
                 </div>
             </div>
             <p class="mb-2 text-muted small">${lead.first_name} ${lead.last_name}</p>
@@ -363,7 +377,7 @@
                         if (file.size > maxFileSize) {
                             alert(
                                 `File ${file.name} is too large. Maximum size is ${maxFileSize/1024/1024}MB`
-                                );
+                            );
                             return;
                         }
 
@@ -834,7 +848,7 @@
                 });
             }
 
-            
+
 
             // Dynamically include footer JS if needed
 

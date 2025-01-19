@@ -4,8 +4,8 @@
 
 <div class="timeline-wrapper">
     @if ($company->paymentTransactions && $company->paymentTransactions->isNotEmpty())
-        <div class="table-responsive table-bg">
-            <table class="table p-3  table-bordered ui celled">
+        <div class="table-responsive ">
+            <table class="table p-3  table-bordered ui daTableQuick">
                 <thead>
                     <tr>
                         <th>Payment ID</th>

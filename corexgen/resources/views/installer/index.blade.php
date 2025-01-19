@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Application Installer</title>
 
-    <script src="{{asset('js/tailwind/index.js')}}"></script>
-    <link rel="stylesheet" type="text/css"  href="{{ asset('css/fontawesome/css/all.min.css')}}" />
+    <script src="{{ asset('js/tailwind/index.js') }}"></script>
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/fontawesome/css/all.min.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ asset('css/select2/select2.min.css') }}" />
     <style>
         body {
@@ -145,12 +145,15 @@
         #skipSmtpBtn:hover {
             background-color: #6b7280;
         }
+
         .searchSelectBox {
             width: 100% !important;
         }
-        .select2.select2-container{
+
+        .select2.select2-container {
             width: 100% !important;
         }
+
         /* Style for Select2 container */
         .select2-container .select2-selection--single {
             height: 45px;
@@ -160,7 +163,7 @@
             padding: 8px 12px;
             outline: none;
             font-size: 14px;
-            width:100%;
+            width: 100%;
             transition: box-shadow 0.3s ease, border 0.3s ease;
         }
 
@@ -188,12 +191,12 @@
 
         /* Hover and Active Styles */
         .select2-results__option--highlighted {
-            background-color: var(--primary-color)!important;
+            background-color: var(--primary-color) !important;
             color: #fff !important;
         }
 
         .select2-results__option--selected {
-            background-color: var(--primary-color)!important;
+            background-color: var(--primary-color) !important;
             color: #fff !important;
         }
     </style>
@@ -434,13 +437,27 @@
                                     class="w-full px-4 py-2 rounded border dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                             </div>
                             <div class="col-span-2">
-                                <label class="block text-sm font-medium mb-2 dark:text-white">Select Timezone</label>
-                                <select class="form-control searchSelectBox" name="timezone" required>
-                                  
+                                <label class="block text-sm font-medium mb-2 dark:text-white ">Select Timezone</label>
+                                <select
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 "
+                                    name="timezone" required>
+
                                     @foreach ($timezones as $timezone)
                                         <option value="{{ $timezone }}">{{ $timezone }}</option>
                                     @endforeach
                                 </select>
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-sm font-medium mb-2 dark:text-white ">Select Module <span
+                                        class="text-red-500">(Most Important)</span></label>
+                                <select
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 "
+                                    name="mode" required>
+                                    <option value="company">Company Module (Only Company CRM Will be Created)</option>
+                                    <option value="saas">SAAS Module</option>
+                                </select>
+
+
                             </div>
                         </div>
                     </div>
@@ -489,12 +506,13 @@
         </div>
     </div>
 
-    <script src="{{asset('js/jquery/jquery.min.js')}}"></script>
+    <script src="{{ asset('js/jquery/jquery.min.js') }}"></script>
     <script src="{{ asset('js/select2/select2.min.js') }}"></script>
     <script>
-           if ($(".searchSelectBox").length > 0) {
+        if ($(".searchSelectBox").length > 0) {
             $(".searchSelectBox").select2();
         }
+
         function showAlertWithHTML(title, htmlContent) {
             // Create the modal overlay
             const modalOverlay = document.createElement('div');

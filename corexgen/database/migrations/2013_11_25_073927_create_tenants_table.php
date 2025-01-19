@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('domain');
+            $table->enum('mode',['company','saas'])->default('saas');
             $table->json('settings')->nullable();
             $table->enum('status', CRM_STATUS_TYPES['TENANTS']['TABLE_STATUS']);
             $table->string('currency_code')->nullable();

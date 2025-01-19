@@ -15,8 +15,8 @@ class PaymentGatewayFactory
     private array $gateways = [
         'stripe' => \App\Services\StripePaymentGateway::class,
         // Future gateways can be added here
-
-
+    
+    
         'paypal' => \Modules\PaypalGatewayModule\App\Services\PayPalPaymentGateway::class,
     ];
 
