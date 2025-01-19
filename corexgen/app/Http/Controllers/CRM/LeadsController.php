@@ -1131,5 +1131,26 @@ class LeadsController extends Controller
     }
 
 
+      /**
+     * add assignee to leads
+     */
+    public function addAssignee(Request $request)
+    {
+        $request->validate([
+            'assign_to' => 'array|nullable|exists:users,id',
+            'id' => 'required|exists:leads,id',
+        ]);
+
+        try {
+            $lead = $this->applyTenantFilter(CRMLeads::query()->where('id', '=', $request->input('id')))->firstOrFail();
+
+            $this->leadsService->assignLeadsToUserIfProvided($request->only(['assign_to', 'id']), $lead);
+
+            return redirect()->back()->with('success', 'Task assingee addedd successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to addedd the task assingee: ' . $e->getMessage());
+        }
+    }
+
 
 }

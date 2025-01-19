@@ -13,11 +13,11 @@
         .card {
             background-color: var(--card-bg);
             box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-            transition: all 0.3s ease;
+            /* transition: all 0.3s ease; */
         }
 
         .card:hover {
-            transform: translateY(-2px);
+            /* transform: translateY(-2px); */
             box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
         }
 
@@ -374,7 +374,7 @@
         .card,
         .btn,
         .badge {
-            transition: all 0.3s ease;
+            /* transition: all 0.3s ease; */
         }
 
         .divider-container {

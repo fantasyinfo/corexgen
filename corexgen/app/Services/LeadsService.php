@@ -212,7 +212,7 @@ class LeadsService
     /**
      *assign leads to users 
      */
-    private function assignLeadsToUserIfProvided(array $validatedData, CRMLeads $lead)
+    public function assignLeadsToUserIfProvided(array $validatedData, CRMLeads $lead)
     {
         if (!empty($validatedData['assign_to']) && is_array($validatedData['assign_to'])) {
             // Retrieve current assignees from the database

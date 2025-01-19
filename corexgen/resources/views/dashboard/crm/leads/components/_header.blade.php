@@ -37,6 +37,18 @@
                         {{ $lead->score ?? 0 }} <i class="fas fa-star text-warning"></i>
                     </span>
                 </div>
+
+                <p class="mt-2">
+                    @foreach ($lead->assignees as $user)
+                        <a style="text-decoration: none;"
+                            href="{{ route(getPanelRoutes('users.view'), ['id' => $user->id]) }}">
+                            <x-form-components.profile-avatar :hw="40" :url="asset('storage/' . ($user->profile_photo_path ?? 'avatars/default.webp'))" :title="$user->name" />
+                        </a>
+                    @endforeach
+                    <x-form-components.add-assignee :action="route(getPanelRoutes('leads.addAssignee'))" :modal="$lead" :teamMates="$teamMates"
+                        :hw="40" />
+
+                </p>
             </div>
         </div>
     </div>

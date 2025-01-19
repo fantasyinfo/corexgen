@@ -674,5 +674,25 @@ class TasksController extends Controller
     }
 
 
+     /**
+     * add assignee to tasks
+     */
+    public function addAssignee(Request $request)
+    {
+        $request->validate([
+            'assign_to' => 'array|nullable|exists:users,id',
+            'id' => 'required|exists:tasks,id',
+        ]);
+
+        try {
+            $task = $this->applyTenantFilter(Tasks::query()->where('id', '=', $request->input('id')))->firstOrFail();
+
+            $this->tasksService->assignTasksToUserIfProvided($request->only(['assign_to', 'id']), $task);
+
+            return redirect()->back()->with('success', 'Task assingee addedd successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to addedd the task assingee: ' . $e->getMessage());
+        }
+    }
 
 }
