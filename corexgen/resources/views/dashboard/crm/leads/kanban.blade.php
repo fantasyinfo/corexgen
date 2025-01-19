@@ -362,7 +362,8 @@
                         // Check file size
                         if (file.size > maxFileSize) {
                             alert(
-                                `File ${file.name} is too large. Maximum size is ${maxFileSize/1024/1024}MB`);
+                                `File ${file.name} is too large. Maximum size is ${maxFileSize/1024/1024}MB`
+                                );
                             return;
                         }
 
@@ -812,9 +813,32 @@
                 new DataTable(".daTableQuick", {});
             }
 
+
+            if (typeof $ !== "undefined" && $(".searchSelectBox").length > 0) {
+                $(".searchSelectBox").select2({
+                    placeholder: "Please select an option",
+                    minimumResultsForSearch: 5,
+                });
+            }
+
+            const dateTimeInput = document.querySelectorAll(
+                'input[type="datetime-local"]'
+            );
+            if (dateTimeInput.length > 0 && typeof flatpickr !== "undefined") {
+                dateTimeInput.forEach((input) => {
+                    flatpickr(input, {
+                        enableTime: true,
+                        altInput: true,
+                        defaultDate: input.value,
+                    });
+                });
+            }
+
+            
+
             // Dynamically include footer JS if needed
 
-            console.log("Footer scripts loaded:", document.getElementById("footer-js-links")?.innerHTML);
+            // console.log("Footer scripts loaded:", document.getElementById("footer-js-links")?.innerHTML);
             loadCommentsScripts();
             loadAttachmentsScripts();
             // Add any other initialization code here

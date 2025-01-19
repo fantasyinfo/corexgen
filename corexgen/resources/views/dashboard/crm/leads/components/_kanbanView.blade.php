@@ -2,7 +2,7 @@
 @section('content')
     <div class="modal-content">
         <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Task View</h5>
+            <h5 class="modal-title" id="exampleModalLabel">Leads View</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -46,8 +46,10 @@
                                             client</a>
                                     @endif
 
+                                    <a href="{{ route(getPanelRoutes('leads.view'), ['id' => $lead->id]) }}"
+                                        class="dt-link  justify-content-end">View in Details</a>
                                 </div>
-
+                               
                             </div>
                         </div>
                     </div>

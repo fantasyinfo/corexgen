@@ -273,6 +273,14 @@
                         if (xhr.status === 422) {
                             const errors = xhr.responseJSON.errors;
                             showErrors(errors);
+                             // Display errors in an alert box
+                             let errorMessages = '';
+                            for (const [field, messages] of Object.entries(errors)) {
+                                errorMessages += `${field}: ${messages.join(', ')}\n`;
+                            }
+
+                            console.log(errors); // Keep the console log for debugging purposes
+                            alert(errorMessages); 
                         } else {
                             showToast('An error occurred', 'error');
                         }

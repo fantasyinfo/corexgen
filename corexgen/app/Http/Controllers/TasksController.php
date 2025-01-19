@@ -431,7 +431,7 @@ class TasksController extends Controller
     /**
      * view the task
      */
-    public function view($id)
+    public function view(Request $request, $id)
     {
         $query = Tasks::query()->with([
             'milestone',
@@ -474,6 +474,40 @@ class TasksController extends Controller
         // timesheets
         $timesheets = collect();
         $timesheets = $this->applyTenantFilter(Timesheet::where('task_id', $id)->with('task', 'user'))->get();
+
+        if ($request->input('fromkanban') && $request->input('fromkanban') == true) {
+
+
+            $view = view($this->getViewFilePath('components._kanbanView'), [
+                'title' => 'View Task',
+                'task' => $task,
+                'module' => PANEL_MODULES[$this->getPanelModule()]['tasks'],
+                'tasksStatus' => $this->tasksService->getTasksStatus(),
+                'teamMates' => getTeamMates(),
+                'cfOldValues' => $cfOldValues,
+                'customFields' => $customFields,
+                'activities' => $activitesQuery,
+                'projects' => $this->projectService->getAllProjects(),
+                'permissions' => PermissionsHelper::getPermissionsArray('TASKS'),
+                'milestones' => $milestones,
+                'timesheets' => $timesheets,
+                'taskUsers' => $this->getAssignee($id, true)
+            ]);
+
+            // Render the view to capture the stacks
+            $renderedView = $view->render();
+
+            // Get the styles and scripts from the stacks
+            $styles = collect($view->gatherData()['__env']->yieldPushContent('style'))->implode('');
+            $scripts = collect($view->gatherData()['__env']->yieldPushContent('scripts'))->implode('');
+
+            return response()->json([
+                'html' => $renderedView,
+                'styles' => $styles,
+                'scripts' => $scripts
+            ]);
+        }
+
 
         return view($this->getViewFilePath('view'), [
             'title' => 'View Task',
@@ -674,7 +708,7 @@ class TasksController extends Controller
     }
 
 
-     /**
+    /**
      * add assignee to tasks
      */
     public function addAssignee(Request $request)
