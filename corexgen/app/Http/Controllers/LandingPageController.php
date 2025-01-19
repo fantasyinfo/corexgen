@@ -52,6 +52,7 @@ class LandingPageController extends Controller
 
 
          if (getModule(1) == 'company') {
+            // info(getModule(1));
             return redirect()->route('login');
         }
 

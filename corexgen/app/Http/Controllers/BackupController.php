@@ -37,6 +37,9 @@ class BackupController extends Controller
      */
     public function index()
     {
+        if (getModule() == 'saas' && panelAccess() == PANEL_TYPES['COMPANY_PANEL']) {
+            abort(403);
+        }
         $backupDestinations = BackupDestinationFactory::createFromArray(config('backup.backup'));
 
         $backups = collect();

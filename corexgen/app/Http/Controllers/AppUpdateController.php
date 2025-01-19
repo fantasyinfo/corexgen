@@ -55,6 +55,10 @@ class AppUpdateController extends Controller
      */
     public function index()
     {
+        if (getModule() == 'saas' && panelAccess() == PANEL_TYPES['COMPANY_PANEL']) {
+            abort(403);
+        }
+
         $apiUrl = rtrim(env('VERSION_CHECK_API'), '/') . '/version_api.php';
         $currentVersion = config('app.version');
         $latestVersion = null;
