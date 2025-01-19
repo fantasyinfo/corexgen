@@ -65,6 +65,12 @@ if (!function_exists('isParentMenuActive')) {
         <ul class="nav flex-column">
             @foreach ($menus->where('parent_menu', '1') as $parentMenu)
 
+                @if (getModule() == 'saas' && $parentMenu->module_type == 'company')
+                    @continue;
+                @endif
+                @if (getModule() == 'company' && $parentMenu->menu_name == 'Membership')
+                    @continue;
+                @endif
                 {{-- Skip the menu if it's not enabled and not a default --}}
                 @if (!$parentMenu->is_default && !isFeatureEnabled($parentMenu->feature_type))
                     <li class="nav-item">

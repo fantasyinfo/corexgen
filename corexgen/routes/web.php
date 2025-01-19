@@ -118,7 +118,7 @@ Route::get('/clear', function () {
         // 7. Optimize the application
         Artisan::call('optimize');
 
-     
+
 
         $output = [
             'View cache cleared ✓',
@@ -910,6 +910,29 @@ Route::middleware([
     Route::prefix('planPaymentTransaction')->as('planPaymentTransaction.')->group(function () {
         // role for fetch, store, update
         Route::get('/', [PlansPaymentTransaction::class, 'indexCompany'])->name('index')->middleware('check.permission:PAYMENTSTRANSACTIONS.READ_ALL');
+    });
+
+    // modules routes
+    Route::prefix('modules')->as('modules.')->group(function () {
+        Route::get('/', [ModuleController::class, 'index'])->name('index')->middleware('check.permission:MODULES.READ_ALL');
+        Route::post('/', [ModuleController::class, 'create'])->name('create')->middleware('check.permission:MODULES.CREATE');
+        Route::delete('/destroy/{module}', [ModuleController::class, 'destroy'])->name('destroy')->middleware('check.permission:MODULES.DELETE');
+    });
+
+
+    // appupdates routes
+    Route::prefix('appupdates')->as('appupdates.')->group(function () {
+        Route::get('/', [AppUpdateController::class, 'index'])->name('index')->middleware('check.permission:APPUPDATES.READ_ALL');
+        Route::post('/', [AppUpdateController::class, 'create'])->name('create')->middleware('check.permission:APPUPDATES.CREATE');
+    });
+
+    // audits routes
+    Route::prefix('backup')->as('backup.')->group(function () {
+        Route::get('/', [BackupController::class, 'index'])->name('index')->middleware('check.permission:DOWNLOAD_BACKUP.READ_ALL');
+        Route::post('/', [BackupController::class, 'createBackup'])->name('createBackup')->middleware('check.permission:DOWNLOAD_BACKUP.CREATE');
+        Route::get('/download', [BackupController::class, 'downloadBackup'])
+            ->name('download')
+            ->middleware(['throttle:5,1', 'check.permission:DOWNLOAD_BACKUP.DOWNLOAD']);
     });
 
 });

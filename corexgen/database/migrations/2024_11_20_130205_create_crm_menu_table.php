@@ -21,6 +21,7 @@ return new class extends Migration {
             $table->enum('panel_type', array_keys(PANEL_TYPES));
             $table->boolean('is_default')->default(false);
             $table->string('feature_type')->nullable();
+            $table->enum('module_type',['company','saas'])->default('saas');
             $table->unique(['panel_type', 'permission_id'], 'panel_type_permission_id_unique');
             $table->timestamps();
         });

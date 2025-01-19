@@ -32,6 +32,7 @@ class CRMMenuSeeder extends Seeder
                 'panel_type' => PANEL_TYPES['SUPER_PANEL'],
                 'created_at' => now(),
                 'updated_at' => now(),
+
             ]);
 
             // Insert child menus
@@ -64,6 +65,7 @@ class CRMMenuSeeder extends Seeder
                 'menu_icon' => $menuData['menu_icon'],
                 'permission_id' => $menuData['permission_id'],
                 'panel_type' => PANEL_TYPES['COMPANY_PANEL'],
+                'module_type' => isset($menuData['panelModule']) ? $menuData['panelModule'] : 'saas',
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

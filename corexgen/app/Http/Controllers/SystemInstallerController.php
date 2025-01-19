@@ -587,6 +587,7 @@ class SystemInstallerController extends Controller
             'currency_symbol' => $request->currency_symbol,
             'timezone' => $request->timezone,
             'settings' => json_encode($settings),
+            'mode' => $request->mode
         ]);
 
         $user = User::create([
@@ -630,6 +631,7 @@ class SystemInstallerController extends Controller
             'currency_symbol' => $request->currency_symbol,
             'timezone' => $request->timezone,
             'settings' => json_encode($settings),
+            'mode' => $request->mode
         ]);
 
         // create a unlimited plan for the company

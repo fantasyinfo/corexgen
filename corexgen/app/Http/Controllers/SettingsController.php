@@ -334,8 +334,9 @@ class SettingsController extends Controller
                 }
             }
 
-             // Update mail configuration
             MailConfigService::updateMailConfig();
+            // Update mail configuration
+
 
         } else {
             $validatedData = $request->validate([
@@ -366,6 +367,19 @@ class SettingsController extends Controller
                 if ($setting) {
                     $setting->update(['value' => $value]);
                 }
+            }
+
+            if (getModule() == 'company') {
+                MailConfigService::updateMailConfig([
+                    'client_mail_provider' => 'required|string|max:255',
+                    'client_mail_host' => 'required|string',
+                    'client_mail_port' => 'required|numeric',
+                    'client_mail_username' => 'required|string',
+                    'client_mail_password' => 'required|string',
+                    'client_mail_encryption' => 'required|string',
+                    'client_mail_from_address' => 'required|email',
+                    'client_mail_from_name' => 'required|string',
+                ]);
             }
         }
 

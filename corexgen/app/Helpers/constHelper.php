@@ -427,6 +427,17 @@ PermissionsHelper::initializePermissions();
             ]
         ]
     ],
+    'System Settings' => [
+        'menu_icon' => 'fa-box',
+        'permission_id' => PermissionsHelper::getParentPermissionId('203'),
+        'menu_url' => 'modules',
+        'panelModule' => 'company',
+        'children' => [
+            'Modules' => ['menu_url' => 'modules.index', 'menu_icon' => 'fa-puzzle-piece', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['MODULES'], 'READ_ALL')],
+            'AppUpdates' => ['menu_url' => 'appupdates.index', 'menu_icon' => 'fa-sync', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['APPUPDATES'], 'READ_ALL')],
+            'Backups' => ['menu_url' => 'backup.index', 'menu_icon' => 'fa-database', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['DOWNLOAD_BACKUP'], 'READ_ALL')],
+        ]
+    ],
     'Settings' => [
         'menu_icon' => 'fa-cog',
         'is_default' => true,
@@ -482,6 +493,7 @@ PermissionsHelper::initializePermissions();
         'permission_plan' => PermissionsHelper::$plansPermissionsKeys['PLANUPGRADE'],
         'permission_id' => PermissionsHelper::getParentPermissionId('150'),
         'menu_url' => 'planupgrade',
+        'panelModule' => 'saas',
         'children' => [
             'Membership' => ['menu_url' => 'planupgrade.index', 'menu_icon' => 'fa-user', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['PLANUPGRADE'], 'READ_ALL')],
         ]
@@ -778,6 +790,7 @@ PermissionsHelper::initializePermissions();
         'calender' => 'calender',
         'planPaymentTransaction' => 'planPaymentTransaction',
         'paymentGateway' => 'paymentGateway',
+        'backup' => 'backup',
 
     ]
 ]);
