@@ -448,7 +448,7 @@ class CompanyService
     /**
      * create company users acc
      */
-    private function createCompanyUser(Company $company, array $data, $userFullName)
+    public function createCompanyUser(Company $company, array $data, $userFullName)
     {
         unset($data['name']);
         return User::create([
@@ -518,7 +518,7 @@ class CompanyService
             PLANS_BILLING_CYCLES['BILLINGS']['3 MONTHS'] => $startDate->addMonths(3),
             PLANS_BILLING_CYCLES['BILLINGS']['6 MONTHS'] => $startDate->addMonths(6),
             PLANS_BILLING_CYCLES['BILLINGS']['1 YEAR'] => $startDate->addYear(),
-            PLANS_BILLING_CYCLES['BILLINGS']['UNLIMITED'] => null, // No end date
+            PLANS_BILLING_CYCLES['BILLINGS']['UNLIMITED'] => $startDate->addYears(100), // No end date
             default => $startDate->addMonth()
         };
 

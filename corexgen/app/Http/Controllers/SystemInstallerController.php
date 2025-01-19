@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
-
+use App\Models\Company;
+use App\Models\Plans;
+use App\Models\PlansFeatures;
 use App\Models\Tenant;
 use App\Models\User;
+use App\Services\CompanyService;
 use DateTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -22,6 +25,12 @@ use Illuminate\Support\Facades\Log;
  */
 class SystemInstallerController extends Controller
 {
+
+    protected $companyService;
+    public function __construct(CompanyService $companyService = null)
+    {
+        $this->companyService = $companyService;
+    }
     /**
      * Method showInstaller
      * showing the view of installer
@@ -269,7 +278,7 @@ class SystemInstallerController extends Controller
     }
 
 
- 
+
     /**
      * Method installApplication
      *
@@ -327,7 +336,8 @@ class SystemInstallerController extends Controller
                 'smtp_password' => 'nullable',
                 'smtp_encryption' => 'nullable|in:tls,ssl',
                 'mail_from_address' => 'nullable|email',
-                'mail_from_name' => 'nullable'
+                'mail_from_name' => 'nullable',
+                'mode' => 'required|in:company,saas'
             ]);
 
             if ($validator->fails()) {
@@ -374,7 +384,12 @@ class SystemInstallerController extends Controller
 
             // Step 8: Create Super Admin
             Log::info('Super Admin Creating...');
-            $user = $this->createSuperAdmin($request);
+            if ($request->input('mode') == 'saas') {
+
+                $user = $this->createSuperAdmin($request);
+            } else if ($request->input('mode') == 'company') {
+                $user = $this->createCompanyAccount($request);
+            }
 
             // Step 9: Create Installation Lock File
             Log::info('Creating installation lock file.');
@@ -592,4 +607,92 @@ class SystemInstallerController extends Controller
 
         return $details;
     }
+
+    /**
+     * Method createSuperAdmin
+     *
+     * @param Request $request creating a company admin user to access the admin panel
+     *
+     * @return array
+     */
+    private function createCompanyAccount(Request $request)
+    {
+
+        $settings = array_merge($request->all(), [
+            'smtp_details' => session()->get('smtp_details'),
+        ]);
+
+        // create tenant account for id pupose only, do not create its user account for login as saas
+        $tenant = Tenant::create([
+            'name' => $request->name,
+            'domain' => $request->admin_email,
+            'currency_code' => $request->currency_code,
+            'currency_symbol' => $request->currency_symbol,
+            'timezone' => $request->timezone,
+            'settings' => json_encode($settings),
+        ]);
+
+        // create a unlimited plan for the company
+        $plan = Plans::create([
+            'name' => 'Direct Company Plan',
+            'desc' => 'Company module direct plan',
+            'price' => 0,
+            'offer_price' => 0,
+            'billing_cycle' => 'UNLIMITED',
+        ]);
+        info('Direct Company Plan Created', [$plan]);
+
+        // add unlimited plan featuers
+        foreach (PLANS_FEATURES as $md) {
+            PlansFeatures::create([
+                'plan_id' => $plan->id,
+                'module_name' => strtolower($md),
+                'value' => -1
+            ]);
+        }
+
+        info('Unlimited plans featuers added.', [$plan]);
+
+        $companyArray = [
+            'name' => 'CoreXGen CRM',
+            'cname' => $request->name,
+            'email' => $request->admin_email,
+            'password' => $request->admin_password,
+            'plan_id' => $plan->id,
+            'tenant_id' => $tenant->id,
+            'status' => CRM_STATUS_TYPES['USERS']['STATUS']['ACTIVE']
+        ];
+
+        $company = Company::create(array_merge($companyArray, [
+            'name' => $companyArray['cname'],
+        ]));
+
+        info('Company Created', [$company]);
+
+        $user = $this->companyService->createCompanyUser($company, $companyArray, $request->name);
+
+        info('Company User Created', [$user]);
+
+        $this->companyService->createPaymentTransaction($plan->id, $company->id, ['currency' => $request->currency_code]);
+
+        info('Company Payment Transaxctions Done');
+
+        $this->companyService->generateAllSettings($company->id);
+
+        info('Company Settings Generated');
+
+
+
+
+        $details = [
+            'name' => $user->name,
+            'email' => $user->email
+        ];
+
+        // \Mail::to($user->email)->send(new \App\Mail\WelcomeSuperAdmin($details));
+
+        return $details;
+    }
+
+
 }
