@@ -24,12 +24,26 @@ class InvoiceEditRequest extends FormRequest
      */
     public function rules(): array
     {
+
+
+
+
         return [
             'id' => 'required|exists:invoices,id',
             'client_id' => 'required|exists:clients,id',
             'notes' => 'nullable|string',
-            'issue_date' => 'required|date',
-            'due_date' => 'nullable|date|after_or_equal:today',
+            'issue_date' => 'required|date|date_format:Y-m-d',
+            'due_date' => [
+                'nullable',
+                'date',
+                'date_format:Y-m-d',
+                function ($attribute, $value, $fail) {
+                    $issueDate = $this->input('issue_date');
+                    if (strtotime($value) < strtotime($issueDate)) {
+                        $fail('The due date must be a date after or equal to the issue date.');
+                    }
+                },
+            ],
             'task_id' => 'nullable|exists:tasks,id',
             'total_amount' => 'required|numeric|min:1',
 

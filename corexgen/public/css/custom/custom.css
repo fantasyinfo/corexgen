@@ -701,3 +701,8 @@ table.celled {
     color: var(--body-color);
     font-size: 16px;
 }
+
+.daTableQuick {
+    min-width: 150px;
+    width: 100%;
+  }

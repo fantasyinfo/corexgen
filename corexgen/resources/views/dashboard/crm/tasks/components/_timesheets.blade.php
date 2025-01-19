@@ -94,8 +94,8 @@
 
 <div class="timeline-wrapper">
     @if ($timesheets && $timesheets->isNotEmpty())
-        <div class="table-responsive table-bg">
-            <table class="table p-3  table-bordered ui celled">
+        <div class="table-responsive ">
+            <table class="table p-3  table-bordered ui daTableQuick">
                 <thead>
                     <tr>
                         <th>Start Date</th>
@@ -179,6 +179,7 @@
 
             let TimesheetCreateRoute = "{{ route(getPanelRoutes('projects' . '.storeTimesheets')) }}";
 
+            
 
 
             // Edit button click handler

@@ -109,7 +109,7 @@ class EstimateService
                 $trimmedTitle = trim($title);
                 if ($trimmedTitle !== '') {
                     $taxData = $this->productServicesService->getProductTaxes('name', $data['product_tax'][$k]);
-                    info('product id', [$data['product_id'][$k]]);
+                    // info('product id', [$data['product_id'][$k]]);
                     $product_details[] = [
                         'title' => $trimmedTitle,
                         'description' => trim($data['product_description'][$k] ?? ''),
@@ -117,7 +117,7 @@ class EstimateService
                         'rate' => (float) ($data['product_rate'][$k] ?? 0.00),
                         'tax' => @$taxData[0]?->name ?? null,
                         'tax_id' => @$taxData[0]?->id ?? null,
-                        'product_id' => (int) ($data['product_id'][$k] ?? 0)
+                        'product_id' => (int) (@$data['product_id'][$k] ?? 0)
                     ];
                 }
             }

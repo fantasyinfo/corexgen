@@ -6,8 +6,8 @@
 
 <div class="timeline-wrapper">
     @if ($tasks && $tasks->isNotEmpty())
-        <div class="table-responsive table-bg">
-            <table class="table p-3  table-bordered ui celled">
+        <div class="table-responsive " >
+            <table class="table p-3  table-bordered ui daTableQuick" >
                 <thead>
                     <tr>
                         <th>Title</th>

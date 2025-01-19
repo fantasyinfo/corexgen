@@ -1,6 +1,24 @@
 document.addEventListener("DOMContentLoaded", function () {
+    // dt
+
+    if ($(".daTableQuick")) {
+        new DataTable(".daTableQuick", {
+            // stateSave: true,
+            // orderClasses: true,
+            // start: 0,
+            // length: 10,
+            // searching: true,
+            // sScrollX: "100%",
+            // lengthMenu: [
+            //     [10, 25, 50, -1],
+            //     [10, 25, 50, "All"],
+            // ],
+            // order: [],
+        });
+    }
+
     // Select2 initialization
-    if (typeof $ !== 'undefined' && $(".searchSelectBox").length > 0) {
+    if (typeof $ !== "undefined" && $(".searchSelectBox").length > 0) {
         $(".searchSelectBox").select2({
             placeholder: "Please select an option",
             minimumResultsForSearch: 5,
@@ -9,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Date input initialization
     const dateInputs = document.querySelectorAll('input[type="date"]');
-    if (dateInputs.length > 0 && typeof flatpickr !== 'undefined') {
+    if (dateInputs.length > 0 && typeof flatpickr !== "undefined") {
         dateInputs.forEach((input) => {
             flatpickr(input, {
                 // enableTime: true,
@@ -22,7 +40,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // Sidebar functionality
     const sidebarToggle = document.getElementById("sidebarToggle");
     const sidebarOverlay = document.querySelector(".sidebar-overlay");
-    const sidebarLinks = document.querySelectorAll('.sidebar .nav-link[data-bs-toggle="collapse"]');
+    const sidebarLinks = document.querySelectorAll(
+        '.sidebar .nav-link[data-bs-toggle="collapse"]'
+    );
 
     if (sidebarToggle && window.innerWidth > 768) {
         document.body.classList.remove("sidebar-collapsed");
@@ -52,7 +72,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Window resize handler
     const handleResize = function () {
-        if (document.querySelector(".sidebar")) {  // Only run if sidebar exists
+        if (document.querySelector(".sidebar")) {
+            // Only run if sidebar exists
             if (window.innerWidth > 768) {
                 document.body.classList.remove("sidebar-collapsed");
             } else {
@@ -70,7 +91,8 @@ document.addEventListener("DOMContentLoaded", function () {
             const setTheme = function (theme) {
                 document.documentElement.setAttribute("data-bs-theme", theme);
                 localStorage.setItem("theme", theme);
-                themeIcon.className = theme === "dark" ? "fas fa-moon" : "fas fa-sun";
+                themeIcon.className =
+                    theme === "dark" ? "fas fa-moon" : "fas fa-sun";
             };
 
             const savedTheme =
@@ -90,7 +112,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // Tooltip initialization
-if (typeof $ !== 'undefined') {
+if (typeof $ !== "undefined") {
     $(function () {
         $('[data-toggle="tooltip"]').tooltip();
     });
@@ -162,12 +184,12 @@ if (dropZone && fileInput) {
 }
 
 // Delete modal functionality
-if (typeof $ !== 'undefined') {
+if (typeof $ !== "undefined") {
     $("#deleteModal").on("show.bs.modal", function (event) {
         const button = $(event.relatedTarget);
         const route = button.data("route");
         const form = $("#deleteForm");
-        
+
         if (form && route) {
             form.attr("action", route);
         }
@@ -176,7 +198,7 @@ if (typeof $ !== 'undefined') {
 
 // Toast initialization
 const toasts = document.querySelectorAll(".toast");
-if (toasts.length > 0 && typeof bootstrap !== 'undefined') {
+if (toasts.length > 0 && typeof bootstrap !== "undefined") {
     toasts.forEach((toastEl) => {
         const toast = new bootstrap.Toast(toastEl);
         toast.show();

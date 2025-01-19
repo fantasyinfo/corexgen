@@ -23,7 +23,7 @@ class CommentRequest extends FormRequest
     {
         return [
             //
-            'comment' => 'required|string|max:1000',
+            'comment' => 'required|string',
             'id' => 'required'
         ];
     }
