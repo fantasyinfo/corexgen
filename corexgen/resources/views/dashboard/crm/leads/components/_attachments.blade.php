@@ -213,32 +213,25 @@
                         <i class="fas fa-cloud-upload-alt"></i>
                         <span>Drop files here or click to upload</span>
                     </label>
-
                     <div class="file-list my-2">
                         <ul id="fileList"></ul>
                     </div>
-
                     <div class="d-flex justify-content-center my-2">
-                        <button form="mediaForm" class="btn btn-primary mt-2 " type="submit">Upload</button>
+                        <button class="btn btn-primary mt-2 " type="submit">Upload</button>
                     </div>
                 </form>
             </div>
 
             <div class="note-list">
                 @php
-                    $deletePermission = false;
-                    if (
+                    $deletePermission =
                         isset($permissions['DELETE']) &&
-                        hasPermission(strtoupper($module) . '.' . $permissions['DELETE']['KEY'])
-                    ) {
-                        $deletePermission = true;
-                    }
+                        hasPermission(strtoupper($module) . '.' . $permissions['DELETE']['KEY']);
                 @endphp
                 @if ($lead->attachments->count() > 0)
                     @foreach ($lead->attachments as $attachment)
-                        <div class="attachment-item mb-4">
+                        <div class="attachment-item mb-4" data-id="{{ $attachment->id }}">
                             <div class="d-flex">
-                                <!-- Attachment Icon -->
                                 <div class="attachment-icon">
                                     @if (in_array($attachment->file_extension, ['jpg', 'jpeg', 'png', 'gif', 'webp']))
                                         <img src="{{ $attachment->file_path }}" alt="{{ $attachment->file_name }}"
@@ -247,11 +240,9 @@
                                         <i class="fas fa-file"></i>
                                     @endif
                                 </div>
-
-                                <!-- Attachment Content -->
-                                <div class="attachment-content  ms-3">
+                                <div class="attachment-content ms-3">
                                     <div
-                                        class="attachment-header text-muted d-flex gap-3 justify-content-between align-items-center">
+                                        class="attachment-header text-muted d-flex justify-content-between align-items-center">
                                         <h6 class="attachment-name mb-0">
                                             {{ $attachment->file_name }}
                                             <small class="text-muted ms-2">
@@ -259,36 +250,22 @@
                                             </small>
                                         </h6>
                                         <div class="attachment-actions">
-
-                                            <!-- View Button -->
-                                            <a title="View Attachment" data-toggle="tooltip"
-                                                href="{{ $attachment->file_path }}"
-                                                class="btn btn-outline-secondary btn-sm" target="_blank">
+                                            <a href="{{ $attachment->file_path }}"
+                                                class="btn btn-outline-secondary btn-sm" target="_blank"
+                                                title="View Attachment">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-
-                                            <!-- Download Button -->
-                                            <a title="Download Attachment" data-toggle="tooltip"
-                                                href="{{ $attachment->file_path }}"
-                                                class="btn btn-outline-secondary btn-sm" download>
+                                            <a href="{{ $attachment->file_path }}"
+                                                class="btn btn-outline-secondary btn-sm" download
+                                                title="Download Attachment">
                                                 <i class="fas fa-download"></i>
                                             </a>
-
-
-                                            <!-- Delete Button -->
                                             @if ($deletePermission)
-                                                <form id="deleteAttachment{{ $attachment->id }}" method="POST"
-                                                    action="{{ route(getPanelRoutes('leads.attachment.destroy'), ['id' => $attachment->id]) }}">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button title="Delete Attachment" data-toggle="tooltip"
-                                                        class="btn btn-danger btn-sm confirm-delete-attachment" type="submit"
-                                                        data-id="{{ $attachment->id }}">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </form>
+                                                <button class="btn btn-danger btn-sm delete-attachment"
+                                                    data-url="{{ route(getPanelRoutes('leads.attachment.destroy'), ['id' => $attachment->id]) }}">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
                                             @endif
-
                                         </div>
                                     </div>
                                 </div>
@@ -301,103 +278,206 @@
                         <p class="mt-2 text-muted">No attachments yet</p>
                     </div>
                 @endif
-
             </div>
         </div>
     </div>
 </div>
 
 
+
 @push('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        $(document).ready(function() {
+            // Initialize variables
+            let selectedFiles = [];
+            const fileUploadInput = $('#fileUpload');
+            const fileListContainer = $('#fileList');
+            const fileUploadArea = $('.file-upload-area');
+            const maxFileSize = 10 * 1024 * 1024; // 10MB limit
+            const csrfToken = $('meta[name="csrf-token"]').attr('content'); // Get CSRF token properly
 
-            document.querySelectorAll('.confirm-delete-attachment').forEach((button) => {
-                button.addEventListener('click', (e) => {
-                    e.preventDefault(); // Prevent form submission
-                    const form = e.target.closest('form'); // Get the form element
-                    const confirmation = confirm(
-                    'Are you sure you want to delete this attachment?');
-                    if (confirmation) {
-                        form.submit(); // Submit the form if confirmed
+            // Handle file selection
+            fileUploadInput.on('change', function() {
+                addFiles(this.files);
+            });
+
+            // Drag-and-drop support
+            fileUploadArea
+                .on('dragover', function(e) {
+                    e.preventDefault();
+                    $(this).addClass('drag-over');
+                })
+                .on('dragleave drop', function(e) {
+                    e.preventDefault();
+                    $(this).removeClass('drag-over');
+                    if (e.type === 'drop') {
+                        addFiles(e.originalEvent.dataTransfer.files);
                     }
                 });
-            });
 
+            // Add files to the list with validation
+            function addFiles(files) {
+                Array.from(files).forEach((file) => {
+                    // Check file size
+                    if (file.size > maxFileSize) {
+                        alert(`File ${file.name} is too large. Maximum size is ${maxFileSize/1024/1024}MB`);
+                        return;
+                    }
 
-            const fileUploadAttachment = document.getElementById('fileUpload');
-            const fileUploadArea = document.querySelector('.file-upload-area');
-            const fileList = document.getElementById('fileList');
-            let selectedFiles = []; // Array to keep track of selected files
-
-            // Handle manual file selection
-            fileUploadAttachment.addEventListener('change', function() {
-                addFilesToList(this.files);
-            });
-
-            // Handle drag-and-drop events
-            fileUploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                fileUploadArea.classList.add('drag-over');
-            });
-
-            fileUploadArea.addEventListener('dragleave', () => {
-                fileUploadArea.classList.remove('drag-over');
-            });
-
-            fileUploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                fileUploadArea.classList.remove('drag-over');
-                addFilesToList(e.dataTransfer.files);
-            });
-
-            // Add files to the selected list
-            function addFilesToList(files) {
-                for (let file of files) {
-                    // Avoid adding duplicate files
-                    if (!selectedFiles.some((f) => f.name === file.name && f.size === file.size)) {
+                    // Check for duplicates
+                    if (!selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
                         selectedFiles.push(file);
                     }
-                }
+                });
                 renderFileList();
             }
 
-            // Render the selected file list
+            // Render file list
             function renderFileList() {
-                fileList.innerHTML = ''; // Clear existing list
-
+                fileListContainer.empty();
                 selectedFiles.forEach((file, index) => {
-                    const listItem = document.createElement('li');
-                    listItem.classList.add('file-item');
-                    listItem.innerHTML = `
-                <div>
-                    <span class="file-name" title="${file.name}">${truncateFileName(file.name, 30)}</span>
-                    <span class="file-size">(${(file.size / 1024).toFixed(2)} KB)</span>
-                </div>
-                <button class="remove-file-btn" data-file-index="${index}">
-                    <i class="fas fa-trash"></i>
-                </button>
-            `;
-                    fileList.appendChild(listItem);
-                });
-
-                // Attach event listeners to remove buttons
-                document.querySelectorAll('.remove-file-btn').forEach((button) => {
-                    button.addEventListener('click', removeFile);
+                    fileListContainer.append(`
+                        <li class="file-item">
+                            <div>
+                                <span class="file-name">${truncateFileName(file.name, 30)}</span>
+                                <span class="file-size">(${(file.size / 1024).toFixed(2)} KB)</span>
+                            </div>
+                            <button type="button" class="btn btn-danger btn-sm remove-file" data-index="${index}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </li>
+                    `);
                 });
             }
 
-            // Remove a file from the list
-            function removeFile(event) {
-                const index = event.target.closest('button').getAttribute('data-file-index');
-                selectedFiles.splice(index, 1); // Remove the file from the array
-                renderFileList(); // Re-render the list
-            }
+            // Remove file from the list
+            fileListContainer.on('click', '.remove-file', function() {
+                const index = $(this).data('index');
+                selectedFiles.splice(index, 1);
+                renderFileList();
+            });
 
-            // Truncate file names for better display
+            // Truncate long file names
             function truncateFileName(name, maxLength) {
-                return name.length > maxLength ? name.substring(0, maxLength - 3) + '...' : name;
+                return name.length > maxLength ? `${name.substring(0, maxLength - 3)}...` : name;
             }
+
+            // Handle file upload via AJAX
+            $('#mediaForm').submit(function(e) {
+                e.preventDefault();
+
+                if (selectedFiles.length === 0) {
+                    alert('Please select files to upload');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('_token', csrfToken); // Add CSRF token to FormData
+                formData.append('id', $('input[name="id"]').val());
+                selectedFiles.forEach(file => formData.append('files[]', file));
+
+                // Disable submit button during upload
+                const submitBtn = $(this).find('button[type="submit"]');
+                submitBtn.prop('disabled', true);
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken // Add CSRF token to headers
+                    },
+                    success: function(response) {
+
+
+
+
+                        let isDeletePermission =
+                            "{{ hasPermission(strtoupper($module) . '.' . $permissions['DELETE']['KEY']) }}";
+
+                        response.attachments.forEach((attachment) => {
+                            let deleteURL =
+                                "{{ route(getPanelRoutes('leads.attachment.destroy'), ['id' => ':id']) }}";
+                            deleteURL = deleteURL.replace(':id', attachment.id);
+
+                            const deleteButton = isDeletePermission ?
+                                `<button class="btn btn-danger btn-sm delete-attachment" data-url="${deleteURL}">
+                                      <i class="fas fa-trash"></i>
+                                   </button>` :
+                                '';
+
+                            $('.note-list').prepend(`
+                                <div class="attachment-item mb-4" data-id="${attachment.id}">
+                                    <div class="d-flex">
+                                        <div class="attachment-icon">
+                                            ${attachment.file_extension.match(/(jpg|jpeg|png|gif|webp)/i)
+                                                ? `<img src="${attachment.file_path}" alt="${attachment.file_name}" class="attachment-preview" />`
+                                                : `<i class="fas fa-file"></i>`}
+                                        </div>
+                                        <div class="attachment-content ms-3">
+                                            <div class="attachment-header text-muted d-flex justify-content-between align-items-center">
+                                                <h6 class="attachment-name mb-0">
+                                                    ${attachment.file_name}
+                                                    <small class="text-muted ms-2">(${(attachment.size / 1024).toFixed(2)} KB)</small>
+                                                </h6>
+                                                <div class="attachment-actions">
+                                                    <a href="${attachment.file_path}" target="_blank" class="btn btn-outline-secondary btn-sm">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="${attachment.file_path}" download class="btn btn-outline-secondary btn-sm">
+                                                        <i class="fas fa-download"></i>
+                                                    </a>
+                                                    ${deleteButton}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `);
+                        });
+
+                        selectedFiles = [];
+                        renderFileList();
+                        alert('Files uploaded successfully.');
+                    },
+                    error: function(xhr) {
+                        alert(xhr.responseJSON?.message || 'An error occurred during upload.');
+                    },
+                    complete: function() {
+                        submitBtn.prop('disabled', false);
+                    }
+                });
+            });
+
+            // Delete attachment via AJAX
+            $(document).on('click', '.delete-attachment', function() {
+                const button = $(this);
+                const url = button.data('url');
+
+                if (confirm('Are you sure you want to delete this attachment?')) {
+                    $.ajax({
+                        url: url,
+                        method: 'POST',
+                        data: {
+                            _method: 'DELETE',
+                            _token: csrfToken
+                        },
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        success: function() {
+                            button.closest('.attachment-item').remove();
+                            alert('Attachment deleted successfully.');
+                        },
+                        error: function(xhr) {
+                            alert(xhr.responseJSON?.message ||
+                                'An error occurred while deleting the attachment.');
+                        }
+                    });
+                }
+            });
         });
     </script>
 @endpush
