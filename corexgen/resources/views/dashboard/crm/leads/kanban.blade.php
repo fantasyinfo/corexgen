@@ -14,6 +14,8 @@
         @include('layout.components.header-buttons')
         @include('dashboard.crm.leads.components.leads-filters')
 
+
+
         <div class="row my-2">
             <div class="w-100 mx-auto">
                 <x-form-components.input-group type="search" name="search" id="searchFilter"
@@ -175,9 +177,11 @@
             let url = baseUrl.replace(':id', lead.id);
 
 
-            const nameElement = lead.type === 'Company' ?
-                `<h6 class="task-title"> <span class="status-circle bg-success me-2"></span> ${lead.company_name}</h6>` :
-                `<h6 class="task-title"> <span class="status-circle bg-warning me-2"></span> ${lead.first_name}</h6>`;
+            // const nameElement = lead.type === 'Company' ?
+            //     `<h6 class="task-title"> <span class="status-circle bg-success me-2"></span> ${lead.company_name}</h6>` :
+            //     `<h6 class="task-title"> <span class="status-circle bg-warning me-2"></span> ${lead.first_name}</h6>`;
+            const nameElement =
+                `<h6 class="task-title"> <span class="status-circle bg-success me-2"></span> ${lead.title}</h6>`;
 
             const assigneeElements = lead.assignees.map(assignee =>
                 `<img src="${assignee.profile_photo_url}" 
@@ -323,7 +327,354 @@
             }
         }
 
+        function loadAttachmentsScripts() {
+            $(document).ready(function() {
+                // Initialize variables
+                let selectedFiles = [];
+                const fileUploadInput = $('#fileUpload');
+                const fileListContainer = $('#fileList');
+                const fileUploadArea = $('.file-upload-area');
+                const maxFileSize = 10 * 1024 * 1024; // 10MB limit
+                const csrfToken = $('meta[name="csrf-token"]').attr('content'); // Get CSRF token properly
 
+                // Handle file selection
+                fileUploadInput.on('change', function() {
+                    addFiles(this.files);
+                });
+
+                // Drag-and-drop support
+                fileUploadArea
+                    .on('dragover', function(e) {
+                        e.preventDefault();
+                        $(this).addClass('drag-over');
+                    })
+                    .on('dragleave drop', function(e) {
+                        e.preventDefault();
+                        $(this).removeClass('drag-over');
+                        if (e.type === 'drop') {
+                            addFiles(e.originalEvent.dataTransfer.files);
+                        }
+                    });
+
+                // Add files to the list with validation
+                function addFiles(files) {
+                    Array.from(files).forEach((file) => {
+                        // Check file size
+                        if (file.size > maxFileSize) {
+                            alert(
+                                `File ${file.name} is too large. Maximum size is ${maxFileSize/1024/1024}MB`);
+                            return;
+                        }
+
+                        // Check for duplicates
+                        if (!selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
+                            selectedFiles.push(file);
+                        }
+                    });
+                    renderFileList();
+                }
+
+                // Render file list
+                function renderFileList() {
+                    fileListContainer.empty();
+                    selectedFiles.forEach((file, index) => {
+                        fileListContainer.append(`
+                        <li class="file-item">
+                            <div>
+                                <span class="file-name">${truncateFileName(file.name, 30)}</span>
+                                <span class="file-size">(${(file.size / 1024).toFixed(2)} KB)</span>
+                            </div>
+                            <button type="button" class="btn btn-danger btn-sm remove-file" data-index="${index}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </li>
+                    `);
+                    });
+                }
+
+                // Remove file from the list
+                fileListContainer.on('click', '.remove-file', function() {
+                    const index = $(this).data('index');
+                    selectedFiles.splice(index, 1);
+                    renderFileList();
+                });
+
+                // Truncate long file names
+                function truncateFileName(name, maxLength) {
+                    return name.length > maxLength ? `${name.substring(0, maxLength - 3)}...` : name;
+                }
+
+                // Handle file upload via AJAX
+                $('#mediaForm').submit(function(e) {
+                    e.preventDefault();
+
+                    if (selectedFiles.length === 0) {
+                        alert('Please select files to upload');
+                        return;
+                    }
+
+                    const formData = new FormData();
+                    formData.append('_token', csrfToken); // Add CSRF token to FormData
+                    formData.append('id', $('input[name="id"]').val());
+                    selectedFiles.forEach(file => formData.append('files[]', file));
+
+                    // Disable submit button during upload
+                    const submitBtn = $(this).find('button[type="submit"]');
+                    submitBtn.prop('disabled', true);
+
+                    $.ajax({
+                        url: $(this).attr('action'),
+                        method: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken // Add CSRF token to headers
+                        },
+                        success: function(response) {
+
+
+
+
+                            let isDeletePermission =
+                                "{{ hasPermission(strtoupper($module) . '.' . $permissions['DELETE']['KEY']) }}";
+
+                            response.attachments.forEach((attachment) => {
+                                let deleteURL =
+                                    "{{ route(getPanelRoutes('leads.attachment.destroy'), ['id' => ':id']) }}";
+                                deleteURL = deleteURL.replace(':id', attachment.id);
+
+                                const deleteButton = isDeletePermission ?
+                                    `<button class="btn btn-danger btn-sm delete-attachment" data-url="${deleteURL}">
+                                      <i class="fas fa-trash"></i>
+                                   </button>` :
+                                    '';
+
+                                $('.note-list').prepend(`
+                                <div class="attachment-item mb-4" data-id="${attachment.id}">
+                                    <div class="d-flex">
+                                        <div class="attachment-icon">
+                                            ${attachment.file_extension.match(/(jpg|jpeg|png|gif|webp)/i)
+                                                ? `<img src="${attachment.file_path}" alt="${attachment.file_name}" class="attachment-preview" />`
+                                                : `<i class="fas fa-file"></i>`}
+                                        </div>
+                                        <div class="attachment-content ms-3">
+                                            <div class="attachment-header text-muted d-flex justify-content-between align-items-center">
+                                                <h6 class="attachment-name mb-0">
+                                                    ${attachment.file_name}
+                                                    <small class="text-muted ms-2">(${(attachment.size / 1024).toFixed(2)} KB)</small>
+                                                </h6>
+                                                <div class="attachment-actions">
+                                                    <a href="${attachment.file_path}" target="_blank" class="btn btn-outline-secondary btn-sm">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="${attachment.file_path}" download class="btn btn-outline-secondary btn-sm">
+                                                        <i class="fas fa-download"></i>
+                                                    </a>
+                                                    ${deleteButton}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `);
+                            });
+
+                            selectedFiles = [];
+                            renderFileList();
+                            alert('Files uploaded successfully.');
+                        },
+                        error: function(xhr) {
+                            alert(xhr.responseJSON?.message ||
+                                'An error occurred during upload.');
+                        },
+                        complete: function() {
+                            submitBtn.prop('disabled', false);
+                        }
+                    });
+                });
+
+                // Delete attachment via AJAX
+                $(document).on('click', '.delete-attachment', function() {
+                    const button = $(this);
+                    const url = button.data('url');
+
+                    if (confirm('Are you sure you want to delete this attachment?')) {
+                        $.ajax({
+                            url: url,
+                            method: 'POST',
+                            data: {
+                                _method: 'DELETE',
+                                _token: csrfToken
+                            },
+                            headers: {
+                                'X-CSRF-TOKEN': csrfToken
+                            },
+                            success: function() {
+                                button.closest('.attachment-item').remove();
+                                alert('Attachment deleted successfully.');
+                            },
+                            error: function(xhr) {
+                                alert(xhr.responseJSON?.message ||
+                                    'An error occurred while deleting the attachment.');
+                            }
+                        });
+                    }
+                });
+            });
+        }
+
+        function loadCommentsScripts() {
+            $('#commentForm').submit(function(e) {
+                e.preventDefault();
+
+                if (typeof tinymce !== 'undefined' && tinymce.get('comment')) {
+                    const content = tinymce.get('comment').getContent();
+                    if (!content.trim()) {
+                        alert('Please enter a comment');
+                        return;
+                    }
+                    $('textarea[name="comment"]').val(content);
+                }
+
+
+                const formData = new FormData(this);
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+
+                        let deleteURL =
+                            "{{ route(getPanelRoutes('leads.comment.destroy'), ['id' => ':id']) }}";
+                        deleteURL = deleteURL.replace(':id', response.comment.id);
+
+                        let isDeletePermission =
+                            "{{ hasPermission(strtoupper($module) . '.' . $permissions['DELETE']['KEY']) }}";
+
+                        // console.log(isDeletePermission)
+                        // Add the new comment to the UI
+                        const deleteButton = isDeletePermission ?
+                            `<div class="action-buttons">
+                                    <button class="btn btn-danger btn-sm delete-comment" data-id="${response.comment.id}" data-url="${deleteURL}">Delete</button>
+                            </div>` :
+                            '';
+
+                        $('.note-list').prepend(`
+    <div class="comment-item mb-4" data-id="${response.comment.id}">
+        <div class="d-flex">
+            <div class="comment-avatar">
+                ${response.user.profile_photo_path ? 
+                    `<img src="${response.user.profile_photo_path}" alt="Avatar" class="rounded-circle">` : 
+                    `<div class="default-avatar"><i class="fas fa-user"></i></div>`}
+            </div>
+            <div class="comment-content flex-grow-1 ms-3">
+                <div class="comment-header text-muted d-flex justify-content-between align-items-center">
+                    <h6 class="comment-author mb-0">
+                        ${response.user.name}
+                        <small class="text-muted ms-2"><i class="far fa-clock"></i> Just now</small>
+                    </h6>
+                    ${deleteButton}
+                </div>
+                <div class="comment-body mt-2">
+                    <p class="mb-0">${response.comment.comment}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+`);
+
+
+                        // Clear the form
+                        $('#commentForm')[0].reset();
+                        alert('Comment added successfully', 'success');
+                    },
+                    error: function(xhr) {
+                        alert('An error occurred while adding the comment.');
+                    },
+                });
+            });
+
+            $(document).on('click', '.delete-comment', function() {
+                const button = $(this);
+                const url = button.data('url');
+
+                if (confirm('Are you sure you want to delete this comment?')) {
+                    $.ajax({
+                        url: url,
+                        method: 'POST',
+                        data: {
+                            _method: 'DELETE',
+                            _token: $('meta[name="csrf-token"]').attr('content'),
+                        },
+                        success: function() {
+                            button.closest('.comment-item').remove();
+                            alert('Comment deleted successfully', 'success');
+                        },
+                        error: function() {
+                            alert('An error occurred while deleting the comment.');
+                        },
+                    });
+                }
+            });
+
+            // Initialize WYSIWYG editor
+            if (typeof tinymce !== 'undefined') {
+                tinymce.init({
+                    selector: '.wysiwyg-editor-comment',
+                    height: 300,
+                    base_url: '/js/tinymce',
+                    license_key: 'gpl',
+                    skin: currentTheme === 'dark' ? 'oxide-dark' : 'oxide',
+                    content_css: currentTheme === 'dark' ? 'dark' : 'default',
+                    menubar: false,
+                    setup: function(editor) {
+                        editor.on('change', function() {
+                            editor.save(); // This automatically updates the textarea
+                        });
+                    },
+                    plugins: [
+                        'accordion',
+                        'advlist',
+                        'anchor',
+                        'autolink',
+                        'autoresize',
+                        'autosave',
+                        'charmap',
+                        'code',
+                        'codesample',
+                        'directionality',
+                        'emoticons',
+                        'fullscreen',
+                        'help',
+                        'lists',
+                        'link',
+                        'image',
+
+
+                        'preview',
+                        'anchor',
+                        'searchreplace',
+                        'visualblocks',
+
+
+                        'insertdatetime',
+                        'media',
+                        'table',
+
+
+
+                        'wordcount'
+                    ],
+                    toolbar: 'undo redo | formatselect | bold italic backcolor | \alignleft aligncenter alignright alignjustify | \bullist numlist outdent indent | removeformat | help | \link image media preview codesample table code'
+                });
+            }
+
+
+        }
 
 
         // Delete task
@@ -386,31 +737,113 @@
             //loadTasks();
         }
 
-        function viewTask(taskId) {
+        // function viewTask(taskId) {
 
-            let baseUrl =
-                "{{ route(getPanelRoutes($module . '.kanbanView'), ['id' => ':id']) }}";
+        //     let baseUrl =
+        //         "{{ route(getPanelRoutes($module . '.kanbanView'), ['id' => ':id']) }}";
+        //     let url = baseUrl.replace(':id', taskId);
+
+        //     $.ajax({
+        //         url: url,
+        //         method: "GET",
+        //         data: {
+        //             _token: '{{ csrf_token() }}',
+        //         },
+        //         success: function(response) {
+        //             console.log(response);
+        //             populateViewModal(response);
+
+        //             $('#viewLeadModal').modal('show');
+        //         },
+        //         error: function(xhr) {
+        //             console.error('Error fetching  data:', xhr.responseText);
+        //         }
+        //     });
+
+
+        // }
+
+        function viewTask(taskId) {
+            let baseUrl = "{{ route(getPanelRoutes($module . '.view'), ['id' => ':id']) }}";
             let url = baseUrl.replace(':id', taskId);
 
-            $.ajax({
-                url: url,
-                method: "GET",
-                data: {
-                    _token: '{{ csrf_token() }}',
-                },
-                success: function(response) {
-                    console.log(response);
-                    populateViewModal(response);
+            $.get(`${url}?fromkanban=true`, function(response) {
+                // Add styles if not already present
+                if (!document.getElementById('modal-dynamic-styles')) {
+                    const styleSheet = document.createElement('style');
+                    styleSheet.id = 'modal-dynamic-styles';
+                    styleSheet.textContent = response.styles;
+                    document.head.appendChild(styleSheet);
+                }
 
-                    $('#viewLeadModal').modal('show');
-                },
-                error: function(xhr) {
-                    console.error('Error fetching  data:', xhr.responseText);
+                // Add the HTML content
+                const modalContainer = document.getElementById('task-detail-container');
+                modalContainer.innerHTML = response.html;
+
+                // Show the modal
+                openTaskModal();
+
+                // Add scripts after modal is shown
+                if (!document.getElementById('modal-dynamic-scripts')) {
+                    const scriptElement = document.createElement('script');
+                    scriptElement.id = 'modal-dynamic-scripts';
+                    scriptElement.textContent = response.scripts;
+                    document.body.appendChild(scriptElement);
+
+                    // Re-initialize any event listeners or plugins
+                    initializeModalScripts();
                 }
             });
-
-
         }
+
+        function initializeModalScripts() {
+            // Re-initialize your modal-specific scripts
+            $("#editToggle").click(function(e) {
+                e.preventDefault();
+                $("#viewDetails").toggle();
+                $("#editDetails").toggle();
+                $("#updateBtn").toggle();
+
+
+            });
+
+            // Check and initialize DataTable if needed
+            if ($.fn.DataTable && $(".daTableQuick").length && !$.fn.DataTable.isDataTable(".daTableQuick")) {
+                new DataTable(".daTableQuick", {});
+            }
+
+            // Dynamically include footer JS if needed
+
+            console.log("Footer scripts loaded:", document.getElementById("footer-js-links")?.innerHTML);
+            loadCommentsScripts();
+            loadAttachmentsScripts();
+            // Add any other initialization code here
+        }
+
+        function openTaskModal() {
+            const modal = new bootstrap.Modal(document.getElementById('task-detail-modal'), {
+                keyboard: true,
+                backdrop: 'static'
+            });
+
+            // Clean up when modal is hidden
+            modal._element.addEventListener('hidden.bs.modal', function() {
+                // Remove dynamic styles and scripts if needed
+                const dynamicStyles = document.getElementById('modal-dynamic-styles');
+                const dynamicScripts = document.getElementById('modal-dynamic-scripts');
+
+                if (dynamicStyles) dynamicStyles.remove();
+                if (dynamicScripts) dynamicScripts.remove();
+            });
+
+            modal.show();
+        }
+
+        function closeTaskModal() {
+            const modal = document.getElementById('task-detail-modal');
+            modal.classList.remove('visible');
+        }
+
 
         function populateViewModal(data) {
             const lead = data.lead;

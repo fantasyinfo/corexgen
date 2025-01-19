@@ -689,7 +689,7 @@ class LeadsController extends Controller
     /**
      * view lead
      */
-    public function view($id)
+    public function view(Request $request, $id)
     {
         $query = CRMLeads::query()->with([
             'address' => fn($q) => $q
@@ -746,6 +746,42 @@ class LeadsController extends Controller
 
         $contracts = collect();
         $contracts = $this->contractService->getContracts(\App\Models\CRM\CRMLeads::class, $id);
+
+
+        if ($request->input('fromkanban') && $request->input('fromkanban') == true) {
+
+
+            $view = view($this->getViewFilePath('components._kanbanView'), [
+                'title' => 'View Lead',
+                'lead' => $lead,
+                'module' => PANEL_MODULES[$this->getPanelModule()]['leads'],
+                'leadsGroups' => $this->leadsService->getLeadsGroups(),
+                'leadsSources' => $this->leadsService->getLeadsSources(),
+                'leadsStatus' => $this->leadsService->getLeadsStatus(),
+                'teamMates' => getTeamMates(),
+                'cfOldValues' => $cfOldValues,
+                'customFields' => $customFields,
+                'activities' => $activitesQuery,
+                'countries' => Country::all(),
+                'permissions' => PermissionsHelper::getPermissionsArray('LEADS'),
+                'proposals' => $proposals,
+                'contracts' => $contracts,
+                'estimates' => $estimates,
+            ]);
+
+            // Render the view to capture the stacks
+            $renderedView = $view->render();
+
+            // Get the styles and scripts from the stacks
+            $styles = collect($view->gatherData()['__env']->yieldPushContent('style'))->implode('');
+            $scripts = collect($view->gatherData()['__env']->yieldPushContent('scripts'))->implode('');
+
+            return response()->json([
+                'html' => $renderedView,
+                'styles' => $styles,
+                'scripts' => $scripts
+            ]);
+        }
 
         return view($this->getViewFilePath('view'), [
             'title' => 'View Lead',
@@ -1131,7 +1167,7 @@ class LeadsController extends Controller
     }
 
 
-      /**
+    /**
      * add assignee to leads
      */
     public function addAssignee(Request $request)

@@ -74,7 +74,21 @@
         <x-form-components.input-label for="assign_to[]">
             {{ __('leads.Assign To') }}
         </x-form-components.input-label>
-        <x-form-components.dropdown-with-profile :title="'Select Team Members'" :options="$teamMates" :name="'assign_to'" :multiple="true"
-            :selected="$lead->assignees->pluck('id')->toArray()" />
+        @foreach ($lead->assignees as $user)
+            <a style="text-decoration: none;" href="{{ route(getPanelRoutes('users.view'), ['id' => $user->id]) }}">
+                <x-form-components.profile-avatar :hw="40" :url="asset('storage/' . ($user->profile_photo_path ?? 'avatars/default.webp'))" :title="$user->name" />
+            </a>
+        @endforeach
+        <select class="form-select searchSelectBox" name="assign_to[]" multiple>
+            @foreach ($teamMates as $tm)
+                @php
+                    $selected = $lead->assignees->where('id', $tm->id)->count() > 0 ? 'selected' : '';
+                @endphp
+                <option value="{{ $tm->id }}" {{ $selected }}>{{ $tm->name }}</option>
+            @endforeach
+        </select>
+
+        {{-- <x-form-components.dropdown-with-profile :title="'Select Team Members'" :options="$teamMates" :name="'assign_to'" :multiple="true"
+            :selected="$lead->assignees->pluck('id')->toArray()" /> --}}
     </div>
 </div>
