@@ -59,6 +59,9 @@ class PlanUpgrade extends Controller
      */
     public function index(Request $request)
     {
+        if (getModule() == 'company') {
+            abort(403);
+        }
         $companyId = Auth::user()->company_id;
 
         $plans = Plans::query()->with('planFeatures')->where('status', CRM_STATUS_TYPES['PLANS']['STATUS']['ACTIVE'])->get();

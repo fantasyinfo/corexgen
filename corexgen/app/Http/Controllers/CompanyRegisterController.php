@@ -40,6 +40,11 @@ class CompanyRegisterController extends Controller
      */
     public function register()
     {
+
+        if (getModule(1) == 'company') {
+            return redirect()->route('login');
+        }
+
         $plans = Plans::where('status', CRM_STATUS_TYPES['PLANS']['STATUS']['ACTIVE'])->get();
         return view('landing.register', ['plans' => $plans, 'logo' => $this->getLogo()]);
     }

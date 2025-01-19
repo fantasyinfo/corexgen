@@ -64,7 +64,7 @@
                             [
                                 'data' => 'actions',
                                 'name' => 'actions',
-                                'label' => __('crud.Action'),
+                                'label' => __('crud.Actions'),
                                 'orderable' => false,
                                 'searchable' => false,
                                 'width' => '100px',

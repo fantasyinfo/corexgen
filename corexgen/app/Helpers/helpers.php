@@ -1174,23 +1174,36 @@ function calculateCostFromMinutes($totalMinutes, $ratePerHour)
 /**
  * Check module type
  */
-function getModule()
+function getModule(int $tenant_id = null)
 {
     // Get the authenticated user
     $user = Auth::user();
 
     // Ensure the user and tenant_id exist
     if (!$user || !$user->tenant_id) {
-        return null; // Or handle the error as needed
+        if (!$tenant_id) {
+            return null; // Or handle the error as needed
+        }
+
     }
 
     // Cache key based on the tenant ID
-    $cacheKey = "tenant_mode_{$user->tenant_id}";
+    if ($tenant_id) {
+        $cacheKey = "tenant_mode_{$tenant_id}";
+    } else {
+        $cacheKey = "tenant_mode_{$user->tenant_id}";
+    }
 
     // Use cache to retrieve or store the tenant's mode
-    return Cache::remember($cacheKey, now()->addMinutes(30), function () use ($user) {
+    return Cache::remember($cacheKey, now()->addMinutes(30), function () use ($user, $tenant_id) {
         // Retrieve the tenant
-        $tenant = Tenant::find($user->tenant_id);
+        if ($tenant_id) {
+
+            $tenant = Tenant::find($tenant_id);
+        } else {
+
+            $tenant = Tenant::find($user->tenant_id);
+        }
 
         // Return the tenant's mode or null if the tenant doesn't exist
         return $tenant ? $tenant->mode : null;
