@@ -98,6 +98,7 @@
     </div>
 </div>
 
+{{-- making changes on the script tag also make changes on the kanban.blade.php files for tasks, and leads --}}
 @push('scripts')
     <script>
         function openAssigneeModal() {

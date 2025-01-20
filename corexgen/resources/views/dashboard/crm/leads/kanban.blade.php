@@ -51,6 +51,10 @@
 @endsection
 
 @push('scripts')
+    <script src="{{ asset('js/tinymce/tinymce.min.js') }}"></script>
+    <script>
+        let currentTheme = document.documentElement.getAttribute('data-bs-theme');
+    </script>
     <script>
         // Initialize the board
         $(document).ready(function() {
@@ -219,8 +223,8 @@
    
                 <div class="task-actions">
                  
+                    ${ViewButtonHTML}
                     ${DeleteButtonHTML}
-                ${ViewButtonHTML}
 
                 </div>
             </div>
@@ -429,11 +433,10 @@
                     }
 
                     const formData = new FormData();
-                    formData.append('_token', csrfToken); // Add CSRF token to FormData
+                    formData.append('_token', csrfToken);
                     formData.append('id', $('input[name="id"]').val());
                     selectedFiles.forEach(file => formData.append('files[]', file));
 
-                    // Disable submit button during upload
                     const submitBtn = $(this).find('button[type="submit"]');
                     submitBtn.prop('disabled', true);
 
@@ -443,14 +446,7 @@
                         data: formData,
                         processData: false,
                         contentType: false,
-                        headers: {
-                            'X-CSRF-TOKEN': csrfToken // Add CSRF token to headers
-                        },
                         success: function(response) {
-
-
-
-
                             let isDeletePermission =
                                 "{{ hasPermission(strtoupper($module) . '.' . $permissions['DELETE']['KEY']) }}";
 
@@ -461,38 +457,38 @@
 
                                 const deleteButton = isDeletePermission ?
                                     `<button class="btn btn-danger btn-sm delete-attachment" data-url="${deleteURL}">
-                                      <i class="fas fa-trash"></i>
-                                   </button>` :
+                          <i class="fas fa-trash"></i>
+                       </button>` :
                                     '';
 
-                                $('.note-list').prepend(`
-                                <div class="attachment-item mb-4" data-id="${attachment.id}">
-                                    <div class="d-flex">
-                                        <div class="attachment-icon">
-                                            ${attachment.file_extension.match(/(jpg|jpeg|png|gif|webp)/i)
-                                                ? `<img src="${attachment.file_path}" alt="${attachment.file_name}" class="attachment-preview" />`
-                                                : `<i class="fas fa-file"></i>`}
-                                        </div>
-                                        <div class="attachment-content ms-3">
-                                            <div class="attachment-header text-muted d-flex justify-content-between align-items-center">
-                                                <h6 class="attachment-name mb-0">
-                                                    ${attachment.file_name}
-                                                    <small class="text-muted ms-2">(${(attachment.size / 1024).toFixed(2)} KB)</small>
-                                                </h6>
-                                                <div class="attachment-actions">
-                                                    <a href="${attachment.file_path}" target="_blank" class="btn btn-outline-secondary btn-sm">
-                                                        <i class="fas fa-eye"></i>
-                                                    </a>
-                                                    <a href="${attachment.file_path}" download class="btn btn-outline-secondary btn-sm">
-                                                        <i class="fas fa-download"></i>
-                                                    </a>
-                                                    ${deleteButton}
-                                                </div>
-                                            </div>
-                                        </div>
+                                $('.attachments-list').prepend(`
+                    <div class="attachment-item mb-4" data-id="${attachment.id}">
+                        <div class="d-flex">
+                            <div class="attachment-icon">
+                                ${attachment.file_extension.match(/(jpg|jpeg|png|gif|webp)/i)
+                                    ? `<img src="${attachment.file_path}" alt="${attachment.file_name}" class="attachment-preview" />`
+                                    : `<i class="fas fa-file"></i>`}
+                            </div>
+                            <div class="attachment-content ms-3">
+                                <div class="attachment-header text-muted d-flex justify-content-between align-items-center">
+                                    <h6 class="attachment-name mb-0">
+                                        ${attachment.file_name}
+                                        <small class="text-muted ms-2">(${(attachment.size / 1024).toFixed(2)} KB)</small>
+                                    </h6>
+                                    <div class="attachment-actions">
+                                        <a href="${attachment.file_path}" target="_blank" class="btn btn-outline-secondary btn-sm">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="${attachment.file_path}" download class="btn btn-outline-secondary btn-sm">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                        ${deleteButton}
                                     </div>
                                 </div>
-                            `);
+                            </div>
+                        </div>
+                    </div>
+                `);
                             });
 
                             selectedFiles = [];
@@ -562,7 +558,6 @@
                     processData: false,
                     contentType: false,
                     success: function(response) {
-
                         let deleteURL =
                             "{{ route(getPanelRoutes('leads.comment.destroy'), ['id' => ':id']) }}";
                         deleteURL = deleteURL.replace(':id', response.comment.id);
@@ -570,42 +565,38 @@
                         let isDeletePermission =
                             "{{ hasPermission(strtoupper($module) . '.' . $permissions['DELETE']['KEY']) }}";
 
-                        // console.log(isDeletePermission)
-                        // Add the new comment to the UI
                         const deleteButton = isDeletePermission ?
                             `<div class="action-buttons">
-                                    <button class="btn btn-danger btn-sm delete-comment" data-id="${response.comment.id}" data-url="${deleteURL}">Delete</button>
-                            </div>` :
+                    <button class="btn btn-danger btn-sm delete-comment" data-id="${response.comment.id}" data-url="${deleteURL}">Delete</button>
+                 </div>` :
                             '';
 
                         $('.note-list').prepend(`
-    <div class="comment-item mb-4" data-id="${response.comment.id}">
-        <div class="d-flex">
-            <div class="comment-avatar">
-                ${response.user.profile_photo_path ? 
-                    `<img src="${response.user.profile_photo_path}" alt="Avatar" class="rounded-circle">` : 
-                    `<div class="default-avatar"><i class="fas fa-user"></i></div>`}
-            </div>
-            <div class="comment-content flex-grow-1 ms-3">
-                <div class="comment-header text-muted d-flex justify-content-between align-items-center">
-                    <h6 class="comment-author mb-0">
-                        ${response.user.name}
-                        <small class="text-muted ms-2"><i class="far fa-clock"></i> Just now</small>
-                    </h6>
-                    ${deleteButton}
+                <div class="comment-item mb-4" data-id="${response.comment.id}">
+                    <div class="d-flex">
+                        <div class="comment-avatar">
+                            ${response.user.profile_photo_path ? 
+                                `<img src="${response.user.profile_photo_path}" alt="Avatar" class="rounded-circle">` : 
+                                `<div class="default-avatar"><i class="fas fa-user"></i></div>`}
+                        </div>
+                        <div class="comment-content flex-grow-1 ms-3">
+                            <div class="comment-header text-muted d-flex justify-content-between align-items-center">
+                                <h6 class="comment-author mb-0">
+                                    ${response.user.name}
+                                    <small class="text-muted ms-2"><i class="far fa-clock"></i> Just now</small>
+                                </h6>
+                                ${deleteButton}
+                            </div>
+                            <div class="comment-body mt-2">
+                                <p class="mb-0">${response.comment.comment}</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="comment-body mt-2">
-                    <p class="mb-0">${response.comment.comment}</p>
-                </div>
-            </div>
-        </div>
-    </div>
-`);
+            `);
 
-
-                        // Clear the form
                         $('#commentForm')[0].reset();
-                        alert('Comment added successfully', 'success');
+                        alert('Comment added successfully.');
                     },
                     error: function(xhr) {
                         alert('An error occurred while adding the comment.');
@@ -636,6 +627,7 @@
                 }
             });
 
+            console.log('tinymce', tinymce)
             // Initialize WYSIWYG editor
             if (typeof tinymce !== 'undefined') {
                 tinymce.init({
@@ -688,9 +680,80 @@
                 });
             }
 
-
         }
 
+        function openAssigneeModal() {
+            document.getElementById('modalBackdrop').classList.remove('hidden');
+            document.getElementById('assigneeModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAssigneeModal() {
+            document.getElementById('modalBackdrop').classList.add('hidden');
+            document.getElementById('assigneeModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function loadAssingeeScripts() {
+
+
+            // Close modal when clicking outside
+            document.getElementById('modalBackdrop').addEventListener('click', closeAssigneeModal);
+
+            // Close modal with escape key
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    closeAssigneeModal();
+                }
+            });
+
+            // Prevent modal from closing when clicking inside the modal content
+            document.querySelector('#assigneeModal .modal-content').addEventListener('click', function(event) {
+                event.stopPropagation();
+            });
+
+            // Handle AJAX form submission
+            $('#assigneeForm').on('submit', function(event) {
+                event.preventDefault(); // Prevent the default form submission
+
+                const form = this;
+                const formData = new FormData(form);
+
+                // Disable submit button to prevent multiple submissions
+                const submitButton = form.querySelector('button[type="submit"]');
+                submitButton.disabled = true;
+                submitButton.innerText = 'Saving...';
+
+                $.ajax({
+                    url: $(form).attr('action'),
+                    method: 'POST',
+                    data: formData,
+                    processData: false, // Required for FormData
+                    contentType: false, // Required for FormData
+                    success: function(response) {
+                        // Handle success
+                        alert(
+                            'Team members assigned successfully!, Reload the page to view new assingees'
+                            );
+                        closeAssigneeModal();
+
+                        // Optionally update the UI dynamically
+                        // For example, refresh a list of team members
+                        // $('#assigneeList').html(response.updatedHTML); // Example
+                    },
+                    error: function(xhr, status, error) {
+                        // Handle errors
+                        console.error('Error:', xhr.responseText);
+                        alert('An error occurred while assigning team members.');
+                    },
+                    complete: function() {
+                        // Re-enable the submit button
+                        submitButton.disabled = false;
+                        submitButton.innerText = 'Save';
+                    }
+                });
+            });
+        }
 
         // Delete task
         function deleteTask(taskId) {
@@ -855,6 +918,7 @@
             // console.log("Footer scripts loaded:", document.getElementById("footer-js-links")?.innerHTML);
             loadCommentsScripts();
             loadAttachmentsScripts();
+            loadAssingeeScripts();
             // Add any other initialization code here
         }
 

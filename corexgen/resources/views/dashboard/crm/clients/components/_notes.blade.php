@@ -82,12 +82,13 @@
 @endpush
 
 <div class="notes-section">
-    <div class="mb-3">
+    <h6><i class="fas fa-comments me-2"></i> Comments</h6>
+    <div class="mb-3 p-2 kanban-border body-bg">
         <form id="commentForm" method="POST" action="{{ route(getPanelRoutes('clients.comment.create')) }}">
             @csrf
             <input type="hidden" name="id" value="{{ $client->id }}" />
             <textarea name="comment" class="form-control wysiwyg-editor-comment" rows="3" placeholder="Add a note..."></textarea>
-            <div class="d-flex justify-content-center my-2">
+            <div class="d-flex justify-content-end my-2">
                 <button class="btn btn-primary mt-2" type="submit">Add Note</button>
             </div>
         </form>

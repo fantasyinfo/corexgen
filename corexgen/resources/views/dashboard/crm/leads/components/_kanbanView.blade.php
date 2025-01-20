@@ -8,53 +8,7 @@
         <div class="modal-body">
             <div class="row">
                 <!-- Main Content Column -->
-                <div class="row align-items-center">
-                    <div class="col-lg-12">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="lead-avatar">
-                                @if ($lead->type == 'Company')
-                                    <div class="company-avatar">{{ substr($lead->company_name, 0, 2) }}</div>
-                                @else
-                                    <div class="individual-avatar">
-                                        {{ substr($lead->first_name, 0, 1) }}{{ substr($lead->last_name, 0, 1) }}
-                                    </div>
-                                @endif
-                            </div>
-                            <div>
-                                <h1 class="mb-1">
-                                    @if ($lead->type == 'Company')
-                                        {{ $lead->company_name }}
-                                    @else
-                                        {{ $lead->first_name }} {{ $lead->last_name }}
-                                    @endif
-                                </h1>
-                                <div class="d-flex align-items-center gap-3">
-                                    <span class="badge bg-info">
-                                        <i class="fas fa-flag me-1"></i> {{ $lead->priority }} Priority
-                                    </span>
-                                    <span class="badge bg-{{ $lead->stage->color }}">
-                                        {{ $lead->stage->name }}
-                                    </span>
-                                    @if ($lead->is_converted)
-                                        <span class="badge bg-success">
-                                            <i class="fas fa-check-circle me-1"></i> Converted
-                                        </span>
-                                    @else
-                                        <a class="btn btn-outline-primary"
-                                            href="{{ route(getPanelRoutes('leads.convert'), ['id' => $lead->id]) }}">Convert
-                                            to
-                                            client</a>
-                                    @endif
-
-                                    <a href="{{ route(getPanelRoutes('leads.view'), ['id' => $lead->id]) }}"
-                                        class="dt-link  justify-content-end">View in Details</a>
-                                </div>
-                               
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
+                @include('dashboard.crm.leads.components._header')
                 <!-- Lead Details Tabs -->
                 <div class="card border-0 ">
                     <div class="card-header bg-transparent border-bottom-0 pb-0">
@@ -65,36 +19,6 @@
                                 </a>
                             </li>
 
-                            <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="tab" href="#proposals">
-                                    <i class="fas fa-flag me-2"></i>Proposals
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="tab" href="#estimates">
-                                    <i class="fas fa-file-signature me-2"></i>Estimates
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="tab" href="#contracts">
-                                    <i class="fas fa-file-contract me-2"></i>Contracts
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="tab" href="#activities">
-                                    <i class="fas fa-history me-2"></i>Activities
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="tab" href="#notes">
-                                    <i class="fas fa-sticky-note me-2"></i>Notes
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="tab" href="#files">
-                                    <i class="fas fa-paperclip me-2"></i>Files
-                                </a>
-                            </li>
                         </ul>
                     </div>
                     <div class="card-body mt-0 pt-0">
@@ -122,6 +46,10 @@
                                         </div>
                                         @include('dashboard.crm.leads.components.viewpartials._address')
                                         @include('dashboard.crm.leads.components.viewpartials._details')
+                                        <hr>
+                                        @include('dashboard.crm.leads.components._notes')
+                                        <hr>
+                                        @include('dashboard.crm.leads.components._attachments')
                                     </div>
                                     <div class="col-lg-1 divider-container">
                                         <div class="divider"></div>
@@ -159,31 +87,6 @@
 
                             </div>
 
-
-                            <div class="tab-pane fade" id="proposals">
-                                @include('dashboard.crm.leads.components._proposals')
-                            </div>
-
-                            <div class="tab-pane fade" id="estimates">
-                                @include('dashboard.crm.leads.components._estimates')
-                            </div>
-                            <div class="tab-pane fade" id="contracts">
-                                @include('dashboard.crm.leads.components._contracts')
-                            </div>
-
-                            <div class="tab-pane fade" id="activities">
-                                @include('dashboard.crm.leads.components._activity')
-                            </div>
-
-                            <!-- Notes Tab -->
-                            <div class="tab-pane fade" id="notes">
-                                @include('dashboard.crm.leads.components._notes')
-                            </div>
-
-                            <!-- Files Tab -->
-                            <div class="tab-pane fade" id="files">
-                                @include('dashboard.crm.leads.components._attachments')
-                            </div>
                         </div>
                     </div>
                 </div>

@@ -200,10 +200,13 @@
         }
     </style>
 @endpush
-<div class="files-section">
+
+{{-- making changes on the script tag on this file, also make on the kanban.blade.php file comments script section as well --}}
+<div class="files-section mt-2">
+    <h6><i class="fas fa-paperclip me-2"></i> Attachments</h6>
     <div class="row">
         <div class="col-lg-12">
-            <div class="file-upload-area mb-3">
+            <div class="file-upload-area mb-3 kanban-border">
                 <form id="mediaForm" method="POST" action="{{ route(getPanelRoutes('leads.attachment.create')) }}"
                     enctype="multipart/form-data">
                     @csrf
@@ -216,13 +219,13 @@
                     <div class="file-list my-2">
                         <ul id="fileList"></ul>
                     </div>
-                    <div class="d-flex justify-content-center my-2">
-                        <button class="btn btn-primary mt-2 " type="submit">Upload</button>
+                    <div class="d-flex justify-content-end my-2 mw-2">
+                        <button class="btn btn-primary mt-2 mx-2" type="submit">Upload</button>
                     </div>
                 </form>
             </div>
 
-            <div class="note-list">
+            <div class="attachments-list">
                 @php
                     $deletePermission =
                         isset($permissions['DELETE']) &&
@@ -372,11 +375,10 @@
                 }
 
                 const formData = new FormData();
-                formData.append('_token', csrfToken); // Add CSRF token to FormData
+                formData.append('_token', csrfToken);
                 formData.append('id', $('input[name="id"]').val());
                 selectedFiles.forEach(file => formData.append('files[]', file));
 
-                // Disable submit button during upload
                 const submitBtn = $(this).find('button[type="submit"]');
                 submitBtn.prop('disabled', true);
 
@@ -386,14 +388,7 @@
                     data: formData,
                     processData: false,
                     contentType: false,
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken // Add CSRF token to headers
-                    },
                     success: function(response) {
-
-
-
-
                         let isDeletePermission =
                             "{{ hasPermission(strtoupper($module) . '.' . $permissions['DELETE']['KEY']) }}";
 
@@ -404,38 +399,38 @@
 
                             const deleteButton = isDeletePermission ?
                                 `<button class="btn btn-danger btn-sm delete-attachment" data-url="${deleteURL}">
-                                      <i class="fas fa-trash"></i>
-                                   </button>` :
+                          <i class="fas fa-trash"></i>
+                       </button>` :
                                 '';
 
-                            $('.note-list').prepend(`
-                                <div class="attachment-item mb-4" data-id="${attachment.id}">
-                                    <div class="d-flex">
-                                        <div class="attachment-icon">
-                                            ${attachment.file_extension.match(/(jpg|jpeg|png|gif|webp)/i)
-                                                ? `<img src="${attachment.file_path}" alt="${attachment.file_name}" class="attachment-preview" />`
-                                                : `<i class="fas fa-file"></i>`}
-                                        </div>
-                                        <div class="attachment-content ms-3">
-                                            <div class="attachment-header text-muted d-flex justify-content-between align-items-center">
-                                                <h6 class="attachment-name mb-0">
-                                                    ${attachment.file_name}
-                                                    <small class="text-muted ms-2">(${(attachment.size / 1024).toFixed(2)} KB)</small>
-                                                </h6>
-                                                <div class="attachment-actions">
-                                                    <a href="${attachment.file_path}" target="_blank" class="btn btn-outline-secondary btn-sm">
-                                                        <i class="fas fa-eye"></i>
-                                                    </a>
-                                                    <a href="${attachment.file_path}" download class="btn btn-outline-secondary btn-sm">
-                                                        <i class="fas fa-download"></i>
-                                                    </a>
-                                                    ${deleteButton}
-                                                </div>
-                                            </div>
-                                        </div>
+                            $('.attachments-list').prepend(`
+                    <div class="attachment-item mb-4" data-id="${attachment.id}">
+                        <div class="d-flex">
+                            <div class="attachment-icon">
+                                ${attachment.file_extension.match(/(jpg|jpeg|png|gif|webp)/i)
+                                    ? `<img src="${attachment.file_path}" alt="${attachment.file_name}" class="attachment-preview" />`
+                                    : `<i class="fas fa-file"></i>`}
+                            </div>
+                            <div class="attachment-content ms-3">
+                                <div class="attachment-header text-muted d-flex justify-content-between align-items-center">
+                                    <h6 class="attachment-name mb-0">
+                                        ${attachment.file_name}
+                                        <small class="text-muted ms-2">(${(attachment.size / 1024).toFixed(2)} KB)</small>
+                                    </h6>
+                                    <div class="attachment-actions">
+                                        <a href="${attachment.file_path}" target="_blank" class="btn btn-outline-secondary btn-sm">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="${attachment.file_path}" download class="btn btn-outline-secondary btn-sm">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                        ${deleteButton}
                                     </div>
                                 </div>
-                            `);
+                            </div>
+                        </div>
+                    </div>
+                `);
                         });
 
                         selectedFiles = [];

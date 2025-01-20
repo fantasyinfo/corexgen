@@ -7,34 +7,7 @@
         </div>
         <div class="modal-body">
             <div class="row">
-                <div class="card mb-4 border-0 pb-0 lead-header-card">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center gap-3">
-                            <div>
-                                <h1 class="mb-1">
-                                    {{ $task->title }}
-                                </h1>
-                            </div>
-
-                            <div class="d-flex align-items-center gap-3">
-                            
-                                <span class="badge bg-{{ $task->stage->color }}">
-                                    {{ $task->stage->name }}
-                                </span>
-                                @if ($task->billable)
-                                    <span class="badge bg-success">
-                                        <i class="fas fa-check-circle me-1"></i> Billable
-                                    </span>
-                                @endif
-                                <a href="{{ route(getPanelRoutes('tasks.view'), ['id' => $task->id]) }}"
-                                    class="dt-link  justify-content-end">View in Details</a>
-                            </div>
-
-
-                        </div>
-
-                    </div>
-                </div>
+                @include('dashboard.crm.tasks.components._header')
                 <div class="card border-0 ">
                     <div class="card-header bg-transparent border-bottom-0 pb-0">
                         <ul class="nav nav-tabs card-header-tabs" role="tablist">
@@ -54,16 +27,7 @@
                                     <i class="fas fa-history me-2"></i>Activities
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="tab" href="#notesTab">
-                                    <i class="fas fa-sticky-note me-2"></i>Notes
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="tab" href="#files">
-                                    <i class="fas fa-paperclip me-2"></i>Files
-                                </a>
-                            </li>
+                          
                         </ul>
                     </div>
                     <div class="card-body mt-0 pt-0">
@@ -91,6 +55,8 @@
                                         </div>
 
                                         @include('dashboard.crm.tasks.components.viewpartials._details')
+                                        @include('dashboard.crm.tasks.components._notes')
+                                        @include('dashboard.crm.tasks.components._attachments')
                                     </div>
                                     <div class="col-lg-1 divider-container">
                                         <div class="divider"></div>
@@ -137,15 +103,7 @@
                                 @include('dashboard.crm.tasks.components._activity')
                             </div>
 
-                            <!-- Notes Tab -->
-                            <div class="tab-pane fade" id="notesTab">
-                                @include('dashboard.crm.tasks.components._notes')
-                            </div>
-
-                            <!-- Files Tab -->
-                            <div class="tab-pane fade" id="files">
-                                @include('dashboard.crm.tasks.components._attachments')
-                            </div>
+                          
                         </div>
                     </div>
                 </div>

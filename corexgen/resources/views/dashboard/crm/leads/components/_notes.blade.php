@@ -81,13 +81,15 @@
     </style>
 @endpush
 
-<div class="notes-section">
-    <div class="mb-3">
+{{-- making changes on the script tag on this file, also make on the kanban.blade.php file comments script section as well --}}
+<div class="notes-section mt-2">
+    <h6><i class="fas fa-comments me-2"></i> Comments</h6>
+    <div class="mb-3 p-2 kanban-border body-bg">
         <form id="commentForm" method="POST" action="{{ route(getPanelRoutes('leads.comment.create')) }}">
             @csrf
             <input type="hidden" name="id" value="{{ $lead->id }}" />
             <textarea name="comment" class="form-control wysiwyg-editor-comment" rows="3" placeholder="Add a note..."></textarea>
-            <div class="d-flex justify-content-center my-2">
+            <div class="d-flex justify-content-end my-2">
                 <button class="btn btn-primary mt-2" type="submit">Add Note</button>
             </div>
         </form>
@@ -178,7 +180,6 @@
                 processData: false,
                 contentType: false,
                 success: function(response) {
-
                     let deleteURL =
                         "{{ route(getPanelRoutes('leads.comment.destroy'), ['id' => ':id']) }}";
                     deleteURL = deleteURL.replace(':id', response.comment.id);
@@ -186,42 +187,38 @@
                     let isDeletePermission =
                         "{{ hasPermission(strtoupper($module) . '.' . $permissions['DELETE']['KEY']) }}";
 
-                    // console.log(isDeletePermission)
-                    // Add the new comment to the UI
                     const deleteButton = isDeletePermission ?
                         `<div class="action-buttons">
-                                    <button class="btn btn-danger btn-sm delete-comment" data-id="${response.comment.id}" data-url="${deleteURL}">Delete</button>
-                            </div>` :
+                    <button class="btn btn-danger btn-sm delete-comment" data-id="${response.comment.id}" data-url="${deleteURL}">Delete</button>
+                 </div>` :
                         '';
 
                     $('.note-list').prepend(`
-    <div class="comment-item mb-4" data-id="${response.comment.id}">
-        <div class="d-flex">
-            <div class="comment-avatar">
-                ${response.user.profile_photo_path ? 
-                    `<img src="${response.user.profile_photo_path}" alt="Avatar" class="rounded-circle">` : 
-                    `<div class="default-avatar"><i class="fas fa-user"></i></div>`}
-            </div>
-            <div class="comment-content flex-grow-1 ms-3">
-                <div class="comment-header text-muted d-flex justify-content-between align-items-center">
-                    <h6 class="comment-author mb-0">
-                        ${response.user.name}
-                        <small class="text-muted ms-2"><i class="far fa-clock"></i> Just now</small>
-                    </h6>
-                    ${deleteButton}
+                <div class="comment-item mb-4" data-id="${response.comment.id}">
+                    <div class="d-flex">
+                        <div class="comment-avatar">
+                            ${response.user.profile_photo_path ? 
+                                `<img src="${response.user.profile_photo_path}" alt="Avatar" class="rounded-circle">` : 
+                                `<div class="default-avatar"><i class="fas fa-user"></i></div>`}
+                        </div>
+                        <div class="comment-content flex-grow-1 ms-3">
+                            <div class="comment-header text-muted d-flex justify-content-between align-items-center">
+                                <h6 class="comment-author mb-0">
+                                    ${response.user.name}
+                                    <small class="text-muted ms-2"><i class="far fa-clock"></i> Just now</small>
+                                </h6>
+                                ${deleteButton}
+                            </div>
+                            <div class="comment-body mt-2">
+                                <p class="mb-0">${response.comment.comment}</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="comment-body mt-2">
-                    <p class="mb-0">${response.comment.comment}</p>
-                </div>
-            </div>
-        </div>
-    </div>
-`);
+            `);
 
-
-                    // Clear the form
                     $('#commentForm')[0].reset();
-                    alert('Comment added successfully', 'success');
+                    alert('Comment added successfully.');
                 },
                 error: function(xhr) {
                     alert('An error occurred while adding the comment.');
