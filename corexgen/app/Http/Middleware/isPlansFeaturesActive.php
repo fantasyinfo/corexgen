@@ -17,7 +17,7 @@ class isPlansFeaturesActive
     {
 
    
-        info('Checking ' . $module . ' Featuers Permissions');
+        // info('Checking ' . $module . ' Featuers Permissions');
         if (!isFeatureEnabled($module)) {
             return redirect()->route(getPanelRoutes('planupgrade.index'))->with('error', 'This feature is not enabled on your current plan, please upgrade your plan.');
         }

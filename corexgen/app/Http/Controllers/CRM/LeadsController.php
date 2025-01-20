@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use App\Jobs\CsvImportJob;
+use App\Models\Company;
 use App\Models\CRM\CRMLeads;
 use App\Repositories\LeadsRepository;
 use App\Services\CustomFieldService;
@@ -841,7 +842,6 @@ class LeadsController extends Controller
 
             // for table view
             return redirect()->back()->with('success', 'Leads stage changed successfully.');
-
         } catch (\Exception $e) {
 
             if (isset($_GET['from_kanban']) && $_GET['from_kanban']) {
@@ -1061,7 +1061,6 @@ class LeadsController extends Controller
                 'success',
                 'Thank you for your interest! Our team will contact you shortly.'
             );
-
         } catch (ValidationException $e) {
             DB::rollBack();
             Log::warning('Lead validation failed', [
@@ -1073,7 +1072,6 @@ class LeadsController extends Controller
                 ->withErrors($e->errors())
                 ->withInput()
                 ->with('error', 'Please check the form for errors and try again.');
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Lead creation failed', [
@@ -1188,5 +1186,156 @@ class LeadsController extends Controller
         }
     }
 
+
+    /**
+     * show the api docs for this leads form 
+     * @param mixed $id
+
+     */
+    public function leadsToWebAPI($id)
+    {
+
+        $form = WebToLeadForm::where('company_id', Auth::user()->company_id)->findOrFail($id);
+
+        return view($this->getViewFilePath('leadToWebAPI'), [
+            'title' => 'Leads API Docs',
+            'permissions' => PermissionsHelper::getPermissionsArray('LEADS'),
+            'module' => PANEL_MODULES[$this->getPanelModule()]['leads'],
+            'type' => 'Leads',
+            'form' => $form,
+
+        ]);
+    }
+
+
+    /**
+     * capture leads via api
+     */
+
+    public function leadsCreateAPI(Request $request)
+    {
+        try {
+
+            // Retrieve the X-API-Key header
+            $apiKey = $request->header('X-API-Key');
+
+            if (!$apiKey) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'API Key is missing.',
+                ], 400); // HTTP 400 Bad Request
+            }
+
+            $company = Company::where('api_token', $apiKey)->first();
+            // Validate the API Key (Example validation logic)
+            if (!$company) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid API Key.',
+                ], 401); // HTTP 401 Unauthorized
+            }
+
+
+            // Start database transaction
+            DB::beginTransaction();
+
+            // Validate incoming request
+            $validated = $request->validate([
+                'uuid' => 'required|string|exists:web_to_leads_form,uuid',
+                'company_name' => 'nullable|string|max:255', // client company name
+                'title' => 'required|string|max:255',
+                'first_name' => 'required|string|max:255',
+                'last_name' => 'required|string|max:255',
+                'email' => 'required|email',
+                'phone' => 'nullable|string|min:7|max:15',
+                'preferred_contact_method' => 'nullable|in:Email,Phone,In-Person',
+                'group_id' => 'required|exists:category_group_tag,id',
+                'source_id' => 'required|exists:category_group_tag,id',
+                'status_id' => 'required|exists:category_group_tag,id',
+                'address_street_address' => 'nullable|string|max:255',
+                'address_country_id' => 'nullable|exists:countries,id',
+                'address_city_name' => 'nullable|string|max:255',
+                'address_pincode' => 'nullable|string|max:20',
+            ]);
+
+
+
+            $form = WebToLeadForm::where('uuid', $validated['uuid'])->where('company_id', $company->id)->first();
+
+            // Validate the API Key (Example validation logic)
+            if (!$form) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid UUID.',
+                ], 401); // HTTP 401 Unauthorized
+            }
+
+            // Log the incoming lead attempt
+            Log::info('New lead form submission', [
+                'company_id' => $validated['company_id'],
+                'email' => $validated['email'],
+                'source' => $validated['source_id'],
+            ]);
+
+            // Validate category group tags (custom logic)
+            $this->validateCategoryGroupTags($validated);
+
+
+            // create required fields dynamically via api token and form uuid
+            $validated['company_id'] = $company->id;
+            $validated['web_to_leads_form_id'] = $form->id;
+            $validated['web_to_leads_form_uuid'] = $form->uuid;
+
+
+            // Create the lead
+            $lead = $this->leadsService->createLead($validated);
+
+            // Commit transaction
+            DB::commit();
+
+            // Log successful lead creation
+            Log::info('Lead successfully created', [
+                'lead_id' => $lead['lead']->id,
+                'company_id' => $lead['lead']->company_id,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Lead created successfully.',
+                'data' => [
+                    'lead_id' => $lead['lead']->id,
+                    'created_at' => $lead['lead']->created_at->toIso8601String(),
+                ],
+            ], 201); // HTTP 201 Created
+
+        } catch (ValidationException $e) {
+            DB::rollBack();
+
+            Log::warning('Lead validation failed', [
+                'errors' => $e->errors(),
+                'input' => $request->except(['password']),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error.',
+                'errors' => $e->errors(),
+            ], 422); // HTTP 422 Unprocessable Entity
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Lead creation failed', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'An unexpected error occurred. Please try again later.',
+                'error' => $e->getMessage(),
+            ], 500); // HTTP 500 Internal Server Error
+        }
+    }
 
 }

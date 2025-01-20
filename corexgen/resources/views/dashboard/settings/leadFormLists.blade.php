@@ -12,7 +12,7 @@
                         New</button>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-striped ">
+                    <table class="table table-striped " id="webLead">
                         <thead>
                             <tr>
                                 <th>Title</th>
@@ -176,6 +176,20 @@
             document.addEventListener('DOMContentLoaded', function() {
 
 
+                function reinitializeDataTable() {
+                    // Destroy the previous instance
+
+
+                    // Reinitialize DataTable
+                    $('#webLead').DataTable({
+
+                        pageLength: 10,
+
+                        searching: true, // Enable search bar
+                        ordering: true, // Enable column ordering
+                    });
+                }
+
                 const route = "{{ route(getPanelRoutes($module . '.leadFormSettingFetch')) }}";
                 // Function to load categories
                 function loadForms() {
@@ -184,64 +198,62 @@
                         .then(data => {
                             const tableBody = document.getElementById('webToLeadFormBody');
                             tableBody.innerHTML = data.map((form, index) => `
-                            <tr>
-                               
-                                <td>${form.title}</td>
-                                <td>${form.leads_count ?? 0}</td>
-                 
-                                <td>
-                                    <span class="badge bg-${form.group.color}">
-                                        ${form.group.name}
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="badge bg-${form.source.color}">
-                                        ${form.source.name}
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="badge bg-${form.stage.color}">
-                                        ${form.stage.name}
-                                    </span>
-                                </td>
-                                <td>
-                                    <button 
-                                    title="Edit"
-                                    data-toggle="tooltip"
-                                    class="btn btn-sm btn-warning edit-btn" 
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#updateModalWebToLead"
-                                        data-id="${form.id}"
-                                        data-source_id="${form.source_id}"
-                                        data-status_id="${form.status_id}"
-                                        data-group_id="${form.group_id}"
-                                        data-title="${form.title}">
-                                        <i class="fas fa-pencil-alt me-2"></i>
-                                    </button>
-                                    <button 
-                                    title="Delete"
-                                    data-toggle="tooltip"
-                                    class="btn btn-sm btn-danger delete-btn" 
-                                    data-id="${form.id}"
-                                    >
-                                        <i class="fas fa-trash me-2"></i>
-                                    </button>
-                                    
-                                    <button 
-                                    title="Generate Form"
-                                    data-toggle="tooltip"
-                                    class="btn btn-sm btn-outline-primary generate-btn" 
-                                    data-id="${form.id}"
-                                    >
-                                        <i class="fas fa-paper-plane me-2"></i>
-                                    </button>
+                <tr>
+                    <td>${form.title}</td>
+                    <td>${form.leads_count ?? 0}</td>
+                    <td>
+                        <span class="badge bg-${form.group.color}">
+                            ${form.group.name}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge bg-${form.source.color}">
+                            ${form.source.name}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge bg-${form.stage.color}">
+                            ${form.stage.name}
+                        </span>
+                    </td>
+                    <td>
+                        <button 
+                            title="Edit"
+                            class="btn btn-sm btn-warning edit-btn" 
+                            data-bs-toggle="modal"
+                            data-bs-target="#updateModalWebToLead"
+                            data-id="${form.id}"
+                            data-source_id="${form.source_id}"
+                            data-status_id="${form.status_id}"
+                            data-group_id="${form.group_id}"
+                            data-title="${form.title}">
+                            <i class="fas fa-pencil-alt me-2"></i>
+                        </button>
+                        <button 
+                            title="Delete"
+                            class="btn btn-sm btn-danger delete-btn" 
+                            data-id="${form.id}">
+                            <i class="fas fa-trash me-2"></i>
+                        </button>
+                        <button 
+                            title="Generate Form"
+                            class="mx-2 btn dt-link btn-sm btn-outline-primary generate-btn" 
+                            data-id="${form.id}">
+                            Share Form
+                        </button>
+                        <button 
+                            title="API for this form"
+                            class="mx-2 btn dt-link btn-sm btn-outline-secondary api-btn" 
+                            data-id="${form.id}">
+                            <i class="fas fa-code-branch"></i> View API
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
 
-                                   
-                                </td>
-                            </tr>
-                        `).join('');
-
-                            // Reinitialize event listeners for edit and delete buttons
+                            // Reinitialize DataTable
+                            $('#webLead').DataTable().destroy();
+                            reinitializeDataTable();
                             initializeEventListeners();
                         })
                         .catch(error => alert('Error:', error));
@@ -268,6 +280,7 @@
                                 bootstrap.Modal.getInstance(document.getElementById('createModalWebToLead'))
                                     .hide();
                                 this.reset();
+                                $('#webLead').DataTable().destroy();
                                 loadForms();
                                 // Show success message
                                 alert('Form created successfully');
@@ -297,6 +310,7 @@
                             if (data.success) {
                                 bootstrap.Modal.getInstance(document.getElementById('updateModalWebToLead'))
                                     .hide();
+                                $('#webLead').DataTable().destroy();
                                 loadForms();
                                 // Show success message
                                 alert('Form updated successfully');
@@ -353,12 +367,23 @@
                         });
                     });
 
-                    // Delete button handlers
+                    // generate button handlers
                     document.querySelectorAll('.generate-btn').forEach(button => {
                         button.addEventListener('click', function() {
 
                             let generateRoute =
                                 "{{ route(getPanelRoutes($module . '.leadFormSettingGenerate'), ['id' => ':id']) }}";
+                            generateRoute = generateRoute.replace(':id', this.dataset.id);
+
+                            window.location.href = generateRoute
+                        });
+                    });
+                    // api button handlers
+                    document.querySelectorAll('.api-btn').forEach(button => {
+                        button.addEventListener('click', function() {
+
+                            let generateRoute =
+                                "{{ route(getPanelRoutes('leads' . '.leadsToWebAPI'), ['id' => ':id']) }}";
                             generateRoute = generateRoute.replace(':id', this.dataset.id);
 
                             window.location.href = generateRoute

@@ -444,6 +444,8 @@ Route::middleware([
 
         Route::delete('/leadFormSettingDestory/{id}', [SettingsController::class, 'leadFormSettingDestory'])->name('leadFormSettingDestory')->middleware('check.permission:SETTINGS_LEADFORM.DELETE')->middleware('check.plans.features.enable:LEADS');
 
+
+
     });
     // upgrade routes
     Route::prefix(PANEL_MODULES['COMPANY_PANEL']['planupgrade'])->as(PANEL_MODULES['COMPANY_PANEL']['planupgrade'] . '.')->group(function () {
@@ -688,6 +690,10 @@ Route::middleware([
     
             Route::post('/attachment', [AttachmentController::class, 'addLeadsAttachment'])->name('attachment.create')->middleware('check.permission:LEADS.CREATE');
             Route::delete('/attachment/destroy/{id}', [AttachmentController::class, 'destroyLeadsAttachment'])->name('attachment.destroy')->middleware('check.permission:LEADS.DELETE');
+
+
+            // leads to web api
+            Route::get('/leadsToWebAPI/{id}', [LeadsController::class, 'leadsToWebAPI'])->name('leadsToWebAPI')->middleware('check.permission:SETTINGS_LEADFORM.DELETE')->middleware('check.plans.features.enable:LEADS');
 
         });
 

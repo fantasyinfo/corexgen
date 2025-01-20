@@ -658,6 +658,7 @@ class SettingsController extends Controller
      */
     public function leadFormSettingStore(Request $request)
     {
+       
         try {
             // Validate incoming request data
             $validatedData = $request->validate([
@@ -667,9 +668,9 @@ class SettingsController extends Controller
                 'status_id' => 'required|exists:category_group_tag,id',
             ]);
 
+            
             // Create the new WebToLeadForm entry
             $form = WebToLeadForm::create($validatedData);
-
 
             // Return success response
             return response()->json(['success' => true, 'form' => $form], 201);
@@ -695,6 +696,7 @@ class SettingsController extends Controller
         */
     public function leadFormSettingUpdate(Request $request)
     {
+       
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'group_id' => 'required|exists:category_group_tag,id',
@@ -702,9 +704,10 @@ class SettingsController extends Controller
             'status_id' => 'required|exists:category_group_tag,id',
             'id' => 'required|exists:web_to_leads_form,id'
         ]);
-
+   
         $form = WebToLeadForm::where('company_id', Auth::user()->company_id)->findOrFail($validated['id']);
         $form->update($validated);
+
 
         return response()->json(['success' => true, 'form' => $form]);
     }

@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use OwenIt\Auditing\Contracts\Auditable;
+use Illuminate\Support\Str;
 
 
 /**
@@ -175,6 +176,7 @@ class Company extends Model implements Auditable
 
         static::creating(function ($company) {
             $company->status = $company->status ?? CRM_STATUS_TYPES['COMPANIES']['STATUS']['ONBOARDING'];
+            $company->api_token = Str::uuid() ?? time();
             $company->tenant_id = Auth::user()->tenant_id ?? '1';
         });
 
