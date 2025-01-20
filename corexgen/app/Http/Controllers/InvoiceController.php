@@ -469,6 +469,7 @@ class InvoiceController extends Controller
                 ])->get();
 
 
+        // info('Payment Gateway', [$paymentGateways]);
 
 
         return view($this->getViewFilePath('viewOpen'), [

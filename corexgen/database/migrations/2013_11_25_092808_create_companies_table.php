@@ -23,7 +23,7 @@ return new class extends Migration
             $table->unsignedBigInteger('address_id')->nullable();
             $table->unsignedBigInteger('plan_id');
 
-            $table->text('api_token')->nullable()->index();
+            $table->string('api_token', 255)->nullable()->index();
 
             $table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('cascade');
             $table->foreign('address_id')->references('id')->on('addresses')->onDelete('cascade');

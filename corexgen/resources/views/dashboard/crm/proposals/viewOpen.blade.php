@@ -388,27 +388,30 @@
                                         <div class="mb-4">
                                             <h5 class="text-muted mb-3">Client Information</h5>
                                             <div class="table-responsive">
-                                                <table class="table table-borderless">
-                                                    <tbody>
-                                                        <tr>
-                                                            <td class="text-muted" style="width: 140px;">Name:</td>
-                                                            <td class="font-weight-bold">
-                                                                {{ $proposal->accepted_details['first_name'] }}
-                                                                {{ $proposal->accepted_details['last_name'] }}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="text-muted">Email:</td>
-                                                            <td class="font-weight-bold">
-                                                                {{ $proposal->accepted_details['email'] }}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="text-muted">Accepted On:</td>
-                                                            <td class="font-weight-bold">
-                                                                {{ formatDateTime($proposal->accepted_details['accepted_at']) }}
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
+                                                <div class="table-responsive">
+                                                    <table class="table table-borderless">
+                                                        <tbody>
+                                                            <tr>
+                                                               
+                                                                <td class="text-muted" style="width: 140px;">Name:</td>
+                                                                <td class="font-weight-bold">
+                                                                    {{ $proposal->accepted_details['first_name'] ?? $proposal?->typable?->first_name }}
+                                                                    {{ $proposal->accepted_details['last_name'] ?? $proposal?->typable?->last_name}}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="text-muted">Email:</td>
+                                                                <td class="font-weight-bold">
+                                                                    {{ $proposal->accepted_details['email'] ?? "" }}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="text-muted">Accepted On:</td>
+                                                                <td class="font-weight-bold">
+                                                                    {{ formatDateTime($proposal->accepted_details['accepted_at'] ?? now())  }}
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -416,7 +419,7 @@
                                         <div class="mb-4">
                                             <h5 class="text-muted mb-3">Digital Signature</h5>
                                             <div class="border rounded p-3 bg-light">
-                                                <img src="{{ $proposal->accepted_details['signature'] }}"
+                                                <img src="{{ $proposal->accepted_details['signature'] ?? 'Direct Accepted' }}"
                                                     alt="Digital Signature" class="img-fluid" style="max-height: 150px;">
                                             </div>
                                         </div>
