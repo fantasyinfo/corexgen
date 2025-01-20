@@ -38,10 +38,10 @@ if (!function_exists('isParentMenuActive')) {
 
 <style>
     .pro {
-        border: 1px dotted red;
+        border: 1px dotted #ffffff;
         padding: 3px 10px;
         color: var(--primary-color);
-        border-radius: 10px;
+        border-radius: 5px;
     }
 
     /*

@@ -76,5 +76,6 @@ class Kernel extends HttpKernel
         'payment.debug' => \App\Http\Middleware\DebugPaymentCallback::class,
         'company.onboarding' => \App\Http\Middleware\CompanyOnboarding::class,
         'company.timezone' =>  \App\Http\Middleware\CompanyTimezoneMiddleware::class,
+        'check.plans.features.enable' =>  \App\Http\Middleware\isPlansFeaturesActive::class,
     ];
 }
