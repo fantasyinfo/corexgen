@@ -49,6 +49,10 @@
 @endsection
 
 @push('scripts')
+    <script src="{{ asset('js/tinymce/tinymce.min.js') }}"></script>
+    <script>
+        let currentTheme = document.documentElement.getAttribute('data-bs-theme');
+    </script>
     <script>
         // Initialize the board
         $(document).ready(function() {
@@ -209,8 +213,8 @@
             <div class="task-header">
                 ${lead.title}
                 <div class="task-actions">
+                    ${ViewButtonHTML}
                     ${DeleteButtonHTML}
-                ${ViewButtonHTML}
                 </div>
             </div>
    
@@ -517,6 +521,7 @@
             loadCommentsScripts();
             loadAttachmentsScripts();
             loadTimeSheetScripts();
+            loadAssingeeScripts();
             // Add any other initialization code here
         }
 
@@ -869,6 +874,79 @@
             }
         }
 
+        function openAssigneeModal() {
+            document.getElementById('modalBackdrop').classList.remove('hidden');
+            document.getElementById('assigneeModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAssigneeModal() {
+            document.getElementById('modalBackdrop').classList.add('hidden');
+            document.getElementById('assigneeModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function loadAssingeeScripts() {
+
+
+            // Close modal when clicking outside
+            document.getElementById('modalBackdrop').addEventListener('click', closeAssigneeModal);
+
+            // Close modal with escape key
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    closeAssigneeModal();
+                }
+            });
+
+            // Prevent modal from closing when clicking inside the modal content
+            document.querySelector('#assigneeModal .modal-content').addEventListener('click', function(event) {
+                event.stopPropagation();
+            });
+
+            // Handle AJAX form submission
+            $('#assigneeForm').on('submit', function(event) {
+                event.preventDefault(); // Prevent the default form submission
+
+                const form = this;
+                const formData = new FormData(form);
+
+                // Disable submit button to prevent multiple submissions
+                const submitButton = form.querySelector('button[type="submit"]');
+                submitButton.disabled = true;
+                submitButton.innerText = 'Saving...';
+
+                $.ajax({
+                    url: $(form).attr('action'),
+                    method: 'POST',
+                    data: formData,
+                    processData: false, // Required for FormData
+                    contentType: false, // Required for FormData
+                    success: function(response) {
+                        // Handle success
+                        alert(
+                            'Team members assigned successfully!, Reload the page to view new assingees'
+                        );
+                        closeAssigneeModal();
+
+                        // Optionally update the UI dynamically
+                        // For example, refresh a list of team members
+                        // $('#assigneeList').html(response.updatedHTML); // Example
+                    },
+                    error: function(xhr, status, error) {
+                        // Handle errors
+                        console.error('Error:', xhr.responseText);
+                        alert('An error occurred while assigning team members.');
+                    },
+                    complete: function() {
+                        // Re-enable the submit button
+                        submitButton.disabled = false;
+                        submitButton.innerText = 'Save';
+                    }
+                });
+            });
+        }
+
         function loadAttachmentsScripts() {
             $(document).ready(function() {
                 // Initialize variables
@@ -993,7 +1071,7 @@
                                    </button>` :
                                     '';
 
-                                $('.note-list').prepend(`
+                                $('.attachments-list').prepend(`
                                 <div class="attachment-item mb-4" data-id="${attachment.id}">
                                     <div class="d-flex">
                                         <div class="attachment-icon">

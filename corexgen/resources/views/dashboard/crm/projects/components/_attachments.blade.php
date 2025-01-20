@@ -201,9 +201,10 @@
     </style>
 @endpush
 <div class="files-section">
+    <h6><i class="fas fa-paperclip me-2"></i> Attachments</h6>
     <div class="row">
         <div class="col-lg-12">
-            <div class="file-upload-area mb-3">
+            <div class="file-upload-area mb-3 kanban-border">
                 <form id="mediaForm" method="POST" action="{{ route(getPanelRoutes('projects.attachment.create')) }}"
                     enctype="multipart/form-data">
                     @csrf
@@ -216,13 +217,13 @@
                     <div class="file-list my-2">
                         <ul id="fileList"></ul>
                     </div>
-                    <div class="d-flex justify-content-center my-2">
-                        <button class="btn btn-primary mt-2 " type="submit">Upload</button>
+                    <div class="d-flex justify-content-end my-2 mw-2">
+                        <button class="btn btn-primary mt-2 mx-2" type="submit">Upload</button>
                     </div>
                 </form>
             </div>
 
-            <div class="note-list">
+            <div class="attachments-list">
                 @php
                     $deletePermission =
                         isset($permissions['DELETE']) &&
@@ -408,7 +409,7 @@
                                    </button>` :
                                 '';
 
-                            $('.note-list').prepend(`
+                            $('.attachments-list').prepend(`
                                 <div class="attachment-item mb-4" data-id="${attachment.id}">
                                     <div class="d-flex">
                                         <div class="attachment-icon">

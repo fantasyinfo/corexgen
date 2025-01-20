@@ -661,10 +661,10 @@ table.celled {
 }
 
 .kanban-border {
-    border-width: 1px;
+    border-width: 2px;
     border-style: solid;
     border-image: initial;
-    border-color: var(--task-columns-cards-border);
+    border-color: var(--primary-color);
     border-radius: 10px;
     -webkit-border-radius: 10px;
     -moz-border-radius: 10px;
