@@ -71,6 +71,7 @@ $GLOBALS['default_user_cache'] = null;
  */
 function isFeatureEnabled($module)
 {
+ 
     // Check if user is not logged in or has no company_id
     if (isDefaultUser() === true) {
         return true;
