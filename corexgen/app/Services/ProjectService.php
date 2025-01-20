@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Helpers\PermissionsHelper;
 use App\Models\Project;
+use App\Models\User;
 use App\Repositories\ProjectRepository;
 use App\Traits\CategoryGroupTagsFilter;
 use App\Traits\MediaTrait;
@@ -87,14 +88,13 @@ class ProjectService
             $existingAssignees = $project->assignees()->pluck('project_user.user_id')->sort()->values()->toArray();
             $newAssignees = collect($validatedData['assign_to'])->sort()->values()->toArray();
 
-            // Skip if assignees are identical - NO NEED TO CREATE AUDIT
-            if ($existingAssignees === $newAssignees) {
-                return;
-            }
+         // Find users to add and remove
+         $usersToAdd = array_diff($newAssignees, $existingAssignees);
+         $usersToRemove = array_diff($existingAssignees, $newAssignees);
 
             // Prepare data for pivot table
             $companyId = Auth::user()->company_id;
-            $assignToData = collect($validatedData['assign_to'])->mapWithKeys(function ($userId) use ($companyId) {
+            $assignToData = collect($usersToAdd)->mapWithKeys(function ($userId) use ($companyId) {
                 return [
                     $userId => [
                         'company_id' => $companyId,
@@ -104,22 +104,50 @@ class ProjectService
                 ];
             })->toArray();
 
-            // Sync assignments
-            $project->assignees()->sync($assignToData);
+ 
+            // Add new users
+            if (!empty($usersToAdd)) {
+
+                $project->assignees()->attach($assignToData);
+        
+                // Send emails to new users
+                foreach ($usersToAdd as $userId) {
+                    // Trigger email logic here
+                    $this->sendEmailToUser($userId, $project);
+                }
+            }
+
+            // Remove users who are no longer assigned
+            if (!empty($usersToRemove)) {
+      
+                $project->assignees()->detach($usersToRemove);
+            }
+
+          
 
         } else {
             // Handle detachment of assignees
             $existingAssignees = $project->assignees()->pluck('project_user.user_id')->toArray();
 
-            if (empty($existingAssignees)) {
-                return; // No existing assignees, skip detachment and logging
+            if (!empty($existingAssignees)) {
+                $project->assignees()->detach();
             }
-
-            $project->assignees()->detach();
 
 
         }
     }
+
+
+      // Example email sending logic
+      private function sendEmailToUser($userId, Project $project)
+      {
+          // Replace with your email sending logic
+          $user = User::find($userId);
+          //todo: send email to new assingee users 
+        //   info('new users to project', $user->toArray());
+  
+      }
+
 
     /**
      * get all projects

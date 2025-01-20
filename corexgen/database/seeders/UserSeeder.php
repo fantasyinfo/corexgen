@@ -14,7 +14,7 @@ class UserSeeder extends Seeder
 
     protected $companyId;
 
-    public function __construct( int $companyId = 5) {
+    public function __construct( int $companyId = 1) {
         $this->companyId = $companyId;
     }
     public function run(): void
