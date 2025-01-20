@@ -7,6 +7,7 @@ use App\Models\Address;
 use App\Models\CategoryGroupTag;
 use App\Models\City;
 use App\Models\CRM\CRMLeads;
+use App\Models\User;
 use App\Repositories\LeadsRepository;
 use App\Traits\CategoryGroupTagsFilter;
 use App\Traits\MediaTrait;
@@ -219,14 +220,14 @@ class LeadsService
             $existingAssignees = $lead->assignees()->pluck('lead_user.user_id')->sort()->values()->toArray();
             $newAssignees = collect($validatedData['assign_to'])->sort()->values()->toArray();
 
-            // Skip if assignees are identical - NO NEED TO CREATE AUDIT
-            if ($existingAssignees === $newAssignees) {
-                return;
-            }
+            // Find users to add and remove
+            $usersToAdd = array_diff($newAssignees, $existingAssignees);
+            $usersToRemove = array_diff($existingAssignees, $newAssignees);
 
             // Prepare data for pivot table
             $companyId = Auth::user()->company_id;
-            $assignToData = collect($validatedData['assign_to'])->mapWithKeys(function ($userId) use ($companyId) {
+        
+            $assignToData = collect($usersToAdd)->mapWithKeys(function ($userId) use ($companyId) {
                 return [
                     $userId => [
                         'company_id' => $companyId,
@@ -236,21 +237,48 @@ class LeadsService
                 ];
             })->toArray();
 
-            // Sync assignments
-            $lead->assignees()->sync($assignToData);
+       
+
+            // Add new users
+            if (!empty($usersToAdd)) {
+
+                $lead->assignees()->attach($assignToData);
+        
+                // Send emails to new users
+                foreach ($usersToAdd as $userId) {
+                    // Trigger email logic here
+                    $this->sendEmailToUser($userId, $lead);
+                }
+            }
+
+            // Remove users who are no longer assigned
+            if (!empty($usersToRemove)) {
+      
+                $lead->assignees()->detach($usersToRemove);
+            }
+
+
+          
 
         } else {
             // Handle detachment of assignees
             $existingAssignees = $lead->assignees()->pluck('lead_user.user_id')->toArray();
 
-            if (empty($existingAssignees)) {
-                return; // No existing assignees, skip detachment and logging
+            if (!empty($existingAssignees)) {
+                $lead->assignees()->detach();
             }
-
-            $lead->assignees()->detach();
 
 
         }
+    }
+
+    // Example email sending logic
+    private function sendEmailToUser($userId, CRMLeads $lead)
+    {
+        // Replace with your email sending logic
+        $user = User::find($userId);
+        //todo: send email to new assingee users 
+
     }
 
 

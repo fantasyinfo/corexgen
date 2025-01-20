@@ -391,20 +391,21 @@
                                                 <table class="table table-borderless">
                                                     <tbody>
                                                         <tr>
+                                                           
                                                             <td class="text-muted" style="width: 140px;">Name:</td>
                                                             <td class="font-weight-bold">
-                                                                {{ $estimate->accepted_details['first_name'] }}
-                                                                {{ $estimate->accepted_details['last_name'] }}</td>
+                                                                {{ $estimate->accepted_details['first_name'] ?? $estimate?->typable?->first_name }}
+                                                                {{ $estimate->accepted_details['last_name'] ?? $estimate?->typable?->last_name}}</td>
                                                         </tr>
                                                         <tr>
                                                             <td class="text-muted">Email:</td>
                                                             <td class="font-weight-bold">
-                                                                {{ $estimate->accepted_details['email'] }}</td>
+                                                                {{ $estimate->accepted_details['email'] ?? "" }}</td>
                                                         </tr>
                                                         <tr>
                                                             <td class="text-muted">Accepted On:</td>
                                                             <td class="font-weight-bold">
-                                                                {{ formatDateTime($estimate->accepted_details['accepted_at']) }}
+                                                                {{ formatDateTime($estimate->accepted_details['accepted_at'] ?? now())  }}
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -416,7 +417,7 @@
                                         <div class="mb-4">
                                             <h5 class="text-muted mb-3">Digital Signature</h5>
                                             <div class="border rounded p-3 bg-light">
-                                                <img src="{{ $estimate->accepted_details['signature'] }}"
+                                                <img src="{{ $estimate->accepted_details['signature'] ?? '' }}"
                                                     alt="Digital Signature" class="img-fluid" style="max-height: 150px;">
                                             </div>
                                         </div>

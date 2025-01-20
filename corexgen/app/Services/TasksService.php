@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Helpers\PermissionsHelper;
 use App\Models\CategoryGroupTag;
 use App\Models\Tasks;
+use App\Models\User;
 use App\Repositories\TasksRepository;
 use App\Traits\CategoryGroupTagsFilter;
 use App\Traits\TenantFilter;
@@ -107,18 +108,17 @@ class TasksService
     public function assignTasksToUserIfProvided(array $validatedData, Tasks $task)
     {
         if (!empty($validatedData['assign_to']) && is_array($validatedData['assign_to'])) {
-            // Retrieve current assignees from the database
-            $existingAssignees = $task->assignees()->pluck('task_user.user_id')->sort()->values()->toArray();
-            $newAssignees = collect($validatedData['assign_to'])->sort()->values()->toArray();
+            // Retrieve current and new assignee lists
+            $existingAssignees = $task->assignees()->pluck('task_user.user_id')->toArray();
+            $newAssignees = $validatedData['assign_to'];
 
-            // Skip if assignees are identical - NO NEED TO CREATE AUDIT
-            if ($existingAssignees === $newAssignees) {
-                return;
-            }
+            // Find users to add and remove
+            $usersToAdd = array_diff($newAssignees, $existingAssignees);
+            $usersToRemove = array_diff($existingAssignees, $newAssignees);
 
             // Prepare data for pivot table
             $companyId = Auth::user()->company_id;
-            $assignToData = collect($validatedData['assign_to'])->mapWithKeys(function ($userId) use ($companyId) {
+            $assignToData = collect($usersToAdd)->mapWithKeys(function ($userId) use ($companyId) {
                 return [
                     $userId => [
                         'company_id' => $companyId,
@@ -128,22 +128,38 @@ class TasksService
                 ];
             })->toArray();
 
-            // Sync assignments
-            $task->assignees()->sync($assignToData);
-
-        } else {
-            // Handle detachment of assignees
-            $existingAssignees = $task->assignees()->pluck('task_user.user_id')->toArray();
-
-            if (empty($existingAssignees)) {
-                return; // No existing assignees, skip detachment and logging
+            // Add new users
+            if (!empty($usersToAdd)) {
+                $task->assignees()->attach($assignToData);
+                // Send emails to new users
+                foreach ($usersToAdd as $userId) {
+                    // Trigger email logic here
+                    $this->sendEmailToUser($userId, $task);
+                }
             }
 
-            $task->assignees()->detach();
+            // Remove users who are no longer assigned
+            if (!empty($usersToRemove)) {
+                $task->assignees()->detach($usersToRemove);
+            }
+        } else {
+            // Handle detachment of all assignees
+            $existingAssignees = $task->assignees()->pluck('task_user.user_id')->toArray();
 
-
+            if (!empty($existingAssignees)) {
+                $task->assignees()->detach();
+            }
         }
     }
+
+    // Example email sending logic
+    private function sendEmailToUser($userId, Tasks $task)
+    {
+        // Replace with your email sending logic
+        $user = User::find($userId);
+        //todo: send email to new assingee users 
+    }
+
 
     /**
      *  get tasks by user

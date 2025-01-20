@@ -1272,20 +1272,19 @@ class LeadsController extends Controller
 
             // Log the incoming lead attempt
             Log::info('New lead form submission', [
-                'company_id' => $validated['company_id'],
                 'email' => $validated['email'],
                 'source' => $validated['source_id'],
             ]);
 
-            // Validate category group tags (custom logic)
-            $this->validateCategoryGroupTags($validated);
-
-
+            
+            
             // create required fields dynamically via api token and form uuid
             $validated['company_id'] = $company->id;
             $validated['web_to_leads_form_id'] = $form->id;
             $validated['web_to_leads_form_uuid'] = $form->uuid;
-
+            
+            // Validate category group tags (custom logic)
+            $this->validateCategoryGroupTags($validated);
 
             // Create the lead
             $lead = $this->leadsService->createLead($validated);

@@ -24,8 +24,8 @@ class TasksSeeder extends Seeder
     public function run(): void
     {
         $faker = Faker::create();
-        $loginUserId = 112;
-        $companyId = 10;
+        $loginUserId = 2;
+        $companyId = 1;
 
         // Fetch statuses and ensure they are available
         $statusIds = CategoryGroupTag::where('type', CATEGORY_GROUP_TAGS_TYPES['KEY']['tasks_status'])
@@ -49,10 +49,10 @@ class TasksSeeder extends Seeder
 
         // Fetch project IDs
         $projectIds = $this->projectService->getAllProjects()->pluck('id')->toArray();
-        if (!$projectIds) {
-            $this->command->warn('No projects found. Seeder will not run.');
-            return;
-        }
+        // if (!$projectIds) {
+        //     $this->command->warn('No projects found. Seeder will not run.');
+        //     return;
+        // }
 
         for ($i = 0; $i <= 100; $i++) {
             $startDate = $faker->date();
@@ -64,7 +64,7 @@ class TasksSeeder extends Seeder
                 'start_date' => $startDate,
                 'due_date' => $dueDate,
                 'related_to' => TASKS_RELATED_TO['TABLE_STATUS'][array_rand(TASKS_RELATED_TO['TABLE_STATUS'])],
-                'project_id' => $projectIds[array_rand($projectIds)],
+                'project_id' => $projectIds ? $projectIds[array_rand($projectIds)] : null,
                 'hourly_rate' => $faker->numberBetween(1111, 9999),
                 'description' => $faker->text(300),
                 'priority' => ['Low', 'Medium', 'High', 'Urgent'][array_rand(['Low', 'Medium', 'High', 'Urgent'])],

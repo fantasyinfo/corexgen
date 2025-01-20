@@ -697,6 +697,35 @@
         function loadAssingeeScripts() {
 
 
+            document.addEventListener('DOMContentLoaded', () => {
+                document.querySelectorAll('.custom-select').forEach(select => {
+                    const searchInput = select.querySelector('.search-input');
+                    const items = select.querySelectorAll('.dropdown-item');
+
+                    // Search functionality
+                    searchInput.addEventListener('input', (e) => {
+                        const searchValue = e.target.value.toLowerCase()
+                            .trim(); // Trim spaces for better search handling
+                        items.forEach(item => {
+                            const labelText = item.querySelector('label').textContent
+                                .toLowerCase();
+                            if (labelText.includes(searchValue)) {
+                                item.style.display = 'block';
+                            } else {
+                                item.style.display = 'none';
+                            }
+                        });
+                    });
+
+                    // Prevent dropdown from closing when clicking an input
+                    select.querySelectorAll('input[type="checkbox"], input[type="radio"], label').forEach(
+                        input => {
+                            input.addEventListener('click', (e) => {
+                                e.stopPropagation(); // Keep dropdown open
+                            });
+                        });
+                });
+            });
             // Close modal when clicking outside
             document.getElementById('modalBackdrop').addEventListener('click', closeAssigneeModal);
 
@@ -734,7 +763,7 @@
                         // Handle success
                         alert(
                             'Team members assigned successfully!, Reload the page to view new assingees'
-                            );
+                        );
                         closeAssigneeModal();
 
                         // Optionally update the UI dynamically
@@ -753,7 +782,10 @@
                     }
                 });
             });
+
+
         }
+
 
         // Delete task
         function deleteTask(taskId) {

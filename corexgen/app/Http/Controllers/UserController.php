@@ -940,7 +940,7 @@ class UserController extends Controller
             // Start new session
             request()->session()->flush();
             request()->session()->regenerate(true); // true parameter forces regeneration
-
+            session()->regenerateToken(); 
             // Login the new user
             $guard->loginUsingId($user->id);
 
@@ -1013,7 +1013,7 @@ class UserController extends Controller
             // Start new session
             request()->session()->flush();
             request()->session()->regenerate(true); // true parameter forces regeneration
-
+            session()->regenerateToken(); 
             // Login the user
             $guard->loginUsingId($user->id);
 

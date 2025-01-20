@@ -43,57 +43,69 @@ class StripePaymentGateway implements PaymentGatewayInterface
      */
     public function initialize(array $paymentDetails)
     {
-        if (isset($paymentDetails['config_key']) && isset($paymentDetails['config_value']) && isset($paymentDetails['mode'])) {
-            $accessToken = $this->getStripeSecretKey(
-                $paymentDetails['config_key'],
-                $paymentDetails['config_value'],
-                $paymentDetails['mode']
-            );
-            \Log::info('from company');
-        } else {
-            $accessToken = $this->getStripeSecretKey();
-            \Log::info('from tenant ');
-        }
+        try {
+            // Initialize Stripe API key
+            if (isset($paymentDetails['config_key']) && isset($paymentDetails['config_value']) && isset($paymentDetails['mode'])) {
+                $accessToken = $this->getStripeSecretKey(
+                    $paymentDetails['config_key'],
+                    $paymentDetails['config_value'],
+                    $paymentDetails['mode']
+                );
+                \Log::info('from company');
+            } else {
+                $accessToken = $this->getStripeSecretKey();
+                \Log::info('from tenant');
+            }
 
-        \Log::info('Stripe API Key from StripePaymentGateway Service: ', [$accessToken]);
-        Stripe::setApiKey($accessToken); // 
+            \Log::info('Stripe API Key from StripePaymentGateway Service: ', [$accessToken]);
+            Stripe::setApiKey($accessToken);
 
-        $session = Session::create([
-            'payment_method_types' => ['card'],
-            'line_items' => [
-                [
-                    'price_data' => [
-                        'currency' => $paymentDetails['currency'] ?? 'usd',
-                        'unit_amount' => $paymentDetails['amount'] * 100,
-                        'product_data' => [
-                            'name' => $paymentDetails['description'] ?? 'Subscription',
+          
+
+            // Create Stripe session
+            $session = Session::create([
+                'payment_method_types' => ['card'],
+                'line_items' => [
+                    [
+                        'price_data' => [
+                            'currency' => $paymentDetails['currency'] ?? 'usd',
+                            'unit_amount' => $paymentDetails['amount'] * 100,
+                            'product_data' => [
+                                'name' => $paymentDetails['description'] ?? 'Subscription',
+                            ],
                         ],
-                    ],
-                    'quantity' => 1,
-                ]
-            ],
-            'mode' => 'payment',
-            'success_url' => route('payment.success', ['gateway' => 'stripe']) . '?session_id={CHECKOUT_SESSION_ID}',
-            'cancel_url' => route('payment.cancel', ['gateway' => 'stripe']),
-            'metadata' => $paymentDetails['metadata'],
-        ]);
+                        'quantity' => 1,
+                    ]
+                ],
+                'mode' => 'payment',
+                'success_url' => route('payment.success', ['gateway' => 'stripe']) . '?session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url' => route('payment.cancel', ['gateway' => 'stripe']),
+                'metadata' => $paymentDetails['metadata'],
+            ]);
 
+            if (!$session) {
+                return redirect()->back()->with('error', 'Unable to create Stripe session. Please try again.');
+            }
 
-        // Store config in database as backup
-        if (isset($paymentDetails['config_key'])) {
-            PaymentGatewayStoreSession::updateOrCreate(
-                ['session_id' => $session->id, 'company_id' => $paymentDetails['metadata']['company_id']],
-                [
-                    'config_key' => $paymentDetails['config_key'],
-                    'config_value' => encrypt($paymentDetails['config_value']),
-                    'mode' => $paymentDetails['mode'],
+            // Store config in database if config_key exists
+            if (isset($paymentDetails['config_key'])) {
+                PaymentGatewayStoreSession::updateOrCreate(
+                    ['session_id' => $session->id, 'company_id' => $paymentDetails['metadata']['company_id']],
+                    [
+                        'config_key' => $paymentDetails['config_key'],
+                        'config_value' => encrypt($paymentDetails['config_value']),
+                        'mode' => $paymentDetails['mode'],
+                    ]
+                );
+            }
 
-                ]
-            );
+            return $session->url;
+
+        } catch (\Stripe\Exception\ApiErrorException $e) {
+            return redirect()->back()->with('error', 'Stripe error: ' . $e->getMessage());
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'An unexpected error occurred: ' . $e->getMessage());
         }
-
-
-        return $session->url;
     }
 
     /**

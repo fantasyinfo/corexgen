@@ -102,7 +102,7 @@
                                         <h5>API Key Header</h5>
                                         <div class="code-block">
                                             <button class="btn btn-sm btn-primary copy-btn">Copy</button>
-                                            <span class="px-2 mx-2">X-API-Key: </span> <pre><code id="apiKey">{{ Auth::user()?->company?->api_token }}</code></pre>
+                                            <span class="px-2 mx-2 text-white">X-API-Key: </span> <pre><code id="apiKey">{{ Auth::user()?->company?->api_token }}</code></pre>
                                         </div>
                                         <p class="text-muted mt-2">Include this header in all API requests</p>
                                     </div>
