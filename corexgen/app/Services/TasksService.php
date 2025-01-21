@@ -6,6 +6,7 @@ use App\Helpers\PermissionsHelper;
 use App\Models\CategoryGroupTag;
 use App\Models\Tasks;
 use App\Models\User;
+use App\Notifications\TaskAssingeeToUser;
 use App\Repositories\TasksRepository;
 use App\Traits\CategoryGroupTagsFilter;
 use App\Traits\TenantFilter;
@@ -155,9 +156,15 @@ class TasksService
     // Example email sending logic
     private function sendEmailToUser($userId, Tasks $task)
     {
+       
         // Replace with your email sending logic
-        $user = User::find($userId);
+        $assigneeTo = User::find($userId);
         //todo: send email to new assingee users 
+        // Notify all assignees
+        $assigneeBy = Auth::user();
+        $mailSettings = $assigneeBy->company->getMailSettings();
+
+        $assigneeTo->notify(new TaskAssingeeToUser($task, $assigneeBy, $assigneeTo, $mailSettings));
     }
 
 

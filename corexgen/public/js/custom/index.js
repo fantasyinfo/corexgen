@@ -36,18 +36,18 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
     }
-    const dateTimeInput = document.querySelectorAll(
-        'input[type="datetime-local"]'
-    );
-    if (dateTimeInput.length > 0 && typeof flatpickr !== "undefined") {
-        dateTimeInput.forEach((input) => {
-            flatpickr(input, {
-                enableTime: true,
-                altInput: true,
-                defaultDate: input.value,
-            });
-        });
-    }
+    // const dateTimeInput = document.querySelectorAll(
+    //     'input[type="datetime-local"]'
+    // );
+    // if (dateTimeInput.length > 0 && typeof flatpickr !== "undefined") {
+    //     dateTimeInput.forEach((input) => {
+    //         flatpickr(input, {
+    //             enableTime: true,
+    //             altInput: true,
+    //             defaultDate: input.value,
+    //         });
+    //     });
+    // }
 
     // Sidebar functionality
     const sidebarToggle = document.getElementById("sidebarToggle");

@@ -7,9 +7,11 @@ use App\Helpers\PermissionsHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TasksEditRequest;
 use App\Http\Requests\TasksRequest;
+use App\Models\CategoryGroupTag;
 use App\Models\Milestone;
 use App\Models\Tasks;
 use App\Models\Timesheet;
+use App\Notifications\TasksStatusChanged;
 use App\Services\ContractService;
 use App\Services\EstimateService;
 use App\Services\ProjectService;
@@ -544,39 +546,50 @@ class TasksController extends Controller
 
 
     // kanban board stuff
+
     /**
-     * change stage the task
+     * Change stage of the task.
      */
     public function changeStage($leadid, $stageid)
     {
-
         try {
-            Tasks::query()->where('id', '=', $leadid)->update(['status_id' => $stageid]);
+            // Fetch the task
+            $task = Tasks::with('assignees')->findOrFail($leadid);
 
-            if (isset($_GET['from_kanban']) && $_GET['from_kanban']) {
-                // Return success response as JSON
+            // Fetch the new status
+            $newStatus = CategoryGroupTag::findOrFail($stageid);
+
+            // Update the task's status
+            $task->update(['status_id' => $stageid]);
+
+            // Notify all assignees
+            $user = Auth::user();
+            $mailSettings = $user->company->getMailSettings();
+
+      
+
+            foreach ($task->assignees as $assignee) {
+
+                $assignee->notify(new TasksStatusChanged($task, $user, $newStatus, $mailSettings));
+            }
+
+            if (request()->has('from_kanban') && request()->get('from_kanban')) {
                 return response()->json([
                     'success' => true,
-                    'message' => 'Tasks status changed successfully.',
+                    'message' => 'Task status changed successfully.',
                 ]);
             }
 
-            // for table view
-            return redirect()->back()->with('success', 'Tasks stage changed successfully.');
-
+            return redirect()->back()->with('success', 'Task stage changed successfully.');
         } catch (\Exception $e) {
-
-            if (isset($_GET['from_kanban']) && $_GET['from_kanban']) {
-                // Handle any exceptions and return error as JSON
+            if (request()->has('from_kanban') && request()->get('from_kanban')) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Failed to change the tasks stages: ' . $e->getMessage(),
-                ], 500); // Use HTTP stages 500 for errors
+                    'message' => 'Failed to change task status: ' . $e->getMessage(),
+                ], 500);
             }
 
-            // for table view
-
-            return redirect()->back()->with('error', 'Failed to changed the tasks stages: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to change task status: ' . $e->getMessage());
         }
     }
 
@@ -728,5 +741,4 @@ class TasksController extends Controller
             return redirect()->back()->with('error', 'Failed to addedd the task assingee: ' . $e->getMessage());
         }
     }
-
 }

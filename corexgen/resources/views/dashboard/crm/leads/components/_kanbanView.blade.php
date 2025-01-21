@@ -2,7 +2,7 @@
 @section('content')
     <div class="modal-content">
         <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Leads View</h5>
+            <h5 class="modal-title" id="exampleModalLabel">Leads View    <a class="dt-link mx-2" href="{{route(getPanelRoutes('leads.view'),['id' => $lead->id])}}">View in Details</a></h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">

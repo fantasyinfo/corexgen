@@ -28,7 +28,7 @@ class SendProposal implements ShouldQueue
         $this->viewPath = $viewPath;
     }
 
-     /**
+    /**
      * send proposal on email job
      */
     public function handle()
@@ -37,10 +37,10 @@ class SendProposal implements ShouldQueue
         $pdf = PDF::loadView($this->viewPath, [
             'proposal' => $this->proposal
         ]);
-        
+
         // Generate temporary file path for PDF
         $pdfPath = storage_path('app/temp/proposal_' . $this->proposal->id . '.pdf');
-        
+
         // Save PDF temporarily
         $pdf->save($pdfPath);
 
@@ -52,6 +52,14 @@ class SendProposal implements ShouldQueue
 
         // Configure mail settings for this specific email
         config([
+            'mail.mailers.smtp.host' => $this->mailSettings['Mail Host'],
+            'mail.mailers.smtp.port' => (int) $this->mailSettings['Mail Port'],
+            'mail.mailers.smtp.username' => $this->mailSettings['Mail Username'],
+            'mail.mailers.smtp.password' => $this->mailSettings['Mail Password'],
+            'mail.from.address' => $this->mailSettings['Mail From Address'],
+            'mail.from.name' => $this->mailSettings['Mail From Name'] ?? config('app.name'),
+        ]);
+        info('Mail Settings', [
             'mail.mailers.smtp.host' => $this->mailSettings['Mail Host'],
             'mail.mailers.smtp.port' => (int) $this->mailSettings['Mail Port'],
             'mail.mailers.smtp.username' => $this->mailSettings['Mail Username'],
