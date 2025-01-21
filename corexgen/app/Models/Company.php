@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\CRM\CRMClients;
 use App\Models\CRM\CRMLeads;
+use App\Models\CRM\CRMSettings;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -166,6 +167,18 @@ class Company extends Model implements Auditable
     {
         return self::count();
     }
+
+    /**
+     * get mail settings for the company
+     */
+    public function getMailSettings($companyId = null)
+    {
+        return CRMSettings::where('company_id', $companyId ?? $this->id)
+            ->where('type', 'Mail')
+            ->select('key', 'value')
+            ->pluck('value', 'key')->toArray();
+    }
+
 
     /**
      * Boot method to handle model events

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Helpers\PermissionsHelper;
 use App\Models\Project;
 use App\Models\User;
+use App\Notifications\ProjectAssingeeToUser;
 use App\Repositories\ProjectRepository;
 use App\Traits\CategoryGroupTagsFilter;
 use App\Traits\MediaTrait;
@@ -88,9 +89,9 @@ class ProjectService
             $existingAssignees = $project->assignees()->pluck('project_user.user_id')->sort()->values()->toArray();
             $newAssignees = collect($validatedData['assign_to'])->sort()->values()->toArray();
 
-         // Find users to add and remove
-         $usersToAdd = array_diff($newAssignees, $existingAssignees);
-         $usersToRemove = array_diff($existingAssignees, $newAssignees);
+            // Find users to add and remove
+            $usersToAdd = array_diff($newAssignees, $existingAssignees);
+            $usersToRemove = array_diff($existingAssignees, $newAssignees);
 
             // Prepare data for pivot table
             $companyId = Auth::user()->company_id;
@@ -104,12 +105,12 @@ class ProjectService
                 ];
             })->toArray();
 
- 
+
             // Add new users
             if (!empty($usersToAdd)) {
 
                 $project->assignees()->attach($assignToData);
-        
+
                 // Send emails to new users
                 foreach ($usersToAdd as $userId) {
                     // Trigger email logic here
@@ -119,11 +120,11 @@ class ProjectService
 
             // Remove users who are no longer assigned
             if (!empty($usersToRemove)) {
-      
+
                 $project->assignees()->detach($usersToRemove);
             }
 
-          
+
 
         } else {
             // Handle detachment of assignees
@@ -138,15 +139,19 @@ class ProjectService
     }
 
 
-      // Example email sending logic
-      private function sendEmailToUser($userId, Project $project)
-      {
-          // Replace with your email sending logic
-          $user = User::find($userId);
-          //todo: send email to new assingee users 
-        //   info('new users to project', $user->toArray());
-  
-      }
+    // Example email sending logic
+    private function sendEmailToUser($userId, Project $project)
+    {
+        // Replace with your email sending logic
+        $assigneeTo = User::find($userId);
+        //todo: send email to new assingee users 
+        // Notify all assignees
+        $assigneeBy = Auth::user();
+        $mailSettings = $assigneeBy->company->getMailSettings();
+
+        $assigneeTo->notify(new ProjectAssingeeToUser($project, $assigneeBy, $assigneeTo, $mailSettings));
+
+    }
 
 
     /**

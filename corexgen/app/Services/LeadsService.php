@@ -8,6 +8,7 @@ use App\Models\CategoryGroupTag;
 use App\Models\City;
 use App\Models\CRM\CRMLeads;
 use App\Models\User;
+use App\Notifications\LeadAssingeeToUser;
 use App\Repositories\LeadsRepository;
 use App\Traits\CategoryGroupTagsFilter;
 use App\Traits\MediaTrait;
@@ -226,7 +227,7 @@ class LeadsService
 
             // Prepare data for pivot table
             $companyId = Auth::user()->company_id;
-        
+
             $assignToData = collect($usersToAdd)->mapWithKeys(function ($userId) use ($companyId) {
                 return [
                     $userId => [
@@ -237,13 +238,13 @@ class LeadsService
                 ];
             })->toArray();
 
-       
+
 
             // Add new users
             if (!empty($usersToAdd)) {
 
                 $lead->assignees()->attach($assignToData);
-        
+
                 // Send emails to new users
                 foreach ($usersToAdd as $userId) {
                     // Trigger email logic here
@@ -253,12 +254,12 @@ class LeadsService
 
             // Remove users who are no longer assigned
             if (!empty($usersToRemove)) {
-      
+
                 $lead->assignees()->detach($usersToRemove);
             }
 
 
-          
+
 
         } else {
             // Handle detachment of assignees
@@ -273,11 +274,17 @@ class LeadsService
     }
 
     // Example email sending logic
+
     private function sendEmailToUser($userId, CRMLeads $lead)
     {
         // Replace with your email sending logic
-        $user = User::find($userId);
+        $assigneeTo = User::find($userId);
         //todo: send email to new assingee users 
+        // Notify all assignees
+        $assigneeBy = Auth::user();
+        $mailSettings = $assigneeBy->company->getMailSettings();
+
+        $assigneeTo->notify(new LeadAssingeeToUser($lead, $assigneeBy, $assigneeTo, $mailSettings));
 
     }
 

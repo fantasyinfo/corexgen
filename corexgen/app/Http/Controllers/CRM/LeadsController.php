@@ -7,9 +7,11 @@ use App\Helpers\PermissionsHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LeadsEditRequest;
 use App\Http\Requests\LeadsRequest;
+use App\Models\CategoryGroupTag;
 use App\Models\Country;
 use App\Models\CRM\CRMClients;
 use App\Models\WebToLeadForm;
+use App\Notifications\LeadsStatusChanged;
 use App\Services\ContractService;
 use App\Services\Csv\ClientsCsvRowProcessor;
 use App\Services\Csv\LeadsCsvRowProcessor;
@@ -830,7 +832,25 @@ class LeadsController extends Controller
     {
 
         try {
-            CRMLeads::query()->where('id', '=', $leadid)->update(['status_id' => $stageid]);
+
+            // Fetch the lead
+            $lead = CRMLeads::with('assignees')->findOrFail($leadid);
+
+            // Fetch the new status
+            $newStatus = CategoryGroupTag::findOrFail($stageid);
+
+            // Update the lead's status
+            $lead->update(['status_id' => $stageid]);
+
+            // Notify all assignees
+            $user = Auth::user();
+            $mailSettings = $user->company->getMailSettings();
+
+            foreach ($lead->assignees as $assignee) {
+
+                $assignee->notify(new LeadsStatusChanged($lead, $user, $newStatus, $mailSettings));
+            }
+
 
             if (isset($_GET['from_kanban']) && $_GET['from_kanban']) {
                 // Return success response as JSON
@@ -1276,13 +1296,13 @@ class LeadsController extends Controller
                 'source' => $validated['source_id'],
             ]);
 
-            
-            
+
+
             // create required fields dynamically via api token and form uuid
             $validated['company_id'] = $company->id;
             $validated['web_to_leads_form_id'] = $form->id;
             $validated['web_to_leads_form_uuid'] = $form->uuid;
-            
+
             // Validate category group tags (custom logic)
             $this->validateCategoryGroupTags($validated);
 

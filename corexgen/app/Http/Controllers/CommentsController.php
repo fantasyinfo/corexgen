@@ -8,6 +8,7 @@ use App\Models\CRM\CRMClients;
 use App\Models\CRM\CRMLeads;
 use App\Models\Project;
 use App\Models\Tasks;
+use App\Notifications\NewCommentAdd;
 use App\Services\CommentService;
 use App\Traits\TenantFilter;
 use Illuminate\Http\Request;
@@ -39,6 +40,10 @@ class CommentsController extends Controller
             $lead = $query->firstOrFail();
 
             $comment = $this->commentService->add($lead, $requestData);
+
+
+            // nofity users
+            $this->notifyUser($lead, 'Lead', 'leads.view', $requestData['comment']);
 
 
             // Log the detach operation as an audit
@@ -112,6 +117,8 @@ class CommentsController extends Controller
 
             $comment = $this->commentService->add($client, $requestData);
 
+                  // nofity users
+            // $this->notifyUser($client, 'Client', 'clients.view', $requestData['comment']);
 
             // Log the detach operation as an audit
             $client->audits()->create([
@@ -184,6 +191,9 @@ class CommentsController extends Controller
             $comment = $this->commentService->add($project, $requestData);
 
 
+            // nofity users
+            $this->notifyUser($project, 'Project', 'projects.view', $requestData['comment']);
+
             // Log the detach operation as an audit
             $project->audits()->create([
                 'old_values' => [],
@@ -250,13 +260,16 @@ class CommentsController extends Controller
             $requestData = $request->validated();
             $query = Tasks::where('id', $requestData['id']);
             $query = $this->applyTenantFilter($query);
-            $project = $query->firstOrFail();
+            $task = $query->firstOrFail();
 
-            $comment = $this->commentService->add($project, $requestData);
+            $comment = $this->commentService->add($task, $requestData);
 
+
+            // nofity users
+            $this->notifyUser($task, 'Task', 'tasks.view', $requestData['comment']);
 
             // Log the detach operation as an audit
-            $project->audits()->create([
+            $task->audits()->create([
                 'old_values' => [],
                 'new_values' => ['comment' => $requestData['comment']],
                 'user_type' => 'App\Models\User',
@@ -308,4 +321,28 @@ class CommentsController extends Controller
         }
 
     }
+
+
+
+    /**
+     * notify on email to users about new comment
+     */
+
+    private function notifyUser($modal, $modalName, $view, $comment)
+    {
+        // Notify all assignees
+        $commentedBy = Auth::user();
+        $mailSettings = $commentedBy->company->getMailSettings();
+
+        // foreach ($lead->assignees as $assignee) {
+        //     $assignee->notify(new NewCommentAdd('Lead', $lead->id, 'leads.view', $commentedBy, $requestData['comment'], $mailSettings));
+        // }
+
+        foreach ($modal->assignees as $assignee) {
+            $assignee->notify(new NewCommentAdd($modalName, $modal->id, $view, $commentedBy, $comment, $mailSettings));
+        }
+    }
+
+
+
 }

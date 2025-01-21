@@ -454,7 +454,7 @@
                                 <i class="fas fa-history me-2"></i>Activities
                             </a>
                         </li>
-                        <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a class="nav-link" data-bs-toggle="tab" href="#notes">
                                 <i class="fas fa-sticky-note me-2"></i>Notes
                             </a>
@@ -463,7 +463,7 @@
                             <a class="nav-link" data-bs-toggle="tab" href="#files">
                                 <i class="fas fa-paperclip me-2"></i>Files
                             </a>
-                        </li>
+                        </li> --}}
                     </ul>
                 </div>
                 <div class="card-body mt-0 pt-0">
@@ -540,7 +540,7 @@
                             @include('dashboard.crm.clients.components._activity')
                         </div>
 
-                        <!-- Notes Tab -->
+                        {{-- <!-- Notes Tab -->
                         <div class="tab-pane fade" id="notes">
                             @include('dashboard.crm.clients.components._notes')
                         </div>
@@ -548,7 +548,7 @@
                         <!-- Files Tab -->
                         <div class="tab-pane fade" id="files">
                             @include('dashboard.crm.clients.components._attachments')
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
             </div>
