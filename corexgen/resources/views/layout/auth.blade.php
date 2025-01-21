@@ -42,7 +42,7 @@
             padding: 2rem;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 600px;
+            max-width: 800px;
         }
 
         .auth-header {
@@ -93,7 +93,8 @@
 
         <div class="mt-3 text-center">
             <p class="small">
-                <a href="#" class="text-decoration-none">{{ __('Need Help?') }}</a>
+                <a href="{{config('app.contact_link')}}"
+                    class="text-decoration-none">{{ __('Need Help?') }}</a>
             </p>
         </div>
     </div>
