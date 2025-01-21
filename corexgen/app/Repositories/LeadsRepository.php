@@ -50,7 +50,7 @@ class LeadsRepository
                     ]),
                 'assignedBy:id,name',
                 'assignees' => fn($q) => $q
-                    ->select(['users.id', 'users.name'])
+                    ->select(['users.id', 'users.name','users.profile_photo_path'])
                     ->withOnly([])
             ]);
 
@@ -200,7 +200,7 @@ class LeadsRepository
                     ]),
                 'assignedBy:id,name',
                 'assignees' => fn($q) => $q
-                    ->select(['users.id', 'users.name'])
+                    ->select(['users.id', 'users.name','users.profile_photo_path'])
                     ->withOnly([])
             ])->orderBy('leads.updated_at', 'desc');
 

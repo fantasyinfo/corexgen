@@ -708,7 +708,7 @@ class LeadsController extends Controller
             'customFields',
             'assignedBy:id,name',
             'assignees' => fn($q) => $q
-                ->select(['users.id', 'users.name'])
+                ->select(['users.id', 'users.name','users.profile_photo_path'])
                 ->withOnly([])
         ])->where('id', $id);
 

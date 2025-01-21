@@ -46,6 +46,7 @@ class User extends Authenticatable implements Auditable
         'tenant_id',
         'company_id',
         'address_id',
+        'profile_photo_url'
     ];
 
     /**
@@ -139,6 +140,24 @@ class User extends Authenticatable implements Auditable
     {
         return self::where('company_id', $company_id)->count();
     }
+
+
+    /**
+     * 
+     * get profile path
+     * @return string
+     */
+    public function getProfilePhotoUrlAttribute()
+    {
+        // Use the `profile_photo_path` if it exists
+        if (!empty($this->profile_photo_path)) {
+            return asset('storage/' . $this->profile_photo_path);
+        }
+
+        // Fallback to Jetstream's default placeholder
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&color=7F9CF5&background=EBF4FF';
+    }
+
 
     /**
      * boot method

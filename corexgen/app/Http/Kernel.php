@@ -77,5 +77,6 @@ class Kernel extends HttpKernel
         'company.onboarding' => \App\Http\Middleware\CompanyOnboarding::class,
         'company.timezone' =>  \App\Http\Middleware\CompanyTimezoneMiddleware::class,
         'check.plans.features.enable' =>  \App\Http\Middleware\isPlansFeaturesActive::class,
+        'check.demoMode' =>  \App\Http\Middleware\isDemoModeEnable::class,
     ];
 }
