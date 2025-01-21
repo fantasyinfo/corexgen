@@ -397,7 +397,7 @@ class ProjectController extends Controller
         $query = Project::query()->with([
             'customFields',
             'assignees' => fn($q) => $q
-                ->select(['users.id', 'users.name'])
+                ->select(['users.id', 'users.name','users.profile_photo_path'])
                 ->withOnly([])
         ])->where('id', $id);
 

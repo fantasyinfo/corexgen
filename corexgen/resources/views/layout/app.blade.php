@@ -13,6 +13,8 @@
 
             @include('layout.header.sub-header')
 
+
+
             <div id="task-detail-container"></div>
             <!-- Content Area -->
             <div class="content-area">
@@ -23,6 +25,10 @@
                 @include('layout.components.bulk-delete-confirm')
                 @include('layout.components.delete-success')
                 @include('layout.components.change-password')
+
+                @if (config('app.app_status') == 'demo')
+                    @include('layout.components.demo-alert')
+                @endif
 
 
                 <div class="toast-container" id="toastContainer"></div>

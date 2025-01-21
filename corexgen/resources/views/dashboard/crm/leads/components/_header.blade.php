@@ -38,13 +38,18 @@
                     </span>
 
                     <p class="mt-2">
+                       
                         @foreach ($lead->assignees as $user)
                             <a style="text-decoration: none;"
                                 href="{{ route(getPanelRoutes('users.view'), ['id' => $user->id]) }}">
-                                <x-form-components.profile-avatar :hw="40" :url="asset('storage/' . ($user->profile_photo_path ?? 'avatars/default.webp'))" :title="$user->name" />
+                                
+                                <x-form-components.profile-avatar :title="$user->name"  :url="asset(
+                                    'storage/' . ($user->profile_photo_path ?? 'avatars/default.webp'))" :hw="35" />
                             </a>
                         @endforeach
-                        <x-form-components.add-assignee :action="route(getPanelRoutes('leads.addAssignee'))" :modal="$lead" :teamMates="$teamMates"
+                        <x-form-components.add-assignee
+                        :title="'Add New'"
+                         :action="route(getPanelRoutes('leads.addAssignee'))" :modal="$lead" :teamMates="$teamMates"
                             :hw="40" />
     
                     </p>
