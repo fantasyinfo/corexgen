@@ -806,7 +806,6 @@ class UserController extends Controller
                 'company',
                 'addresses' => function ($query) {
                     $query->with('country')
-
                         ->with(['city' => fn($q) => $q->select('id', 'name as city_name')])
                         ->select('id', 'country_id', 'city_id', 'street_address', 'postal_code');
                 },

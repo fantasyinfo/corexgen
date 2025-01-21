@@ -45,28 +45,43 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td><span class="badge bg-success">Super Admin</span></td>
-                                    <td>superadmin@example.com</td>
-                                    <td>password123</td>
-                                    <td>
-                                        <button onclick="fillLoginForm('superadmin@example.com', 'password123')"
-                                            class="btn btn-sm btn-primary">
-                                            Login as Super Admin
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><span class="badge bg-info">Company Admin</span></td>
-                                    <td>admin@company.com</td>
-                                    <td>demo123</td>
-                                    <td>
-                                        <button onclick="fillLoginForm('admin@company.com', 'demo123')"
-                                            class="btn btn-sm btn-primary">
-                                            Login as Admin
-                                        </button>
-                                    </td>
-                                </tr>
+                                @if (getModule() == 'saas')
+                                    <tr>
+                                        <td><span class="badge bg-success">Super Admin</span></td>
+                                        <td>superadmin@example.com</td>
+                                        <td>password123</td>
+                                        <td>
+                                            <button onclick="fillLoginForm('superadmin@example.com', 'password123')"
+                                                class="btn btn-sm btn-primary">
+                                                Login as Super Admin
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge bg-info">Company Admin</span></td>
+                                        <td>admin@company.com</td>
+                                        <td>demo123</td>
+                                        <td>
+                                            <button onclick="fillLoginForm('admin@company.com', 'demo123')"
+                                                class="btn btn-sm btn-primary">
+                                                Login as Admin
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @endif
+                                @if (getModule() == 'company')
+                                    <tr>
+                                        <td><span class="badge bg-info">Company Admin</span></td>
+                                        <td>admin@company.com</td>
+                                        <td>demo123</td>
+                                        <td>
+                                            <button onclick="fillLoginForm('admin@company.com', 'demo123')"
+                                                class="btn btn-sm btn-primary">
+                                                Login as Admin
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @endif
                             </tbody>
                         </table>
                     </div>
