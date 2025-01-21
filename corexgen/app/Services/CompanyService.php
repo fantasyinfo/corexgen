@@ -88,6 +88,7 @@ class CompanyService
         $this->generateMailSettingsForCompany($companyid);
         $this->generatezOneWordSettingsForCompany($companyid);
         $this->generateCategoryGroupsTags($companyid);
+        $this->generateThemeSettings($companyid);
     }
 
     /**
@@ -386,6 +387,61 @@ class CompanyService
         }
     }
 
+    /**
+     * genearte company theme settings
+     */
+    protected function generateThemeSettings($companyid)
+    {
+
+        // light colors
+        foreach (CRM_COMPANY_THEME_LIGHT_SETTINGS as $setting) {
+            // Create CRM setting
+            CRMSettings::updateOrCreate([
+                'key' => $setting['key'],
+                'name' => $setting['name'],
+                'company_id' => $companyid,
+                'type' => 'Theme',
+            ], [
+                'key' => $setting['key'],
+                'value' => $setting['value'],
+                'is_media_setting' => $setting['is_media_setting'],
+                'media_id' => null,
+                'input_type' => $setting['input_type'],
+                'value_type' => $setting['value_type'],
+                'name' => $setting['name'],
+                'placeholder' => $setting['placeholder'] ?? '',
+                'is_tenant' => @$setting['is_tenant'] ?? false,
+                'type' => 'Theme',
+                'updated_by' => Auth::id() ?? '1',
+                'created_by' => Auth::id() ?? '1',
+            ]);
+
+        }
+
+        // dark colors
+        foreach (CRM_COMPANY_THEME_DARK_SETTINGS as $setting) {
+            // Create CRM setting
+            CRMSettings::updateOrCreate([
+                'key' => $setting['key'],
+                'name' => $setting['name'],
+                'company_id' => $companyid,
+                'type' => 'Theme',
+            ], [
+                'key' => $setting['key'],
+                'value' => $setting['value'],
+                'is_media_setting' => $setting['is_media_setting'],
+                'media_id' => null,
+                'input_type' => $setting['input_type'],
+                'value_type' => $setting['value_type'],
+                'name' => $setting['name'],
+                'placeholder' => $setting['placeholder'] ?? '',
+                'is_tenant' => @$setting['is_tenant'] ?? false,
+                'type' => 'Theme',
+                'updated_by' => Auth::id() ?? '1',
+                'created_by' => Auth::id() ?? '1',
+            ]);
+        }
+    }
 
 
 

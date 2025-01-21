@@ -52,6 +52,7 @@ class PermissionsHelper
         'CALENDER' => 'CALENDER',
         'SETTINGS_LEADFORM' => 'SETTINGS_LEADFORM',
         'LANDING_PAGE_SETTINGS' => 'LANDING_PAGE_SETTINGS',
+        'THEME_CUSTOMIZE' => 'THEME_CUSTOMIZE',
 
 
     ];
@@ -160,6 +161,8 @@ class PermissionsHelper
             self::$plansPermissionsKeys['SETTINGS_LEADFORM'] => [4601 => 'READ', 4602 => 'READ_ALL', 4603 => 'CREATE', 4604 => 'UPDATE', 4605 => 'DELETE'],
 
             self::$plansPermissionsKeys['LANDING_PAGE_SETTINGS'] => [5001 => 'READ', 5002 => 'READ_ALL', 5003 => 'UPDATE',],
+
+            self::$plansPermissionsKeys['THEME_CUSTOMIZE'] => [5051 => 'READ', 5052 => 'READ_ALL', 5053 => 'UPDATE',],
         ];
     }
 
@@ -184,7 +187,8 @@ class PermissionsHelper
             'CONTRACTS_TEMPLATES' => 'CONTRACTS_TEMPLATES',
             'TIMESHEETS' => 'TIMESHEETS',
             'SETTINGS_CTG' => 'SETTINGS_CTG',
-            'SETTINGS_LEADFORM' => 'SETTINGS_LEADFORM'
+            'SETTINGS_LEADFORM' => 'SETTINGS_LEADFORM',
+            'THEME_CUSTOMIZE' => 'THEME_CUSTOMIZE'
         ];
     }
 

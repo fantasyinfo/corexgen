@@ -21,6 +21,7 @@ class CRMSettingsSeeder extends Seeder
 
         $this->seedGeneralSettings();
         $this->seedMailSettings();
+        $this->seedThemeSettings();
 
     }
 
@@ -92,6 +93,53 @@ class CRMSettingsSeeder extends Seeder
                 'placeholder' => $setting['placeholder'] ?? '',
                 'is_tenant' => @$setting['is_tenant'] ?? false,
                 'type' => 'Mail',
+                'updated_by' => null,
+                'created_by' => null,
+            ]);
+        }
+    }
+
+    /**
+     * seed theme settings
+     */
+    protected function seedThemeSettings()
+    {
+        // Delete existing mail settings
+        CRMSettings::where('type', 'Theme')->where('is_tenant', '1')->delete();
+
+        // light colors
+        foreach (CRM_TENANT_THEME_LIGHT_SETTINGS as $setting) {
+            // Create CRM setting
+            CRMSettings::create([
+                'key' => $setting['key'],
+                'value' => $setting['value'],
+                'is_media_setting' => $setting['is_media_setting'],
+                'media_id' => null,
+                'input_type' => $setting['input_type'],
+                'value_type' => $setting['value_type'],
+                'name' => $setting['name'],
+                'placeholder' => $setting['placeholder'] ?? '',
+                'is_tenant' => @$setting['is_tenant'] ?? false,
+                'type' => 'Theme',
+                'updated_by' => null,
+                'created_by' => null,
+            ]);
+        }
+
+        // dark colors
+        foreach (CRM_TENANT_THEME_DARK_SETTINGS as $setting) {
+            // Create CRM setting
+            CRMSettings::create([
+                'key' => $setting['key'],
+                'value' => $setting['value'],
+                'is_media_setting' => $setting['is_media_setting'],
+                'media_id' => null,
+                'input_type' => $setting['input_type'],
+                'value_type' => $setting['value_type'],
+                'name' => $setting['name'],
+                'placeholder' => $setting['placeholder'] ?? '',
+                'is_tenant' => @$setting['is_tenant'] ?? false,
+                'type' => 'Theme',
                 'updated_by' => null,
                 'created_by' => null,
             ]);

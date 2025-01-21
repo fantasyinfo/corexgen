@@ -78,5 +78,6 @@ class Kernel extends HttpKernel
         'company.timezone' =>  \App\Http\Middleware\CompanyTimezoneMiddleware::class,
         'check.plans.features.enable' =>  \App\Http\Middleware\isPlansFeaturesActive::class,
         'check.demoMode' =>  \App\Http\Middleware\isDemoModeEnable::class,
+        'applyTheme' =>  \App\Http\Middleware\ApplyTheme::class,
     ];
 }

@@ -305,7 +305,8 @@ Route::middleware([
     'company.onboarding',
     // config('jetstream.auth_session'),
     'check.installation',
-    'company.timezone'
+    'company.timezone',
+    'applyTheme',
 ])->prefix(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']))->as(getPanelUrl(PANEL_TYPES['COMPANY_PANEL']) . '.')->group(function () {
 
     // home routes
@@ -427,6 +428,10 @@ Route::middleware([
 
         Route::get('/oneWord', [SettingsController::class, 'oneWord'])->name('oneWord')->middleware('check.permission:SETTINGS_ONEWORD.READ_ALL');
         Route::put('/oneWord', [SettingsController::class, 'oneWordUpdate'])->name('oneWordUpdate')->middleware('check.permission:SETTINGS_ONEWORD.UPDATE');
+
+        Route::get('/theme', [SettingsController::class, 'theme'])->name('theme')->middleware('check.permission:THEME_CUSTOMIZE.READ_ALL');
+        Route::put('/theme', [SettingsController::class, 'themeUpdate'])->name('themeUpdate')->middleware('check.permission:THEME_CUSTOMIZE.UPDATE');
+
 
         // web to lead form settings
 
@@ -978,7 +983,8 @@ Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
-    'check.installation'
+    'check.installation',
+    'applyTheme',
 ])->prefix(getPanelUrl(PANEL_TYPES['SUPER_PANEL']))->as(getPanelUrl(PANEL_TYPES['SUPER_PANEL']) . '.')->group(function () {
 
     // home routes
@@ -1151,6 +1157,9 @@ Route::middleware([
 
 
         Route::get('/cron', [SettingsController::class, 'cron'])->name('cron')->middleware('check.permission:SETTINGS_CRON.READ_ALL');
+
+        Route::get('/theme', [SettingsController::class, 'theme'])->name('theme')->middleware('check.permission:THEME_CUSTOMIZE.READ_ALL');
+        Route::put('/theme', [SettingsController::class, 'themeUpdate'])->name('themeUpdate')->middleware('check.permission:THEME_CUSTOMIZE.UPDATE');
 
         Route::get('/frontend', [SettingsController::class, 'frontend'])->name('frontend')->middleware('check.permission:LANDING_PAGE_SETTINGS.READ_ALL');
         Route::put('/frontend', [SettingsController::class, 'frontendUpdate'])->name('frontendUpdate')->middleware('check.permission:LANDING_PAGE_SETTINGS.UPDATE');

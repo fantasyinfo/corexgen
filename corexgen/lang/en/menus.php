@@ -51,5 +51,6 @@ return [
     "Bulk Import" => "Bulk Import",
     "Templates" => "Templates",
     "Web to Lead" => "Web to Lead",
-    'Front End' => 'Front End'
+    'Front End' => 'Front End',
+    'Theme Customize' => 'Theme Customize'
 ];
