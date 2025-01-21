@@ -117,7 +117,6 @@ class SettingsController extends Controller
             'r' => now()->format('r'),
             'U' => now()->format('U'),
         ];
-
     }
 
     /**
@@ -152,8 +151,6 @@ class SettingsController extends Controller
                     $setting->update(['value' => $value]);
                 }
             }
-
-
         } else {
 
             $validatedData = $request->validate([
@@ -445,7 +442,6 @@ class SettingsController extends Controller
                 if ($isValid['status']) {
                     return response()->json(['success' => true, 'message' => 'SMTP settings are valid.']);
                 }
-
             } else {
                 $validatedData = $request->validate([
                     'client_mail_provider' => 'required|string|max:255',
@@ -493,7 +489,6 @@ class SettingsController extends Controller
                 if ($isValid['status']) {
                     return response()->json(['success' => true, 'message' => 'SMTP settings are valid.']);
                 }
-
             }
 
 
@@ -658,7 +653,7 @@ class SettingsController extends Controller
      */
     public function leadFormSettingStore(Request $request)
     {
-       
+
         try {
             // Validate incoming request data
             $validatedData = $request->validate([
@@ -668,7 +663,7 @@ class SettingsController extends Controller
                 'status_id' => 'required|exists:category_group_tag,id',
             ]);
 
-            
+
             // Create the new WebToLeadForm entry
             $form = WebToLeadForm::create($validatedData);
 
@@ -691,12 +686,12 @@ class SettingsController extends Controller
     }
 
     /**
-        * update and save leadFormSettingUpdate
+     * update and save leadFormSettingUpdate
 
-        */
+     */
     public function leadFormSettingUpdate(Request $request)
     {
-       
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'group_id' => 'required|exists:category_group_tag,id',
@@ -704,7 +699,7 @@ class SettingsController extends Controller
             'status_id' => 'required|exists:category_group_tag,id',
             'id' => 'required|exists:web_to_leads_form,id'
         ]);
-   
+
         $form = WebToLeadForm::where('company_id', Auth::user()->company_id)->findOrFail($validated['id']);
         $form->update($validated);
 
@@ -803,8 +798,6 @@ class SettingsController extends Controller
                 DB::commit();
 
                 return redirect()->back()->with('success', 'Frontend settings updated successfully');
-
-
             } catch (\Exception $e) {
                 DB::rollBack();
                 Log::error('Frontend settings update failed: ' . $e->getMessage());
@@ -812,7 +805,6 @@ class SettingsController extends Controller
             }
         } catch (ValidationException $e) {
             return redirect()->back()->with('error', 'Validation failed')->withInput();
-
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage())->withInput();
         }
@@ -925,4 +917,146 @@ class SettingsController extends Controller
         $this->updateSection('testimonials', $testimonials);
     }
 
+
+    /**
+     * Get Theme Customize Settings
+     */
+    public function theme()
+    {
+
+        $this->tenantRoute = $this->getTenantRoute();
+
+        $theme_settings = $this->applyTenantFilter(CRMSettings::where('type', 'Theme'))->get()->toArray();
+
+        return view($this->getViewFilePath('theme'), [
+            'theme_settings' => $theme_settings,
+            'title' => 'Theme Settings',
+            'permissions' => PermissionsHelper::getPermissionsArray('THEME_CUSTOMIZE'),
+            'module' => PANEL_MODULES[$this->getPanelModule()]['settings'],
+            'is_tenant' => Auth::user()->is_tenant,
+            'company_id' => Auth::user()->company_id,
+        ]);
+    }
+    /**
+     * Update Theme Customize Settings
+     */
+    public function themeUpdate(Request $request)
+    {
+
+        if ($request->is_tenant) {
+            $validatedData = $request->validate([
+                "primary-color" => 'required|string|max:30',
+                "primary-hover" => 'required|string|max:30',
+                "secondary-color" => 'required|string|max:30',
+                "success-color" => 'required|string|max:30',
+                "danger-color" => 'required|string|max:30',
+                "warning-color" => 'required|string|max:30',
+                "info-color" => 'required|string|max:30',
+                "light-color" => 'required|string|max:30',
+                "dark-color" => 'required|string|max:30',
+                "body-bg" => 'required|string|max:30',
+                "body-color" => 'required|string|max:30',
+                "border-color" => 'required|string|max:30',
+                "card-bg" => 'required|string|max:30',
+                "input-bg" => 'required|string|max:30',
+                "input-border" => 'required|string|max:30',
+                "neutral-gray" => 'required|string|max:30',
+                "sidebar-bg" => 'required|string|max:30',
+                "sidebar-diff-bg" => 'required|string|max:30',
+                "task-columns-cards-border" => 'required|string|max:30',
+                "primary-color-d" => 'required|string|max:30',
+                "primary-hover-d" => 'required|string|max:30',
+                "secondary-color-d" => 'required|string|max:30',
+                "success-color-d" => 'required|string|max:30',
+                "danger-color-d" => 'required|string|max:30',
+                "warning-color-d" => 'required|string|max:30',
+                "info-color-d" => 'required|string|max:30',
+                "light-color-d" => 'required|string|max:30',
+                "dark-color-d" => 'required|string|max:30',
+                "body-bg-d" => 'required|string|max:30',
+                "body-color-d" => 'required|string|max:30',
+                "border-color-d" => 'required|string|max:30',
+                "card-bg-d" => 'required|string|max:30',
+                "input-bg-d" => 'required|string|max:30',
+                "input-border-d" => 'required|string|max:30',
+                "neutral-gray-d" => 'required|string|max:30',
+                "sidebar-bg-d" => 'required|string|max:30',
+                "sidebar-diff-bg-d" => 'required|string|max:30',
+                "task-columns-cards-border-d" => 'required|string|max:30',
+            ]);
+
+            // Update the settings in the database
+            // Automatically build the $settings array dynamically
+            $settings = collect($validatedData)->mapWithKeys(function ($value, $key) use ($request) {
+                return [$key => $request->input($key)];
+            })->toArray();
+
+            foreach ($settings as $key => $value) {
+                $setting = CRMSettings::where('name', $key)->where('is_tenant', '1')->first();
+                if ($setting) {
+                    $setting->update(['value' => $value]);
+                }
+            }
+        } else {
+
+
+            $validatedData = $request->validate([
+                "primary-color-company" => 'required|string|max:30',
+                "primary-hover-company" => 'required|string|max:30',
+                "secondary-color-company" => 'required|string|max:30',
+                "success-color-company" => 'required|string|max:30',
+                "danger-color-company" => 'required|string|max:30',
+                "warning-color-company" => 'required|string|max:30',
+                "info-color-company" => 'required|string|max:30',
+                "light-color-company" => 'required|string|max:30',
+                "dark-color-company" => 'required|string|max:30',
+                "body-bg-company" => 'required|string|max:30',
+                "body-color-company" => 'required|string|max:30',
+                "border-color-company" => 'required|string|max:30',
+                "card-bg-company" => 'required|string|max:30',
+                "input-bg-company" => 'required|string|max:30',
+                "input-border-company" => 'required|string|max:30',
+                "neutral-gray-company" => 'required|string|max:30',
+                "sidebar-bg-company" => 'required|string|max:30',
+                "sidebar-diff-bg-company" => 'required|string|max:30',
+                "task-columns-cards-border-company" => 'required|string|max:30',
+                "primary-color-d-company" => 'required|string|max:30',
+                "primary-hover-d-company" => 'required|string|max:30',
+                "secondary-color-d-company" => 'required|string|max:30',
+                "success-color-d-company" => 'required|string|max:30',
+                "danger-color-d-company" => 'required|string|max:30',
+                "warning-color-d-company" => 'required|string|max:30',
+                "info-color-d-company" => 'required|string|max:30',
+                "light-color-d-company" => 'required|string|max:30',
+                "dark-color-d-company" => 'required|string|max:30',
+                "body-bg-d-company" => 'required|string|max:30',
+                "body-color-d-company" => 'required|string|max:30',
+                "border-color-d-company" => 'required|string|max:30',
+                "card-bg-d-company" => 'required|string|max:30',
+                "input-bg-d-company" => 'required|string|max:30',
+                "input-border-d-company" => 'required|string|max:30',
+                "neutral-gray-d-company" => 'required|string|max:30',
+                "sidebar-bg-d-company" => 'required|string|max:30',
+                "sidebar-diff-bg-d-company" => 'required|string|max:30',
+                "task-columns-cards-border-d-company" => 'required|string|max:30',
+            ]);
+            // Automatically build the $settings array dynamically
+            $settings = collect($validatedData)->mapWithKeys(function ($value, $key) use ($request) {
+                return [$key => $request->input($key)];
+            })->toArray();
+
+            foreach ($settings as $key => $value) {
+                $setting = CRMSettings::where('name', $key)->where('company_id', Auth::user()->company_id)->first();
+                if ($setting) {
+                    $setting->update(['value' => $value]);
+                }
+            }
+        }
+
+        // Clear the cache for all users/companies affected
+        $cacheKey = 'theme_settings_user_' . Auth::id() . '_company_' . (Auth::user()->company_id ?? 'global');
+        Cache::forget($cacheKey);
+
+        return redirect()->back()->with('success', 'Settings updated successfully');
+    }
 }

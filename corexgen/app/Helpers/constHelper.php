@@ -319,6 +319,13 @@ PermissionsHelper::initializePermissions();
         'children' => PermissionsHelper::$PERMISSIONS_IDS['BULK_IMPORT_STATUS'],
         'for' => 'both',
         'is_feature' => false
+    ],
+    PermissionsHelper::$plansPermissionsKeys['THEME_CUSTOMIZE'] => [
+        'name' => 'THEME_CUSTOMIZE',
+        'id' => PermissionsHelper::getParentPermissionId('162'),
+        'children' => PermissionsHelper::$PERMISSIONS_IDS['THEME_CUSTOMIZE'],
+        'for' => 'both',
+        'is_feature' => false
     ]
 ]);
 
@@ -397,6 +404,7 @@ PermissionsHelper::initializePermissions();
             'General' => ['menu_url' => 'settings.general', 'menu_icon' => 'fa-sliders-h', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_GENERAL'], 'READ')],
             'Mail' => ['menu_url' => 'settings.mail', 'menu_icon' => 'fa-envelope', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_MAIL'], 'READ')],
             'Cron' => ['menu_url' => 'settings.cron', 'menu_icon' => 'fa-clock', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_CRON'], 'READ')],
+            'Theme Customize' => ['menu_url' => 'settings.theme', 'menu_icon' => 'fa-palette', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['THEME_CUSTOMIZE'], 'READ')],
             'Front End' => ['menu_url' => 'settings.frontend', 'menu_icon' => 'fa-clock', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['LANDING_PAGE_SETTINGS'], 'READ')],
 
         ]
@@ -448,6 +456,7 @@ PermissionsHelper::initializePermissions();
             'Mail' => ['menu_url' => 'settings.mail', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_MAIL'], 'READ')],
             'One Word' => ['menu_url' => 'settings.oneWord', 'menu_icon' => 'fa-cog', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_ONEWORD'], 'READ')],
             'Web to Lead' => ['menu_url' => 'settings.leadFormSetting', 'menu_icon' => 'fa-clock', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_LEADFORM'], 'READ')],
+            'Theme Customize' => ['menu_url' => 'settings.theme', 'menu_icon' => 'fa-palette', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['THEME_CUSTOMIZE'], 'READ')],
             'Clients Category' => ['menu_url' => 'cgt.indexClientCategory', 'menu_icon' => 'fa-cog', 'permission_id' => 2000],
             'Leads Groups' => ['menu_url' => 'cgt.indexLeadsGroups', 'menu_icon' => 'fa-cog', 'permission_id' => 2001],
             'Leads Status' => ['menu_url' => 'cgt.indexLeadsStatus', 'menu_icon' => 'fa-cog', 'permission_id' => 2002],
@@ -952,6 +961,13 @@ PermissionsHelper::initializePermissions();
         'for' => 'company',
         'module' => 'settings',
     ],
+    'Theme Customize' => [
+        'name' => 'Theme Customize',
+        'link' => 'theme',
+        'icon' => 'fa-palette',
+        'for' => 'both',
+        'module' => 'settings',
+    ],
 ]);
 
 // general settings 
@@ -1354,6 +1370,878 @@ PermissionsHelper::initializePermissions();
         'name' => 'client_mail_from_name'
     ],
 ]);
+
+
+
+/**
+ * Tenant Theme Light Colors Settings
+ */
+!defined('CRM_TENANT_THEME_LIGHT_SETTINGS') && define('CRM_TENANT_THEME_LIGHT_SETTINGS', [
+    'PRIMARY_COLOR' => [
+        'key' => 'Panel Primary Color Light',
+        'value' => '#673DE6',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#673DE6',
+        'name' => 'primary-color'
+    ],
+    'PRIMARY_COLOR_HOVER' => [
+        'key' => 'Panel Primary Color Hover Light',
+        'value' => '#5025d1',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#5025d1',
+        'name' => 'primary-hover'
+    ],
+    'SECONDARY_COLOR' => [
+        'key' => 'Panel Secondary Color Light',
+        'value' => '#2F1C6A',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#2F1C6A',
+        'name' => 'secondary-color'
+    ],
+    'SUCCESS_COLOR' => [
+        'key' => 'Panel Success Color Light',
+        'value' => '#00B090',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#00B090',
+        'name' => 'success-color'
+    ],
+    'DANGER_COLOR' => [
+        'key' => 'Panel Danger Color Light',
+        'value' => '#FF3C5C',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#FF3C5C',
+        'name' => 'danger-color'
+    ],
+    'WARNING_COLOR' => [
+        'key' => 'Panel Warning Color Light',
+        'value' => '#FFB800',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#FFB800',
+        'name' => 'warning-color'
+    ],
+    'INFO_COLOR' => [
+        'key' => 'Panel Info Color Light',
+        'value' => '#2C5CC5',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#2C5CC5',
+        'name' => 'info-color'
+    ],
+    'LIGHT_COLOR' => [
+        'key' => 'Panel Light Color Light',
+        'value' => '#F8F9FA',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#F8F9FA',
+        'name' => 'light-color'
+    ],
+    'DARK_COLOR' => [
+        'key' => 'Panel Dark Color Light',
+        'value' => '#1D1E20',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#1D1E20',
+        'name' => 'dark-color'
+    ],
+    'BODY_BG_COLOR' => [
+        'key' => 'Panel Body BG Color Light',
+        'value' => '#F4F4F5',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#F4F4F5',
+        'name' => 'body-bg'
+    ],
+    'BODY_COLOR' => [
+        'key' => 'Panel Body Color Light',
+        'value' => '#1D1E20',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#1D1E20',
+        'name' => 'body-color'
+    ],
+    'BORDER_COLOR' => [
+        'key' => 'Panel Border Color Light',
+        'value' => '#E6E6E6',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#E6E6E6',
+        'name' => 'border-color'
+    ],
+    'CARD_BG_COLOR' => [
+        'key' => 'Panel Card BG Color Light',
+        'value' => '#ffffff',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#ffffff',
+        'name' => 'card-bg'
+    ],
+    'INPUT_BG_COLOR' => [
+        'key' => 'Panel Input BG Color Light',
+        'value' => '#ffffff',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#ffffff',
+        'name' => 'input-bg'
+    ],
+    'INPUT_BORDER_COLOR' => [
+        'key' => 'Panel Input Border Color Light',
+        'value' => '#E6E6E6',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#E6E6E6',
+        'name' => 'input-border'
+    ],
+    'NEUTRAL_GRAY_COLOR' => [
+        'key' => 'Panel Neutral Gray Color Light',
+        'value' => '#727586',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#727586',
+        'name' => 'neutral-gray'
+    ],
+    'SIDEBAR_BG' => [
+        'key' => 'Panel Sidebar BG Color Light',
+        'value' => '#ffffff',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#ffffff',
+        'name' => 'sidebar-bg'
+    ],
+    'SIDEBAR_DIFF_BG' => [
+        'key' => 'Panel Sidebar Diff BG Light',
+        'value' => 'rgba(237, 232, 252,0.9)',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => 'rgba(237, 232, 252,0.9)',
+        'name' => 'sidebar-diff-bg'
+    ],
+    'TASK_COL_CARD_BORDER' => [
+        'key' => 'Panel Tasks Col Card Border Light',
+        'value' => '#cfd3d7',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#cfd3d7',
+        'name' => 'task-columns-cards-border'
+    ],
+ 
+]);
+
+/**
+ * Tenant Theme Dark Colors Settings
+ */
+!defined('CRM_TENANT_THEME_DARK_SETTINGS') && define('CRM_TENANT_THEME_DARK_SETTINGS', [
+    'PRIMARY_COLOR' => [
+        'key' => 'Panel Primary Color Dark',
+        'value' => '#673DE6',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#673DE6',
+        'name' => 'primary-color-d'
+    ],
+    'PRIMARY_COLOR_HOVER' => [
+        'key' => 'Panel Primary Color Hover Dark',
+        'value' => '#5025d1',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#5025d1',
+        'name' => 'primary-hover-d'
+    ],
+    'SECONDARY_COLOR' => [
+        'key' => 'Panel Secondary Color Dark',
+        'value' => '#9B8AFB',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#9B8AFB',
+        'name' => 'secondary-color-d'
+    ],
+    'SUCCESS_COLOR' => [
+        'key' => 'Panel Success Color Dark',
+        'value' => '#00D1AB',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#00D1AB',
+        'name' => 'success-color-d'
+    ],
+    'DANGER_COLOR' => [
+        'key' => 'Panel Danger Color Dark',
+        'value' => '#FF5C7C',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#FF5C7C',
+        'name' => 'danger-color-d'
+    ],
+    'WARNING_COLOR' => [
+        'key' => 'Panel Warning Color Dark',
+        'value' => '#FFD033',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#FFD033',
+        'name' => 'warning-color-d'
+    ],
+    'INFO_COLOR' => [
+        'key' => 'Panel Info Color Dark',
+        'value' => '#4B7BE5',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#4B7BE5',
+        'name' => 'info-color-d'
+    ],
+    'LIGHT_COLOR' => [
+        'key' => 'Panel Light Color Dark',
+        'value' => '#2D2D2D',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#2D2D2D',
+        'name' => 'light-color-d'
+    ],
+    'DARK_COLOR' => [
+        'key' => 'Panel Dark Color Dark',
+        'value' => '#1A1A1A',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#1A1A1A',
+        'name' => 'dark-color-d'
+    ],
+    'BODY_BG_COLOR' => [
+        'key' => 'Panel Body BG Color Dark',
+        'value' => '#1A1A1A',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#1A1A1A',
+        'name' => 'body-bg-d'
+    ],
+    'BODY_COLOR' => [
+        'key' => 'Panel Body Color Dark',
+        'value' => '#ffffff',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#ffffff',
+        'name' => 'body-color-d'
+    ],
+    'BORDER_COLOR' => [
+        'key' => 'Panel Border Color Dark',
+        'value' => '#2D2D2D',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#2D2D2D',
+        'name' => 'border-color-d'
+    ],
+    'CARD_BG_COLOR' => [
+        'key' => 'Panel Card BG Color Dark',
+        'value' => '#2D2D2D',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#2D2D2D',
+        'name' => 'card-bg-d'
+    ],
+    'INPUT_BG_COLOR' => [
+        'key' => 'Panel Input BG Color Dark',
+        'value' => '#2D2D2D',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#2D2D2D',
+        'name' => 'input-bg-d'
+    ],
+    'INPUT_BORDER_COLOR' => [
+        'key' => 'Panel Input Border Color Dark',
+        'value' => '#3D3D3D',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#3D3D3D',
+        'name' => 'input-border-d'
+    ],
+    'NEUTRAL_GRAY_COLOR' => [
+        'key' => 'Panel Neutral Gray Color Dark',
+        'value' => '#A0A0A0',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#A0A0A0',
+        'name' => 'neutral-gray-d'
+    ],
+    'SIDEBAR_BG' => [
+        'key' => 'Panel Sidebar BG Color Dark',
+        'value' => '#2D2D2D',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#2D2D2D',
+        'name' => 'sidebar-bg-d'
+    ],
+    'SIDEBAR_DIFF_BG' => [
+        'key' => 'Panel Sidebar Diff BG Dark',
+        'value' => '#0e0d0d',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#0e0d0d',
+        'name' => 'sidebar-diff-bg-d'
+    ],
+    'TASK_COL_CARD_BORDER' => [
+        'key' => 'Panel Tasks Col Card Border Dark',
+        'value' => '#30363d',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#30363d',
+        'name' => 'task-columns-cards-border-d'
+    ],
+ 
+]);
+
+
+
+/**
+ * Company Theme Light Colors Settings
+ */
+!defined('CRM_COMPANY_THEME_LIGHT_SETTINGS') && define('CRM_COMPANY_THEME_LIGHT_SETTINGS', [
+    'PRIMARY_COLOR' => [
+        'key' => 'Primary Color Light',
+        'value' => '#673DE6',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#673DE6',
+        'name' => 'primary-color-company'
+    ],
+    'PRIMARY_COLOR_HOVER' => [
+        'key' => 'Primary Color Hover Light',
+        'value' => '#5025d1',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#5025d1',
+        'name' => 'primary-hover-company'
+    ],
+    'SECONDARY_COLOR' => [
+        'key' => 'Secondary Color Light',
+        'value' => '#2F1C6A',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#2F1C6A',
+        'name' => 'secondary-color-company'
+    ],
+    'SUCCESS_COLOR' => [
+        'key' => 'Success Color Light',
+        'value' => '#00B090',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#00B090',
+        'name' => 'success-color-company'
+    ],
+    'DANGER_COLOR' => [
+        'key' => 'Danger Color Light',
+        'value' => '#FF3C5C',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#FF3C5C',
+        'name' => 'danger-color-company'
+    ],
+    'WARNING_COLOR' => [
+        'key' => 'Warning Color Light',
+        'value' => '#FFB800',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#FFB800',
+        'name' => 'warning-color-company'
+    ],
+    'INFO_COLOR' => [
+        'key' => 'Info Color Light',
+        'value' => '#2C5CC5',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#2C5CC5',
+        'name' => 'info-color-company'
+    ],
+    'LIGHT_COLOR' => [
+        'key' => 'Light Color Light',
+        'value' => '#F8F9FA',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#F8F9FA',
+        'name' => 'light-color-company'
+    ],
+    'DARK_COLOR' => [
+        'key' => 'Dark Color Light',
+        'value' => '#1D1E20',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#1D1E20',
+        'name' => 'dark-color-company'
+    ],
+    'BODY_BG_COLOR' => [
+        'key' => 'Body BG Color Light',
+        'value' => '#F4F4F5',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#F4F4F5',
+        'name' => 'body-bg-company'
+    ],
+    'BODY_COLOR' => [
+        'key' => 'Body Color Light',
+        'value' => '#1D1E20',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#1D1E20',
+        'name' => 'body-color-company'
+    ],
+    'BORDER_COLOR' => [
+        'key' => 'Border Color Light',
+        'value' => '#E6E6E6',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#E6E6E6',
+        'name' => 'border-color-company'
+    ],
+    'CARD_BG_COLOR' => [
+        'key' => 'Card BG Color Light',
+        'value' => '#ffffff',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#ffffff',
+        'name' => 'card-bg-company'
+    ],
+    'INPUT_BG_COLOR' => [
+        'key' => 'Input BG Color Light',
+        'value' => '#ffffff',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#ffffff',
+        'name' => 'input-bg-company'
+    ],
+    'INPUT_BORDER_COLOR' => [
+        'key' => 'Input Border Color Light',
+        'value' => '#E6E6E6',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#E6E6E6',
+        'name' => 'input-border-company'
+    ],
+    'NEUTRAL_GRAY_COLOR' => [
+        'key' => 'Neutral Gray Color Light',
+        'value' => '#727586',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#727586',
+        'name' => 'neutral-gray-company'
+    ],
+    'SIDEBAR_BG' => [
+        'key' => 'Sidebar BG Color Light',
+        'value' => '#ffffff',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#ffffff',
+        'name' => 'sidebar-bg-company'
+    ],
+    'SIDEBAR_DIFF_BG' => [
+        'key' => 'Sidebar Diff BG Light',
+        'value' => 'rgba(237, 232, 252,0.9)',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => 'rgba(237, 232, 252,0.9)',
+        'name' => 'sidebar-diff-bg-company'
+    ],
+    'TASK_COL_CARD_BORDER' => [
+        'key' => 'Tasks Col Card Border Light',
+        'value' => '#cfd3d7',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#cfd3d7',
+        'name' => 'task-columns-cards-border-company'
+    ],
+ 
+]);
+
+
+/**
+ * Company Theme Dark Colors Settings
+ */
+!defined('CRM_COMPANY_THEME_DARK_SETTINGS') && define('CRM_COMPANY_THEME_DARK_SETTINGS', [
+    'PRIMARY_COLOR' => [
+        'key' => 'Primary Color Dark',
+        'value' => '#673DE6',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#673DE6',
+        'name' => 'primary-color-d-company'
+    ],
+    'PRIMARY_COLOR_HOVER' => [
+        'key' => 'Primary Color Hover Dark',
+        'value' => '#5025d1',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#5025d1',
+        'name' => 'primary-hover-d-company'
+    ],
+    'SECONDARY_COLOR' => [
+        'key' => 'Secondary Color Dark',
+        'value' => '#9B8AFB',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#9B8AFB',
+        'name' => 'secondary-color-d-company'
+    ],
+    'SUCCESS_COLOR' => [
+        'key' => 'Success Color Dark',
+        'value' => '#00D1AB',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#00D1AB',
+        'name' => 'success-color-d-company'
+    ],
+    'DANGER_COLOR' => [
+        'key' => 'Danger Color Dark',
+        'value' => '#FF5C7C',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#FF5C7C',
+        'name' => 'danger-color-d-company'
+    ],
+    'WARNING_COLOR' => [
+        'key' => 'Warning Color Dark',
+        'value' => '#FFD033',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#FFD033',
+        'name' => 'warning-color-d-company'
+    ],
+    'INFO_COLOR' => [
+        'key' => 'Info Color Dark',
+        'value' => '#4B7BE5',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#4B7BE5',
+        'name' => 'info-color-d-company'
+    ],
+    'LIGHT_COLOR' => [
+        'key' => 'Light Color Dark',
+        'value' => '#2D2D2D',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#2D2D2D',
+        'name' => 'light-color-d-company'
+    ],
+    'DARK_COLOR' => [
+        'key' => 'Dark Color Dark',
+        'value' => '#1A1A1A',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#1A1A1A',
+        'name' => 'dark-color-d-company'
+    ],
+    'BODY_BG_COLOR' => [
+        'key' => 'Body BG Color Dark',
+        'value' => '#1A1A1A',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#1A1A1A',
+        'name' => 'body-bg-d-company'
+    ],
+    'BODY_COLOR' => [
+        'key' => 'Body Color Dark',
+        'value' => '#ffffff',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#ffffff',
+        'name' => 'body-color-d-company'
+    ],
+    'BORDER_COLOR' => [
+        'key' => 'Border Color Dark',
+        'value' => '#2D2D2D',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#2D2D2D',
+        'name' => 'border-color-d-company'
+    ],
+    'CARD_BG_COLOR' => [
+        'key' => 'Card BG Color Dark',
+        'value' => '#2D2D2D',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#2D2D2D',
+        'name' => 'card-bg-d-company'
+    ],
+    'INPUT_BG_COLOR' => [
+        'key' => 'Input BG Color Dark',
+        'value' => '#2D2D2D',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#2D2D2D',
+        'name' => 'input-bg-d-company'
+    ],
+    'INPUT_BORDER_COLOR' => [
+        'key' => 'Input Border Color Dark',
+        'value' => '#3D3D3D',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#3D3D3D',
+        'name' => 'input-border-d-company'
+    ],
+    'NEUTRAL_GRAY_COLOR' => [
+        'key' => 'Neutral Gray Color Dark',
+        'value' => '#A0A0A0',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#A0A0A0',
+        'name' => 'neutral-gray-d-company'
+    ],
+    'SIDEBAR_BG' => [
+        'key' => 'Sidebar BG Color Dark',
+        'value' => '#2D2D2D',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#2D2D2D',
+        'name' => 'sidebar-bg-d-company'
+    ],
+    'SIDEBAR_DIFF_BG' => [
+        'key' => 'Sidebar Diff BG Dark',
+        'value' => '#0e0d0d',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#0e0d0d',
+        'name' => 'sidebar-diff-bg-d-company'
+    ],
+    'TASK_COL_CARD_BORDER' => [
+        'key' => 'Tasks Col Card Border Dark',
+        'value' => '#30363d',
+        'is_media_setting' => false,
+        'media_id' => null,
+        'value_type' => 'string',
+        'input_type' => 'color',
+        'is_tenant' => true,
+        'placeholder' => '#30363d',
+        'name' => 'task-columns-cards-border-d-company'
+    ],
+ 
+]);
+
+
+
 
 
 // One Word Settings
