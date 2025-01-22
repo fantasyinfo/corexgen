@@ -43,16 +43,19 @@ class ClientService
     {
         return DB::transaction(function () use ($validatedData) {
 
-            if (isset($validatedData['cgt_id'])) {
-                $validCGTID = $this->checkIsValidCGTID($validatedData['cgt_id'], Auth::user()->company_id, CATEGORY_GROUP_TAGS_TYPES['KEY']['categories'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['clients']);
+            if (Auth::check()) {
 
 
-                if (!$validCGTID) {
-                    throw new \InvalidArgumentException("Failed to create client beacuse invalid CGT ID ");
+                if (isset($validatedData['cgt_id'])) {
+                    $validCGTID = $this->checkIsValidCGTID($validatedData['cgt_id'], Auth::user()->company_id, CATEGORY_GROUP_TAGS_TYPES['KEY']['categories'], CATEGORY_GROUP_TAGS_RELATIONS['KEY']['clients']);
+
+
+                    if (!$validCGTID) {
+                        throw new \InvalidArgumentException("Failed to create client beacuse invalid CGT ID ");
+                    }
                 }
+
             }
-
-
 
 
             $client = CRMClients::create($validatedData);

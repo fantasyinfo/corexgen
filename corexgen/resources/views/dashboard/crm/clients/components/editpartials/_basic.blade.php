@@ -54,7 +54,7 @@
             {{ __('clients.Email') }}
         </x-form-components.input-label>
         <x-form-components.input-group type="email" name="email[0]" id="email"
-            placeholder="{{ __('Email Address') }}" value="{{ old('email[0]', $client->email[0]) }}" required />
+            placeholder="{{ __('Email Address') }}" value="{{ old('email[0]', @$client->email[0]) }}" required />
     </div>
 
 
@@ -63,7 +63,7 @@
             {{ __('clients.Phone') }}
         </x-form-components.input-label>
         <x-form-components.input-group type="tel" name="phone[0]" id="phone"
-            placeholder="{{ __('Phone Number') }}" value="{{ old('phone[0]', $client->phone[0]) }}" required />
+            placeholder="{{ __('Phone Number') }}" value="{{ old('phone[0]', @$client->phone[0]) }}" required />
     </div>
 
 </div>
