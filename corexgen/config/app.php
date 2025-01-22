@@ -178,6 +178,7 @@ return [
         Modules\PaypalGatewayModule\PaypalGatewayModuleServiceProvider::class,
 
 
+
     ])->toArray(),
 
     /*
@@ -201,5 +202,6 @@ return [
     // App Version
     'version' => env('APP_VERSION', '1.0.0'),
     'app_status' => env('APP_STATUS', 'live'),
+    'contact_link' => env('CONTACT_LINK', '/contact-us'),
 
 ];

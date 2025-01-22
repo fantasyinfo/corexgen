@@ -91,6 +91,7 @@ class ModuleController extends Controller
         try {
             if ($this->moduleManager->install($fullPath)) {
 
+                Log::info('Came here');
                 $this->updateComposerJson('addAutoloadModuleComposerJson.php');
                 $this->runComposerDumpAutoload();
 
@@ -139,7 +140,7 @@ class ModuleController extends Controller
         $output = shell_exec("cd {$basePath} && composer dump-autoload 2>&1");
 
         if ($output === null) {
-            Log::error('Failed to execute composer dump-autoload. No output returned.');
+            Log::error(message: 'Failed to execute composer dump-autoload. No output returned.');
         } else {
             // Log::info('composer dump-autoload executed. Output: ' . $output);
             Log::info('composer dump-autoload executed. Output: want to logs the output change this log');
@@ -184,7 +185,7 @@ class ModuleController extends Controller
         $moduleSettings = DB::table('modules')->where('name' , $module)->first();
         if ($this->moduleManager->uninstall($module,$moduleSettings)) {
 
-            $this->updateComposerJson('addAutoloadModuleComposerJson.php');
+            #$this->updateComposerJson('removeAutoloadModuleComposerJson.php');
             $this->runComposerDumpAutoload();
 
             // Run the "php artisan optimize" command

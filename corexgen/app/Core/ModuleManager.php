@@ -314,7 +314,6 @@ class ModuleManager
                 $moduleJson['payment_gateway']['key'],
                 $moduleJson['payment_gateway']['class']
             );
-
         }
 
         return [
@@ -340,22 +339,86 @@ class ModuleManager
         }
     }
 
-    protected function requirePackage(string $package): void
-    {
-        // Build the composer require command
-        $command = "composer require $package --working-dir=" . base_path();
-
-        // Execute the command
-        exec($command, $output, $resultCode);
-
-        // Check the result
-        if ($resultCode !== 0) {
-            throw new \Exception("Failed to install package: $package. Output: " . implode("\n", $output));
+protected function requirePackage(string $package): void
+{
+    try {
+        // Check if package already exists in composer.json first
+        $composerJsonPath = base_path('composer.json');
+        if (!file_exists($composerJsonPath)) {
+            throw new \Exception('composer.json not found');
         }
 
-        // Log the success
-        \Log::info("Package installed successfully: $package\n");
+        $composerJson = json_decode(file_get_contents($composerJsonPath), true);
+        if (isset($composerJson['require'][$package])) {
+            \Log::info("Package already listed in composer.json: $package");
+            return;
+        }
+
+        // Find composer executable
+        $composerPath = $this->findComposerPath();
+        \Log::info("Using composer at: $composerPath");
+
+        // Build and execute command with full error output capture
+        $command = sprintf(
+            '%s require %s 2>&1',
+            escapeshellarg($composerPath),
+            escapeshellarg($package)
+        );
+
+        $process = Process::fromShellCommandline($command, base_path());
+        $process->setTimeout(300); // 5 minutes timeout
+        $process->setIdleTimeout(60); // 1 minute idle timeout
+
+        \Log::info("Executing command: " . $command);
+        
+        $process->run(function ($type, $buffer) {
+            \Log::info($buffer);
+        });
+
+        if (!$process->isSuccessful()) {
+            throw new \Exception(
+                sprintf(
+                    'Failed to install package: %s. Error: %s',
+                    $package,
+                    $process->getErrorOutput()
+                )
+            );
+        }
+
+        \Log::info("Package installed successfully: $package");
+    } catch (\Exception $e) {
+        \Log::error("Package installation failed: " . $e->getMessage());
+        throw $e;
     }
+}
+
+protected function findComposerPath(): string
+{
+    // Check common locations
+    $paths = [
+        '/usr/local/bin/composer',
+        '/usr/bin/composer',
+        base_path('composer.phar'),
+    ];
+
+    foreach ($paths as $path) {
+        if (file_exists($path)) {
+            return $path;
+        }
+    }
+
+    // Try to find composer in PATH
+    $process = new Process(['which', 'composer']);
+    $process->run();
+    
+    if ($process->isSuccessful()) {
+        return trim($process->getOutput());
+    }
+
+    throw new \Exception('Could not find composer executable');
+}
+
+
 
     /**
      * Method registerModule
@@ -434,57 +497,89 @@ class ModuleManager
         }
     }
 
-    /**
-     * Method runSeeder
-     *
-     * @param string $moduleId running the migrations of module
-     *
-     * @return void
-     */
-    protected function runSeeder(string $moduleId): void
-    {
-        Log::info("Running seeder for module: $moduleId");
+protected function runSeeder(string $moduleId): void
+{
+    Log::info("Running seeder for module: $moduleId");
+    
+    $seederPath = 'modules/' . $moduleId . '/database/seeders';
+    Log::info("Relative Seeder Path: $seederPath");
+    
+    if (!File::exists(base_path($seederPath))) {
+        Log::error('Seeder path does not exist: ' . $seederPath);
+        return;
+    }
 
-        // Set the relative path for seeders
-        $seederPath = 'modules/' . $moduleId . '/database/seeders'; // Relative path to base directory
-        Log::info("Relative Seeder Path: $seederPath");
+    // First, try to load any module-specific autoload files
+    $moduleAutoloadFile = base_path("modules/$moduleId/vendor/autoload.php");
+    if (File::exists($moduleAutoloadFile)) {
+        require_once $moduleAutoloadFile;
+        Log::info("Loaded module autoload file: $moduleAutoloadFile");
+    }
 
-        // Check if the seeders directory exists
-        if (File::exists(base_path($seederPath))) {
-            Log::info("Seeders directory exists.");
+    $files = File::files(base_path($seederPath));
+    foreach ($files as $file) {
+        if ($file->getExtension() !== 'php') {
+            Log::info("Skipping non-PHP file: " . $file->getFilename());
+            continue;
+        }
 
-            // Get all PHP files in the directory
-            $files = File::files(base_path($seederPath));
-            foreach ($files as $file) {
-                if ($file->getExtension() === 'php') {
-                    // Derive the class name from the file
-                    $className = $this->getSeederClassName($file->getPathname());
-                    Log::info("Found seeder class: $className");
-
-                    try {
-                        // Run the seeder
-                        $exitCode = Artisan::call('db:seed', ['--class' => $className,'--force' => true,]);
-                        Log::info("Artisan seeder output: " . Artisan::output());
-                        Log::info("Artisan seeder exit code: $exitCode");
-
-                        if ($exitCode !== 0) {
-                            Log::error("Seeder command failed with exit code: $exitCode for class: $className");
-                        } else {
-                            Log::info("Seeder executed successfully: $className");
-                        }
-                    } catch (\Exception $e) {
-                        // Handle exceptions during the seeding process
-                        Log::error("Error running seeder: $className, Message: " . $e->getMessage());
-                    }
-                } else {
-                    Log::info("Skipping non-PHP file: " . $file->getFilename());
-                }
+        try {
+            // Include the file directly first to ensure the class is loaded
+            require_once $file->getPathname();
+            
+            $className = $this->getSeederClassName($file->getPathname());
+            Log::info("Attempting to run seeder: $className");
+            
+            // Verify the class exists before trying to run it
+            if (!class_exists($className)) {
+                Log::error("Class not found after loading file: $className");
+                Log::info("File contents: " . File::get($file->getPathname()));
+                continue;
             }
-        } else {
-            // Log an error if the seeder path doesn't exist
-            Log::error('Seeder path does not exist: ' . $seederPath);
+
+            // Run the seeder with error tracking
+            $exitCode = Artisan::call('db:seed', [
+                '--class' => $className,
+                '--force' => true,
+            ]);
+
+            $output = Artisan::output();
+            Log::info("Artisan seeder output: " . $output);
+            
+            if ($exitCode !== 0) {
+                Log::error("Seeder failed with exit code $exitCode: $className");
+                Log::error("Full output: " . $output);
+            } else {
+                Log::info("Seeder completed successfully: $className");
+            }
+        } catch (\Exception $e) {
+            Log::error("Error running seeder: $className");
+            Log::error("Exception: " . $e->getMessage());
+            Log::error("Stack trace: " . $e->getTraceAsString());
         }
     }
+}
+
+// Add this helper method if you don't already have it
+protected function getSeederClassName(string $filepath): string
+{
+    // Get the content of the file
+    $content = file_get_contents($filepath);
+    
+    // Extract namespace
+    preg_match('/namespace\s+([^;]+);/', $content, $matches);
+    $namespace = $matches[1] ?? null;
+    
+    // Extract class name
+    preg_match('/class\s+(\w+)/', $content, $matches);
+    $className = $matches[1] ?? null;
+    
+    if (!$namespace || !$className) {
+        throw new \Exception("Could not parse namespace or class name from $filepath");
+    }
+    
+    return $namespace . '\\' . $className;
+}
 
     /**
      * Get the fully qualified class name for a seeder file.
@@ -492,26 +587,26 @@ class ModuleManager
      * @param string $filePath
      * @return string|null
      */
-    protected function getSeederClassName(string $filePath): ?string
-    {
-        // Extract the namespace and class name from the file
-        $namespace = null;
-        $className = null;
+    // protected function getSeederClassName(string $filePath): ?string
+    // {
+    //     // Extract the namespace and class name from the file
+    //     $namespace = null;
+    //     $className = null;
 
-        $lines = file($filePath);
-        foreach ($lines as $line) {
-            if (preg_match('/^namespace\s+(.+);$/', trim($line), $matches)) {
-                $namespace = $matches[1];
-            }
+    //     $lines = file($filePath);
+    //     foreach ($lines as $line) {
+    //         if (preg_match('/^namespace\s+(.+);$/', trim($line), $matches)) {
+    //             $namespace = $matches[1];
+    //         }
 
-            if (preg_match('/^class\s+([a-zA-Z0-9_]+)\s/', trim($line), $matches)) {
-                $className = $matches[1];
-                break;
-            }
-        }
+    //         if (preg_match('/^class\s+([a-zA-Z0-9_]+)\s/', trim($line), $matches)) {
+    //             $className = $matches[1];
+    //             break;
+    //         }
+    //     }
 
-        return $namespace && $className ? $namespace . '\\' . $className : null;
-    }
+    //     return $namespace && $className ? $namespace . '\\' . $className : null;
+    // }
 
 
     /**
@@ -733,54 +828,75 @@ class ModuleManager
         }
     }
 
-    protected function rollbackSeeder(string $moduleId): void
-    {
-        Log::info("Running rollback for module: $moduleId");
+protected function rollbackSeeder(string $moduleId): void
+{
+    Log::info("Running rollback for module: $moduleId");
+    
+    $seederPath = 'modules/' . $moduleId . '/database/seeders';
+    Log::info("Relative Seeder Path: $seederPath");
+    
+    if (!File::exists(base_path($seederPath))) {
+        Log::error('Seeder path does not exist: ' . $seederPath);
+        return;
+    }
 
-        // Set the relative path for seeders
-        $seederPath = 'modules/' . $moduleId . '/database/seeders'; // Relative path to base directory
-        Log::info("Relative Seeder Path: $seederPath");
+    // Load module-specific autoload file if it exists
+    $moduleAutoloadFile = base_path("modules/$moduleId/vendor/autoload.php");
+    if (File::exists($moduleAutoloadFile)) {
+        require_once $moduleAutoloadFile;
+        Log::info("Loaded module autoload file: $moduleAutoloadFile");
+    }
 
-        // Check if the seeders directory exists
-        if (File::exists(base_path($seederPath))) {
-            Log::info("Seeders directory exists.");
+    $files = File::files(base_path($seederPath));
+    foreach ($files as $file) {
+        if ($file->getExtension() !== 'php') {
+            Log::info("Skipping non-PHP file: " . $file->getFilename());
+            continue;
+        }
 
-            // Get all PHP files in the directory
-            $files = File::files(base_path($seederPath));
-            foreach ($files as $file) {
-                if ($file->getExtension() === 'php') {
-                    // Derive the class name from the file
-                    $className = $this->getSeederClassName($file->getPathname());
-                    Log::info("Found seeder class: $className");
-
-                    try {
-                        // Check if the class exists
-                        if (class_exists($className)) {
-                            $seederInstance = new $className();
-
-                            // Check if the rollback method exists
-                            if (method_exists($seederInstance, 'rollback')) {
-                                Log::info("Running rollback method for: $className");
-                                $seederInstance->rollback(); // Call the rollback method
-                            } else {
-                                Log::warning("Rollback method does not exist in class: $className");
-                            }
-                        } else {
-                            Log::error("Seeder class does not exist: $className");
-                        }
-                    } catch (\Exception $e) {
-                        // Handle exceptions during the rollback process
-                        Log::error("Error running rollback for seeder: $className, Message: " . $e->getMessage());
-                    }
-                } else {
-                    Log::info("Skipping non-PHP file: " . $file->getFilename());
-                }
+        try {
+            // Include the file directly to ensure the class is loaded
+            require_once $file->getPathname();
+            
+            $className = $this->getSeederClassName($file->getPathname());
+            Log::info("Attempting to rollback seeder: $className");
+            
+            // Verify the class exists after loading
+            if (!class_exists($className)) {
+                Log::error("Class not found after loading file: $className");
+                Log::info("File contents: " . File::get($file->getPathname()));
+                continue;
             }
-        } else {
-            // Log an error if the seeder path doesn't exist
-            Log::error('Seeder path does not exist: ' . $seederPath);
+
+            // Create an instance of the seeder with Laravel's service container
+            $seederInstance = app($className);
+            
+            if (!method_exists($seederInstance, 'rollback')) {
+                Log::warning("Rollback method does not exist in class: $className");
+                continue;
+            }
+
+            Log::info("Running rollback method for: $className");
+            
+            // Wrap the rollback in a database transaction
+            DB::beginTransaction();
+            try {
+                $seederInstance->rollback();
+                DB::commit();
+                Log::info("Successfully rolled back seeder: $className");
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
+
+        } catch (\Exception $e) {
+            Log::error("Error rolling back seeder: $className");
+            Log::error("Exception: " . $e->getMessage());
+            Log::error("Stack trace: " . $e->getTraceAsString());
         }
     }
+}
+
 
     public function uninstall(string $moduleId, $moduleSettings): bool
     {
@@ -792,7 +908,7 @@ class ModuleManager
             $this->runUninstallMigrations($moduleId);
             $this->rollbackSeeder($moduleId);
 
-          
+
             // Remove module files
             File::deleteDirectory($this->moduleDirectory . '/' . $moduleId);
 
@@ -805,7 +921,7 @@ class ModuleManager
             $this->removeProviderFromConfig($providerClassName);
 
             $settingsData = json_decode($moduleSettings->settings, true);
-            \Log::info('Settings', $settingsData );
+            \Log::info('Settings', $settingsData);
             // remove payment gateway class from factory if its a gateway module
             if (isset($settingsData) && isset($settingsData['payment_gateway']) && isset($settingsData['payment_gateway']['key'])) {
                 PaymentGatewayFactoryModifier::removeGateway($settingsData['payment_gateway']['key']);
@@ -860,19 +976,52 @@ class ModuleManager
         \Log::info('Rolling back the module migrations from ' . $migrationPath);
 
         if (File::exists($migrationPath)) {
-            \Log::info('Rolling back the module migrations from this file exists ' . $migrationPath);
+            \Log::info('Migrations directory exists: ' . $migrationPath);
 
-            $exitCode = Artisan::call('migrate:rollback', [
-                '--path' => str_replace(base_path(), '', $migrationPath),
-                '--force' => true
-            ]);
+            try {
+                // Get all migration files in the module directory
+                $migrationFiles = File::files($migrationPath);
 
-            // Log the Artisan output and exit code
-            \Log::info('Artisan command output: ' . Artisan::output());
-            \Log::info('Artisan command exit code: ' . $exitCode);
+                \Log::info('Found migration files:', array_map(fn($file) => $file->getFilename(), $migrationFiles));
+
+                foreach ($migrationFiles as $file) {
+                    $migrationClassName = $this->getMigrationClassName($file->getPathname());
+
+                    if (class_exists($migrationClassName)) {
+                        \Log::info('Rolling back migration: ' . $migrationClassName);
+
+                        // Run the down method for the migration class
+                        (new $migrationClassName)->down();
+
+                        // Remove the migration record from the migrations table
+                        DB::table('migrations')
+                            ->where('migration', basename($file->getFilename(), '.php'))
+                            ->delete();
+                    } else {
+                        \Log::warning('Migration class not found for file: ' . $file->getFilename());
+                    }
+                }
+
+                \Log::info('Module migrations rolled back successfully.');
+            } catch (\Exception $e) {
+                \Log::error('Error rolling back module migrations: ' . $e->getMessage());
+            }
         } else {
             \Log::warning('Migration path does not exist: ' . $migrationPath);
         }
+    }
+
+    /**
+     * Extract the migration class name from a migration file.
+     */
+    protected function getMigrationClassName(string $migrationFilePath): string
+    {
+        $content = file_get_contents($migrationFilePath);
+        if (preg_match('/class\s+(\w+)\s+extends/', $content, $matches)) {
+            return $matches[1];
+        }
+
+        throw new \RuntimeException('Unable to determine class name for migration file: ' . $migrationFilePath);
     }
 
 }

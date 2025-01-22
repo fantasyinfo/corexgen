@@ -1,22 +1,19 @@
 <?php
 
-$composerJsonPath = __DIR__ . '/composer.json';
-
-// var_dump($composerJsonPath);
+$composerJsonPath = dirname(__DIR__) . '/composer.json';
 
 // Check if the composer.json file exists
 if (!file_exists($composerJsonPath)) {
-    // echo "composer.json not found!";
-    exit;
+    exit('composer.json not found!');
 }
 
 // Read the composer.json file
 $composerJson = json_decode(file_get_contents($composerJsonPath), true);
 
-// Check if repositories and autoload sections exist, if not create them
-// if (!isset($composerJson['repositories'])) {
-//     $composerJson['repositories'] = [];
-// }
+// Ensure the `autoload` and `psr-4` sections exist
+if (!isset($composerJson['autoload'])) {
+    $composerJson['autoload'] = [];
+}
 if (!isset($composerJson['autoload']['psr-4'])) {
     $composerJson['autoload']['psr-4'] = [];
 }
@@ -28,25 +25,23 @@ $modules = array_filter(glob($modulesDir . '/*'), 'is_dir');
 
 foreach ($modules as $moduleDir) {
     $moduleName = basename($moduleDir);
-    $moduleNamespace = 'Modules\\' . $moduleName;
-
-    // Add module to repositories section
-    // $composerJson['repositories'][] = [
-    //     'type' => 'path',
-    //     'url' => 'modules/' . $moduleName
-    // ];
+    $moduleNamespace = 'Modules\\' . $moduleName . '\\';
 
     // Add module to autoload section if the 'src' directory exists
     $moduleSrcDir = $moduleDir . '/src';
     if (is_dir($moduleSrcDir)) {
-        $composerJson['autoload']['psr-4'][$moduleNamespace . '\\'] = 'modules/' . $moduleName . '/src';
+        $relativePath = 'modules/' . $moduleName . '/src';
+
+        // Check if the namespace is already set correctly to avoid duplicates
+        if (!isset($composerJson['autoload']['psr-4'][$moduleNamespace]) || 
+            $composerJson['autoload']['psr-4'][$moduleNamespace] !== $relativePath) {
+            $composerJson['autoload']['psr-4'][$moduleNamespace] = $relativePath;
+        }
     }
 }
-
-// Debug: Check the composer.json content before saving
-// echo json_encode($composerJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
 // Save the updated composer.json
 file_put_contents($composerJsonPath, json_encode($composerJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
-// echo "composer.json updated successfully.\n";
+// Output success message for debugging
+\Log::info('composer.json updated successfully.');

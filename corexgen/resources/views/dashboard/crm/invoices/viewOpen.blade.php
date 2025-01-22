@@ -135,6 +135,9 @@
 @endpush
 
 @section('content')
+
+
+
     <div class="container-fluid py-5" id="printDom">
         <div class="proposal-container shadow-lg rounded-lg overflow-hidden">
             <!-- Cover Page -->
@@ -358,6 +361,32 @@
 
 
                 <!-- Action Buttons -->
+                @if (!$payment_gateways->isNotEmpty())
+                    <div class="alert alert-warning alert-dismissible fade show border-start border-warning border-4 shadow-sm"
+                        role="alert">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="fas fa-exclamation-triangle fa-2x text-warning"></i>
+                            </div>
+                            <div>
+                                <h4 class="alert-heading mb-2 fw-bold">
+                                    <i class="fas fa-credit-card me-2"></i>
+                                    Payment Gateways Not Configured
+                                </h4>
+                                <p class="mb-0">Please configure your payment gateway credentials in the "Gateways &
+                                    Transactions Section.". Without proper configuration, payment processing functionality
+                                    will be unavailable.</p>
+                                <hr>
+                                <p class="mb-0 small">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Navigate to <strong>Gateways & Transactions → Gateways</strong> to update the
+                                    configuration.
+                                </p>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
 
                 <div class="d-flex justify-content-end mt-5 pt-4 border-top">
 

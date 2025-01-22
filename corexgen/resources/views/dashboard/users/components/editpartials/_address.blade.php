@@ -4,7 +4,7 @@
     <p class="my-1">
         <x-form-components.textarea-group name="address.street_address" id="compnayAddressStreet"
             placeholder="Enter Registered Street Address" class="custom-class"
-            value="{{ old('address.street_address', $user?->address?->street_address) }}" />
+            value="{{ old('address.street_address', $user?->addresses?->street_address) }}" />
     </p>
     <h6 class="detail-label">Country</h6>
     <p class="my-1">
@@ -14,7 +14,7 @@
             @if ($countries)
                 @foreach ($countries as $country)
                     <option value="{{ $country->id }}"
-                        {{ old('address.country_id', $user?->address?->country_id) == $country->id ? 'selected' : '' }}>
+                        {{ old('address.country_id', $user?->addresses?->country_id) == $country->id ? 'selected' : '' }}>
                         {{ $country->name }}
                     </option>
                 @endforeach
@@ -26,13 +26,13 @@
     <h6 class="detail-label mt-4">City</h6>
     <p class="my-1">
         <x-form-components.input-group type="text" name="address.city_name" id="compnayAddressCity"
-            placeholder="{{ __('Enter City') }}" value="{{ old('address.city_name', $user?->address?->city?->name) }}"
+            placeholder="{{ __('Enter City') }}" value="{{ old('address.city_name', $user?->addresses?->city?->city_name) }}"
             class="custom-class" />
     </p>
     <h6 class="detail-label">Pincode</h6>
     <p class="my-1">
         <x-form-components.input-group type="text" name="address.pincode" id="compnayAddressPincode"
-            placeholder="{{ __('Enter Pincode') }}" value="{{ old('address.pincode', $user?->address?->postal_code) }}"
+            placeholder="{{ __('Enter Pincode') }}" value="{{ old('address.pincode', $user?->addresses?->postal_code) }}"
             class="custom-class" />
     </p>
     </p>

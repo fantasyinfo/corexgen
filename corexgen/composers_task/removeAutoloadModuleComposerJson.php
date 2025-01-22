@@ -1,9 +1,10 @@
 <?php
 
-$composerJsonPath = __DIR__ . '/composer.json';
+$composerJsonPath = dirname(__DIR__) . '/composer.json';
 
 // Check if the composer.json file exists
 if (!file_exists($composerJsonPath)) {
+    \Log::info('Composer json file not found', [$composerJsonPath]);
     exit('composer.json not found!');
 }
 
@@ -23,19 +24,21 @@ $modules = array_filter(glob($modulesDir . '/*'), 'is_dir');
 // Get the current autoload entries for modules
 $currentAutoload = $composerJson['autoload']['psr-4'];
 
-// Remove autoload entries for any deleted modules
+// Only remove entries that start with "Modules\\" and match deleted modules
 foreach ($currentAutoload as $namespace => $path) {
-    $moduleName = str_replace('Modules\\', '', $namespace);
-    $moduleDir = $modulesDir . '/' . $moduleName;
+    if (str_starts_with($namespace, 'Modules\\')) {
+        $moduleName = str_replace('Modules\\', '', $namespace);
+        $moduleDir = $modulesDir . '/' . $moduleName;
 
-    // If the module directory doesn't exist, remove it from the autoload section
-    if (!is_dir($moduleDir)) {
-        unset($composerJson['autoload']['psr-4'][$namespace]);
+        // If the module directory doesn't exist, remove it from the autoload section
+        if (!is_dir($moduleDir)) {
+            unset($composerJson['autoload']['psr-4'][$namespace]);
+            \Log::info("Removed autoload entry for deleted module: {$namespace}");
+        }
     }
 }
 
 // Save the updated composer.json
 file_put_contents($composerJsonPath, json_encode($composerJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
-// Optionally, output to confirm the removal
-echo "composer.json updated successfully.\n";
+\Log::info('composer.json updated successfully.');

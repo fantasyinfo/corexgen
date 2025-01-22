@@ -318,9 +318,11 @@
         .searchSelectBox {
             width: 100% !important;
         }
-        .select2.select2-container{
+
+        .select2.select2-container {
             width: 100% !important;
         }
+
         /* Style for Select2 container */
         .select2-container .select2-selection--single {
             height: 45px;
@@ -330,7 +332,7 @@
             padding: 8px 12px;
             outline: none;
             font-size: 14px;
-            width:100%;
+            width: 100%;
             transition: box-shadow 0.3s ease, border 0.3s ease;
         }
 
@@ -358,12 +360,12 @@
 
         /* Hover and Active Styles */
         .select2-results__option--highlighted {
-            background-color: var(--primary-color)!important;
+            background-color: var(--primary-color) !important;
             color: #fff !important;
         }
 
         .select2-results__option--selected {
-            background-color: var(--primary-color)!important;
+            background-color: var(--primary-color) !important;
             color: #fff !important;
         }
     </style>
@@ -454,8 +456,8 @@
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <input type="text" class="form-control" name="address_city_name"
-                                placeholder="City Name" required>
+                            <input type="text" class="form-control" name="address_city_name" placeholder="City Name"
+                                required>
                         </div>
 
                         <div class="col-md-6 mb-3">
@@ -523,6 +525,36 @@
                 </div>
 
                 <div class="step" id="paymentStep">
+                    @if (!$payment_gateways->isNotEmpty())
+                        <div class="alert alert-warning alert-dismissible fade show border-start border-warning border-4 shadow-sm"
+                            role="alert">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <i class="fas fa-exclamation-triangle fa-2x text-warning"></i>
+                                </div>
+                                <div>
+                                    <h4 class="alert-heading mb-2 fw-bold">
+                                        <i class="fas fa-credit-card me-2"></i>
+                                        Payment Gateways Not Configured
+                                    </h4>
+                                    <p class="mb-0">Please configure your payment gateway credentials in the
+                                        "Gateways &
+                                        Transactions Section.". Without proper configuration, payment processing
+                                        functionality
+                                        will be unavailable.</p>
+                                    <hr>
+                                    <p class="mb-0 small">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Navigate to <strong>Gateways & Transactions → Gateways</strong> to update the
+                                        configuration.
+                                    </p>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                aria-label="Close"></button>
+                        </div>
+                    @endif
+
                     <h2 class="text-center mb-4">Select Payment</h2>
                     <!-- Payment gateway integration goes here -->
                     <div class="col-12 mb-3">
@@ -726,6 +758,4 @@
                 $(this).removeClass('is-invalid');
             });
         });
-
-      
     </script>
