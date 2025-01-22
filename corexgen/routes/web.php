@@ -101,6 +101,8 @@ Route::get('/clear', function () {
             unlink(app_path('../bootstrap/cache/services.php'));
         }
 
+        
+
         // 4. Recreate bootstrap/cache directory if it doesn't exist
         if (!file_exists(app_path('../bootstrap/cache'))) {
             mkdir(app_path('../bootstrap/cache'), 0755, true);
@@ -118,6 +120,9 @@ Route::get('/clear', function () {
         // 7. Optimize the application
         Artisan::call('optimize');
 
+
+
+     
 
 
         $output = [

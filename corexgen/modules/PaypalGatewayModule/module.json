@@ -1,0 +1,15 @@
+{
+    "name": "PaypalGatewayModule",
+    "version": "1.0.0",
+    "author": "Paypal Payment Gateway Module",
+    "description": "Paypal Payment Gateway for Trnasactions.",
+    "providers": ["PaypalGatewayModuleServiceProvider"],
+    "packages": ["guzzlehttp/guzzle"],
+    "payment_gateway": {
+        "key": "paypal",
+        "class": "Modules\\PaypalGatewayModule\\App\\Services\\PayPalPaymentGateway"
+    },
+    "dependencies": {
+        "core": ">=1.0.0"
+    }
+}

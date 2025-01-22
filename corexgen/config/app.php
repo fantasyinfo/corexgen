@@ -175,6 +175,7 @@ return [
         Yajra\DataTables\DataTablesServiceProvider::class,
         OwenIt\Auditing\AuditingServiceProvider::class,
         App\Providers\DatabaseServiceProvider::class,
+        Modules\PaypalGatewayModule\PaypalGatewayModuleServiceProvider::class,
 
 
 
