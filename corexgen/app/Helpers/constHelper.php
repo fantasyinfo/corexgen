@@ -142,7 +142,7 @@ PermissionsHelper::initializePermissions();
         'name' => 'SETTINGS_CRON',
         'id' => PermissionsHelper::getParentPermissionId('33'),
         'children' => PermissionsHelper::$PERMISSIONS_IDS['SETTINGS_CRON'],
-        'for' => 'tenant',
+        'for' => 'both',
         'is_feature' => false
     ],
     PermissionsHelper::$plansPermissionsKeys['SETTINGS_ONEWORD'] => [
@@ -443,7 +443,10 @@ PermissionsHelper::initializePermissions();
         'children' => [
             'Modules' => ['menu_url' => 'modules.index', 'menu_icon' => 'fa-puzzle-piece', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['MODULES'], 'READ_ALL')],
             'AppUpdates' => ['menu_url' => 'appupdates.index', 'menu_icon' => 'fa-sync', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['APPUPDATES'], 'READ_ALL')],
+            
             'Backups' => ['menu_url' => 'backup.index', 'menu_icon' => 'fa-database', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['DOWNLOAD_BACKUP'], 'READ_ALL')],
+
+            'Cron' => ['menu_url' => 'settings.cron', 'menu_icon' => 'fa-clock', 'permission_id' => PermissionsHelper::findPermissionKey(PermissionsHelper::$plansPermissionsKeys['SETTINGS_CRON'], 'READ')],
         ]
     ],
     'Settings' => [

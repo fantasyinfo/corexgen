@@ -342,10 +342,12 @@ class AttachmentController extends Controller
      */
     public function destroyTasksAttachment($id, AttachmentService $attachmentService)
     {
+       
         try {
             // Retrieve the attachment
             $attachment = $this->applyTenantFilter(Attachments::where('id', $id))->first();
 
+            
             if (!$attachment) {
                 return redirect()
                     ->back()

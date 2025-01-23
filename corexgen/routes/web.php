@@ -431,6 +431,8 @@ Route::middleware([
         Route::post('/test-connection', [SettingsController::class, 'testMailConnection'])->name('test-connection')->middleware('check.permission:SETTINGS_MAIL.READ_ALL');
 
 
+        Route::get('/cron', [SettingsController::class, 'cron'])->name('cron')->middleware('check.permission:SETTINGS_CRON.READ_ALL');
+        
         Route::get('/oneWord', [SettingsController::class, 'oneWord'])->name('oneWord')->middleware('check.permission:SETTINGS_ONEWORD.READ_ALL');
         Route::put('/oneWord', [SettingsController::class, 'oneWordUpdate'])->name('oneWordUpdate')->middleware('check.permission:SETTINGS_ONEWORD.UPDATE');
 

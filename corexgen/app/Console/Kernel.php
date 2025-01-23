@@ -27,6 +27,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('app:docs-check')->daily();
         //$schedule->command('queue:listen --sleep=3 --tries=3')->everyMinute();
         $schedule->command('queue:work --stop-when-empty')->everyMinute();
+        $schedule->command('demo:reset-database')->hourly();
 
         
     }
