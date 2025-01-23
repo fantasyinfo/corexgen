@@ -203,6 +203,11 @@ class ProjectService
             ->editColumn('title', function ($project) use ($module) {
                 return "<a  class='dt-link' href='" . route($this->tenantRoute . $module . '.view', $project->id) . "' target='_blank'>$project->title</a>";
             })
+            ->editColumn('progress', function ($project) {
+                return '<div class="progress">
+                <div class="progress-bar bg-primary" role="progressbar" style="width: ' . $project?->progress . '%;" aria-valuenow="' . $project?->progress . '" aria-valuemin="0" aria-valuemax="100">' . $project?->progress . '%</div>
+              </div>';
+            })
             ->editColumn('client_name', function ($project) use ($cmodule) {
                 $client_name = "";
                 if ($project?->client?->type == 'Individual') {
@@ -231,7 +236,7 @@ class ProjectService
             ->editColumn('status', function ($project) {
                 return $this->renderStatusColumn($project);
             })
-            ->rawColumns(['actions', 'client_name', 'assign_to', 'status', 'title', 'name']) // Include any HTML columns
+            ->rawColumns(['actions','progress', 'client_name', 'assign_to', 'status', 'title', 'name']) // Include any HTML columns
             ->make(true);
     }
 

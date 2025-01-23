@@ -7,7 +7,7 @@
     'teamMates' => '',
 ])
 
-<button type="button" onclick="openAssigneeModal()" title="add new user" class="link rounded-circle border border-3"
+<button type="button" onclick="openAssigneeModal()" data-bs-toggle="tooltip" title="add new user" class="link rounded-circle border border-3"
     style="width: {{ $hw }}px; height: {{ $hw }}px; object-fit: cover; border-color: var(--primary-color)">
     <i class="fas fa-user-plus" style="color: var(--primary-color)"></i>
 </button>

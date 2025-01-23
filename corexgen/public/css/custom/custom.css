@@ -477,7 +477,7 @@ ul.pagination {
 
 /* General Dropdown Styles */
 .dropdown-menu {
-    background-color: var(--card-bg);
+    background-color: var(--body-bg);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
@@ -641,11 +641,9 @@ table.celled {
 }
 
 .submenu {
-    box-shadow:  inset 0px 0px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.1);
     background: var(--body-bg);
 }
-
-
 
 .sidebar .submenu .nav-link:hover,
 .sidebar .submenu .nav-link.active {
@@ -672,24 +670,25 @@ table.celled {
     -o-border-radius: 10px;
 }
 
-.badge{
-    font-size:1rem;
+.badge {
+    font-size: 1rem;
     /* color: var(--body-color) ; */
 }
 
-.badge.bg-light, .badge.bg-warning {
+.badge.bg-light,
+.badge.bg-warning {
     color: black !important;
 }
 
-.badge.bg-dark, .text-dark {
+.badge.bg-dark,
+.text-dark {
     color: white !important;
 }
 .border-dark {
     border-color: white !important;
 }
 
-
-.dt-scroll-body{
+.dt-scroll-body {
     min-height: 400px;
 }
 
@@ -705,4 +704,13 @@ table.celled {
 .daTableQuick {
     min-width: 150px;
     width: 100%;
-  }
+}
+
+.timeline-wrapper {
+    background-color: rgb(255 255 255 / 6%);
+    /* padding: 10px; */
+    /* border: 1px solid white; */
+    border-radius: 20px;
+}
+
+

@@ -1,9 +1,14 @@
 <div class="col-md-6">
     <h6 class="detail-label">Additional Information</h6>
     <div class="detail-group">
-        <label class="stat-label">{{ $project?->type === 'Hourly' ? 'Per hour cost' : 'One time cost' }}</label>
+        <label class="stat-label">Billing Type</label>
+        <p class="stat-value">{{ $project?->billing_type }}</p>
+    </div>
+
+    <div class="detail-group">
+        <label class="stat-label">{{ $project?->billing_type === 'Hourly' ? 'Per hour cost' : 'One time cost' }}</label>
         <p class="stat-value">{{ getSettingValue('Currency Symbol') }}
-            {{ $project?->type === 'Hourly' ? $project?->per_hour_cost : $project?->one_time_cost }}</p>
+            {{ $project?->billing_type === 'Hourly' ? $project?->per_hour_cost : $project?->one_time_cost }}</p>
     </div>
 
     <div class="detail-group">

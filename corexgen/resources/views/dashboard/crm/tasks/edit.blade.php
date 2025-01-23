@@ -165,7 +165,7 @@
                                         <div class="col-lg-8">
                                             <select class="form-select searchSelectBox" name="milestone_id"
                                                 id="milestone_id">
-                                                <option>Select Milestone (optional)</option>
+                                                <option  value="">Select Milestone (optional)</option>
                                                 @foreach ($milestones as $ml)
                                                     <option value="{{ $ml->id }}"
                                                         {{ old('milestone_id', $task->milestone_id) == $ml->id ? 'selected' : '' }}>

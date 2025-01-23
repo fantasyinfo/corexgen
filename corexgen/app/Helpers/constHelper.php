@@ -2390,27 +2390,27 @@ PermissionsHelper::initializePermissions();
  */
 !defined('TASKS_RELATED_TO') && define('TASKS_RELATED_TO', [
     'TABLE_STATUS' => [
+        'project',
         'clients',
         'leads',
-        'project',
         'estimate',
         'proposal',
         'contract',
         'ticket',
     ],
     'STATUS' => [
+        'project' => 'Projects',
         'clients' => 'Clients',
         'leads' => 'Leads',
-        'project' => 'Projects',
         'estimate' => 'Estimate',
         'proposal' => 'Proposal',
         'contract' => 'Contract',
         'ticket' => 'Ticket',
     ],
     'KEY' => [
+        'project' => 'project',
         'clients' => 'clients',
         'leads' => 'leads',
-        'project' => 'project',
         'estimate' => 'estimate',
         'proposal' => 'proposal',
         'contract' => 'contract',
