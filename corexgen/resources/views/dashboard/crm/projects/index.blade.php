@@ -55,6 +55,14 @@
                                 'width' => '200px',
                             ],
                             [
+                                'data' => 'progress',
+                                'name' => 'progress',
+                                'label' => __('projects.Progress'),
+                                'searchable' => false,
+                                'orderable' => false,
+                                'width' => '200px',
+                            ],
+                            [
                                 'data' => 'assign_to',
                                 'name' => 'assign_to',
                                 'label' => __('projects.Assign To'),

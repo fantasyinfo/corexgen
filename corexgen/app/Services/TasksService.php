@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Helpers\PermissionsHelper;
 use App\Models\CategoryGroupTag;
+use App\Models\Project;
 use App\Models\Tasks;
 use App\Models\User;
 use App\Notifications\TaskAssingeeToUser;
@@ -156,7 +157,7 @@ class TasksService
     // Example email sending logic
     private function sendEmailToUser($userId, Tasks $task)
     {
-       
+
         // Replace with your email sending logic
         $assigneeTo = User::find($userId);
         //todo: send email to new assingee users 
@@ -168,6 +169,50 @@ class TasksService
     }
 
 
+    /**
+     * Recalculate and update project progress.
+     *
+     * @param int $projectId
+     * @return void
+     */
+    public function recalculateProjectProgress(int $projectId): void
+    {
+        // Fetch the project
+        $project = Project::findOrFail($projectId);
+
+        // Fetch all tasks associated with the project
+        $tasks = Tasks::where('project_id', $projectId)->get();
+
+        // Ensure there are tasks
+        if ($tasks->isNotEmpty()) {
+            // Find the 'Completed' stage
+            $stagesComplete = $this->applyTenantFilter(CategoryGroupTag::where('name', 'Completed')->first());
+
+            if ($stagesComplete) {
+                $totalTasks = $tasks->count();
+                $completedTasks = $tasks->where('status_id', $stagesComplete->id)->count();
+
+                // Prevent division by zero
+                $progress = $totalTasks > 0
+                    ? ($completedTasks / $totalTasks) * 100
+                    : 0;
+
+                \Log::info('Recalculating project progress', [
+                    'projectId' => $projectId,
+                    'totalTasks' => $totalTasks,
+                    'completedTasks' => $completedTasks,
+                    'progress' => $progress
+                ]);
+
+                $project->progress = round($progress, 2);
+                $project->save();
+            }
+        } else {
+            // If no tasks, set progress to 0
+            // $project->progress = 0; // what ever users added, not override
+            $project->save();
+        }
+    }
     /**
      *  get tasks by user
      */

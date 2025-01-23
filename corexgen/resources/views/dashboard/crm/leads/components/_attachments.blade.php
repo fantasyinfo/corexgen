@@ -247,7 +247,7 @@
                                     <div
                                         class="attachment-header text-muted d-flex justify-content-between align-items-center">
                                         <h6 class="attachment-name mb-0">
-                                            {{ $attachment->file_name }}
+                                            {{ truncateFileName($attachment->file_name) }}
                                             <small class="text-muted ms-2">
                                                 ({{ number_format($attachment->size / 1024, 2) }} KB)
                                             </small>
@@ -414,7 +414,7 @@
                             <div class="attachment-content ms-3">
                                 <div class="attachment-header text-muted d-flex justify-content-between align-items-center">
                                     <h6 class="attachment-name mb-0">
-                                        ${attachment.file_name}
+                                        ${truncateFileName(attachment.file_name)}
                                         <small class="text-muted ms-2">(${(attachment.size / 1024).toFixed(2)} KB)</small>
                                     </h6>
                                     <div class="attachment-actions">

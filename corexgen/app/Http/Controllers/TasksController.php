@@ -190,6 +190,12 @@ class TasksController extends Controller
                 $this->customFieldService->saveValues($task, $validatedData);
             }
 
+            // get all projects tasks, then make an average, and increse the progress of the project
+            if ($task?->project_id) {
+                // get all projects tasks, then make an average, and increse the progress of the project
+                $this->tasksService->recalculateProjectProgress($task?->project_id);
+            }
+
             $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['TASKS']]), '+', '1');
 
             // redirect back to refrer ...
@@ -285,6 +291,12 @@ class TasksController extends Controller
             $task = $this->tasksService->updateTask($request->validated());
 
 
+            // get all projects tasks, then make an average, and increse the progress of the project
+            if ($task?->project_id) {
+                // get all projects tasks, then make an average, and increse the progress of the project
+                $this->tasksService->recalculateProjectProgress($task?->project_id);
+            }
+
             // insert custom fields values to db
             if ($request->has('custom_fields') && !empty($validatedData) && count($validatedData) > 0 && !is_null(Auth::user()->company_id)) {
                 $this->customFieldService->saveValues($task, $validatedData);
@@ -368,13 +380,24 @@ class TasksController extends Controller
         try {
             // Delete the user
             $task = Tasks::find($id);
+            $projectId = null;
             if ($task) {
 
                 // delete its custom fields also if any
                 $this->customFieldService->deleteEntityValues($task);
 
+                // update progress
+                if ($task?->project) {
+                    $projectId = $task?->project?->id;
+
+                }
+
                 // delete  now
                 $task->delete();
+
+
+                // get all projects tasks, then make an average, and increse the progress of the project
+                $this->tasksService->recalculateProjectProgress($projectId);
 
                 // update the subscription usage
                 $this->updateUsage(strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['TASKS']]), '-', '1');
@@ -397,13 +420,15 @@ class TasksController extends Controller
         $ids = $request->input('ids');
 
         try {
+
             if (is_array($ids) && count($ids) > 0) {
                 DB::transaction(function () use ($ids) {
                     // First, delete custom field values
                     $this->customFieldService->bulkDeleteEntityValues(CUSTOM_FIELDS_RELATION_TYPES['KEYS']['tasks'], $ids);
 
                     // Then delete the tasks
-                    Tasks::whereIn('id', $ids)->delete();
+                    $tasks = Tasks::whereIn('id', $ids);
+                    $tasks->delete();
 
                     $this->updateUsage(
                         strtolower(PLANS_FEATURES[PermissionsHelper::$plansPermissionsKeys['TASKS']]),
@@ -411,6 +436,8 @@ class TasksController extends Controller
                         count($ids)
                     );
                 });
+
+
 
                 return response()->json(['message' => 'Selected tasks deleted successfully.'], 200);
             }
@@ -442,7 +469,7 @@ class TasksController extends Controller
             'stage:id,name,color',
             'assignedBy:id,name',
             'assignees' => fn($q) => $q
-                ->select(['users.id', 'users.name','users.profile_photo_path'])
+                ->select(['users.id', 'users.name', 'users.profile_photo_path'])
                 ->withOnly([])
         ])->where('id', $id);
 
@@ -554,10 +581,12 @@ class TasksController extends Controller
     {
         try {
             // Fetch the task
-            $task = Tasks::with('assignees')->findOrFail($leadid);
+            $task = Tasks::with(['assignees'])->findOrFail($leadid);
 
             // Fetch the new status
             $newStatus = CategoryGroupTag::findOrFail($stageid);
+
+
 
             // Update the task's status
             $task->update(['status_id' => $stageid]);
@@ -566,11 +595,18 @@ class TasksController extends Controller
             $user = Auth::user();
             $mailSettings = $user->company->getMailSettings();
 
-      
+
 
             foreach ($task->assignees as $assignee) {
 
                 $assignee->notify(new TasksStatusChanged($task, $user, $newStatus, $mailSettings));
+            }
+
+            // if project is completed, then recalulate the progress
+
+            if ($newStatus?->name == 'Completed' && $task?->project_id) {
+                // get all projects tasks, then make an average, and increse the progress of the project
+                $this->tasksService->recalculateProjectProgress($task?->project_id);
             }
 
             if (request()->has('from_kanban') && request()->get('from_kanban')) {

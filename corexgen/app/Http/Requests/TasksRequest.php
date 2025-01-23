@@ -30,6 +30,7 @@ class TasksRequest extends FormRequest
             "priority" => "required|in:Low,Medium,High,Urgent",
             "related_to" => "required",
             "project_id" => "nullable|exists:projects,id",
+            "milestone_id" => "nullable",
 
             "files" => "nullable|array",
             "description" => "nullable|string",

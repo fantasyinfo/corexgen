@@ -16,9 +16,20 @@
                         {{ $project->status }}
                     </span>
 
-                    <span class="lead-score" data-bs-toggle="tooltip" title="Progress">
-                        {{ $project->progress ?? 0 }} <i class="fas fa-star text-warning"></i>
-                    </span>
+                        <div class="flex flex-col justify-content-center align-items-center ">
+                            <div class="progress" style="width:300px;"  data-bs-toggle="tooltip" title="Progress">
+                                <div class="progress-bar bg-primary" role="progressbar"
+                                    style="width: {{ $project?->progress }}%;" aria-valuenow="{{ $project?->progress }}"
+                                    aria-valuemin="0" aria-valuemax="100">
+                                    {{ $project?->progress }}%
+                                </div>
+                              
+                            </div>
+                            <span class="font-12">Progess is calculates based on tasks completed</span>
+                        </div>
+                       
+
+              
                     <p class="mt-2">
                         @foreach ($project->assignees as $user)
                             <a style="text-decoration: none;"
@@ -27,8 +38,7 @@
                                     :title="$user->name" />
                             </a>
                         @endforeach
-                        <x-form-components.add-assignee 
-                        :action="route(getPanelRoutes('projects.addAssignee'))" :modal="$project" :teamMates="$teamMates"
+                        <x-form-components.add-assignee :action="route(getPanelRoutes('projects.addAssignee'))" :modal="$project" :teamMates="$teamMates"
                             :hw="40" />
 
                     </p>
