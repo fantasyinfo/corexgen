@@ -1,66 +1,88 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# CoreXgen CRM
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Overview
 
-## About Laravel
+CoreXgen CRM is a state-of-the-art business management solution designed to streamline operations, boost productivity, and drive growth. Built for companies of all sizes, including those running SaaS models, CoreXgen offers a modern, intuitive interface with powerful features to meet your business needs. Whether you are managing leads, tasks, projects, invoices, or more, CoreXgen ensures efficiency and flexibility every step of the way.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+-   **Multi-Language Support**: Seamlessly communicate with a global audience.
+-   **Dark & Light Theme**: Customize the interface for a visually appealing experience.
+-   **Dual Mode: Company & SaaS**: Choose between standalone company mode or SaaS mode for maximum flexibility.
+-   **Prebuilt Installer**: Get started quickly with an easy installation process.
+-   **Roles & Permissions Management**: Control user access and ensure secure collaboration.
+-   **Users & Employees Management**: Organize and manage your team efficiently.
+-   **Custom Fields**: Capture business-specific data effortlessly.
+-   **Leads Management with Kanban Board**: Track and manage leads with ease, including API integration for third-party tools.
+-   **Clients Management**: Maintain comprehensive client records for stronger relationships.
+-   **Products & Services Management**: Keep your inventory organized and accessible.
+-   **Proposal, Estimates & Contracts Management**: Simplify document workflows with digital signatures.
+-   **Project Management**: Plan, execute, and track projects with milestones and progress updates.
+-   **Tasks Management with Kanban Board**: Organize tasks efficiently with an interactive board.
+-   **Invoice Management with Online Payment**: Create invoices and enable secure online payments.
+-   **Calendar Events Management**: Schedule and manage events effortlessly.
+-   **Modules Management**: Extend functionality with customizable modules.
+-   **Import & Export**: Transfer data securely and efficiently.
+-   **Advanced Filters**: Refine data views for quick access to relevant information.
+-   **Bulk Delete**: Clean up records in a few clicks.
+-   **Activity & Logs Management**: Track system activity with detailed logs.
+-   **Plans & Features Management (SaaS)**: Manage subscription plans and features for SaaS clients.
+-   **Frontend Site Settings Management (SaaS)**: Customize your SaaS platform’s frontend appearance.
+-   **Theme Customization**: Align the interface with your branding.
+-   **Timesheet Management**: Track employee work hours and project progress.
+-   **Comments & Notes**: Collaborate effectively with built-in comments and notes.
+-   **Attachments**: Manage files and documents for tasks, projects, and clients.
+-   **Well-Commented Code**: Clean, organized codebase for easy customization.
+-   **Well-Documented Code**: Comprehensive documentation to simplify onboarding and development.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Demo Access
 
-## Learning Laravel
+### Company Demo (Admin Login)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+-   URL: [Company Demo](https://corexgen-company-demo.fantasyinfo.cloud/login)
+-   Email: `admin@company.com`
+-   Password: `demo123`
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### SaaS Demo (Super Admin Login)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+-   URL: [SaaS Demo - Super Admin](https://corexgen-saas-demo.fantasyinfo.cloud/login)
+-   Email: `superadmin@example.com`
+-   Password: `password123`
 
-## Laravel Sponsors
+### SaaS Demo (Company Admin Login)
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+-   URL: [SaaS Demo - Company Admin](https://corexgen-saas-demo.fantasyinfo.cloud/login)
+-   Email: `admin@company.com`
+-   Password: `demo123`
 
-### Premium Partners
+## Requirements
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+-   **Server**: Ubuntu, CentOS, or any Linux-based environment
+-   **Web Server**: Nginx or Apache
+-   **PHP**: Version 8.0+
+-   **Database**: MySQL 5.7+ or MariaDB
+-   **Additional Tools**: Composer, Node.js, npm/yarn
 
-## Contributing
+## Installation
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+1. Download the CoreXgen CRM package.
+2. Upload the files to your server.
+3. Set up a database and configure the `.env` file.
+4. Run the prebuilt installer by visiting the installation URL.
+5. Follow the on-screen instructions to complete the setup.
 
-## Code of Conduct
+## Credits
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+CoreXgen CRM is built using the following technologies and libraries:
 
-## Security Vulnerabilities
+-   PHP, Laravel, MySQL
+-   Bootstrap, Tailwind CSS, HTML, CSS
+-   Datatables, Select2
+-   FontAwesome, Google Fonts
+-   FlatPicker, Stripe
+-   DomPdf, Node.js, Composer
+-   JetStream, Fortify, Symfony Mailer
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Thank you for choosing CoreXgen CRM! We’re committed to helping you manage your business efficiently and effectively.
